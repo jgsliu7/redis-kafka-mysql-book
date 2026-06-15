@@ -46,7 +46,7 @@ thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
 figure.fig{margin:1.8em auto;text-align:center}
 .svg-wrap,.inline-svg{display:inline-block;max-width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{max-width:100%;height:auto;display:block;margin:0 auto}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:100%;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 .toc-toggle{display:none}
 @media(max-width:860px){
@@ -210,7 +210,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>第三类是<strong>异步解耦与流转</strong>。系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都需要一个中间介质把生产者和消费者解耦。这类能力的核心约束是吞吐与可扩展，单条延迟反而其次。</p>
 <p>三类能力互补而非替代。一个真实的电商订单系统会同时用到三者：Redis 存购物车与库存计数、MySQL 落订单与账户、Kafka 把"订单已创建"这个事件广播给履约、推荐、风控等下游。它们各司其职，谁也取代不了谁。</p>
 <p>我们用一句话给三类能力各配一个"代言人"：内存 → Redis；磁盘数据库 → MySQL；消息与流 → Kafka。下图把这种代言关系固定下来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -397,7 +397,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>本书采用<strong>主题式</strong>而非软件式的组织。每一章围绕一个架构主题——生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步——同时讲三家软件在该主题上的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这样做的好处有三。其一，避免知识孤岛：主题式组织强迫你把三家放在同一坐标系里看，天然形成对比。其二，突出架构共性：同一个问题（比如持久化、比如副本同步）反复出现，你就会发现三家给出的答案背后有共同的规律，这正是本书要提炼的东西。其三，训练对比分析能力——这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一家的人有价值。</p>
 <p>下面这张图给出全书的章节地图，让你一眼建立全局坐标系。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -538,7 +538,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>贯穿全章的有三对共同矛盾，它们会在后文三家做法中反复出现：</p>
 <ol><li><strong>一致性 vs 可用性。</strong> 启动时多恢复一步更安全，但用户等得更久；关闭时多刷一页更安全，但停服时间更长。</li><li><strong>速度 vs 确定性。</strong> 是追求快速就绪（懒加载、跳过校验），还是追求启动后处于"已知的确定状态"（全量校验、预分配）。</li><li><strong>单机视角 vs 分布式视角。</strong> 单机软件的关闭只关心自己；分布式组件的关闭是一个集群事件，要让 Leader 迁移、让副本同步可见。</li></ol>
 <p>图 2-1 把启动与关闭画成一对"对称"的过程：启动是重建，关闭是快照，中间任何一次崩溃或 <code>kill -9</code> 都会把系统强行推回"不完整状态"，逼着下次启动多做恢复工作。三对矛盾标在图的右侧，作为本章后续展开的红线。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -601,7 +601,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>第一段：配置默认值加覆盖。</strong> Redis 先用 <code>initServerConfig</code> 给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数逐层覆盖。这里的设计取舍是"先全量设默认值再逐层覆盖"，好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这个 bug 类别。这看起来不起眼，但很多线上事故就栽在某个配置项忘了初始化。</p>
 <p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略、SIGCHLD 回收 RDB/AOF 子进程）；调用 <code>aeCreateEventLoop</code> 创建事件循环；分配数据库数组；打开监听端口。这里有一个关键的取舍——<strong>核心数据结构在启动期预分配而非懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）、客户端结构池等核心结构一次性分配好，而不是等到运行期第一次用到时才分配。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。在这个分叉口，Redis 选了"启动确定性"，弃了"零内存启动"。</p>
 <p><strong>第三段：数据恢复——AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。图 2-2 完整呈现了这段流程。需要补充一句版本事实：Redis 7.0 引入了多分片 AOF（multi-part AOF），AOF 目录里的 base 文件本身就是 RDB 格式，后面才跟着记录增量写命令的 incr 文件——所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令，加载速度比 4.x 以前那种"纯命令重放"快很多。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -678,7 +678,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s29">关闭：三种触发，两条路径</h3>
 <p>关闭有三种触发方式：客户端发 <code>SHUTDOWN</code> 命令、收到 SIGTERM/SIGINT、守护条件触发（比如内存超限被父进程监视退出）。无论哪种触发，进入的处理流程都一样，只是"存不存数据"这一步的选择不同。</p>
 <p>图 2-3 画出了完整的关闭流程。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -783,7 +783,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>InnoDB 存储引擎启动段</strong>是真正的硬骨头，分三步：</p>
 <ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典。</li><li><strong>崩溃恢复</strong>——读 checkpoint LSN（日志序列号），从该位置扫描重做日志（redo log），把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用回滚日志（undo log）回滚所有未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理：redo 重放先无差别地把所有页修改补回去（恢复出崩溃瞬间的物理页状态），undo 回滚再撤掉未提交事务留下的痕迹，最终恢复出严格的事务一致性——已提交的全部保留，未提交的全部回滚。这是 ACID 里原子性（Atomicity）和持久性（Durability）在启动期的兑现。图 2-4 把崩溃恢复画成时序。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -877,7 +877,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s36">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络三段是理解 Kafka 启动的关键。</p>
 <ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起进入生产可用、3.5 起成为默认，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志。节点启动时要先追上这份元数据日志，才能知道"自己是谁、该服务哪些分区、当前 Controller 是谁"。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志住在一起、用同一套机制管理。</li><li><strong>日志管理器启动（恢复重头戏）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。为什么分区恢复是瓶颈？因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把活分摊开。</li><li><strong>三层网络架构。</strong> 这是 Kafka 高吞吐的骨架，值得单独看。图 2-5 画出了它的布局。</li></ol>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -979,7 +979,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用或失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。这条路径里 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>——Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才慌忙去重新选举那些原本由它当 Leader 的分区。选举期间分区短暂不可用，客户端会看到抖动。</p>
 <p><strong>受控关闭（Controlled Shutdown）</strong>是 Kafka 的亮点。Broker 在真正退出之前，先发请求给 Controller，告诉它"我要走了"。Controller 收到后，<strong>提前把该 Broker 上的 Leader 副本迁移到 ISR（同步副本集合）里还活着的其他副本</strong>——它会向这些副本发 LeaderAndIsr 请求，让它们接任 Leader。等所有 Leader 都迁移完，Controller 回执"你可以走了"，Broker 才走完整的刷盘退出流程。图 2-6 把这条时序和普通关闭画在一起做对照。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1139,7 +1139,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>LFU 看频率、LRU 看时间，这是两者的本质差异。举个具体场景：你跑一次全表扫描把一批冷数据读进 Redis，过几秒又来一波真正的热点查询。LRU 下，刚被扫到的冷数据"最新"，会顶掉前面的热数据；LFU 下，冷数据的计数器还是低值，热数据因为高频访问计数器已经爬高，被顶掉的会是冷数据。这就是 LFU 存在的理由。</p>
 <p>Redis 把淘汰策略做成八种，可以归成三组。<code>noeviction</code> 是内存满了直接报错、不淘汰，适合"数据不能丢"的场景。<code>allkeys-lru</code> / <code>allkeys-lfu</code> / <code>allkeys-random</code> 在全部键里挑淘汰对象。<code>volatile-lru</code> / <code>volatile-lfu</code> / <code>volatile-random</code> / <code>volatile-ttl</code> 只在设置了过期时间（TTL）的键里挑淘汰对象。第三组的存在是为了混合场景：同一份 Redis 既当缓存（带 TTL，可淘汰）又当小型持久存储（不带 TTL，永不淘汰）。理解了这层意图，选策略就不会盲目。</p>
 <p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1280,7 +1280,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 自 7.0 起默认就是 <code>yes</code>，是当前推荐配置。</p>
 <p>需要特别说明的是 <strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 3-3 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件，具体文件名以 7.x 实际实现为准。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，揭示 Redis"内存为主、磁盘为辅"的根本姿态。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1388,7 +1388,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>LRU List 是最值得讲的部分，因为 InnoDB 没有直接用朴素 LRU，而是把它改良成了"新老分区"。整个 LRU List 被一个叫 <code>midpoint</code> 的点分成两段：靠头的 <strong>New Sublist</strong> 占约 5/8，是热区；靠尾的 <strong>Old Sublist</strong> 占约 3/8，是冷区。一个从磁盘新读入的页不进热区头部，而是被插到 <code>midpoint</code>，也就是冷区的头部。它必须在冷区停留超过 <code>innodb_old_blocks_time</code>（默认 1000 毫秒）之后再次被访问，才有资格晋升进热区。</p>
 <p>这个改良专门为了对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们顶掉热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，下次被挤走时根本碰不到热区，真正的热数据安然无恙。这是一次"牺牲一点精度换抗污染能力"的取舍，效果极其显著。</p>
 <p>下图把三分链表和 midpoint 的位置画出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1513,7 +1513,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>重做日志（redo log）</strong>。重做日志是顺序追加写的。崩溃之后，InnoDB 用重做日志重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
 <p>为什么用顺序日志而不是直接随机写数据页？因为顺序写远快于随机写（呼应 3.1 节的伏笔）。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 IO；而把这些修改先打包成顺序日志追加写，只产生顺序 IO。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1652,7 +1652,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>第二，自己管内存会和 PageCache 形成"双份缓存"。如果 Kafka 在用户态也缓存一份数据，那同一份数据就在内核 PageCache 和用户态各占一份内存，白白浪费一倍。在大吞吐场景下，这点浪费很可观。</p>
 <p>第三，进程重启后 PageCache 仍在。这是依赖操作系统换来的最隐蔽也最值钱的红利。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好——升级 Kafka 不等于把读性能打回原形。</p>
 <p>下图把 Kafka 生产-存储-消费的零拷贝数据流画出来，对比传统拷贝路径。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 740" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 740" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1837,7 +1837,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s79">4.2.2 逻辑层：命令表 + robj 统一抽象</h3>
 <p>逻辑层是 Redis 的"大脑"，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 <code>redisCommandTable</code>，定义在 <code>server.c</code> 里，每条命令占一行。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。</p>
 <p>命令执行的流水线是这样跑的：RESP 解析完得到参数数组 <code>argv</code> 和参数个数 <code>argc</code> → 用命令名做一次 dict 哈希查到命令表条目 → ACL 权限校验和 arity 校验 → 调用 <code>cmd-&gt;proc(client)</code> 执行 → 跑慢查询日志和 MONITOR 钩子。下面这张图把这条流水线和它如何用 <code>client</code> 结构体衔接交互层与逻辑层画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -1922,7 +1922,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>图里最值得注意的不是纵向的六步流程，而是右边那个贯穿全程的虚线框——<code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针、当前 db 索引、输出缓冲区、用户与 ACL 标志。换句话说，<strong>整个会话上下文都挂在一个对象上</strong>。交互层往里写、逻辑层往外读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路（后面 4.3 节会细讲），区别只在 Redis 把交互层和逻辑层压在了同一线程，所以这个对象甚至不需要跨线程。</p>
 <p>这里有一个关键的设计取舍：<strong>把命令做成数据，而不是做成代码分支</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里塞新命令。这换来运行时可扩展，代价是表项的字段（命令标志位）一旦定下就很难改——加一个新标志位意味着要改遍所有命令的声明。</p>
 <p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 把所有数据类型装进同一个壳子的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义——这个对象是字符串、列表、哈希、集合还是有序集合，它决定了能执行哪些命令；encoding 决定内存表示——同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。7.0 起 listpack 全面取代了旧版 ziplist，成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码——这是为了消除 ziplist 著名的"连锁更新"问题（一个元素长度变化引发 O(n²) 级联搬移）。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowL43" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2030,7 +2030,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>认证本身是可插拔的——MySQL 8.0 默认使用 <code>caching_sha2_password</code>（带缓存的 SHA-2 认证，比旧的 <code>mysql_native_password</code> 更安全，并支持 TLS 证书协商）。SSL/TLS 在握手阶段协商，可以选择性启用。认证插件机制让 MySQL 能对接 LDAP、Kerberos、PAM 等外部身份系统，这是企业场景必备的能力。</p>
 <p>线程模型有两种。默认是 thread-per-connection：每个客户端连接分配一个独立线程，全程服务这个连接，断开时销毁。优点是隔离好、实现简单，缺点是高并发下线程数爆炸，线程切换和内存占用都会成为瓶颈。另一种是线程池（企业版、Percona、MariaDB 提供）：用一组固定数量的工作线程服务所有连接，连接进来后排队等空闲线程。优点是切换开销低、内存可控，缺点是某个慢查询会"队头阻塞"同一池子里的其他请求。两种模型的取舍是典型的隔离与吞吐之争，没有绝对的好坏，只有匹配不匹配场景。</p>
 <p>无论用哪种线程模型，MySQL 都有一个贯穿全链路的对象：<strong><code>THD</code>（类名 <code>THD</code>，源码里通常理解为 thread descriptor / 线程描述符，MySQL 官方文档并未给出权威展开）</strong>。每个连接创建一个 THD，里面塞着当前库、当前事务、会话变量、权限位图、错误栈、字符集、临时表列表……所有这条连接在生命周期内需要的状态。THD 会跟着请求穿过连接层、服务层、存储引擎层，每一层都从它里面读写自己关心的字段。下面这张时序图把 THD 如何贯穿三层画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr45" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2124,7 +2124,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s85">4.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>存储层是 MySQL 分层的灵魂，它的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约——一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）——所有这些组合起来，定义了"一个能被 MySQL 调用的存储引擎"长什么样。</p>
 <p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、多版本并发控制（MVCC，Multi-Version Concurrency Control）、缓冲池、重做日志与回滚日志，是 OLTP（联机事务处理）场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存——同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow44" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
@@ -2217,7 +2217,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>Processor</strong> 是一组线程（数量可配，典型几个到十几个），每个 Processor 管理一批连接的网络读写和协议编解码。它把客户端发来的字节流按 Kafka 协议解析成 <code>Request</code> 对象，塞进 RequestChannel；同时把 <code>Response</code> 从 RequestChannel 取出来，序列化写回客户端。</p>
 <p><strong>RequestChannel</strong> 是 Processor 与业务线程之间的桥梁——一个<strong>有界阻塞队列</strong>。它有界是关键：当业务线程处理不过来、队列填满时，Processor 的入队操作会阻塞，进而阻塞网络 IO。这是一个天然的背压（backpressure）点——消费慢的时候压力会一路回传到上游，避免内存被请求堆积拖垮。这种"用有界队列当流量调节器"的模式，是高吞吐系统的标配。</p>
 <p><strong>KafkaRequestHandler</strong> 是一组业务线程（数量可配，等于 <code>num.io.threads</code>），每个线程从 RequestChannel 里取请求，调用 <code>KafkaApis.handle()</code> 处理。下面这张图把这套四级结构画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr46" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2340,7 +2340,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>这里要重点讲一个让 Kafka 吞吐显著提升的机制：<strong>零拷贝（sendfile）</strong>。传统读取流程是：磁盘 → 内核缓冲区 → 用户态缓冲区 → 内核 socket 缓冲区 → 网卡，四次拷贝加四次上下文切换（<code>read</code> 与 <code>write</code> 各自一对进出内核态）。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉两次拷贝（在支持 scatter-gather DMA 的网卡上连这两次也免了，只剩 DMA 自身的拷贝）和两次上下文切换。这对消费历史数据（数据往往在页缓存里）的场景，性能提升是数量级的。</p>
 <p>但零拷贝有一个前提：<strong>数据必须是从文件到 socket 的纯转发，中间不能被修改</strong>。这恰好契合 Kafka 的语义——消息是不可变的字节流，Broker 拿到什么就转发什么。Kafka 把自己的存储设计成"零拷贝友好"，这是它性能的根因之一。</p>
 <p>下面这张时序图展示了 Kafka 的一个标志性设计：<strong>消费者读路径和副本同步路径是同一条</strong>。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr47" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2450,7 +2450,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h2 id="s93">4.5 横向对比</h2>
 <p>讲完三家，把它们压到同一个坐标系里看，才能看清"为什么不同"。这一节先用总览图建立视角，再用一张三栏对比表把六个维度并排放，最后解读分歧的根因。</p>
 <p>先用一张总览图把三段式视角如何映射到三家画出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowDown" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,0 L5,9 z" fill="#4B5563"/>
@@ -2598,7 +2598,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>在拆解三家实现之前，先把"数据系统的安全"抽象成一个共性问题。任何一个面向多用户的数据系统，都要在四条线上同时把守。</p>
 <p>第一条是<strong>认证（Authentication）</strong>，回答"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。第二条是<strong>授权（Authorization）</strong>，回答"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。第三条是<strong>加密（Encryption）</strong>，分为传输加密和存储加密：传输加密保证机密性与完整性在路上不被破坏，存储加密保证数据落盘后即使磁盘被盗也无法直接读取。第四条是<strong>审计（Audit）</strong>，回答"事后能否查清谁在什么时候做了什么"，是合规取证和事后复盘的依据。这四条线不是孤立的，它们在一次"客户端发起请求到数据落盘"的链路上各管一段。</p>
 <p>下面这张总览图把四维模型落在一次请求链路上，让你直观看到它们各自负责的范围。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2715,7 +2715,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>Redis 的授权把权限直接绑到用户，不做角色继承。前面说过，理由是用户数少、角色层是过度设计。授权的控制面是两个维度的组合：命令类别和键模式。</p>
 <p>命令类别是关键抽象。Redis 把上百条命令折叠成几个语义组：<code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code>、<code>@fast</code>、<code>@slow</code>。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分桶"的命名本身就是安全设计——它让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
 <p>为了把"会话级认证一次、每命令授权一次"这套模型讲清楚，下面这张时序图展示了一次完整连接里 Redis ACL 的工作流程。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2824,7 +2824,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s107">5.3.2 授权：多层级权限表加 8.0 RBAC</h3>
 <p>MySQL 的授权模型是三家里最复杂的，也是最精细的。权限按作用域分五层：全局、数据库、表、列、存储程序。这套层级不是装饰，它对应 <code>mysql.user</code>、<code>mysql.db</code>、<code>mysql.tables_priv</code>、<code>mysql.columns_priv</code>、<code>mysql.procs_priv</code> 多张权限表。授权检查时，从全局到列逐层收窄，命中即停。</p>
 <p>下面这张图展示了这条逐层收窄的检查流程。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2952,7 +2952,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>这里还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，形成鸡生蛋的僵局。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解，我们在 5.6 节会展开它的设计意义。</p>
 <p>监听器分层是 Kafka 区别于单机系统的关键能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密）、受信网络走 <code>SASL_PLAINTEXT</code>（认证但不加密，省 CPU）、对外走 <code>SSL</code>（仅加密）或独立的 <code>SASL_SSL</code>。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，下面这张图展示了它的典型布局。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3118,7 +3118,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>第四，元数据谁说了算。</strong> 哪个节点负责哪些分片？谁是当前的主？副本同步到哪了？这些元数据（metadata）放哪——是集中存到一个协调者（Controller）上，还是去中心化地用 Gossip 让所有节点最终一致？集中式强一致但有单点风险，去中心化无单点但收敛慢。这是集群架构的另一条主轴。</p>
 <p>这四个难题之上，还横着一条更根本的约束：<strong>CAP 定理</strong>。网络分区（Partition）是分布式绕不开的现实，于是一致性（Consistency）与可用性（Availability）必须取舍。P 是给定的，C 和 A 之间只能偏一头。Redis 偏 A，MySQL 偏 C，Kafka 在两端之间可调——这条主轴贯穿全章。</p>
 <p>下面我们看三家各自怎么走这条路。图 6-1 把三家的演进主线并列出来，便于先建立一个总体印象。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3237,7 +3237,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s131">6.2.3 Redis Cluster：分片加自动容错，去中心化元数据</h3>
 <p>Redis Cluster 是 Redis 真正意义上的分布式集群方案。它的三个关键词是：分片、自动容错、去中心化。</p>
 <p><strong>分片用 16384 个槽（slot）。</strong> Redis Cluster 不直接把 key 映射到节点，而是先映射到 0–16383 这 16384 个槽，再把槽分配给节点。映射公式是 <code>CRC16(key) mod 16384</code>。每个主节点负责其中一段连续或不连续的槽。为什么不直接 <code>hash(key) mod 节点数</code>？因为节点数会变，节点一变所有 key 都要重映射，而引入槽这一层中间抽象后，加节点只是把部分槽从老节点迁移到新节点，大部分 key 不动。图 6-2 把这套槽位划分和路由语义画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3362,7 +3362,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>每个分区在物理上有多个副本（replica），其中一个是 Leader、其余是 Follower。所有读写都走 Leader，Follower 主动从 Leader 拉取（fetch）数据追同步。这套 Leader-Follower 模型看着和 Redis、MySQL 的主从很像，但 Kafka 在"谁能当 Leader"上做了一个关键设计——<strong>ISR（In-Sync Replicas，同步副本集合）</strong>。</p>
 <p>ISR 是一个动态名单：只有那些能在 <code>replica.lag.time.max.ms</code> 这个时间窗口内跟上 Leader 进度的副本，才被算作"同步副本"，留在 ISR 里；跟不上（lag 超时）的副本会被 Leader 踢出 ISR。当 Leader 故障时，新 Leader <strong>只能从 ISR 里选</strong>——不在 ISR 里的副本，哪怕它数据更全，也没资格当选，因为它已经被判定为"落后太多，不可信"。这套设计的妙处在于：它把"副本是否可信"从静态配置（比如写死"3 副本才算数"）变成了动态判定（按实际同步进度实时调整），既能在节点慢下来时自动剔除、不拖累整体，又能在节点恢复时自动加回。</p>
 <p>和 ISR 紧密配合的是两个关键偏移量概念：<strong>LEO（Log End Offset，日志末尾位移）</strong> 是每个副本自己日志的最后一条消息的下一条位移，<strong>HW（High Watermark，高水位）</strong> 是消费者能看到的最大位移。HW 由 Leader 维护，等于当前 ISR 内所有副本 LEO 的最小值。这个语义非常关键：HW 之前（含）的消息才对消费者可见，HW 之后的消息即使 Leader 已经写入、消费者也看不到。为什么要这样设计？因为只有 ISR 全部都收到的消息，才不会在 Leader 切换时丢失——如果 Leader 把还没被 Follower 收到的消息暴露给消费者，那么 Leader 一宕机、新 Leader 是另一个 Follower（它没有这条消息），消费者就会"读到一条然后这条消失了"，违反一致性。HW 机制把"对消费者可见"与"已被 ISR 全部确认"绑定，保证了"消费者读到的消息不会因 Leader 切换而消失"。图 6-3 把 Leader、Follower、ISR、HW、LEO 五者的时间关系画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3492,7 +3492,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>分片策略的差异，反映的是定位差异。</strong> Redis 和 Kafka 都做分片，但粒度不同：Redis 是"key → 槽 → 节点"两层映射，槽是可迁移的最小单位；Kafka 是"key → 分区"直接映射，分区既是分片单位也是并行单位，没有中间抽象。MySQL 选择不分片，把这事交给上层中间件，是生态分工——它专注单机事务引擎的极致。三种选择没有对错，只有定位：Redis 和 Kafka 要扛海量数据和高吞吐，必须分片；MySQL 要扛强一致事务，先把单机和复制做到极致。</p>
 <p><strong>副本一致性模型，是一条从弱到强的光谱。</strong> Redis 纯异步在最左（最快、可丢），MySQL MGR 多数派在最右（不丢、最慢），Kafka 的 ISR 加 acks 是中间的可滑动点。这条光谱的横轴是写延迟，纵轴是一致性强度——没有免费的一致性，只有你愿意付多少延迟。MySQL 选 CP 是因为它要当交易账本，丢一笔就是事故；Redis 选 AP 是因为它常被当缓存，丢了从后端回源就行；Kafka 把旋钮交给使用者，是因为它的使用场景跨度太大（从日志采集的"尽力而为"到金融级流的"绝不丢"），写死任何一个都太武断。</p>
 <p><strong>故障检测与 Leader 选举，三家走了三条完全不同的路。</strong> Redis 用 Gossip 让所有节点去中心化地传播和投票，无单点但收敛慢；MySQL 用 XCom 在组内跑 Paxos，强一致但要凑齐多数派；Kafka 由活跃 Controller 集中地从 ISR 里选 Leader，仲裁集中、速度快但 Controller 本身是关键节点（用 KRaft 保证它高可用）。三种机制对应三种取舍：去中心化的鲁棒性 vs 共识协议的强一致 vs 集中仲裁的效率。图 6-4 把同一条"选新主"的决策路径在三家的差别并排画了出来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 680" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 680" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3688,7 +3688,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>Redis、MySQL、Kafka 都要回答同一组问题：基本 I/O 单元多大、写是追加还是原地改、怎么做崩溃恢复、怎么演进格式。但各自的约束南辕北辙，这直接把它们的格式推向了三种完全不同的骨架。</p>
 <p>对 Redis 来说，内存才是数据的家，磁盘是保险——存盘只为崩溃后恢复，不为线上查询。对 MySQL 来说，磁盘才是数据的家，内存（缓冲池）只是磁盘页的缓存——线上事务随时要读写任意一行，格式必须支持随机定位与原地改。对 Kafka 来说，磁盘就是日志本体本身——消息只有一份真相躺在日志段里，读靠索引而非扫描，写永远追加。这三句是后面三家所有格式差异的总根。</p>
 <p>我们先用一张图看清三家在"数据真正住在哪里"这件事上的权重差异。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3775,7 +3775,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>文件以一段固定魔数 <code>REDIS</code> 开头，紧跟 4 字节 ASCII 版本号。RDB 版本号随 Redis 主版本递增，且与 Redis 主版本号不一一对应：Redis 7.0 写出 RDB version 10，7.2 提升到 11，7.4 提升到 12（具体以 <code>src/rdb.h</code> 中的 <code>RDB_VERSION</code> 宏为准）。文件靠前缀自识别，不靠扩展名——任何一段字节流，只要开头是 <code>REDIS</code> 加合法版本号，加载器就认它。长度字段普遍采用变长整数编码（length-encoding），按实际大小自动选最省字节的表示：类型字节的高两位做档位选择——<code>00</code> 走 6 位（0–63）、<code>01</code> 走 14 位（0–16383）、<code>10</code> 走 32 位定长、<code>11</code> 则是特殊编码（int8/int16/int32/LZF 压缩串等，把数值或压缩后的串直接塞进这几个字节）。小长度（0–63）只需 1 个字节就搞定，连额外长度字段都省了。每一处省下来的字节，乘以全量快照的规模，就是显著的文件体积下降。</p>
 <p>值得专门提一句的是存储态编码与内存态编码的分离。内存里 Hash 可能用 listpack 编码，也可能用 hashtable 编码，存盘时并不照搬内存布局，而是按统一的紧凑二进制序列化；加载后由加载器按当前阈值重新决定编码。这种分离让磁盘格式不绑死内存数据结构的演进——内存编码升级，磁盘格式不需要跟着变。</p>
 <p>我们来看 RDB 文件的整体布局。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3887,7 +3887,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s156">7.2.4 混合持久化：工程实用主义的胜利</h3>
 <p>Redis 4.0 引入的混合持久化把前面的两套格式拼了起来（由 <code>aof-use-rdb-preamble</code> 开关控制，7.0 起默认开启）。文件头是 RDB 全量快照，尾部接 AOF 增量命令。设计意图很直接：取 RDB 的"加载快"（大头走二进制快速灌入）加上 AOF 的"少丢"（尾部增量精确回放自上次 RDB 之后的所有写命令）。一次重启，先用 RDB 快速把内存主体建起来，再回放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
 <p>我们用一张时序图看清 AOF 重写与混合持久化的双缓冲协作。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -3987,7 +3987,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s160">7.3.3 数据页内布局：把一行行记录塞进 16KB</h3>
 <p>知道了页是 16KB 之后，下一个问题是这 16KB 内部怎么布局。InnoDB 的数据页内部分成七段，从上到下依次是：FIL Header（38 字节，含页号、前后指针、LSN、页类型）、Page Header（56 字节，记录页内统计信息）、Infimum 与 Supremum 两条虚拟记录（界定这一页的最小与最大记录）、User Records（真正按主键有序存放的用户记录）、Free Space（剩余空间）、Page Directory（稀疏槽）、FIL Trailer（8 字节，存 LSN 与校验和）。前后各放一个 LSN 是为了让恢复时能验证页是否完整写入。</p>
 <p>我们用一张图看清这七段布局。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4088,7 +4088,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页落盘前，先顺序写到一段连续的双写区，再写到正式位置；恢复时若某页校验和不对，从双写区取回那个页的完整副本，再用 redo 重做到最新。双写区的物理位置随版本有过迁移：早期放在共享表空间（ibdata）内的一段连续区，8.0.20 起改为独立的 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大——同一份脏页要落两次盘，但因为双写区是连续的顺序写，对性能影响有限。</p>
 <p>redo log 本身是循环日志，按 512 字节块对齐。512 字节这个数字不是随便选的，它匹配传统磁盘扇区的原子写粒度——一次 512 字节的写要么完整要么不发生，不会留下半个扇区的撕裂。先写 redo（这就是 WAL，预写日志），再改页；崩溃后用 redo 把页重做到一致状态。8.0.30 之前 redo log 由固定数量、固定大小的文件循环写；8.0.30 起改为由 <code>innodb_redo_log_capacity</code> 统一管控的动态容量（可在运行期调整、无需重启，默认 100MB，允许范围 8MB 到 128GB，具体取值属调优细节），但"循环写 + 512B 块对齐"的物理骨架没变。redo 是物理到页、逻辑到操作的混合日志——记录的是"对哪个页偏移做了什么修改"，既不像纯物理日志那样体积大（每个字节改动都记一条），又不像纯逻辑日志那样难以幂等重做（重做同一个操作可能产生不同结果）。物理逻辑混合日志在"日志体积"与"恢复时能否幂等重做"之间取了折中。</p>
 <p>我们用一张图看清脏页落盘与崩溃恢复的完整路径。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4212,7 +4212,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的分区在磁盘上不是一个大文件，而是一串日志段（segment）。每个日志段是一组三个文件：<code>.log</code> 存消息数据本体、<code>.index</code> 存位移索引、<code>.timeindex</code> 存时间戳索引。三件套是一组——删日志段时三个文件一起删，压实（compaction）时三个文件一起重写，生命周期完全一致。</p>
 <p>文件名是该日志段的起始位移。比如 <code>00000000000000000000.log</code>、<code>00000000000000123456.log</code>，文件名本身就是这一段消息的最小位移。这是一个极聪明的设计——用文件系统目录结构免费做了一层稀疏索引。按位移定位一条消息时，先把目录里的文件名排序，二分找到起始位移不大于目标的最大那个日志段，再进 <code>.log</code> 内部细找。文件系统的目录就是这个分区的第一层索引，零额外开销。</p>
 <p>我们用一张图看清分区、日志段与三件套的关系。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4410,7 +4410,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <h3 id="s178">7.6.6 给实践者的三问</h3>
 <p>把上面五条原则落到实践，面对自己的存储设计先回答三个问题。第一问，数据会被原地改吗？这是最根本的分叉——会原地改，选定长页骨架（像 MySQL，页号即偏移，原地改加 WAL）；不会原地改，进下一问。第二问，访问是随机定位要快，还是批量流式进出？随机定位要快，走定长页加索引（B+ 树加页内稀疏槽）；批量流式进出且写远多于点查，走追加日志骨架（像 Kafka，纯追加加稀疏索引）；既不原地改也不批量流式、只需要崩溃后整体重建，走快照骨架（像 Redis 的 RDB 加 AOF）。其中"怕丢一小段还是怕全量重建慢"决定快照与增量日志的组合方式——怕丢选快照加增量日志（Redis 的混合持久化），怕恢复慢就提高快照频率、压缩增量。第三问，格式五年后还能被新代码读懂吗？能，靠预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位）兜底；不能，就现在补上——这是常被忽略但代价最大的一项。</p>
 <p>我们用一张决策树把这三问串起来。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4526,7 +4526,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p><strong>第三，传播到什么程度才算数。</strong> 主写完就告诉客户端"成功"，还是要等一个副本确认、多数派确认、所有副本确认？这是一个连续谱，不是一个二选一。</p>
 <p><strong>第四，传播断了或乱了怎么办。</strong> 网络一定会断、副本一定会重启、主节点一定会换。断了之后能不能不重头来，从哪里接着传？这要求系统记一份"进度坐标"，并能在重启时用它对齐。</p>
 <p>数据同步的这四个子问题，构成全章的分析骨架，见图 8-1。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4604,7 +4604,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>三家都在用这个模型，差异只在"序列"的载体和"执行"的方式：</p>
 <ul><li>Redis 的序列载体是命令流，副本直接执行命令；</li><li>MySQL 的序列载体是 binlog event，副本回放事件；</li><li>Kafka 的序列载体是分区日志里的消息，副本按位移追加。</li></ul>
 <p>状态机复制模型可以用图 8-2 一目了然地表达：同一份有序输入序列分别喂给三个副本，每个副本独立"执行"，最终状态必然相同。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4719,7 +4719,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（表示"我什么都没有"），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存到复制积压缓冲区（replication backlog）</strong>。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把积压缓冲区里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
 <p>这里的巧妙之处是第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。backlog 正是连接"过去那一刻"和"当前"的桥梁。</p>
 <p>代价同样清楚：<code>BGSAVE</code> 的 fork 在大实例上会有一瞬间的内存翻倍风险（写时复制）和短暂的停顿；RDB 文件在网络上的传输要消耗主节点的出口带宽。全量同步越频繁，这两项代价越痛——所以 Redis 才会下大力气做增量同步，把全量降级为"兜底手段"。Redis 全量同步与部分重同步的完整分支见图 8-3。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4807,7 +4807,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>副本断线重连时，把自己的 <code>replica_offset</code> 通过 <code>PSYNC &lt;replid&gt; &lt;offset&gt;</code> 报给主节点。主节点检查：这个 offset 还在 backlog 窗口内吗？</p>
 <ul><li>在 → <strong>部分重同步（partial resync）</strong>：只把 offset 到当前之间的差额命令发给副本，几乎瞬间追上。</li><li>不在 → 退回全量同步，从头来过。</li></ul>
 <p>backlog 窗口与主从 offset 的位置关系，见图 8-4。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -4914,7 +4914,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的传统异步复制是<strong>两段式</strong>的，背后是两个独立的线程：</p>
 <ul><li><strong>IO 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志（relay log）。这一段是"网络拉取"。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
 <p>主节点写 binlog、从节点 IO 线程拉到 relay log、SQL 线程回放，这条链路见图 8-5。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。本质上这是推拉结合：从节点拉、relay log 缓冲、本地推。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -5025,7 +5025,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>传统复制最大的痛点是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件，主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越后。</p>
 <p>8.0 的多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）给出了一个聪明的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放——这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
 <p>这个设计的取巧之处在于，它不在副本侧做复杂的冲突检测，而是借用主节点组提交时已经完成的事实判断，把并行性从主节点"搬运"到从节点。配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上能压到很小。并行复制与 MGR 共识的关系见图 8-6。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -5176,7 +5176,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <ul><li><strong>LEO（Log End Offset，日志末端位移）</strong>：每个副本（Leader 和 Follower 各自）维护自己的 LEO，表示"我的日志下一条要写到第几位"（即已有日志长度，比最后一条消息的位移大一）。这是每个副本的本地进度。</li><li><strong>HW（High Watermark，高水位）</strong>：Leader 维护的、等于<strong>当前 ISR 中所有副本的最小 LEO</strong>。HW 以下的消息才算"已提交"。</li></ul>
 <p>为什么 HW 是 ISR 中最小的 LEO？因为只有 ISR 里的副本才算"跟得上"，它们里进度最慢的那个，决定了"已确认"的边界——比这个边界更靠后的消息，至少有一个 ISR 副本还没收到，不能算数。消费者只能读到 HW 以下的消息，所以 HW 是消费者能看到的进度上限。</p>
 <p>这个设计的关键在于：HW 是一个<strong>动态的、由最慢者决定</strong>的进度线。ISR 里只要有一个副本变慢，HW 就被拖慢；变慢的副本一旦掉队到阈值之外，就被踢出 ISR，HW 重新由剩下的较快副本决定。HW 因此始终反映"当前 ISR 集合的实际同步进度"。Leader、Follower、ISR 与 HW 的时间关系见图 8-7。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -5402,7 +5402,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>换你做会怎样：设计系统时，先问"我最坏会处于哪些状态"，再为每个状态写"如何进、如何出"。能写出来才算可控；写不出来的状态，故障时一定会演变成事故。规律五其实是规律一的延伸 —— 真相之源之所以能被守护，是因为它的状态被显式建模，恢复路径被预先写定。</p>
 <h3 id="s239">9.2.6 规律小结</h3>
 <p>五条规律不是并列的清单，而是一棵树：第一条是根，后四条都在服务它。下面这张图把这种递进关系画清楚。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -5533,7 +5533,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>五个维度不是孤立的，它们会互相牵扯。比如维度一（速度 vs 持久性）和维度二（CP vs AP）常常联动：你越偏持久性，越倾向于 CP。这种联动是真实的工程现实，不必强求每个维度都独立打分，但要把牵扯记在心里。</p>
 <h3 id="s242">9.3.2 一个选型决策树</h3>
 <p>五个维度摆开之后，真正的问题是"我该怎么把它走通"。下图把取舍框架做成一棵可以一步步走的决策树。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -5697,7 +5697,7 @@ figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 <p>这张表的用法不是照抄三家的答案，而是借三家的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，三家的默认值差异巨大，正好提醒你 —— 这不是技术问题，是业务问题，得让业务方拍板。收束一句：<strong>这 12 个问题答完，选型往往就自己浮出来了 —— 因为约束已经替你做了决定</strong>。</p>
 <h3 id="s246">9.4.2 认知跃迁的四层台阶</h3>
 <p>读这本书的过程，本质上是一次认知坐标系的变换。这个过程可以拆成四层台阶。</p>
-<figure class="fig"><div class="svg-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>

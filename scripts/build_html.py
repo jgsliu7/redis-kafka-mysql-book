@@ -14,6 +14,8 @@ def load_svg(path):
     s = open(path, encoding='utf-8').read()
     s = re.sub(r'<\?xml[^>]*\?>\s*', '', s)   # 去 XML 声明
     s = re.sub(r'<!DOCTYPE[^>]*>\s*', '', s)
+    # 内联 SVG 没有 width/height 时浏览器会塌缩为 0×0；注入 width="100%" 保证可见
+    s = re.sub(r'(<svg\b)(?![^>]*\swidth=)', r'\1 width="100%"', s)
     return s  # <svg ...>...</svg>
 
 def split_row(line):
@@ -195,7 +197,7 @@ thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
 figure.fig{margin:1.8em auto;text-align:center}
 .svg-wrap,.inline-svg{display:inline-block;max-width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{max-width:100%;height:auto;display:block;margin:0 auto}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:100%;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.88em;margin-top:.6em;line-height:1.5}
 .toc-toggle{display:none}
 @media(max-width:860px){
