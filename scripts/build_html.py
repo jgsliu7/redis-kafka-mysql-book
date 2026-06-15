@@ -10,12 +10,21 @@ ROOT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.dirname(os
 def esc(s):
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
-def load_svg(path):
+def load_svg(path, prefix=''):
     s = open(path, encoding='utf-8').read()
     s = re.sub(r'<\?xml[^>]*\?>\s*', '', s)   # 去 XML 声明
     s = re.sub(r'<!DOCTYPE[^>]*>\s*', '', s)
     # 内联 SVG 没有 width/height 时浏览器会塌缩为 0×0；注入 width="100%" 保证可见
     s = re.sub(r'(<svg\b)(?![^>]*\swidth=)', r'\1 width="100%"', s)
+    # 内联到同一 HTML 时，各 SVG 的 <marker id="arrow"> 等会跨文件冲突
+    # （HTML 规范要求 id 唯一，且 url(#id) 会全部指向第一个同名定义）。
+    # 给每个图的 id 加上唯一前缀（基于文件名），同步替换 url(#...) 引用。
+    if prefix:
+        ids = set(re.findall(r'\bid="([^"]+)"', s))
+        for _id in ids:
+            s = s.replace('id="%s"' % _id, 'id="%s_%s"' % (prefix, _id))
+            s = s.replace('url(#%s)' % _id, 'url(#%s_%s)' % (prefix, _id))
+            s = s.replace('href="#%s"' % _id, 'href="#%s_%s"' % (prefix, _id))
     return s  # <svg ...>...</svg>
 
 def split_row(line):
@@ -247,7 +256,8 @@ def main():
         if diag and os.path.isdir(os.path.join(ROOT, diag)):
             for fn in sorted(os.listdir(os.path.join(ROOT, diag))):
                 if fn.endswith('.svg'):
-                    svg = load_svg(os.path.join(ROOT, diag, fn))
+                    prefix = fn.replace('.svg', '').replace('-', '_')  # fig-1-1 → fig_1_1
+                    svg = load_svg(os.path.join(ROOT, diag, fn), prefix)
                     svgmap['diagrams/' + fn] = '<div class="svg-wrap">' + svg + '</div>'
         html_body, heads = convert(md, svgmap, counter)
         sec_id = 'ch%d' % idx

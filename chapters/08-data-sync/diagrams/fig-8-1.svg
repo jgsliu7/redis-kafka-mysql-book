@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="410" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">数据同步的四个子问题</text>
+  <text x="410" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-1　数据同步的四个子问题</text>
   <text x="410" y="56" text-anchor="middle" font-size="13" fill="#374151">一道状态变化，要可靠、有界延迟地传播到其他副本</text>
 
   <!-- 中心节点：一处状态变化 -->

@@ -13,7 +13,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">MySQL 异步 / 半同步复制与 GTID 链路</text>
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-5　MySQL 异步 / 半同步复制与 GTID 链路</text>
   <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">两段式：IO 线程拉取 binlog 到 relay log，SQL 线程本地回放；半同步在主提交后等从的 ACK</text>
 
   <!-- ============ 主节点 Source ============ -->

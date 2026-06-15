@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis 复制积压缓冲区与 replication offset</text>
+  <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-4　Redis 复制积压缓冲区与 replication offset</text>
   <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">backlog 是一个固定大小的环形缓冲；主从各持一份字节进度坐标（offset），重连时比对两坐标的差</text>
 
   <!-- ============ 主节点侧 backlog 环形缓冲 ============ -->

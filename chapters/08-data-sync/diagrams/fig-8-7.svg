@@ -13,7 +13,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Kafka Follower FETCH + LEO/HW + leader epoch</text>
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-7　Kafka Follower FETCH + LEO/HW + leader epoch</text>
   <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">纯拉模式同步：HW = ISR 中最小 LEO，消费者只能读 HW 以下；leader epoch 防止老 Leader 复活导致的日志分叉</text>
 
   <!-- =========== 上半：LEO/HW 时序 =========== -->

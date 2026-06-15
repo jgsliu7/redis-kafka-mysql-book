@@ -13,7 +13,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">MySQL 多线程并行复制与组复制（MGR）共识</text>
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-6　MySQL 多线程并行复制与组复制（MGR）共识</text>
   <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">左：从库按组提交（LOGICAL_CLOCK）并行回放；右：MGR 把 binlog event 作为共识 log entry，多数派确认才提交</text>
 
   <!-- =========== 左半：多线程并行复制 =========== -->

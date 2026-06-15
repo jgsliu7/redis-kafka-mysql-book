@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">状态机复制模型</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-2　状态机复制模型</text>
   <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">若每个副本按相同顺序执行相同输入序列，最终状态必然相同 — 这是三家同步的共同底层模型</text>
 
   <!-- 顶部：同一个有序输入序列 -->

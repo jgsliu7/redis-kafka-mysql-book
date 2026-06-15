@@ -13,7 +13,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis PSYNC2 全量 + 部分重同步流程</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-3　Redis PSYNC2 全量 + 部分重同步流程</text>
   <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">断线重连后，靠 replication offset 与 backlog 窗口比对决定走哪条分支</text>
 
   <!-- 两条泳道头部 -->
