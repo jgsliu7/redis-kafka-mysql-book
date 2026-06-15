@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-3　Kafka Partition 的 HW / LEO 与 ISR 同步时序</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">HW（高水位）= ISR 中最小 LEO，决定消费者可见位移；只有 ISR 内的副本才有资格当选 Leader</text>
+
+  <!-- ===== Three lifelines: Producer / Leader / Follower ===== -->
+  <!-- Producer -->
+  <rect x="60" y="80" width="120" height="36" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="120" y="103" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">生产者</text>
+  <line x1="120" y1="116" x2="120" y2="560" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,4"/>
+
+  <!-- Leader -->
+  <rect x="340" y="80" width="140" height="36" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="410" y="103" text-anchor="middle" font-size="14" font-weight="600" fill="#059669">Leader 副本</text>
+  <line x1="410" y1="116" x2="410" y2="560" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,4"/>
+
+  <!-- Follower -->
+  <rect x="640" y="80" width="160" height="36" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="720" y="103" text-anchor="middle" font-size="14" font-weight="600" fill="#059669">Follower 副本（在 ISR）</text>
+  <line x1="720" y1="116" x2="720" y2="560" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,4"/>
+
+  <!-- offset axis label on the right -->
+  <text x="858" y="103" text-anchor="middle" font-size="12" fill="#6B7280">位移轴</text>
+
+  <!-- ===== Messages m1..m5 written to Leader ===== -->
+  <!-- Producer -> Leader m1 -->
+  <line x1="120" y1="145" x2="406" y2="145" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
+  <text x="263" y="138" text-anchor="middle" font-size="11" fill="#EF4444">写入 m1</text>
+
+  <!-- Producer -> Leader m2 -->
+  <line x1="120" y1="185" x2="406" y2="185" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
+  <text x="263" y="178" text-anchor="middle" font-size="11" fill="#EF4444">写入 m2</text>
+
+  <!-- Leader LEO advances to 2 -->
+  <rect x="402" y="155" width="16" height="50" fill="#059669"/>
+  <text x="430" y="175" font-size="11" fill="#111827">LEO=2</text>
+
+  <!-- Follower fetches m1, m2 -->
+  <line x1="716" y1="215" x2="414" y2="215" stroke="#059669" stroke-width="1.6" marker-end="url(#arrow-green)"/>
+  <text x="565" y="208" text-anchor="middle" font-size="11" fill="#059669">① fetch 拉取 m1, m2</text>
+
+  <!-- Leader -> Follower return data -->
+  <line x1="406" y1="240" x2="716" y2="240" stroke="#059669" stroke-width="1.6" marker-end="url(#arrow-green)"/>
+  <text x="565" y="233" text-anchor="middle" font-size="11" fill="#059669">② 返回 m1, m2 + Leader 当前 HW=0</text>
+
+  <!-- Follower LEO advances to 2 -->
+  <rect x="712" y="250" width="16" height="40" fill="#059669"/>
+  <text x="740" y="263" font-size="11" fill="#111827">LEO=2</text>
+
+  <!-- Follower -> Leader: fetch with updated LEO=2 -->
+  <line x1="716" y1="300" x2="414" y2="300" stroke="#059669" stroke-width="1.6" marker-end="url(#arrow-green)"/>
+  <text x="565" y="293" text-anchor="middle" font-size="11" fill="#059669">③ 下次 fetch，告知 Leader：我的 LEO=2</text>
+
+  <!-- Leader updates HW = min(LEO_Leader, LEO_Follower) = 2 -->
+  <rect x="402" y="318" width="16" height="20" fill="#4F46E5"/>
+  <text x="430" y="332" font-size="11" font-weight="600" fill="#4F46E5">HW 推进到 2</text>
+  <line x1="418" y1="335" x2="712" y2="335" stroke="#4F46E5" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="640" y="350" font-size="11" fill="#4F46E5">HW = min(Leader LEO, Follower LEO)</text>
+
+  <!-- Consumer can read up to HW=2 -->
+  <rect x="820" y="318" width="16" height="22" fill="#4F46E5"/>
+  <text x="846" y="335" font-size="11" font-weight="600" fill="#4F46E5">HW=2</text>
+  <text x="846" y="350" font-size="10" fill="#6B7280">消费者可见</text>
+
+  <!-- Producer writes m3, m4 -->
+  <line x1="120" y1="380" x2="406" y2="380" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
+  <text x="263" y="373" text-anchor="middle" font-size="11" fill="#EF4444">写入 m3, m4（Leader LEO=4）</text>
+  <rect x="402" y="360" width="16" height="40" fill="#059669"/>
+  <text x="430" y="383" font-size="11" fill="#111827">LEO=4</text>
+
+  <!-- Follower is slow, has not yet fetched m3,m4 -->
+  <text x="720" y="390" text-anchor="middle" font-size="11" fill="#D97706">Follower 滞后：仍 LEO=2</text>
+
+  <!-- HW stays at 2 because min(4,2)=2 -->
+  <rect x="820" y="395" width="16" height="22" fill="#4F46E5"/>
+  <text x="846" y="412" font-size="11" font-weight="600" fill="#4F46E5">HW=2</text>
+  <text x="846" y="427" font-size="10" fill="#6B7280">仍只可见到 m2</text>
+  <line x1="418" y1="412" x2="820" y2="412" stroke="#4F46E5" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ===== Legend / invariant box at bottom ===== -->
+  <rect x="40" y="455" width="860" height="130" rx="8" fill="#F9FAFB" stroke="#6B7280"/>
+  <text x="60" y="478" font-size="13" font-weight="700" fill="#111827">关键不变量与保证链路</text>
+
+  <!-- invariant 1 -->
+  <rect x="60" y="490" width="14" height="14" fill="#059669"/>
+  <text x="82" y="502" font-size="12" fill="#374151">LEO（Log End Offset）：每个副本日志的下一条待写位移，随写入单调增长。</text>
+
+  <!-- invariant 2 -->
+  <rect x="60" y="512" width="14" height="14" fill="#4F46E5"/>
+  <text x="82" y="524" font-size="12" fill="#374151">HW（High Watermark）：ISR 中所有副本 LEO 的最小值。只有 ≤ HW 的消息才对消费者可见。</text>
+
+  <!-- invariant 3 -->
+  <rect x="60" y="534" width="14" height="14" fill="#EF4444"/>
+  <text x="82" y="546" font-size="12" fill="#374151">ISR：在 replica.lag.time.max.ms 内跟上 Leader 的副本集合。Leader 故障时，只从 ISR 内选新 Leader。</text>
+
+  <!-- guarantee -->
+  <text x="60" y="572" font-size="12" font-style="italic" fill="#059669">结论：已推进到 HW 的消息必然已被 ISR 全体收到 → Leader 切换不会丢「已确认」消息（acks=all 前提下）。</text>
+</svg>

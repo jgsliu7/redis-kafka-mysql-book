@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-2 五条共性规律的递进关系</text>
+  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让真相之源又快、又稳、又可控</text>
+
+  <!-- ============ 规律一：真相之源（顶端，核心） ============ -->
+  <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定"真相之源"</text>
+  <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个真相之源，其余皆为派生物</text>
+  <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
+
+  <!-- "服务"主箭头：从规律一向下分叉到四条 -->
+  <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
+  <text x="455" y="178" font-size="11.5" fill="#EF4444" font-weight="600">后四条皆为之服务</text>
+
+  <!-- 横向汇流线 -->
+  <line x1="130" y1="200" x2="780" y2="200" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="130" y1="200" x2="130" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="340" y1="200" x2="340" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="550" y1="200" x2="550" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="780" y1="200" x2="780" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+
+  <!-- ============ 规律二：层包裹可变 ============ -->
+  <rect x="40" y="232" width="180" height="104" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="130" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律二</text>
+  <text x="130" y="275" text-anchor="middle" font-size="12.5" fill="#374151">用"层"把可变性</text>
+  <text x="130" y="291" text-anchor="middle" font-size="12.5" fill="#374151">关进笼子</text>
+  <line x1="58" y1="302" x2="202" y2="302" stroke="#4F46E5" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="130" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让实现可替换</text>
+  <text x="130" y="331" text-anchor="middle" font-size="11" fill="#6B7280">演进自由度</text>
+
+  <!-- ============ 规律三：顺序批量 ============ -->
+  <rect x="250" y="232" width="180" height="104" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="340" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律三</text>
+  <text x="340" y="275" text-anchor="middle" font-size="12.5" fill="#374151">把随机变顺序</text>
+  <text x="340" y="291" text-anchor="middle" font-size="12.5" fill="#374151">把一次变一批</text>
+  <line x1="268" y1="302" x2="412" y2="302" stroke="#059669" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="340" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更快</text>
+  <text x="340" y="331" text-anchor="middle" font-size="11" fill="#6B7280">提升吞吐</text>
+
+  <!-- ============ 规律四：一致性看价签 ============ -->
+  <rect x="460" y="232" width="180" height="104" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="550" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律四</text>
+  <text x="550" y="275" text-anchor="middle" font-size="12.5" fill="#374151">可靠性要用性能去买</text>
+  <text x="550" y="291" text-anchor="middle" font-size="12.5" fill="#374151">但要知道买的是什么</text>
+  <line x1="478" y1="302" x2="622" y2="302" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="550" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更稳</text>
+  <text x="550" y="331" text-anchor="middle" font-size="11" fill="#6B7280">权衡 RPO 与延迟</text>
+
+  <!-- ============ 规律五：状态显式建模 ============ -->
+  <rect x="690" y="232" width="150" height="104" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="765" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律五</text>
+  <text x="765" y="275" text-anchor="middle" font-size="12.5" fill="#374151">复杂状态显式建模</text>
+  <text x="765" y="291" text-anchor="middle" font-size="12.5" fill="#374151">故障恢复可预测</text>
+  <line x1="708" y1="302" x2="822" y2="302" stroke="#6B7280" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="765" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源</text>
+  <text x="765" y="331" text-anchor="middle" font-size="11" fill="#6B7280">可控可恢复</text>
+
+  <!-- 横向递进箭头：二 → 三 → 四 → 五（设计层面的递进） -->
+  <line x1="222" y1="284" x2="248" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
+  <line x1="432" y1="284" x2="458" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
+  <line x1="642" y1="284" x2="688" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
+  <text x="235" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+  <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+  <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+
+  <!-- ============ 底部：三家印证带 ============ -->
+  <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三家印证：同一条规律，三种语言</text>
+
+  <!-- Redis 列 -->
+  <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
+  <text x="182" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
+  <line x1="76" y1="442" x2="288" y2="442" stroke="#4F46E5" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存即真相，RDB/AOF 派生</text>
+  <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type 与 encoding 解耦</text>
+  <text x="76" y="502" font-size="11.5" fill="#374151">· 规律三：pipeline / Multi 压往返</text>
+  <text x="76" y="522" font-size="11.5" fill="#374151">· 规律四：appendfsync 三档价签</text>
+  <text x="76" y="542" font-size="11.5" fill="#374151">· 规律五：键空间 + RDB/AOF 恢复剧本</text>
+
+  <!-- MySQL 列 -->
+  <rect x="318" y="412" width="244" height="180" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
+  <text x="440" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
+  <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为真相，缓冲池派生</text>
+  <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
+  <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer / group commit</text>
+  <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的价签</text>
+  <text x="334" y="542" font-size="11.5" fill="#374151">· 规律五：ARIES 三阶段 + GTID</text>
+
+  <!-- Kafka 列 -->
+  <rect x="576" y="412" width="244" height="180" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1"/>
+  <text x="698" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
+  <line x1="592" y1="442" x2="804" y2="442" stroke="#059669" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为真相，副本派生</text>
+  <text x="592" y="482" font-size="11.5" fill="#374151">· 规律二：Log 接口分层，冷段可挪</text>
+  <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：Record Batch + 零拷贝</text>
+  <text x="592" y="522" font-size="11.5" fill="#374151">· 规律四：acks / min.insync 价签</text>
+  <text x="592" y="542" font-size="11.5" fill="#374151">· 规律五：HW/LEO + Controller 重选</text>
+
+  <!-- 底注 -->
+  <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示"服务关系"，灰虚线表示"设计递进"；五条规律不是并列清单，而是一条收束链。</text>
+</svg>

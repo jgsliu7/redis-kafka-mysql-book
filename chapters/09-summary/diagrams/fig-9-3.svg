@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-3 实践者选型决策树</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不是选 Redis 还是 MySQL，而是先把约束答清楚，再去三家"借形不借器"</text>
+
+  <!-- ============ 根节点 ============ -->
+  <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="460" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">我要建一个有状态的系统</text>
+  <text x="460" y="118" text-anchor="middle" font-size="12" fill="#374151">从根出发，依次回答四个问题</text>
+
+  <!-- 主干连线 -->
+  <line x1="460" y1="130" x2="460" y2="156" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ============ 问题一：能丢吗 ============ -->
+  <polygon points="460,158 612,212 460,266 308,212" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="200" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q1 · 数据能丢吗？</text>
+  <text x="460" y="220" text-anchor="middle" font-size="11.5" fill="#374151">（速度 vs 持久性）</text>
+  <text x="460" y="240" text-anchor="middle" font-size="11.5" fill="#374151">RPO 容忍度是多少？</text>
+
+  <!-- Q1 左分支：不能丢 -->
+  <line x1="308" y1="212" x2="180" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="180" y1="212" x2="180" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="240" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">不能丢</text>
+
+  <!-- Q1 右分支：可丢/可秒丢 -->
+  <line x1="612" y1="212" x2="740" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="740" y1="212" x2="740" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="680" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">可丢/可秒丢</text>
+
+  <!-- Q1 叶子 - 左 -->
+  <rect x="70" y="290" width="220" height="62" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="180" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏持久性档位</text>
+  <text x="180" y="330" text-anchor="middle" font-size="11" fill="#374151">真相之源不能丢</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 双1 / Kafka acks=all</text>
+
+  <!-- Q1 叶子 - 右 -->
+  <rect x="630" y="290" width="220" height="62" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="740" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏速度档位</text>
+  <text x="740" y="330" text-anchor="middle" font-size="11" fill="#374151">可容忍秒级丢</text>
+  <text x="740" y="345" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis everysec / 缓存场景</text>
+
+  <!-- ============ 问题二：一致性多强（中间主干） ============ -->
+  <line x1="460" y1="266" x2="460" y2="298" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <polygon points="460,300 600,348 460,396 320,348" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="338" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q2 · 一致性多强？</text>
+  <text x="460" y="356" text-anchor="middle" font-size="11.5" fill="#374151">（CP vs AP）</text>
+  <text x="460" y="374" text-anchor="middle" font-size="11.5" fill="#374151">分区时要"对"还是要"活"？</text>
+
+  <!-- Q2 左：偏强一致 -->
+  <line x1="320" y1="348" x2="200" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="348" x2="200" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 CP</text>
+
+  <!-- Q2 右：偏高可用 -->
+  <line x1="600" y1="348" x2="720" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="348" x2="720" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 AP</text>
+
+  <!-- Q2 叶子 - 左 -->
+  <rect x="90" y="414" width="220" height="58" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="200" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">少数派拒绝写</text>
+  <text x="200" y="453" text-anchor="middle" font-size="11" fill="#374151">金融核心 / 账本</text>
+  <text x="200" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL MGR / Kafka 多数派</text>
+
+  <!-- Q2 叶子 - 右 -->
+  <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区先接客</text>
+  <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
+  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
+
+  <!-- ============ 问题三：读写模式 ============ -->
+  <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <polygon points="460,428 600,472 460,516 320,472" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="462" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q3 · 读写模式？</text>
+  <text x="460" y="480" text-anchor="middle" font-size="11.5" fill="#374151">（空间 vs 时间）</text>
+  <text x="460" y="498" text-anchor="middle" font-size="11.5" fill="#374151">热点读 / 随机点查 / 顺序流？</text>
+
+  <!-- Q3 左：空间换时间 -->
+  <line x1="320" y1="472" x2="200" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="472" x2="200" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">空间换时间</text>
+
+  <!-- Q3 右：时间换空间 -->
+  <line x1="600" y1="472" x2="720" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="472" x2="720" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">时间换空间</text>
+
+  <!-- Q3 叶子 - 左 -->
+  <rect x="90" y="536" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">内存换 O(1) 访问</text>
+  <text x="200" y="575" text-anchor="middle" font-size="11" fill="#374151">热点读 / 随机点查</text>
+  <text x="200" y="588" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis / MySQL B+树索引</text>
+
+  <!-- Q3 叶子 - 右 -->
+  <rect x="610" y="536" width="220" height="58" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="720" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">顺序扫描兜底定位</text>
+  <text x="720" y="575" text-anchor="middle" font-size="11" fill="#374151">高吞吐追加 / 冷数据归档</text>
+  <text x="720" y="588" text-anchor="middle" font-size="11" fill="#6B7280">→ Kafka 稀疏索引 + 顺序扫描</text>
+
+  <!-- ============ 问题四：是否长期演进 ============ -->
+  <line x1="460" y1="516" x2="460" y2="546" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <polygon points="460,548 612,588 460,628 308,588" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="578" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q4 · 长期演进？</text>
+  <text x="460" y="596" text-anchor="middle" font-size="11.5" fill="#374151">（简单 vs 灵活）</text>
+  <text x="460" y="614" text-anchor="middle" font-size="11.5" fill="#374151">需求多变，还是规模可控？</text>
+
+  <!-- Q4 左：偏简单 -->
+  <line x1="308" y1="588" x2="200" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="588" x2="200" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏简单</text>
+
+  <!-- Q4 右：偏灵活 -->
+  <line x1="612" y1="588" x2="720" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="588" x2="720" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏灵活</text>
+
+  <!-- Q4 叶子 - 左 -->
+  <rect x="90" y="650" width="220" height="54" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">决策写死换性能</text>
+  <text x="200" y="688" text-anchor="middle" font-size="11" fill="#374151">规模可控、需求稳定</text>
+  <text x="200" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis 单线程无锁模型</text>
+
+  <!-- Q4 叶子 - 右 -->
+  <rect x="610" y="650" width="220" height="54" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="720" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">留开关换灵活性</text>
+  <text x="720" y="688" text-anchor="middle" font-size="11" fill="#374151">需求多变、长期演进</text>
+  <text x="720" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 可插拔引擎</text>
+
+  <!-- 中间收束提示 -->
+  <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
+  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型自己浮出来</text>
+  <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">约束已替你做了决定</text>
+
+  <!-- 底注 -->
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
+</svg>
