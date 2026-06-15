@@ -150,6 +150,7 @@ CHAPTERS = [
     ('chapters/08-data-sync/chapter.md', 'chapters/08-data-sync/diagrams'),
     ('chapters/09-summary/chapter.md', 'chapters/09-summary/diagrams'),
     ('chapters/10-epilogue.md', None),
+    ('chapters/11-references.md', None),
 ]
 
 CSS = """
