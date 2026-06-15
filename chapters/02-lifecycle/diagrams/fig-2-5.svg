@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <text x="460" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 2-5　Kafka 三层网络架构</text>
+
+  <!-- Clients -->
+  <rect x="40" y="80" width="120" height="44" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="100" y="107" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">生产者 / 消费者</text>
+
+  <rect x="40" y="140" width="120" height="44" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="100" y="167" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">客户端连接</text>
+
+  <!-- Layer 1: Acceptor -->
+  <rect x="240" y="100" width="160" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="320" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Acceptor（1 个）</text>
+  <text x="320" y="146" text-anchor="middle" font-size="12" fill="#374151">接收新连接</text>
+  <text x="320" y="160" text-anchor="middle" font-size="11" fill="#374151">轮询分发给 Processor</text>
+
+  <!-- arrows clients -> acceptor -->
+  <path d="M160 102 L238 124" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M160 162 L238 140" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Layer 2: Processors (3) -->
+  <rect x="240" y="210" width="160" height="40" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="320" y="236" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Processor（默认 3 个）</text>
+
+  <rect x="240" y="260" width="160" height="36" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
+  <text x="320" y="283" text-anchor="middle" font-size="12" fill="#374151">解析协议帧</text>
+
+  <!-- acceptor -> processor -->
+  <path d="M320 166 L320 208" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Request queue -->
+  <rect x="240" y="320" width="160" height="50" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="320" y="343" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">请求队列</text>
+  <text x="320" y="361" text-anchor="middle" font-size="11" fill="#374151">RequestQueue（共享）</text>
+
+  <!-- processor -> request queue -->
+  <path d="M320 296 L320 318" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
+
+  <!-- Layer 3: Handler 线程池 -->
+  <rect x="480" y="100" width="180" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="570" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Handler 线程池</text>
+  <text x="570" y="146" text-anchor="middle" font-size="12" fill="#374151">执行真正的业务逻辑</text>
+  <text x="570" y="160" text-anchor="middle" font-size="11" fill="#374151">（读写日志、副本同步等）</text>
+
+  <rect x="480" y="190" width="180" height="40" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
+  <text x="570" y="215" text-anchor="middle" font-size="12" fill="#374151">num.io.threads（CPU 密集）</text>
+
+  <!-- request queue -> handler (dequeue) -->
+  <path d="M400 330 C 440 330, 440 130, 478 130" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
+
+  <!-- Response queue -->
+  <rect x="480" y="320" width="180" height="50" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="570" y="343" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">响应队列</text>
+  <text x="570" y="361" text-anchor="middle" font-size="11" fill="#374151">ResponseQueue（每 Processor 一个）</text>
+
+  <!-- handler -> response queue -->
+  <path d="M570 230 L570 318" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
+
+  <!-- response queue -> processor (back) -->
+  <path d="M478 350 C 440 350, 400 290, 400 290" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
+
+  <!-- processor -> clients (response out) -->
+  <path d="M238 280 C 180 280, 160 175, 162 162" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
+
+  <!-- Right side: design intent -->
+  <rect x="720" y="100" width="170" height="270" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="805" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">设计意图</text>
+  <text x="734" y="152" font-size="12" fill="#374151">I/O 密集（收发）</text>
+  <text x="734" y="170" font-size="12" fill="#374151">与 CPU 密集（处理）</text>
+  <text x="734" y="188" font-size="12" fill="#374151">分到不同线程池</text>
+  <text x="734" y="222" font-size="12" fill="#374151">避免互相拖累</text>
+  <text x="734" y="256" font-size="12" fill="#374151">队列作为线程池</text>
+  <text x="734" y="274" font-size="12" fill="#374151">之间的解耦点</text>
+  <text x="734" y="308" font-size="12" fill="#374151">这是 Kafka 高吞吐</text>
+  <text x="734" y="326" font-size="12" fill="#374151">的骨架</text>
+
+  <!-- Bottom annotation: startup order -->
+  <rect x="40" y="420" width="850" height="138" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="446" font-size="14" font-weight="700" fill="#111827">三层网络在启动链路中的位置（KRaft 模式）</text>
+  <text x="60" y="472" font-size="12.5" fill="#374151">① 日志 / 配置初始化　→　② 元数据管理初始化（追上 Raft 元数据日志）</text>
+  <text x="60" y="492" font-size="12.5" fill="#374151">→　③ 日志管理器启动（恢复每个 TopicPartition，靠 num.recovery.threads 并行）</text>
+  <text x="60" y="512" font-size="12.5" fill="#374151">→　④ 三层网络架构启动（Acceptor / Processor / Handler）　→　⑤ 副本管理器 / Controller / 注册集群</text>
+  <text x="60" y="540" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
+</svg>

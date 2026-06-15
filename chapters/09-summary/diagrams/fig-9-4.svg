@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-5 认知跃迁的四层台阶</text>
+  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-4 认知跃迁的四层台阶</text>
   <text x="450" y="53" text-anchor="middle" font-size="13" fill="#6B7280">从使用者到设计者，跨越的不是知识量，而是看问题的坐标系</text>
 
   <!-- 台阶：从下到上 L1 → L4，宽度递增、高度递增、左对齐基线相同 -->

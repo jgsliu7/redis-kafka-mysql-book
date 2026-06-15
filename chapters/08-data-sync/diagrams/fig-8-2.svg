@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,74 +7,93 @@
     <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
-    </marker>
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis PSYNC2 全量 + 部分重同步流程</text>
-  <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">断线重连后，靠 replication offset 与 backlog 窗口比对决定走哪条分支</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">状态机复制模型</text>
+  <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">若每个副本按相同顺序执行相同输入序列，最终状态必然相同 — 这是三家同步的共同底层模型</text>
 
-  <!-- 两条泳道头部 -->
-  <rect x="110" y="78" width="120" height="40" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="170" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">从节点 Replica</text>
+  <!-- 顶部：同一个有序输入序列 -->
+  <rect x="120" y="80" width="640" height="62" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="440" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">同一个有序输入序列（log / 日志 / 命令流）</text>
+  <text x="180" y="124" font-size="12" fill="#374151">op1</text>
+  <text x="220" y="124" font-size="12" fill="#6B7280">→</text>
+  <text x="260" y="124" font-size="12" fill="#374151">op2</text>
+  <text x="300" y="124" font-size="12" fill="#6B7280">→</text>
+  <text x="340" y="124" font-size="12" fill="#374151">op3</text>
+  <text x="380" y="124" font-size="12" fill="#6B7280">→</text>
+  <text x="420" y="124" font-size="12" fill="#374151">op4</text>
+  <text x="460" y="124" font-size="12" fill="#6B7280">→</text>
+  <text x="500" y="124" font-size="12" fill="#374151">op5</text>
+  <text x="540" y="124" font-size="12" fill="#6B7280">→</text>
+  <text x="600" y="124" font-size="12" fill="#374151">op6 …</text>
 
-  <rect x="650" y="78" width="120" height="40" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="710" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">主节点 Master</text>
+  <!-- 分发到三个副本（Redis / MySQL / Kafka 配色） -->
+  <line x1="200" y1="142" x2="160" y2="178" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="440" y1="142" x2="440" y2="178" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="680" y1="142" x2="720" y2="178" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
 
-  <!-- 生命线 -->
-  <line x1="170" y1="118" x2="170" y2="585" stroke="#4B5563" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="710" y1="118" x2="710" y2="585" stroke="#4B5563" stroke-width="1" stroke-dasharray="4 4"/>
+  <!-- =========== 副本 A：Redis =========== -->
+  <rect x="40" y="182" width="240" height="240" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
+  <text x="160" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">副本 A · Redis</text>
+  <text x="160" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：命令流</text>
 
-  <!-- 步骤1：重连 + PSYNC replid,offset -->
-  <line x1="178" y1="150" x2="702" y2="150" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="440" y="142" text-anchor="middle" font-size="12" fill="#111827">① 断线重连：PSYNC &lt;replid&gt; &lt;offset&gt;</text>
+  <text x="60" y="250" font-size="12" fill="#374151">初始状态 S0</text>
+  <line x1="60" y1="258" x2="260" y2="258" stroke="#4F46E5" stroke-width="0.8" stroke-dasharray="3 2"/>
 
-  <!-- 步骤2：主节点比对（决策框，放中线上） -->
-  <rect x="440" y="178" width="220" height="92" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="550" y="202" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">② 主节点比对</text>
-  <text x="550" y="222" text-anchor="middle" font-size="12" fill="#374151">replid 一致？</text>
-  <text x="550" y="240" text-anchor="middle" font-size="12" fill="#374151">offset 是否在 backlog 窗口内？</text>
-  <text x="550" y="260" text-anchor="middle" font-size="11" fill="#6B7280">backlog 默认约 1MB</text>
-  <line x1="550" y1="178" x2="550" y2="150" stroke="#4B5563" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="60" y="280" font-size="12" fill="#111827">apply(op1) → S1</text>
+  <text x="60" y="300" font-size="12" fill="#111827">apply(op2) → S2</text>
+  <text x="60" y="320" font-size="12" fill="#111827">apply(op3) → S3</text>
+  <text x="60" y="340" font-size="12" fill="#111827">apply(op4) → S4</text>
+  <text x="60" y="360" font-size="12" fill="#111827">apply(op5) → S5</text>
+  <line x1="60" y1="368" x2="260" y2="368" stroke="#4F46E5" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <text x="60" y="392" font-size="12" font-weight="700" fill="#059669">最终状态 S5</text>
+  <text x="60" y="410" font-size="11" fill="#6B7280">执行方式：命令解释执行</text>
 
-  <!-- 分支标签 -->
-  <text x="370" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（窗口内）</text>
-  <text x="710" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（窗口外）</text>
+  <!-- =========== 副本 B：MySQL =========== -->
+  <rect x="320" y="182" width="240" height="240" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
+  <text x="440" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">副本 B · MySQL</text>
+  <text x="440" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：binlog event</text>
 
-  <!-- 左分支：部分重同步 -->
-  <rect x="60" y="320" width="320" height="158" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="220" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">部分重同步（Partial Resync）</text>
-  <text x="80" y="368" font-size="12" fill="#374151">③ 主节点：+CONTINUE</text>
-  <text x="80" y="388" font-size="12" fill="#374151">④ 从 backlog 中取出 offset 之后</text>
-  <text x="92" y="406" font-size="12" fill="#374151">的差额命令，增量补发</text>
-  <text x="80" y="430" font-size="12" fill="#374151">⑤ 从节点回放差额命令，offset 追平</text>
-  <text x="80" y="458" font-size="11" font-weight="600" fill="#059669">代价低：只补差额，主节点不 fork</text>
+  <text x="340" y="250" font-size="12" fill="#374151">初始状态 S0</text>
+  <line x1="340" y1="258" x2="540" y2="258" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3 2"/>
 
-  <!-- 左分支连线 -->
-  <path d="M 470 270 Q 380 290 290 320" fill="none" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="340" y="280" font-size="12" fill="#111827">apply(op1) → S1</text>
+  <text x="340" y="300" font-size="12" fill="#111827">apply(op2) → S2</text>
+  <text x="340" y="320" font-size="12" fill="#111827">apply(op3) → S3</text>
+  <text x="340" y="340" font-size="12" fill="#111827">apply(op4) → S4</text>
+  <text x="340" y="360" font-size="12" fill="#111827">apply(op5) → S5</text>
+  <line x1="340" y1="368" x2="540" y2="368" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <text x="340" y="392" font-size="12" font-weight="700" fill="#059669">最终状态 S5</text>
+  <text x="340" y="410" font-size="11" fill="#6B7280">执行方式：SQL 线程回放</text>
 
-  <!-- 右分支：全量同步 -->
-  <rect x="500" y="320" width="340" height="158" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
-  <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
-  <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
-  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入 backlog</text>
-  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发积压命令</text>
-  <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
+  <!-- =========== 副本 C：Kafka =========== -->
+  <rect x="600" y="182" width="240" height="240" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
+  <text x="720" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">副本 C · Kafka</text>
+  <text x="720" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：消息日志</text>
 
-  <!-- 右分支连线 -->
-  <path d="M 640 270 Q 720 290 800 320" fill="none" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="620" y="250" font-size="12" fill="#374151">初始状态 S0</text>
+  <line x1="620" y1="258" x2="820" y2="258" stroke="#059669" stroke-width="0.8" stroke-dasharray="3 2"/>
 
-  <!-- 汇合 -->
-  <path d="M 220 478 Q 220 510 350 530" fill="none" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="4 4"/>
-  <path d="M 670 478 Q 670 510 540 530" fill="none" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="4 4"/>
+  <text x="620" y="280" font-size="12" fill="#111827">apply(op1) → S1</text>
+  <text x="620" y="300" font-size="12" fill="#111827">apply(op2) → S2</text>
+  <text x="620" y="320" font-size="12" fill="#111827">apply(op3) → S3</text>
+  <text x="620" y="340" font-size="12" fill="#111827">apply(op4) → S4</text>
+  <text x="620" y="360" font-size="12" fill="#111827">apply(op5) → S5</text>
+  <line x1="620" y1="368" x2="820" y2="368" stroke="#059669" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <text x="620" y="392" font-size="12" font-weight="700" fill="#059669">最终状态 S5</text>
+  <text x="620" y="410" font-size="11" fill="#6B7280">执行方式：日志追加复制</text>
 
-  <!-- 终态 -->
-  <rect x="330" y="538" width="220" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="440" y="563" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">从节点 offset 追平，恢复增量同步</text>
+  <!-- 三路汇合到同一最终状态 -->
+  <line x1="160" y1="422" x2="380" y2="448" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <line x1="440" y1="422" x2="440" y2="448" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <line x1="720" y1="422" x2="500" y2="448" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
 
-  <!-- 底注 -->
-  <text x="440" y="602" text-anchor="middle" font-size="12" fill="#6B7280">取舍：backlog 是"断线容忍窗口"与"内存占用"的折中 — 窗口越大越能救回部分重同步</text>
+  <rect x="270" y="452" width="340" height="44" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="440" y="472" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">三个副本最终状态必然相同</text>
+  <text x="440" y="489" text-anchor="middle" font-size="11" fill="#374151">差异只在序列的载体与执行的方式</text>
+
+  <!-- 底注箴言 -->
+  <rect x="60" y="514" width="760" height="34" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="440" y="535" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">箴言：同步不是搬运数据，而是重放历史</text>
 </svg>

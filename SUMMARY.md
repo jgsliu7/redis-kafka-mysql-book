@@ -24,3 +24,6 @@
 
 ## 后记
 - [后记](chapters/10-epilogue.md)
+
+## 附录
+- [附录　参考文献与延伸阅读](chapters/11-references.md)

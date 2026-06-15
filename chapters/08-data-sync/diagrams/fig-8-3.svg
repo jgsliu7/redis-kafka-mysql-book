@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,79 +7,74 @@
     <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
   </defs>
 
   <!-- 标题 -->
-  <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis 复制积压缓冲区与 replication offset</text>
-  <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">backlog 是一个固定大小的环形缓冲；主从各持一份字节进度坐标（offset），重连时比对两坐标的差</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis PSYNC2 全量 + 部分重同步流程</text>
+  <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">断线重连后，靠 replication offset 与 backlog 窗口比对决定走哪条分支</text>
 
-  <!-- ============ 主节点侧 backlog 环形缓冲 ============ -->
-  <text x="430" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">主节点 Master · 复制积压缓冲区（backlog，默认约 1MB）</text>
+  <!-- 两条泳道头部 -->
+  <rect x="110" y="78" width="120" height="40" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="170" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">从节点 Replica</text>
 
-  <!-- 环形缓冲：8 格 -->
-  <g transform="translate(80,108)">
-    <!-- 8 个格子，环形排列 -->
-    <rect x="0" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-    <text x="40" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd A</text>
-    <text x="40" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=100</text>
+  <rect x="650" y="78" width="120" height="40" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="710" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">主节点 Master</text>
 
-    <rect x="84" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-    <text x="124" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd B</text>
-    <text x="124" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=160</text>
+  <!-- 生命线 -->
+  <line x1="170" y1="118" x2="170" y2="585" stroke="#4B5563" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="710" y1="118" x2="710" y2="585" stroke="#4B5563" stroke-width="1" stroke-dasharray="4 4"/>
 
-    <rect x="168" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-    <text x="208" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd C</text>
-    <text x="208" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=220</text>
+  <!-- 步骤1：重连 + PSYNC replid,offset -->
+  <line x1="178" y1="150" x2="702" y2="150" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="440" y="142" text-anchor="middle" font-size="12" fill="#111827">① 断线重连：PSYNC &lt;replid&gt; &lt;offset&gt;</text>
 
-    <rect x="252" y="40" width="80" height="56" rx="4" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
-    <text x="292" y="64" text-anchor="middle" font-size="11" fill="#111827">cmd D（新写）</text>
-    <text x="292" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=280</text>
+  <!-- 步骤2：主节点比对（决策框，放中线上） -->
+  <rect x="440" y="178" width="220" height="92" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="550" y="202" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">② 主节点比对</text>
+  <text x="550" y="222" text-anchor="middle" font-size="12" fill="#374151">replid 一致？</text>
+  <text x="550" y="240" text-anchor="middle" font-size="12" fill="#374151">offset 是否在 backlog 窗口内？</text>
+  <text x="550" y="260" text-anchor="middle" font-size="11" fill="#6B7280">backlog 默认约 1MB</text>
+  <line x1="550" y1="178" x2="550" y2="150" stroke="#4B5563" stroke-width="1" stroke-dasharray="3 3"/>
 
-    <rect x="336" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="376" y="64" text-anchor="middle" font-size="11" fill="#6B7280">…（环形回绕）…</text>
-    <text x="376" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=340</text>
+  <!-- 分支标签 -->
+  <text x="370" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（窗口内）</text>
+  <text x="710" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（窗口外）</text>
 
-    <rect x="420" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="460" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
-    <text x="460" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=400</text>
+  <!-- 左分支：部分重同步 -->
+  <rect x="60" y="320" width="320" height="158" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="220" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">部分重同步（Partial Resync）</text>
+  <text x="80" y="368" font-size="12" fill="#374151">③ 主节点：+CONTINUE</text>
+  <text x="80" y="388" font-size="12" fill="#374151">④ 从 backlog 中取出 offset 之后</text>
+  <text x="92" y="406" font-size="12" fill="#374151">的差额命令，增量补发</text>
+  <text x="80" y="430" font-size="12" fill="#374151">⑤ 从节点回放差额命令，offset 追平</text>
+  <text x="80" y="458" font-size="11" font-weight="600" fill="#059669">代价低：只补差额，主节点不 fork</text>
 
-    <rect x="504" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="544" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
-    <text x="544" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=460</text>
+  <!-- 左分支连线 -->
+  <path d="M 470 270 Q 380 290 290 320" fill="none" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
 
-    <rect x="588" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="628" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
-    <text x="628" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=520</text>
+  <!-- 右分支：全量同步 -->
+  <rect x="500" y="320" width="340" height="158" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
+  <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
+  <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
+  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入 backlog</text>
+  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发积压命令</text>
+  <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
 
-    <!-- 环形回绕弧线（从右端到左端） -->
-    <path d="M 670 60 Q 740 60 740 20 Q 740 0 40 0 Q 0 0 0 30" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="745" y="30" font-size="10" fill="#6B7280">回绕</text>
+  <!-- 右分支连线 -->
+  <path d="M 640 270 Q 720 290 800 320" fill="none" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
 
-    <!-- 主 offset 指针 -->
-    <line x1="292" y1="100" x2="292" y2="120" stroke="#EF4444" stroke-width="2"/>
-    <polygon points="286,118 298,118 292,128" fill="#EF4444"/>
-    <text x="300" y="135" font-size="12" font-weight="700" fill="#EF4444">主 master_repl_offset = 280</text>
-  </g>
+  <!-- 汇合 -->
+  <path d="M 220 478 Q 220 510 350 530" fill="none" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="4 4"/>
+  <path d="M 670 478 Q 670 510 540 530" fill="none" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="4 4"/>
 
-  <!-- ============ 从节点侧 offset ============ -->
-  <text x="430" y="278" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">从节点 Replica · 记录自己已同步到的字节进度</text>
-
-  <rect x="180" y="296" width="500" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="430" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">从节点本地的复制进度坐标</text>
-  <text x="430" y="338" text-anchor="middle" font-size="13" fill="#EF4444" font-weight="700">replica offset = 160（断线前同步到 cmd B）</text>
-
-  <!-- ============ 比对与结论 ============ -->
-  <line x1="430" y1="352" x2="430" y2="380" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
-
-  <rect x="100" y="386" width="660" height="120" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">重连时比对：主 offset 280 − 从 offset 160 = 差额 120 字节</text>
-
-  <text x="120" y="438" font-size="12.5" fill="#374151">① 若差额落在 backlog 窗口内（280−520） → cmd B 之后的 cmd C、cmd D 仍在缓冲</text>
-  <text x="120" y="458" font-size="12.5" font-weight="700" fill="#059669">     ⇒ 走部分重同步：只补发差额命令，主节点不 fork</text>
-
-  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外） → 所需命令已被新命令挤出 backlog</text>
-  <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
+  <!-- 终态 -->
+  <rect x="330" y="538" width="220" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="440" y="563" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">从节点 offset 追平，恢复增量同步</text>
 
   <!-- 底注 -->
-  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节坐标，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
+  <text x="440" y="602" text-anchor="middle" font-size="12" fill="#6B7280">取舍：backlog 是"断线容忍窗口"与"内存占用"的折中 — 窗口越大越能救回部分重同步</text>
 </svg>

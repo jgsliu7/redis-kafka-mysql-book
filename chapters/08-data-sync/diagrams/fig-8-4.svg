@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,90 +7,79 @@
     <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
-    </marker>
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">MySQL 异步 / 半同步复制与 GTID 链路</text>
-  <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">两段式：IO 线程拉取 binlog 到 relay log，SQL 线程本地回放；半同步在主提交后等从的 ACK</text>
+  <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Redis 复制积压缓冲区与 replication offset</text>
+  <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">backlog 是一个固定大小的环形缓冲；主从各持一份字节进度坐标（offset），重连时比对两坐标的差</text>
 
-  <!-- ============ 主节点 Source ============ -->
-  <rect x="30" y="80" width="240" height="380" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
-  <text x="150" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">主节点 Source</text>
+  <!-- ============ 主节点侧 backlog 环形缓冲 ============ -->
+  <text x="430" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">主节点 Master · 复制积压缓冲区（backlog，默认约 1MB）</text>
 
-  <rect x="50" y="120" width="200" height="44" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="150" y="138" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">客户端提交事务</text>
-  <text x="150" y="156" text-anchor="middle" font-size="11" fill="#374151">分配 GTID（source_id:seq）</text>
+  <!-- 环形缓冲：8 格 -->
+  <g transform="translate(80,108)">
+    <!-- 8 个格子，环形排列 -->
+    <rect x="0" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+    <text x="40" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd A</text>
+    <text x="40" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=100</text>
 
-  <line x1="150" y1="164" x2="150" y2="182" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="84" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+    <text x="124" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd B</text>
+    <text x="124" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=160</text>
 
-  <rect x="50" y="186" width="200" height="44" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="150" y="204" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">写 binlog（行级事件）</text>
-  <text x="150" y="222" text-anchor="middle" font-size="11" fill="#374151">ROW 格式，按事务追加</text>
+    <rect x="168" y="40" width="80" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+    <text x="208" y="64" text-anchor="middle" font-size="11" fill="#374151">cmd C</text>
+    <text x="208" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=220</text>
 
-  <line x1="150" y1="230" x2="150" y2="248" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="252" y="40" width="80" height="56" rx="4" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
+    <text x="292" y="64" text-anchor="middle" font-size="11" fill="#111827">cmd D（新写）</text>
+    <text x="292" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=280</text>
 
-  <rect x="50" y="252" width="200" height="44" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="150" y="270" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">提交事务（commit）</text>
-  <text x="150" y="288" text-anchor="middle" font-size="11" fill="#374151">异步：提交即返回客户端</text>
+    <rect x="336" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="376" y="64" text-anchor="middle" font-size="11" fill="#6B7280">…（环形回绕）…</text>
+    <text x="376" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=340</text>
 
-  <!-- 半同步 ACK 等待框 -->
-  <line x1="150" y1="296" x2="150" y2="314" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrowRed)"/>
-  <rect x="50" y="318" width="200" height="58" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5 3"/>
-  <text x="150" y="338" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">半同步：等至少一个从 ACK</text>
-  <text x="150" y="356" text-anchor="middle" font-size="11" fill="#374151">超时则降级回异步（可观测、可告警）</text>
-  <text x="150" y="370" text-anchor="middle" font-size="10" fill="#6B7280">after_sync / after_commit</text>
+    <rect x="420" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="460" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
+    <text x="460" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=400</text>
 
-  <!-- dump 线程 -->
-  <rect x="50" y="394" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="150" y="414" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Binlog Dump 线程</text>
-  <text x="150" y="432" text-anchor="middle" font-size="11" fill="#374151">按 GTID 推送未同步事件</text>
+    <rect x="504" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="544" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
+    <text x="544" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=460</text>
 
-  <!-- ============ 从节点 Replica ============ -->
-  <rect x="670" y="80" width="240" height="380" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
-  <text x="790" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">从节点 Replica</text>
+    <rect x="588" y="40" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="628" y="64" text-anchor="middle" font-size="11" fill="#6B7280">cmd</text>
+    <text x="628" y="82" text-anchor="middle" font-size="10" fill="#6B7280">off=520</text>
 
-  <rect x="690" y="120" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">IO 线程（拉取）</text>
-  <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，按 GTID 拉取</text>
+    <!-- 环形回绕弧线（从右端到左端） -->
+    <path d="M 670 60 Q 740 60 740 20 Q 740 0 40 0 Q 0 0 0 30" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="745" y="30" font-size="10" fill="#6B7280">回绕</text>
 
-  <line x1="790" y1="170" x2="790" y2="188" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <!-- 主 offset 指针 -->
+    <line x1="292" y1="100" x2="292" y2="120" stroke="#EF4444" stroke-width="2"/>
+    <polygon points="286,118 298,118 292,128" fill="#EF4444"/>
+    <text x="300" y="135" font-size="12" font-weight="700" fill="#EF4444">主 master_repl_offset = 280</text>
+  </g>
 
-  <rect x="690" y="192" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">relay log（中继日志）</text>
-  <text x="790" y="230" text-anchor="middle" font-size="11" fill="#374151">落地本地的 binlog 副本</text>
+  <!-- ============ 从节点侧 offset ============ -->
+  <text x="430" y="278" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">从节点 Replica · 记录自己已同步到的字节进度</text>
 
-  <line x1="790" y1="242" x2="790" y2="260" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <rect x="180" y="296" width="500" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="430" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">从节点本地的复制进度坐标</text>
+  <text x="430" y="338" text-anchor="middle" font-size="13" fill="#EF4444" font-weight="700">replica offset = 160（断线前同步到 cmd B）</text>
 
-  <rect x="690" y="264" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">SQL 线程（回放）</text>
-  <text x="790" y="302" text-anchor="middle" font-size="11" fill="#374151">读 relay log → 本地重放事务</text>
+  <!-- ============ 比对与结论 ============ -->
+  <line x1="430" y1="352" x2="430" y2="380" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
 
-  <line x1="790" y1="314" x2="790" y2="332" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrowRed)"/>
+  <rect x="100" y="386" width="660" height="120" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">重连时比对：主 offset 280 − 从 offset 160 = 差额 120 字节</text>
 
-  <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="790" y="356" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log）</text>
-  <text x="790" y="374" text-anchor="middle" font-size="11" fill="#374151">不等本地回放完成</text>
+  <text x="120" y="438" font-size="12.5" fill="#374151">① 若差额落在 backlog 窗口内（280−520） → cmd B 之后的 cmd C、cmd D 仍在缓冲</text>
+  <text x="120" y="458" font-size="12.5" font-weight="700" fill="#059669">     ⇒ 走部分重同步：只补发差额命令，主节点不 fork</text>
 
-  <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="790" y="416" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">本地数据追平</text>
-  <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 进度自动定位续传</text>
+  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外） → 所需命令已被新命令挤出 backlog</text>
+  <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
 
-  <!-- ============ 中间链路连线 ============ -->
-  <!-- IO 线程 → Dump 线程：拉取 binlog -->
-  <line x1="688" y1="145" x2="252" y2="419" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">网络拉取 binlog event</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，自动定位续传点</text>
-
-  <!-- 半同步 ACK 回路：从 → 主 -->
-  <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrowRed)"/>
-  <text x="470" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">半同步 ACK 回路（从 → 主，仅半同步模式启用）</text>
-
-  <!-- 底部说明 -->
-  <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步：主提交后等从 ACK（落 relay log）才返回；半同步超时自动降级回异步</text>
+  <!-- 底注 -->
+  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节坐标，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
 </svg>

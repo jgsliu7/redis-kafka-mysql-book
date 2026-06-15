@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -13,97 +13,116 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">Kafka Follower FETCH + LEO/HW + leader epoch</text>
-  <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">纯拉模式同步：HW = ISR 中最小 LEO，消费者只能读 HW 以下；leader epoch 防止老 Leader 复活导致的日志分叉</text>
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">MySQL 多线程并行复制与组复制（MGR）共识</text>
+  <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">左：从库按组提交（LOGICAL_CLOCK）并行回放；右：MGR 把 binlog event 作为共识 log entry，多数派确认才提交</text>
 
-  <!-- =========== 上半：LEO/HW 时序 =========== -->
-  <text x="470" y="84" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">① Leader / Follower / ISR 与 HW 的进度关系</text>
+  <!-- =========== 左半：多线程并行复制 =========== -->
+  <text x="235" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">① 从库多线程并行复制（LOGICAL_CLOCK）</text>
 
-  <!-- Leader 日志 -->
-  <rect x="60" y="100" width="820" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="80" y="120" font-size="13" font-weight="700" fill="#111827">Leader 日志（按位移追加）</text>
-  <!-- 5 个消息格 -->
-  <rect x="200" y="118" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
-  <text x="255" y="132" text-anchor="middle" font-size="11" fill="#374151">m0</text>
-  <text x="255" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=0</text>
+  <!-- 组提交：主库一次提交了 3 个事务 -->
+  <rect x="50" y="100" width="370" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="235" y="120" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">主库一次组提交（group commit）= 同一 LOGICAL_CLOCK</text>
+  <rect x="65" y="130" width="100" height="32" rx="4" fill="#FFFFFF" stroke="#D97706"/>
+  <text x="115" y="150" text-anchor="middle" font-size="11" fill="#374151">事务 T1</text>
+  <rect x="175" y="130" width="100" height="32" rx="4" fill="#FFFFFF" stroke="#D97706"/>
+  <text x="225" y="150" text-anchor="middle" font-size="11" fill="#374151">事务 T2</text>
+  <rect x="285" y="130" width="120" height="32" rx="4" fill="#FFFFFF" stroke="#D97706"/>
+  <text x="345" y="150" text-anchor="middle" font-size="11" fill="#374151">事务 T3</text>
 
-  <rect x="314" y="118" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
-  <text x="369" y="132" text-anchor="middle" font-size="11" fill="#374151">m1</text>
-  <text x="369" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=1</text>
+  <!-- 传到 relay log -->
+  <line x1="235" y1="170" x2="235" y2="190" stroke="#4B5563" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="320" y="185" font-size="11" fill="#6B7280">写入 relay log</text>
 
-  <rect x="428" y="118" width="110" height="34" rx="3" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.6"/>
-  <text x="483" y="132" text-anchor="middle" font-size="11" fill="#111827">m2（新写）</text>
-  <text x="483" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=2</text>
+  <!-- 并行分发 -->
+  <rect x="50" y="194" width="370" height="44" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <text x="235" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Coordinator 线程：按 LOGICAL_CLOCK 判定可并行</text>
+  <text x="235" y="231" text-anchor="middle" font-size="11" fill="#374151">同一组内事务无锁冲突 → 分发给多个 worker</text>
 
-  <rect x="542" y="118" width="110" height="34" rx="3" fill="#F3F4F6" stroke="#6B7280" stroke-dasharray="3 2"/>
-  <text x="597" y="132" text-anchor="middle" font-size="11" fill="#6B7280">m3</text>
-  <text x="597" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=3</text>
+  <!-- 三个 worker 并行回放 -->
+  <line x1="115" y1="238" x2="115" y2="258" stroke="#059669" stroke-width="1.3" marker-end="url(#arrowGreen)"/>
+  <line x1="225" y1="238" x2="225" y2="258" stroke="#059669" stroke-width="1.3" marker-end="url(#arrowGreen)"/>
+  <line x1="345" y1="238" x2="345" y2="258" stroke="#059669" stroke-width="1.3" marker-end="url(#arrowGreen)"/>
 
-  <rect x="656" y="118" width="110" height="34" rx="3" fill="#F3F4F6" stroke="#6B7280" stroke-dasharray="3 2"/>
-  <text x="711" y="132" text-anchor="middle" font-size="11" fill="#6B7280">m4</text>
-  <text x="711" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=4</text>
+  <rect x="55" y="262" width="120" height="48" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="115" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Worker 1</text>
+  <text x="115" y="300" text-anchor="middle" font-size="11" fill="#374151">回放 T1</text>
 
-  <!-- LEO 指针（Leader） -->
-  <line x1="711" y1="164" x2="711" y2="180" stroke="#EF4444" stroke-width="2"/>
-  <polygon points="705,178 717,178 711,188" fill="#EF4444"/>
-  <text x="711" y="204" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">Leader LEO = 5（日志末端）</text>
+  <rect x="185" y="262" width="100" height="48" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="235" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Worker 2</text>
+  <text x="235" y="300" text-anchor="middle" font-size="11" fill="#374151">回放 T2</text>
 
-  <!-- Follower 日志 -->
-  <rect x="60" y="220" width="820" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="80" y="240" font-size="13" font-weight="700" fill="#111827">Follower 日志（仅同步到 m1）</text>
-  <rect x="200" y="238" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
-  <text x="255" y="262" text-anchor="middle" font-size="11" fill="#374151">m0 ✓</text>
-  <rect x="314" y="238" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
-  <text x="369" y="262" text-anchor="middle" font-size="11" fill="#374151">m1 ✓</text>
-  <rect x="428" y="238" width="110" height="34" rx="3" fill="#F3F4F6" stroke="#6B7280" stroke-dasharray="3 2"/>
-  <text x="483" y="262" text-anchor="middle" font-size="11" fill="#6B7280">尚未拉到</text>
+  <rect x="295" y="262" width="120" height="48" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="355" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Worker 3</text>
+  <text x="355" y="300" text-anchor="middle" font-size="11" fill="#374151">回放 T3</text>
 
-  <!-- Follower LEO 指针 -->
-  <line x1="369" y1="284" x2="369" y2="300" stroke="#4B5563" stroke-width="2"/>
-  <polygon points="363,298 375,298 369,308" fill="#4B5563"/>
-  <text x="369" y="324" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Follower LEO = 2</text>
-
-  <!-- FETCH 箭头 -->
-  <path d="M 440 260 Q 500 195 540 160" fill="none" stroke="#059669" stroke-width="1.6" marker-end="url(#arrowGreen)"/>
-  <rect x="450" y="178" width="160" height="36" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.3"/>
-  <text x="530" y="192" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">FETCH（同消费者读路径）</text>
-  <text x="530" y="207" text-anchor="middle" font-size="10" fill="#374151">"给我 off≥2 的消息"</text>
-
-  <!-- HW 计算 -->
-  <rect x="60" y="340" width="820" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.6"/>
-  <text x="80" y="362" font-size="13" font-weight="700" fill="#EF4444">HW（高水位）= ISR 中最小 LEO = min(Leader LEO 5, Follower LEO 2) = 2</text>
-  <text x="80" y="384" font-size="12" fill="#374151">只有 HW 以下的消息算"已提交"，消费者只能读到 HW</text>
-  <text x="80" y="404" font-size="12" fill="#374151">ISR：跟上 Leader 的动态副本集合；只有 ISR 成员才有资格当选新 Leader</text>
+  <!-- 收益 -->
+  <rect x="50" y="328" width="370" height="68" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="235" y="350" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">收益：缓解单 SQL 线程的复制延迟</text>
+  <text x="235" y="370" text-anchor="middle" font-size="11" fill="#374151">前提：主库组提交粒度大（同组事务多）→ 从库并行度才高</text>
+  <text x="235" y="386" text-anchor="middle" font-size="11" fill="#6B7280">仍是异步最终一致，不改变一致性模型</text>
 
   <!-- 分隔线 -->
-  <line x1="60" y1="436" x2="880" y2="436" stroke="#6B7280" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="470" y1="90" x2="470" y2="400" stroke="#6B7280" stroke-width="1" stroke-dasharray="4 4"/>
 
-  <!-- =========== 下半：leader epoch 截断脑裂 =========== -->
-  <text x="470" y="466" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">② leader epoch 截断不一致尾部（解决脑裂）</text>
+  <!-- =========== 右半：MGR 共识 =========== -->
+  <text x="710" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">② 组复制（MGR）多数派共识（CP）</text>
 
-  <!-- 老 Leader 复活场景，三栏：旧主 / 新主 / Follower恢复 -->
-  <!-- Epoch 1 段 -->
-  <rect x="70" y="488" width="260" height="80" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader L1）</text>
-  <text x="90" y="532" font-size="11" fill="#374151">日志：m0 m1 m2 m3 m4</text>
-  <text x="90" y="552" font-size="11" fill="#374151">L1 短暂失联，被仲裁下线</text>
+  <!-- XCom 共识层 -->
+  <rect x="500" y="100" width="410" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="705" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event = 共识 log entry</text>
+  <text x="705" y="140" text-anchor="middle" font-size="11" fill="#374151">交由 XCom（Paxos 变种）仲裁：组内多数派确认</text>
+  <text x="705" y="158" text-anchor="middle" font-size="11" fill="#6B7280">事务先达成全局顺序，再各自本地提交</text>
 
-  <!-- Epoch 2 段 -->
-  <rect x="340" y="488" width="260" height="80" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader L2）</text>
-  <text x="360" y="532" font-size="11" fill="#374151">新主只确认到 m2，新写 m2'</text>
-  <text x="360" y="552" font-size="11" fill="#374151">权威日志：m0 m1 m2 m2'</text>
+  <!-- 三个成员 -->
+  <line x1="600" y1="170" x2="600" y2="190" stroke="#4B5563" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="705" y1="170" x2="705" y2="190" stroke="#4B5563" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="810" y1="170" x2="810" y2="190" stroke="#4B5563" stroke-width="1.3" marker-end="url(#arrow)"/>
 
-  <!-- L1 复活 -->
-  <rect x="610" y="488" width="270" height="80" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">L1 复活，试图以 Follower 加入</text>
-  <text x="630" y="532" font-size="11" fill="#374151">L1 仍持 m3 m4（已被新主否决）</text>
-  <text x="630" y="552" font-size="11" fill="#374151">若不截断 → 数据分叉（脑裂）</text>
+  <rect x="525" y="194" width="150" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="600" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员 M1（提议）</text>
+  <text x="600" y="232" text-anchor="middle" font-size="11" fill="#374151">提议事务</text>
+  <text x="600" y="246" text-anchor="middle" font-size="10" fill="#6B7280">Primary 或 Secondary</text>
 
-  <!-- 截断过程 -->
-  <line x1="470" y1="568" x2="470" y2="588" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>
-  <rect x="120" y="592" width="700" height="74" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="470" y="614" text-anchor="middle" font-size="13" font-weight="700" fill="#EF4444">leader epoch 协议：副本恢复时按 epoch 比对</text>
-  <text x="140" y="636" font-size="12" fill="#374151">L1 携带 (epoch=1, lastOffset=4) 发起 FETCH；L2 回 (epoch=2, endOffset=3)</text>
-  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">L1 发现 epoch=2 起点为 off=3 → 截断自身 m3 m4，从 off=3 开始重新追赶 L2 的权威日志</text>
+  <rect x="630" y="194" width="150" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="705" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员 M2</text>
+  <text x="705" y="232" text-anchor="middle" font-size="11" fill="#374151">投票 / 写日志</text>
+  <text x="705" y="246" text-anchor="middle" font-size="10" fill="#6B7280">应答 ACK</text>
+
+  <rect x="735" y="194" width="150" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="810" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员 M3</text>
+  <text x="810" y="232" text-anchor="middle" font-size="11" fill="#374151">投票 / 写日志</text>
+  <text x="810" y="246" text-anchor="middle" font-size="10" fill="#6B7280">应答 ACK</text>
+
+  <!-- 多数派确认 (M1+M2) -->
+  <line x1="660" y1="250" x2="690" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#arrowRed)"/>
+  <line x1="750" y1="250" x2="720" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#arrowRed)"/>
+  <rect x="615" y="274" width="180" height="40" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="705" y="291" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">多数派确认（2/3）</text>
+  <text x="705" y="307" text-anchor="middle" font-size="11" fill="#374151">事务在共识层"已提交"</text>
+
+  <line x1="705" y1="314" x2="705" y2="334" stroke="#059669" stroke-width="1.3" marker-end="url(#arrowGreen)"/>
+  <rect x="500" y="338" width="410" height="58" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="705" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">各成员各自本地 apply（按共识后的全局顺序）</text>
+  <text x="705" y="376" text-anchor="middle" font-size="11" fill="#374151">状态机复制：相同顺序 → 相同最终状态</text>
+  <text x="705" y="390" text-anchor="middle" font-size="11" fill="#6B7280">group_replication_consistency 可调读写等待强度</text>
+
+  <!-- 底部对比 -->
+  <rect x="30" y="424" width="880" height="220" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="470" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">两种机制的位置与代价</text>
+
+  <rect x="60" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <text x="260" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">多线程并行复制</text>
+  <text x="80" y="512" font-size="12" fill="#374151">定位：从库侧加速回放，缓解延迟</text>
+  <text x="80" y="532" font-size="12" fill="#374151">一致性：异步最终一致（AP）</text>
+  <text x="80" y="552" font-size="12" fill="#374151">前提：主库组提交粒度决定并行度上限</text>
+  <text x="80" y="572" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
+  <text x="80" y="600" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
+
+  <rect x="480" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <text x="680" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">组复制 MGR</text>
+  <text x="500" y="512" font-size="12" fill="#374151">定位：把复制升级为共识协议</text>
+  <text x="500" y="532" font-size="12" fill="#374151">一致性：多数派强一致（CP）</text>
+  <text x="500" y="552" font-size="12" fill="#374151">机制：binlog event 即 log entry，Paxos 仲裁顺序</text>
+  <text x="500" y="572" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
+  <text x="500" y="600" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
 </svg>
