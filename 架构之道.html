@@ -877,7 +877,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的生命周期是分布式加追加写日志的范式。它和前两家最本质的区别在于：<strong>关闭不是一个节点的私事，而是集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller 重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 的关闭设计核心不在"怎么刷自己的盘"，而在"怎么把自己的离开对集群的冲击压到最小"。本节先讲启动，再讲关闭，重点剖析受控关闭（Controlled Shutdown）和 KRaft 模式带来的变化。</p>
 <h3 id="s36">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络三段是理解 Kafka 启动的关键。</p>
-<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起进入生产可用、3.5 起成为默认，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志。节点启动时要先追上这份元数据日志，才能知道"自己是谁、该服务哪些分区、当前 Controller 是谁"。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志住在一起、用同一套机制管理。</li><li><strong>日志管理器启动（恢复重头戏）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。为什么分区恢复是瓶颈？因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把活分摊开。</li><li><strong>三层网络架构。</strong> 这是 Kafka 高吞吐的骨架，值得单独看。图 2-5 画出了它的布局。</li></ol>
+<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起对新集群进入生产可用（KIP-833），3.5 起 ZooKeeper 模式被标记弃用（3.5.0 同时是 ZK→KRaft 迁移的 bridge release），4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志。节点启动时要先追上这份元数据日志，才能知道"自己是谁、该服务哪些分区、当前 Controller 是谁"。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志住在一起、用同一套机制管理。</li><li><strong>日志管理器启动（恢复重头戏）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。为什么分区恢复是瓶颈？因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把活分摊开。</li><li><strong>三层网络架构。</strong> 这是 Kafka 高吞吐的骨架，值得单独看。图 2-5 画出了它的布局。</li></ol>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -1130,7 +1130,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul><li><strong>全内存范式</strong>（in-memory first）——数据以内存为家，磁盘只做备份。Redis 是代表。</li><li><strong>缓存磁盘范式</strong>（buffer-first）——数据以磁盘为家，内存做加速。MySQL（InnoDB）是代表。</li><li><strong>顺序日志范式</strong>（log-first）——数据以磁盘顺序日志为家，靠操作系统页缓存（PageCache）加速。Kafka 是代表。</li></ul>
 <p>这三家没有谁对谁错，它们服务的访问模式不同。Redis 服务"小而热"的快速读写，MySQL 服务"大而杂"的事务查询，Kafka 服务"大而流"的追加写与顺序消费。下面三节逐家拆解它们如何架各自的桥。</p>
 <h2 id="s50">3.2 Redis 的做法</h2>
-<p>Redis 在官方文档里把自己定义为"内存数据结构存储（in-memory data structure store）"，而不是"带内存的缓存"。这一定位决定了它的一切取舍：所有数据默认住在内存里，跳表、压缩列表、哈希表等结构（详见第 4 章）原生跑在内存中，复杂度 O(1) 到 O(log N) 的操作直接在内存完成。这个假设带来的红利是低延迟——常规读写稳定在亚毫秒级；代价是容量被内存的物理上限锁死。</p>
+<p>Redis 在官方文档里把自己定义为"内存数据结构存储（in-memory data structure store）"，而不是"带内存的缓存"。这一定位决定了它的一切取舍：所有数据默认住在内存里，跳表、紧凑列表（listpack）、哈希表等结构（详见第 4 章）原生跑在内存中，复杂度 O(1) 到 O(log N) 的操作直接在内存完成。这个假设带来的红利是低延迟——常规读写稳定在亚毫秒级；代价是容量被内存的物理上限锁死。</p>
 <p>Redis 敢假设"数据全在内存"，是因为它的目标场景就是"小而热"。一个会话缓存、一个排行榜、一个限流计数器，这些数据天然体量不大、访问频率极高、对延迟敏感。把这类数据放在内存里，每次访问都省掉了从磁盘捞页的开销，操作延迟从毫秒级压到亚毫秒级。这种延迟优势是 Redis 在缓存市场立住脚的根本，也是它后来扩展出多种数据结构、Stream、Function 等能力的底座。</p>
 <p>但"全内存"假设一旦确立，两个绕不开的问题立刻浮现：内存满了怎么办，断电了数据还在不在。Redis 用"内存淘汰"回答第一个问题，用"持久化两条腿"回答第二个。</p>
 <h3 id="s51">内存淘汰的真实实现</h3>
