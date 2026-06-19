@@ -65,7 +65,7 @@ KIP 全文索引见：<https://cwiki.apache.org/confluence/display/KAFKA/Kafka+I
 
 ### MySQL
 
-- **Jeremiah P. et al. *High Performance MySQL***. O'Reilly. —— MySQL 性能与架构优化的实战参考。
+- **Schwartz, B. / Zaitsev, P. / Tkachenko, V. *High Performance MySQL***（第 4 版）. O'Reilly, 2022. —— MySQL 性能与架构优化的实战参考。
 - **InnoDB 引擎源码与官方文档**. —— 页结构、B+ 树、redo/undo、MVCC 的一手资料。
 
 ### Kafka
