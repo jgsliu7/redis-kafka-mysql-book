@@ -10,7 +10,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3 Redis 持久化数据流</text>
+  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3　Redis 持久化数据流</text>
   <text x="460" y="58" text-anchor="middle" font-size="13" fill="#374151">写命令通往内存与 RDB 快照 / AOF（含混合持久化）两类持久化产物</text>
 
   <!-- Client -->

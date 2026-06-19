@@ -9,7 +9,7 @@
     </marker>
   </defs>
 
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-4 InnoDB 16KB 数据页内部七段布局</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-4　InnoDB 16KB 数据页内部七段布局</text>
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">自上而下：文件头 → 页头 → 虚拟记录 → 用户记录 → 空闲 → 页目录 → 文件尾</text>
 
   <!-- page outline -->

@@ -222,7 +222,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图1-1　后端基础设施的三种核心范式与三家代言</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-1　后端基础设施的三种核心范式与三家代言</text>
 
   <!-- ============ 第 1 行：三类核心能力 ============ -->
   <text x="40" y="74" font-size="13" font-weight="600" fill="#374151">后端基础能力（拆到最底层绕不开三类）</text>
@@ -409,7 +409,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图1-2　全书章节地图</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-2　全书章节地图</text>
   <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：7 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->
@@ -1154,7 +1154,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="470" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减</text>
+  <text x="470" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减</text>
   <text x="470" y="56" text-anchor="middle" font-size="13" fill="#374151">LRU 看时间（采样池内淘汰最久未用）·LFU 看频率（Morris 近似计数器 + 衰减）</text>
 
   <!-- ===== Left half: Approximate LRU ===== -->
@@ -1292,7 +1292,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3 Redis 持久化数据流</text>
+  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3　Redis 持久化数据流</text>
   <text x="460" y="58" text-anchor="middle" font-size="13" fill="#374151">写命令通往内存与 RDB 快照 / AOF（含混合持久化）两类持久化产物</text>
 
   <!-- Client -->
@@ -1403,7 +1403,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-4 InnoDB 缓冲池三分链表</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-4　InnoDB 缓冲池三分链表</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">Free List（空闲页）·LRU List（新老分区 5/8 与 3/8）·Flush List（脏页排队刷盘）</text>
 
   <!-- ===== Free List ===== -->
@@ -1528,7 +1528,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-5 MySQL 一次写操作的全链路时序</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-5　MySQL 一次写操作的全链路时序</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写重做日志）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
 
   <!-- Lifelines (actors) -->
@@ -1667,7 +1667,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-6 Kafka 生产-存储-消费的零拷贝数据流</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-6　Kafka 生产-存储-消费的零拷贝数据流</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">传统读发 4 次拷贝 + 4 次切换　vs　零拷贝（sendfile）2 次 DMA 拷贝 + 2 次切换</text>
 
   <!-- ===== TOP: Traditional read+send (4 copies) ===== -->
@@ -2610,7 +2610,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1 一次请求链路上的安全四维分工</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1　一次请求链路上的安全四维分工</text>
   <text x="440" y="52" text-anchor="middle" font-size="12" fill="#374151">从客户端发起请求到数据落盘，认证 / 授权 / 加密 / 审计各负责哪一段</text>
 
   <!-- Horizontal pipeline (y=180 baseline) -->
@@ -2727,7 +2727,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-2 Redis ACL 连接的认证 + 每命令授权检查时序</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-2　Redis ACL 连接的认证 + 每命令授权检查时序</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">会话级认证一次，每条命令都走"命令类别 + 键模式"二维授权检查</text>
 
   <!-- Two lifelines: Client / Redis Server -->
@@ -2839,7 +2839,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-3 MySQL 五级权限表的层级收窄检查流程</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-3　MySQL 五级权限表的层级收窄检查流程</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">授权检查从全局到列逐层收窄，命中即停；细粒度优先于粗粒度</text>
 
   <!-- Left column: 权限表层级 (stacked boxes) -->
@@ -2967,7 +2967,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-4 Kafka 同一 Broker 的监听器分层</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-4　Kafka 同一 Broker 的监听器分层</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">内部 SASL_SSL / 外部 SSL / 控制面 KRaft 三条路径并行，按网络域分级信任</text>
 
   <!-- Three sources (left column) -->
@@ -3697,7 +3697,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- Title -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1 三家“数据真正住在哪里”</text>
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　三家“数据真正住在哪里”</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">内存与磁盘的权重决定了存储格式的基本立场</text>
 
   <!-- Column headers -->
@@ -3783,7 +3783,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="450" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-2 RDB 文件布局（紧凑二进制快照）</text>
+  <text x="450" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-2　RDB 文件布局（紧凑二进制快照）</text>
   <text x="450" y="56" text-anchor="middle" font-size="13" fill="#374151">自识别前缀 + 变长整数编码 + 全量 entries + 尾部 CRC64 校验</text>
 
   <!-- ============ linear byte stream ============ -->
@@ -3898,7 +3898,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-3 AOF 重写与混合持久化的双缓冲协作</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-3　AOF 重写与混合持久化的双缓冲协作</text>
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">fork 子进程从内存生成新文件，rewrite buffer 收集重写期间的新写命令，完成后原子追加</text>
 
   <!-- ============ three lifelines ============ -->
@@ -3998,7 +3998,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-4 InnoDB 16KB 数据页内部七段布局</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-4　InnoDB 16KB 数据页内部七段布局</text>
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">自上而下：文件头 → 页头 → 虚拟记录 → 用户记录 → 空闲 → 页目录 → 文件尾</text>
 
   <!-- page outline -->
@@ -4102,7 +4102,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-5 脏页落盘与崩溃恢复路径</text>
+  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-5　脏页落盘与崩溃恢复路径</text>
   <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">上半部：正常落盘（双写缓冲 → 正式页）；下半部：崩溃后用双写修页 + redo 重做</text>
 
   <!-- ============ Normal flush path (top) ============ -->
@@ -4223,7 +4223,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-6 Kafka 分区 → Segment → 三件套文件</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-6　Kafka 分区 → Segment → 三件套文件</text>
   <text x="480" y="54" text-anchor="middle" font-size="13" fill="#374151">文件名即起始位移；.log 消息数据 + .index 位移索引 + .timeindex 时间戳索引</text>
 
   <!-- ============ partition ============ -->
@@ -4424,7 +4424,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     </marker>
   </defs>
 
-  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-7 存储格式设计决策树</text>
+  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-7　存储格式设计决策树</text>
   <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">从访问模式三问，推到格式骨架选型——存储格式是访问模式的镜像</text>
 
   <!-- ============ root ============ -->
@@ -5410,7 +5410,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-2 五条共性规律的递进关系</text>
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-2　五条共性规律的递进关系</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让真相之源又快、又稳、又可控</text>
 
   <!-- ============ 规律一：真相之源（顶端，核心） ============ -->
@@ -5535,7 +5535,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-3 实践者选型决策树</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-3　实践者选型决策树</text>
   <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不是选 Redis 还是 MySQL，而是先把约束答清楚，再去三家"借形不借器"</text>
 
   <!-- ============ 根节点 ============ -->
@@ -5702,7 +5702,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-4 认知跃迁的四层台阶</text>
+  <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-4　认知跃迁的四层台阶</text>
   <text x="450" y="53" text-anchor="middle" font-size="13" fill="#6B7280">从使用者到设计者，跨越的不是知识量，而是看问题的坐标系</text>
 
   <!-- 台阶：从下到上 L1 → L4，宽度递增、高度递增、左对齐基线相同 -->

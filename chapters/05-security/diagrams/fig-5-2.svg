@@ -10,7 +10,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-2 Redis ACL 连接的认证 + 每命令授权检查时序</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-2　Redis ACL 连接的认证 + 每命令授权检查时序</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">会话级认证一次，每条命令都走"命令类别 + 键模式"二维授权检查</text>
 
   <!-- Two lifelines: Client / Redis Server -->

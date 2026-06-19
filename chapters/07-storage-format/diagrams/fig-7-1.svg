@@ -7,7 +7,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1 三家“数据真正住在哪里”</text>
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　三家“数据真正住在哪里”</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">内存与磁盘的权重决定了存储格式的基本立场</text>
 
   <!-- Column headers -->

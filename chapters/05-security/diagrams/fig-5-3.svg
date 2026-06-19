@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-3 MySQL 五级权限表的层级收窄检查流程</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-3　MySQL 五级权限表的层级收窄检查流程</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">授权检查从全局到列逐层收窄，命中即停；细粒度优先于粗粒度</text>
 
   <!-- Left column: 权限表层级 (stacked boxes) -->

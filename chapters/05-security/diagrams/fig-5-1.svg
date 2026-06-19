@@ -10,7 +10,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1 一次请求链路上的安全四维分工</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1　一次请求链路上的安全四维分工</text>
   <text x="440" y="52" text-anchor="middle" font-size="12" fill="#374151">从客户端发起请求到数据落盘，认证 / 授权 / 加密 / 审计各负责哪一段</text>
 
   <!-- Horizontal pipeline (y=180 baseline) -->

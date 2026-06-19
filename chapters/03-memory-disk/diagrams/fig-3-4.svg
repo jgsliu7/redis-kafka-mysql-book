@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-4 InnoDB 缓冲池三分链表</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-4　InnoDB 缓冲池三分链表</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">Free List（空闲页）·LRU List（新老分区 5/8 与 3/8）·Flush List（脏页排队刷盘）</text>
 
   <!-- ===== Free List ===== -->

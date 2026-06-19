@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="470" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减</text>
+  <text x="470" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减</text>
   <text x="470" y="56" text-anchor="middle" font-size="13" fill="#374151">LRU 看时间（采样池内淘汰最久未用）·LFU 看频率（Morris 近似计数器 + 衰减）</text>
 
   <!-- ===== Left half: Approximate LRU ===== -->

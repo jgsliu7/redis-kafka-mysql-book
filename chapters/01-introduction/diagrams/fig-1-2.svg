@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图1-2　全书章节地图</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-2　全书章节地图</text>
   <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：7 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->

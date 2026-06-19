@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-6 Kafka 生产-存储-消费的零拷贝数据流</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-6　Kafka 生产-存储-消费的零拷贝数据流</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">传统读发 4 次拷贝 + 4 次切换　vs　零拷贝（sendfile）2 次 DMA 拷贝 + 2 次切换</text>
 
   <!-- ===== TOP: Traditional read+send (4 copies) ===== -->

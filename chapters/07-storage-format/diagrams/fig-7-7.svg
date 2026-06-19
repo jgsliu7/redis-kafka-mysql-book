@@ -12,7 +12,7 @@
     </marker>
   </defs>
 
-  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-7 存储格式设计决策树</text>
+  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-7　存储格式设计决策树</text>
   <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">从访问模式三问，推到格式骨架选型——存储格式是访问模式的镜像</text>
 
   <!-- ============ root ============ -->

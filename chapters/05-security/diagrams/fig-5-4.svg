@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-4 Kafka 同一 Broker 的监听器分层</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-4　Kafka 同一 Broker 的监听器分层</text>
   <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">内部 SASL_SSL / 外部 SSL / 控制面 KRaft 三条路径并行，按网络域分级信任</text>
 
   <!-- Three sources (left column) -->

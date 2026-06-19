@@ -9,7 +9,7 @@
     </marker>
   </defs>
 
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-3 AOF 重写与混合持久化的双缓冲协作</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-3　AOF 重写与混合持久化的双缓冲协作</text>
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">fork 子进程从内存生成新文件，rewrite buffer 收集重写期间的新写命令，完成后原子追加</text>
 
   <!-- ============ three lifelines ============ -->

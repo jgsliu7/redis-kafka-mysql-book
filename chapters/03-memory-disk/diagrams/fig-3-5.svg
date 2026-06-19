@@ -13,7 +13,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-5 MySQL 一次写操作的全链路时序</text>
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-5　MySQL 一次写操作的全链路时序</text>
   <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写重做日志）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
 
   <!-- Lifelines (actors) -->

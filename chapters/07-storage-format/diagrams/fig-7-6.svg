@@ -9,7 +9,7 @@
     </marker>
   </defs>
 
-  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-6 Kafka 分区 → Segment → 三件套文件</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-6　Kafka 分区 → Segment → 三件套文件</text>
   <text x="480" y="54" text-anchor="middle" font-size="13" fill="#374151">文件名即起始位移；.log 消息数据 + .index 位移索引 + .timeindex 时间戳索引</text>
 
   <!-- ============ partition ============ -->

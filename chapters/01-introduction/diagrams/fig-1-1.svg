@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图1-1　后端基础设施的三种核心范式与三家代言</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-1　后端基础设施的三种核心范式与三家代言</text>
 
   <!-- ============ 第 1 行：三类核心能力 ============ -->
   <text x="40" y="74" font-size="13" font-weight="600" fill="#374151">后端基础能力（拆到最底层绕不开三类）</text>

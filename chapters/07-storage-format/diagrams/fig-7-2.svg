@@ -6,7 +6,7 @@
     </marker>
   </defs>
 
-  <text x="450" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-2 RDB 文件布局（紧凑二进制快照）</text>
+  <text x="450" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-2　RDB 文件布局（紧凑二进制快照）</text>
   <text x="450" y="56" text-anchor="middle" font-size="13" fill="#374151">自识别前缀 + 变长整数编码 + 全量 entries + 尾部 CRC64 校验</text>
 
   <!-- ============ linear byte stream ============ -->
