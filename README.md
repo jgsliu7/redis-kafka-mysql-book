@@ -63,7 +63,8 @@ chapters/
 ├── 07-storage-format/         # 第7章：磁盘存储格式
 ├── 08-data-sync/              # 第8章：数据同步机制
 ├── 09-summary/                # 第9章：总结
-└── 10-epilogue.md             # 后记
+├── 10-epilogue.md             # 后记
+└── 11-references.md           # 参考文献与延伸阅读
 ```
 
 每章目录下包含：`chapter.md`（正文）、`diagrams/`（SVG 配图）、`outline.md`（写作大纲）。全书配图均为可独立渲染的自包含 SVG。

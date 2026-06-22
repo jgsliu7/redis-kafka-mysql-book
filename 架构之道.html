@@ -362,7 +362,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s12">1.2.4 三家速写小结</h3>
 <p>三张设计身份证已经画完。用一张对比表把它们并排收束，差异就一目了然。</p>
 <p><strong>表 1-1 三家设计身份证对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而生</td><td>1995，MySQL AB，经 Sun 入 Oracle，关系库常青树</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 位移）</td></tr><tr><td>设计哲学 / 最在乎</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 最不在乎</td><td>内存容量与复杂聚合</td><td>极致写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>亚毫秒级低延迟</td><td>毫秒级、强一致</td><td>百万级 TPS 高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而生</td><td>1995，MySQL AB，经 Sun 入 Oracle，关系库常青树</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 位移）</td></tr><tr><td>设计哲学 / 最在乎</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 最不在乎</td><td>内存容量与复杂聚合</td><td>极致写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>稳定事务语义</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
 <p><em>表 1-1：三家设计身份证对比——三栏顺序固定为 Redis | MySQL | Kafka。</em></p>
 <p>读这张表有一个关键：差异不只是"谁更强"，而是"谁在乎的东西根本不同"。Redis 在乎快，MySQL 在乎对，Kafka 在乎多。这三句话是本书所有横向对比的总纲，后续每一章都会让这三家在同一张答卷上"同题作答"，对照着看取舍的全貌。</p>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
@@ -513,7 +513,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><em>图 1-2：全书章节地图——7 个主题章加第 9 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</em></p>
 <p>看这张图时请记住一点：每一章解决的是同一个底层问题在不同软件里的不同回答，章与章之间是递进而非并列的关系。从第 2 章的"生与死"出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 9 章汇成共性规律与取舍之道。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
-<p>凡涉及具体行为、参数或默认值，本书一律以如下版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x</strong>。涉及版本差异时我们会显式说明。需要特别留意的是几条版本相关的演化：Redis 在 6.0 引入了多线程 IO，7.x 又带来了 ACL、Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 3.3 标志着 KRaft 达到生产可用（去 ZooKeeper），分层存储（Tiered Storage）持续完善，而生产者幂等与事务早在 0.11 就已引入。这些演化会被反复提到。版本细节若有不确定，我们会标注"以实际实现为准"，绝不编造。</p>
+<p>凡涉及具体行为、参数或默认值，本书一律以如下版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x</strong>。涉及版本差异时我们会显式说明。需要特别留意的是几条版本相关的演化：Redis 在 6.0 引入了多线程 IO，7.x 又带来了 ACL、Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 3.3 标志着 KRaft 达到生产可用（去 ZooKeeper），分层存储（Tiered Storage）持续完善，而生产者幂等与事务早在 0.11 就已引入。这些演化会被反复提到。版本细节会按基线明确边界，不把未经核实的实现细枝写成定论。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许"裸奔"。本章用到两张 SVG 图（图 1-1、图 1-2）与两张内联表格（表 1-1、表 1-2）；后续章节的流程图与时序图会以 SVG 为主，内存布局与文件格式会以表格呈现。</p>
 <p>术语约定如下。全书术语统一译法，首次出现以"中文（英文）"标注，之后用中文。例如重做日志（redo log）、缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到本书术语表未列的术语，我们会在首次出现时同样标注英文原词。</p>
 <h3 id="s21">1.4.4 推荐阅读路径</h3>
@@ -530,7 +530,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>如果这一章只让你记住一件事，那应当是这句话：<strong>理解一个系统的关键，不是记住它怎么做，而是还原它为什么这么做、反过来会怎样、这套取舍的边界在哪。</strong> 带着这个追问，我们进入第 2 章——从最朴素的"生与死"开始，看这三家软件怎样启动、怎样优雅地关闭、以及为什么"断电式关机"对它们而言是灾难。</p></section>
 <section class="chapter" id="ch2"><h1 id="s24">第 2 章 生命周期管理 — 优雅启动与关闭的艺术</h1>
 <h2 id="s25">本章导读</h2>
-<p>大多数后端开发者都敲过 <code>redis-server</code>、<code>systemctl stop mysqld</code>、<code>kill &lt;pid&gt;</code>，却很少有人追问这一行命令背后到底发生了什么。来看一个反直觉的现象：同样是 <code>kill -9</code>，对 Redis 通常只是丢掉几秒的数据（具体取决于 AOF 的 fsync 策略——<code>everysec</code> 默认约丢 1 秒量级的数据，<code>always</code> 几乎不丢，纯 RDB 则丢自上次快照起的全部），对 MySQL 可能要花几分钟做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选，让上游业务短暂抖动。同样是"杀进程"，后果差别为何如此之大？因为三家的"启动"和"关闭"承载着截然不同的承诺——Redis 主要对自己负责，MySQL 要守护事务语义，Kafka 还要对整个集群负责。</p>
+<p>大多数后端开发者都敲过 <code>redis-server</code>、<code>systemctl stop mysqld</code>、<code>kill &lt;pid&gt;</code>，却很少有人追问这一行命令背后到底发生了什么。来看一个反直觉的现象：同样是 <code>kill -9</code>，对 Redis 通常只是丢掉最近一小段时间的数据（具体取决于 AOF 的 fsync 策略——<code>everysec</code> 默认是约 1 秒量级的数据窗口，<code>always</code> 风险更低，纯 RDB 则丢自上次快照起的全部），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选，让上游业务短暂抖动。同样是"杀进程"，后果差别为何如此之大？因为三家的"启动"和"关闭"承载着截然不同的承诺——Redis 主要对自己负责，MySQL 要守护事务语义，Kafka 还要对整个集群负责。</p>
 <p>本章要回答三个问题：一个进程从可执行文件到"可对外服务"中间必须完成哪些事；为什么不能直接断电；"优雅（graceful）"二字到底优雅在哪里。读完本章，你能写出更健壮的服务生命周期代码，也能在故障复盘时准确判断系统死在了启动的哪一步。我们会先抽象出启动与关闭的本质问题，再逐一深讲 Redis、MySQL、Kafka 的具体做法，最后横向对比并提炼出可复用的架构启示。</p>
 <h2 id="s26">2.1 问题的本质</h2>
 <p>把"启动"和"关闭"从一个运维动作抽象成一个软件设计问题，问题的轮廓就清晰了。</p>
@@ -1076,7 +1076,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 2-6 Kafka 受控关闭时序（对照普通关闭）</figcaption></figure>
 <p>图 2-6　受控关闭：Broker 先告知 Controller，Controller 提前迁移 Leader 后才放行；对照普通关闭的抖动窗口。</p>
-<p>两种关闭的取舍很清楚：普通关闭快，但客户端会看到分区短暂不可用的抖动窗口；受控关闭慢（要等 Leader 迁移完成），但客户端几乎看不到抖动。Kafka 选了"用更长的关闭时间换更小的集群可用性影响"——一个 Broker 多停 10 秒，换来的是上游业务少抖动几秒。在以可用性为首要目标的中间件场景里，这种取舍成立。</p>
+<p>两种关闭的取舍很清楚：普通关闭快，但客户端会看到分区短暂不可用的抖动窗口；受控关闭慢（要等 Leader 迁移完成），但客户端感受到的抖动更小。Kafka 选了"用更长的关闭时间换更小的集群可用性影响"——Broker 退出前多做一段协调工作，换来的是上游业务少经历一次突兀的 Leader 重选。在以可用性为首要目标的中间件场景里，这种取舍成立。</p>
 <p>需要补充一点异常路径：受控关闭也不是万能。如果 Controller 不可达，或者迁移超时（受控关闭有超时阈值），Broker 会退化为普通关闭，不再死等。这是分布式系统常见的"有更好选项时就用，没有就降级"的工程化思路。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数）控制是否启用；<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制重试次数与退避间隔——这些参数名在 KRaft 与 ZK 模式下保持一致。</p>
 <h3 id="s38">追加写日志对生命周期的影响</h3>
 <p>Kafka 的日志是 append-only（仅追加）的，这一性质对生命周期有决定性影响。恢复时，Kafka 只需要"找到最后一段完整写入的位移（offset）并截断未完整部分"，不需要像 MySQL 那样重放事务或回滚事务。一条日志要么完整写入、要么不写，不存在"写了一半"的中间状态需要回滚。这就是为什么 Kafka 的日志恢复通常比 MySQL 崩溃恢复轻——<strong>数据结构越简单，恢复语义越简单。</strong> 这个结论是横向对比里的一条主线，2.5 节会再次回到这里。</p>
@@ -1113,11 +1113,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <section class="chapter" id="ch3"><h1 id="s47">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</h1>
 <h2 id="s48">本章导读</h2>
 <p>内存快但易失且昂贵，磁盘慢但持久且廉价，任何存储软件都必须在这道速度鸿沟上架一座桥。这听起来像一句工程常识，但真正值得琢磨的是：面对同一道鸿沟，Redis、MySQL、Kafka 做出了三个几乎相反的选择。Redis 把内存当作家、磁盘只做备份；MySQL 把磁盘当作家、内存只做加速；Kafka 把磁盘顺序日志当作家、连加速都甩给了操作系统内核。</p>
-<p>这三个选择不是工程师一时兴起，而是各自从要服务的访问模式倒推出来的。理解了这个分叉，你就能理解它们后续几乎所有性能特征与取舍的根源——为什么 Redis 容量被内存锁死、为什么 MySQL 的延迟要靠缓冲池命中率撑、为什么 Kafka 能把吞吐做到百万级消息却几乎不自己管内存。</p>
+<p>这三个选择不是工程师一时兴起，而是各自从要服务的访问模式倒推出来的。理解了这个分叉，你就能理解它们后续几乎所有性能特征与取舍的根源——为什么 Redis 容量被内存锁死、为什么 MySQL 的延迟要靠缓冲池命中率撑、为什么 Kafka 能在合适的批量和硬件条件下把吞吐做得很高，却几乎不自己管内存。</p>
 <p>读完这一章，你会掌握三套"内存-磁盘"协作范式，并学会据此为自己的系统选型与调优，而不是套用"哪个快用哪个"这种糊涂经验。本章也是后续章节的根：第 6 章讲集群架构、第 8 章讲数据同步，都要回到这里"数据住哪里"这个问题上。</p>
 <h2 id="s49">3.1 问题的本质</h2>
 <p>任何存储软件都活在同一组物理约束之下。先把这组约束量化到你能感受的程度。</p>
-<p>先看一张把存储介质访问延迟摆出来的表，建立直觉。</p>
+<p>先看一张把存储介质访问延迟摆出来的表，建立直觉。表中数字用于建立数量级，不是硬件基准；真实值会随 CPU、磁盘、文件系统、队列深度与负载模型变化。</p>
 <p><strong>表 3-1　存储介质的访问延迟数量级</strong></p>
 <div class="table-wrap"><table><thead><tr><th>存储介质</th><th>典型访问延迟</th><th>相对内存（以内存为 1）</th><th>是否持久</th></tr></thead><tbody><tr><td>CPU L1 缓存</td><td>~1 ns</td><td>0.01×</td><td>否</td></tr><tr><td>内存（DRAM）</td><td>~100 ns</td><td>1×</td><td>否</td></tr><tr><td>SSD（随机读）</td><td>~100 μs</td><td>~1000×</td><td>是</td></tr><tr><td>SSD（顺序写）</td><td>~300–500 MB/s 吞吐</td><td>吞吐可追平内存随机访问</td><td>是</td></tr><tr><td>机械盘（随机寻道）</td><td>~10 ms</td><td>~100 000×</td><td>是</td></tr><tr><td>机械盘（顺序写）</td><td>~100–200 MB/s 吞吐</td><td>吞吐远高于随机访问</td><td>是</td></tr></tbody></table></div>
 <p>这张表说明了三件事：内存比任何持久介质都快一个数量级以上；顺序 IO 在吞吐维度上能逼近内存随机访问；持久性总是以延迟或复杂度为代价。把这套数量级换算成体感：如果内存访问是 1 秒，SSD 一次随机访问就是 17 分钟，机械盘一次随机寻道就是 28 小时。纳秒、微秒、毫秒之间隔着三到五个数量级——这就是存储软件要架的那道桥，也是所有"内存-磁盘"设计的根本动因。</p>
@@ -1130,8 +1130,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul><li><strong>全内存范式</strong>（in-memory first）——数据以内存为家，磁盘只做备份。Redis 是代表。</li><li><strong>缓存磁盘范式</strong>（buffer-first）——数据以磁盘为家，内存做加速。MySQL（InnoDB）是代表。</li><li><strong>顺序日志范式</strong>（log-first）——数据以磁盘顺序日志为家，靠操作系统页缓存（PageCache）加速。Kafka 是代表。</li></ul>
 <p>这三家没有谁对谁错，它们服务的访问模式不同。Redis 服务"小而热"的快速读写，MySQL 服务"大而杂"的事务查询，Kafka 服务"大而流"的追加写与顺序消费。下面三节逐家分析它们如何架各自的桥。</p>
 <h2 id="s50">3.2 Redis 的做法</h2>
-<p>Redis 在官方文档里把自己定义为"内存数据结构存储（in-memory data structure store）"，而不是"带内存的缓存"。这一定位决定了它的一切取舍：所有数据默认住在内存里，跳表、紧凑列表（listpack）、哈希表等结构（详见第 4 章）原生跑在内存中，复杂度 O(1) 到 O(log N) 的操作直接在内存完成。这个假设带来的红利是低延迟——常规读写稳定在亚毫秒级；代价是容量被内存的物理上限锁死。</p>
-<p>Redis 敢假设"数据全在内存"，是因为它的目标场景就是"小而热"。一个会话缓存、一个排行榜、一个限流计数器，这些数据天然体量不大、访问频率极高、对延迟敏感。把这类数据放在内存里，每次访问都省掉了从磁盘捞页的开销，操作延迟从毫秒级压到亚毫秒级。这种延迟优势是 Redis 在缓存市场立住脚的根本，也是它后来扩展出多种数据结构、Stream、Function 等能力的底座。</p>
+<p>Redis 在官方文档里把自己定义为"内存数据结构存储（in-memory data structure store）"，而不是"带内存的缓存"。这一定位决定了它的一切取舍：所有数据默认住在内存里，跳表、紧凑列表（listpack）、哈希表等结构（详见第 4 章）原生跑在内存中，复杂度 O(1) 到 O(log N) 的操作直接在内存完成。这个假设带来的红利是低延迟——常见本地或同机房访问能落在亚毫秒到毫秒级；代价是容量被内存的物理上限锁死。</p>
+<p>Redis 敢假设"数据全在内存"，是因为它的目标场景就是"小而热"。一个会话缓存、一个排行榜、一个限流计数器，这些数据天然体量不大、访问频率极高、对延迟敏感。把这类数据放在内存里，每次访问都省掉了从磁盘捞页的开销，延迟通常能比磁盘随机访问低几个数量级。这种延迟优势是 Redis 在缓存市场立住脚的根本，也是它后来扩展出多种数据结构、Stream、Function 等能力的底座。</p>
 <p>但"全内存"假设一旦确立，两个绕不开的问题立刻浮现：内存满了怎么办，断电了数据还在不在。Redis 用"内存淘汰"回答第一个问题，用"持久化两条腿"回答第二个。</p>
 <h3 id="s51">内存淘汰的真实实现</h3>
 <p>教科书里的 LRU 维护一个双向链表，每次访问把节点移到链表头，淘汰时摘掉链表尾。这个方案准确但代价大：每次访问都要动链表指针，访问量上去之后链表操作的 CPU 开销不可忽视。</p>
@@ -1142,13 +1142,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_3_2_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_1_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_3_2_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_1_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
     </marker>
   </defs>
@@ -1199,8 +1199,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </g>
 
   <!-- arrows: random pick -->
-  <path d="M 83 250 Q 83 300 83 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_2_arrowInd)"/>
-  <path d="M 239 250 Q 239 300 239 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_2_arrowInd)"/>
+  <path d="M 83 250 Q 83 300 83 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_1_arrowInd)"/>
+  <path d="M 239 250 Q 239 300 239 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_1_arrowInd)"/>
   <text x="425" y="358" font-size="11" fill="#374151">← 随机抽 N 个</text>
 
   <!-- evict -->
@@ -1209,7 +1209,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="60" y="444" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.6"/>
   <text x="120" y="463" text-anchor="middle" font-size="12" fill="#EF4444" font-weight="700">k11 (最久未用)</text>
   <text x="195" y="463" font-size="11" fill="#374151">→ DEL 释放内存</text>
-  <path d="M 187 380 L 120 406" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+  <path d="M 187 380 L 120 406" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_1_arrowRed)"/>
 
   <text x="220" y="510" text-anchor="middle" font-size="11" fill="#6B7280">精度换性能：采样数越大越接近真 LRU，但每次淘汰成本越高</text>
 
@@ -1269,24 +1269,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="606" font-size="12" fill="#374151">LFU 看频率：谁访问得少就淘汰谁（Morris 计数器 + 衰减实现）。</text>
   <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
 </svg>
-</div><figcaption>图 3-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
-<p>图 3-2 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰线程从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
+</div><figcaption>图 3-1 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
+<p>图 3-1 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰线程从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
 <h3 id="s52">持久化的两条腿</h3>
 <p>内存淘汰回答的是"满了怎么办"，持久化回答的是"断电了还在不在"。Redis 给了两条腿：RDB 和 AOF。</p>
 <p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程安心写快照，两者通过 COW 隔离，互不阻塞。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了——生产环境里这种卡顿通常表现为一波客户端超时告警，排查时若发现告警间隔正好等于 <code>save</code> 规则的触发周期，基本就能锁定是 fork。这就是大实例要控制容量的核心原因之一。</p>
 <p><strong>AOF（仅追加文件）</strong> 走另一条路：它不存数据本身，而是把每一条写命令追加到日志末尾。恢复时按顺序回放这些命令重建内存状态。AOF 的核心旋钮是 <code>appendfsync</code>，它决定了日志什么时候真正落到磁盘：</p>
 <ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把页缓存写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
-<p>这三档本质上是"可靠性 vs 性能"这条连续谱上的三个采样点。生产环境几乎都选 <code>everysec</code>，因为它在常见故障下约丢 1 秒，代价只是每秒一次的 <code>fsync</code>。</p>
+<p>这三档本质上是"可靠性 vs 性能"这条连续谱上的三个采样点。很多生产环境会选择 <code>everysec</code>，因为它把潜在丢失控制在约 1 秒量级，代价是每秒一次的 <code>fsync</code>。</p>
 <p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。注意，重写不是回放旧日志，而是按内存当前状态重新生成一份最小的命令集——把那一万条 <code>INCR</code> 压成一条 <code>SET key 10000</code>。重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套机制保证了重写过程不丢数据。</p>
 <p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 自 7.0 起默认就是 <code>yes</code>，是当前推荐配置。</p>
-<p>需要特别说明的是 <strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 3-3 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件，具体文件名以 7.x 实际实现为准。</p>
+<p>需要特别说明的是 <strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 3-2 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，揭示 Redis"内存为主、磁盘为辅"的根本姿态。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_3_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_3_3_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_2_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
@@ -1307,7 +1307,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / 压缩列表）</text>
 
   <!-- arrow client -> redis -->
-  <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_3_arrow)"/>
+  <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_2_arrow)"/>
 
   <!-- Branch label -->
   <text x="545" y="156" font-size="12" fill="#374151">同时触发持久化 ↓</text>
@@ -1344,9 +1344,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="640" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（base+incr+manifest）</text>
 
   <!-- arrows from redis to three paths -->
-  <path d="M 380 164 Q 380 210 180 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_3_arrow)"/>
-  <path d="M 420 164 L 420 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_3_arrow)"/>
-  <path d="M 460 164 Q 460 210 660 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_3_arrow)"/>
+  <path d="M 380 164 Q 380 210 180 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
+  <path d="M 420 164 L 420 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
+  <path d="M 460 164 Q 460 210 660 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
 
   <!-- Branch labels -->
   <text x="200" y="220" font-size="11" fill="#374151" text-anchor="middle">触发 BGSAVE / 定时</text>
@@ -1359,29 +1359,29 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="518" text-anchor="middle" font-size="12" fill="#374151">崩溃后用于恢复内存</text>
 
   <!-- arrows to disk -->
-  <path d="M 180 412 L 320 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
-  <path d="M 460 412 L 460 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
-  <path d="M 740 412 L 600 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
+  <path d="M 180 412 L 320 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+  <path d="M 460 412 L 460 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+  <path d="M 740 412 L 600 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
 
   <!-- Legend -->
   <g transform="translate(60,560)">
-    <line x1="0" y1="10" x2="28" y2="10" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_3_arrow)"/>
+    <line x1="0" y1="10" x2="28" y2="10" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_2_arrow)"/>
     <text x="36" y="14" font-size="11" fill="#374151">控制流 / 触发</text>
-    <line x1="160" y1="10" x2="188" y2="10" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_3_arrowRed)"/>
+    <line x1="160" y1="10" x2="188" y2="10" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_2_arrowRed)"/>
     <text x="196" y="14" font-size="11" fill="#374151">数据落盘</text>
     <rect x="300" y="2" width="14" height="14" rx="2" fill="#EEF2FF" stroke="#4F46E5"/>
     <text x="320" y="14" font-size="11" fill="#374151">Redis 相关</text>
   </g>
 </svg>
-</div><figcaption>图 3-3 Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
-<p>图 3-3 展示了一条写命令进入 Redis 后如何通往内存与持久化。命令先在内存里执行；RDB 是另一条独立的全量快照路径（fork 触发），而 AOF（含 7.x 默认的混合持久化）走的是追加日志路径，产物落在 <code>appendonlydir/</code>。这张图揭示了 Redis 的根本姿态：内存是主，磁盘是从，持久化只是给内存数据上保险。</p>
+</div><figcaption>图 3-2 Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
+<p>图 3-2 展示了一条写命令进入 Redis 后如何通往内存与持久化。命令先在内存里执行；RDB 是另一条独立的全量快照路径（fork 触发），而 AOF（含 7.x 默认的混合持久化）走的是追加日志路径，产物落在 <code>appendonlydir/</code>。这张图揭示了 Redis 的根本姿态：内存是主，磁盘是从，持久化只是给内存数据上保险。</p>
 <h3 id="s53">取舍总账</h3>
-<p>Redis 的取舍可以一句话概括：它用内存和秒级持久化，换来读写延迟低、原生支持多种数据结构。这套取舍在缓存和快速键值场景成立——访问频繁、对延迟敏感、数据可重建或可容忍少量丢失；但它要求容量受物理内存约束。生产实践中通常把单实例内存控制在 25 GB 以下，主要原因是控制 fork 阻塞时间与 RDB 加载时间。超出这个容量，要么上 Redis Cluster 分片（详见第 6 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
+<p>Redis 的取舍可以一句话概括：它用内存和秒级持久化，换来读写延迟低、原生支持多种数据结构。这套取舍在缓存和快速键值场景成立——访问频繁、对延迟敏感、数据可重建或可容忍少量丢失；但它要求容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见第 6 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
 <p>理解了 Redis 的"全内存 + 持久化兜底"，再看 MySQL 如何把"磁盘为主、内存加速"做成一套精密系统，会更清楚两家为什么差别这么大。</p>
 <h2 id="s54">3.3 MySQL 的做法</h2>
 <p>MySQL 默认的存储引擎是 InnoDB。InnoDB 的核心假设与 Redis 几乎相反：数据最终必须落盘，内存只是减少磁盘 IO 的缓冲。这个假设换来的是"容量几乎无限 + ACID 可靠"，代价是延迟受缓冲池命中率支配——一旦缓存未命中（cache miss），延迟立刻从内存级跌到磁盘级。</p>
 <h3 id="s55">核心假设</h3>
-<p>InnoDB 假设数据量会远超内存。这意味着任何一个时刻，磁盘上的大部分页都不在内存里。一次查询命中内存里的页是亚毫秒级，没命中就要去磁盘捞，延迟掉到毫秒甚至十毫秒级。所以 InnoDB 的一切设计都围绕一个目标：尽量让访问命中内存，尽量减少对磁盘的随机 IO。</p>
+<p>InnoDB 假设数据量会远超内存。这意味着任何一个时刻，磁盘上的大部分页都不在内存里。一次查询命中内存里的页通常很快，没命中就要去磁盘捞，延迟会明显抬高。所以 InnoDB 的一切设计都围绕一个目标：尽量让访问命中内存，尽量减少对磁盘的随机 IO。</p>
 <p>这个假设带来一个根本特征：MySQL 的延迟不是常数，它取决于"你访问的页此刻在不在内存里"。一个刚启动的实例缓冲池是空的，所有访问都打磁盘，延迟很高；跑稳之后热数据进了内存，延迟降下来；某次大扫描把热数据挤走了，延迟又会显著上升。在生产里这种现象很常见：平时几十毫秒的查询，某天有人跑了一个大报表，之后整个库的延迟集体飙上去，要等热数据重新被访问回暖才慢慢回落——这就是缓冲池被污染的代价。理解这一点，是理解 MySQL 性能波动的钥匙。</p>
 <h3 id="s56">缓冲池的三分链表</h3>
 <p>缓冲池（Buffer Pool）是 InnoDB 在内存里缓存磁盘页的地方。它不是简单的页数组，而是用三条链表精密管理：</p>
@@ -1391,13 +1391,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>下图把三分链表和 midpoint 的位置画出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_3_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_3_4_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_3_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_3_4_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_3_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
     </marker>
   </defs>
@@ -1465,7 +1465,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- eviction -->
   <text x="700" y="270" font-size="11" fill="#374151">← 尾部淘汰</text>
-  <path d="M 870 152 Q 900 152 900 250 Q 900 285 880 285" fill="none" stroke="#EF4444" stroke-width="1.4" marker-end="url(#fig_3_4_arrowRed)"/>
+  <path d="M 870 152 Q 900 152 900 250 Q 900 285 880 285" fill="none" stroke="#EF4444" stroke-width="1.4" marker-end="url(#fig_3_3_arrowRed)"/>
 
   <!-- ===== Flush List ===== -->
   <rect x="320" y="320" width="600" height="160" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
@@ -1482,11 +1482,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="340" y="458" font-size="11" fill="#6B7280">刷盘后从 Flush List 移除（仍留 LRU 直到被淘汰或换出）</text>
 
   <!-- Free -> LRU arrow -->
-  <path d="M 280 180 L 316 180" fill="none" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_4_arrowInd)"/>
+  <path d="M 280 180 L 316 180" fill="none" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_3_arrowInd)"/>
   <text x="298" y="172" text-anchor="middle" font-size="10" fill="#D97706">取页</text>
 
   <!-- LRU modify -> Flush -->
-  <path d="M 620 296 L 620 316" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
+  <path d="M 620 296 L 620 316" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
   <text x="630" y="310" font-size="10" fill="#EF4444">页被改</text>
 
   <!-- Disk -->
@@ -1495,11 +1495,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠重做日志重放补齐</text>
 
   <!-- Flush -> Disk -->
-  <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
+  <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
   <text x="630" y="504" font-size="10" fill="#EF4444">Checkpoint 刷盘</text>
 
   <!-- Evicted page returns to Free List -->
-  <path d="M 540 200 Q 200 200 160 200 Q 90 200 90 250 Q 90 290 100 290" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_3_4_arrow)"/>
+  <path d="M 540 200 Q 200 200 160 200 Q 90 200 90 250 Q 90 290 100 290" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_3_3_arrow)"/>
   <text x="230" y="240" font-size="10" fill="#6B7280">淘汰的页归还 Free List</text>
 
   <!-- bottom note -->
@@ -1508,21 +1508,21 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="646" font-size="12" fill="#374151">1）三分链表各司其职：Free 管空闲、LRU 管命中、Flush 管刷盘；同一页可同时位于 LRU 与 Flush。</text>
   <text x="60" y="666" font-size="12" fill="#374151">2）老区分流 + 停留时间门槛，专门对付「全表扫描污染缓冲池」这一陷阱。</text>
 </svg>
-</div><figcaption>图 3-4 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
-<p>图 3-4 把 Free List、改良版 LRU List（含 New / Old 子链表与 midpoint）、Flush List 并排画出，箭头标出页在链表间的流转路径：新页从 Free List 进入 LRU 的 midpoint，停留超时后晋升 New 区；被修改的页同时进入 Flush List，等待后台线程刷盘。这张图是理解 InnoDB 内存管理的骨架。</p>
+</div><figcaption>图 3-3 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
+<p>图 3-3 把 Free List、改良版 LRU List（含 New / Old 子链表与 midpoint）、Flush List 并排画出，箭头标出页在链表间的流转路径：新页从 Free List 进入 LRU 的 midpoint，停留超时后晋升 New 区；被修改的页同时进入 Flush List，等待后台线程刷盘。这张图是理解 InnoDB 内存管理的骨架。</p>
 <h3 id="s57">WAL 与崩溃恢复</h3>
 <p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>重做日志（redo log）</strong>。重做日志是顺序追加写的。崩溃之后，InnoDB 用重做日志重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
 <p>为什么用顺序日志而不是直接随机写数据页？因为顺序写远快于随机写（呼应 3.1 节的伏笔）。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 IO；而把这些修改先打包成顺序日志追加写，只产生顺序 IO。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_3_5_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_4_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_3_5_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_4_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
     </marker>
   </defs>
@@ -1563,27 +1563,27 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ===== Messages ===== -->
   <!-- 1. UPDATE request -->
-  <line x1="100" y1="160" x2="284" y2="160" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_5_arrow)"/>
+  <line x1="100" y1="160" x2="284" y2="160" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_4_arrow)"/>
   <text x="192" y="153" text-anchor="middle" font-size="11" fill="#374151">① UPDATE 请求</text>
 
   <!-- 2. WAL: write redo log FIRST -->
-  <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_5_arrowRed)"/>
+  <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
   <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写重做日志（WAL，顺序写）</text>
   <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">「这页要怎么改」先落盘，崩溃后可重放</text>
 
   <!-- 3. modify buffer pool page (in memory) -->
-  <line x1="290" y1="250" x2="484" y2="250" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_5_arrowInd)"/>
+  <line x1="290" y1="250" x2="484" y2="250" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_4_arrowInd)"/>
   <text x="387" y="243" text-anchor="middle" font-size="11" fill="#374151">③ 改缓冲池中的页 → 标记为脏页</text>
 
   <!-- note: redo flushed (innodb_flush_log_at_trx_commit) -->
   <rect x="620" y="270" width="140" height="34" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2"/>
   <text x="690" y="285" text-anchor="middle" font-size="10" fill="#374151">innodb_flush_log_at_trx_commit</text>
   <text x="690" y="299" text-anchor="middle" font-size="10" fill="#374151">=1 提交即落盘（默认）</text>
-  <line x1="690" y1="304" x2="876" y2="304" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+  <line x1="690" y1="304" x2="876" y2="304" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
   <text x="783" y="298" text-anchor="middle" font-size="10" fill="#EF4444">落盘</text>
 
   <!-- 4. COMMIT -->
-  <line x1="284" y1="340" x2="100" y2="340" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_5_arrow)" stroke-dasharray="5,3"/>
+  <line x1="284" y1="340" x2="100" y2="340" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_4_arrow)" stroke-dasharray="5,3"/>
   <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（重做日志已落盘 → 持久化达成）</text>
 
   <!-- Divider -->
@@ -1599,7 +1599,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="490" y1="408" x2="490" y2="408" stroke="#D97706" stroke-width="1.4"/>
 
   <!-- 6. double write to disk -->
-  <line x1="876" y1="466" x2="880" y2="500" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+  <line x1="876" y1="466" x2="880" y2="500" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
   <text x="888" y="486" font-size="10" fill="#EF4444">半页损坏免疫</text>
 
   <!-- 7. Checkpoint flush dirty pages -->
@@ -1608,7 +1608,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="650" y="550" text-anchor="middle" font-size="11" fill="#374151">后台线程依「最早修改时间」排队，批量顺序写回</text>
 
   <!-- arrow checkpoint to disk -->
-  <line x1="876" y1="560" x2="880" y2="592" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_5_arrowRed)"/>
+  <line x1="876" y1="560" x2="880" y2="592" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
   <text x="918" y="580" font-size="10" fill="#EF4444">刷盘</text>
 
   <!-- 8. Crash recovery note -->
@@ -1619,21 +1619,21 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- legend -->
   <g transform="translate(40,705)">
-    <line x1="0" y1="8" x2="28" y2="8" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_5_arrow)"/>
+    <line x1="0" y1="8" x2="28" y2="8" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_4_arrow)"/>
     <text x="36" y="12" font-size="10" fill="#374151">控制流</text>
-    <line x1="110" y1="8" x2="138" y2="8" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_5_arrowRed)"/>
+    <line x1="110" y1="8" x2="138" y2="8" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
     <text x="146" y="12" font-size="10" fill="#374151">数据/落盘</text>
-    <line x1="240" y1="8" x2="268" y2="8" stroke="#D97706" stroke-width="1.8" marker-end="url(#fig_3_5_arrowInd)"/>
+    <line x1="240" y1="8" x2="268" y2="8" stroke="#D97706" stroke-width="1.8" marker-end="url(#fig_3_4_arrowInd)"/>
     <text x="276" y="12" font-size="10" fill="#374151">内存操作</text>
     <rect x="370" y="1" width="12" height="14" rx="2" fill="#FEF3C7" stroke="#D97706"/>
     <text x="388" y="12" font-size="10" fill="#374151">MySQL 相关</text>
   </g>
 </svg>
-</div><figcaption>图 3-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘）</figcaption></figure>
-<p>图 3-5 在时间轴上画出 WAL、双写缓冲、Checkpoint 三件事的先后与依赖：事务提交时先把重做日志写到日志文件并落盘（保证持久性）；脏页随后进入 Flush List；后台线程把脏页先写到双写缓冲再写到表空间；最后推进检查点，标记之前的日志可以回收。这条时间轴揭示了 InnoDB 写路径的多层防护。</p>
+</div><figcaption>图 3-4 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘）</figcaption></figure>
+<p>图 3-4 在时间轴上画出 WAL、双写缓冲、Checkpoint 三件事的先后与依赖：事务提交时先把重做日志写到日志文件并落盘（保证持久性）；脏页随后进入 Flush List；后台线程把脏页先写到双写缓冲再写到表空间；最后推进检查点，标记之前的日志可以回收。这条时间轴揭示了 InnoDB 写路径的多层防护。</p>
 <h3 id="s58">三个"防坑"结构</h3>
 <p>InnoDB 还有三个辅助结构，每一个都是为某个具体的故障或性能陷阱设计的。</p>
-<p><strong>双写缓冲（Double Write Buffer）</strong>：InnoDB 的页是 16 KB，操作系统和磁盘的扇区通常是 4 KB 或更小。如果写一个 16 KB 页写到一半断电，这个页就损坏了，而且损坏的不是日志、是数据本身——重做日志也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写区从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件（默认形如 <code>#ib_16384_0.dblwr</code> / <code>#ib_16384_1.dblwr</code>，具体文件名以 8.0.x 实际实现为准）。如果写到一半断电，恢复时可以从双写区拿回完整的页。这是"用一点顺序写换半页损坏免疫"。</p>
+<p><strong>双写缓冲（Double Write Buffer）</strong>：InnoDB 的页是 16 KB，操作系统和磁盘的扇区通常是 4 KB 或更小。如果写一个 16 KB 页写到一半断电，这个页就损坏了，而且损坏的不是日志、是数据本身——重做日志也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写区从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。文件名不是这里的重点，重点是双写区从“共享表空间内的一段区域”演进为“独立管理的文件”。如果写到一半断电，恢复时可以从双写区拿回完整的页。这是"用一点顺序写换半页损坏免疫"。</p>
 <p><strong>修改缓冲（Change Buffer）</strong>：InnoDB 的二级索引是 B+ 树，更新一个二级索引项可能要修改一个当前不在缓冲池的页。如果每次都把这个页从磁盘捞上来，就是一次随机 IO。修改缓冲的做法是：先把这次修改记下来（缓存），等这个页因为别的原因被读入缓冲池时，再把缓存的修改合并（merge）进去。这样就把"为改一个索引项触发一次随机读"延迟成了"等页自然读入时顺便合并"。修改缓冲只对二级索引的非唯一索引生效，因为唯一索引必须立刻检查约束。这是"延迟随机 IO"的经典手法。</p>
 <p><strong>自适应哈希索引（AHI）</strong>：InnoDB 监控热点访问模式，如果发现某些 B+ 树路径被频繁遍历，就自动给这些路径建哈希，把 3 到 4 次页访问压成 1 次。它无需配置、对用户透明，但只在负载稳定、热点集中时才有收益；负载剧烈变化时它反而可能成为开销。这是"在通用引擎里嵌入专用优化"的取舍。</p>
 <h3 id="s59">取舍总账</h3>
@@ -1655,13 +1655,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>下图把 Kafka 生产-存储-消费的零拷贝数据流画出来，对比传统拷贝路径。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 740" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_3_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_3_6_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_5_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_3_6_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_3_5_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
     </marker>
   </defs>
@@ -1695,18 +1695,18 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </g>
 
   <!-- arrows between -->
-  <line x1="240" y1="172" x2="288" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_6_arrowRed)"/>
+  <line x1="240" y1="172" x2="288" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
   <text x="264" y="165" text-anchor="middle" font-size="10" fill="#EF4444">①DMA</text>
-  <line x1="460" y1="172" x2="508" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_6_arrowRed)"/>
+  <line x1="460" y1="172" x2="508" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
   <text x="484" y="165" text-anchor="middle" font-size="10" fill="#EF4444">②CPU</text>
-  <line x1="680" y1="172" x2="728" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_6_arrowRed)"/>
+  <line x1="680" y1="172" x2="728" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
   <text x="704" y="165" text-anchor="middle" font-size="10" fill="#EF4444">③CPU</text>
 
   <!-- nic + switch count -->
   <rect x="730" y="220" width="170" height="40" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
   <text x="815" y="237" text-anchor="middle" font-weight="700" font-size="11" fill="#111827">网卡</text>
   <text x="815" y="252" text-anchor="middle" font-size="10" fill="#374151">④DMA → 网络</text>
-  <line x1="815" y1="194" x2="815" y2="218" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_6_arrowRed)"/>
+  <line x1="815" y1="194" x2="815" y2="218" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
 
   <!-- steps text -->
   <text x="60" y="240" font-size="11" fill="#374151">read()：内核态→用户态（切换1）</text>
@@ -1737,9 +1737,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </g>
 
   <!-- arrows -->
-  <line x1="260" y1="484" x2="378" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_6_arrowG)"/>
+  <line x1="260" y1="484" x2="378" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_5_arrowG)"/>
   <text x="319" y="476" text-anchor="middle" font-size="10" fill="#059669">①DMA 读入</text>
-  <line x1="580" y1="484" x2="698" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_6_arrowG)"/>
+  <line x1="580" y1="484" x2="698" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_5_arrowG)"/>
   <text x="639" y="476" text-anchor="middle" font-size="10" fill="#059669">②DMA 发出（带 gather）</text>
 
   <!-- Kafka process ghost (not touching data) -->
@@ -1758,8 +1758,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="686" font-size="13" font-weight="700" fill="#111827">关键前提与边界</text>
   <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心红利。</text>
 </svg>
-</div><figcaption>图 3-6 Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
-<p>图 3-6 对比了传统发送路径与零拷贝路径。传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。需要说明的是，这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝。零拷贝只在消费者读"已经缓存在 PageCache 里的数据"时才生效；冷数据还是要走磁盘 IO，这是它的边界。</p>
+</div><figcaption>图 3-5 Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
+<p>图 3-5 对比了传统发送路径与零拷贝路径。传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。需要说明的是，这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝。零拷贝只在消费者读"已经缓存在 PageCache 里的数据"时才生效；冷数据还是要走磁盘 IO，这是它的边界。</p>
 <h3 id="s64">可靠性旋钮</h3>
 <p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（攒多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后会显著损失吞吐，通常只在特殊合规要求下使用。这是"吞吐 vs 本地持久性"的旋钮。</p>
 <p>更常用的可靠性旋钮是生产者端的 <code>acks</code>：</p>
@@ -1777,8 +1777,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>表 3-3　三家"内存-磁盘"哲学横向对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据住哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>重做日志（WAL）+ 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1)~O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按位移顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 回放 AOF（大实例数分钟）</td><td>重放重做日志 + 恢复脏页</td><td>几乎无（PageCache 热度取决于 OS）</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 IO 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
 <p>逐维度解读，要点都在"为什么不同"。</p>
-<p><strong>数据住哪里</strong>。三家在这条轴上的选择决定了容量上限。Redis 选内存，所以容量被内存物理上限锁死，单实例通常控制在几十 GB 以内。MySQL 选磁盘，所以容量几乎无限，几十 TB 是常态。Kafka 选磁盘顺序日志，容量也几乎无限，但要付出"放弃随机访问"的代价。</p>
-<p><strong>持久化机制</strong>。三家的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的重做日志是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后能丢多少——Redis 默认约丢 1 秒，MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）不丢已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>数据住哪里</strong>。三家在这条轴上的选择决定了容量上限。Redis 选内存，所以容量被内存物理上限锁死，单实例通常会被有意控制在便于 fork、备份和恢复的范围内。MySQL 选磁盘，所以容量上限主要由存储、索引和运维能力决定。Kafka 选磁盘顺序日志，容量也主要受磁盘和保留策略约束，但要付出"放弃随机访问"的代价。</p>
+<p><strong>持久化机制</strong>。三家的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的重做日志是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界——Redis 默认 <code>everysec</code> 是约 1 秒量级的数据窗口，MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
 <p><strong>内存管理主体</strong>。这是三家最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 的运维门槛在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。Redis 和 MySQL 都原生支持随机读写，Redis 是 O(1) 到 O(log N) 的内存访问，MySQL 是 B+ 树的几次页访问。Kafka 不支持随机访问，只能按位移区间顺序消费。这条决定了适用场景——你需要按主键查一行数据，Kafka 直接出局。</p>
 <p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或回放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放重做日志通常较快（重做日志设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务；唯一受影响的是 PageCache 是否还热。</p>
@@ -2562,7 +2562,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s94">4.6 架构启示</h2>
 <p>这一章具体实现讲得够多了，现在要从中提炼出可复用的东西。下面五条启示，每一条都对应前面某一节的具体取舍，并能独立应用到任何系统的分层设计里。</p>
 <p><strong>启示一：分层深度匹配性能目标，而非追求"标准层数"。</strong></p>
-<p>很多人有种错觉：好系统就该分层多、抽象高。三家的实现直接反驳了这一点。Redis 的延迟目标是亚毫秒级，它就把层数压到最少，跨层全是函数调用；Kafka 的目标是单机几十万消息吞吐，它就把交互层做到最重，用四级线程结构榨干多核。脱离性能目标谈"该分几层"是无意义的——你的系统要的是纳秒级响应、毫秒级响应、还是秒级批处理？目标不同，最优分层形态天差地别。这一条对应的设计原则是：</p>
+<p>很多人有种错觉：好系统就该分层多、抽象高。三家的实现直接反驳了这一点。Redis 的目标是低延迟，它就把层数压到最少，跨层全是函数调用；Kafka 的目标是高吞吐，它就把交互层做到最重，用四级线程结构榨干多核。脱离性能目标谈"该分几层"是无意义的——你的系统要的是纳秒级响应、毫秒级响应、还是秒级批处理？目标不同，最优分层形态天差地别。这一条对应的设计原则是：</p>
 <blockquote><strong>分层的厚度，等于你愿意为这次抽象支付的延迟预算。</strong></blockquote>
 <p>你要为这次抽象付多少纳秒、多少毫秒的延迟？这是分层的唯一计量单位。Redis 的答案是"几乎为零"，所以它的层数少、跨层全是直接调用；Kafka 的答案是"毫秒级可以接受，以换取吞吐"，所以它的层多而厚。</p>
 <p><strong>启示二：接口稳定性优先于接口优雅性。</strong></p>
@@ -4895,7 +4895,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图8-4 Redis 复制积压缓冲区与 replication offset</figcaption></figure>
 <p>图 8-4　backlog 是滑动窗口，主从各持一个字节进度坐标；offset 在窗口内即可增量补差，否则全量。</p>
 <p>backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。窗口越大，能容忍越长时间的断线（典型场景：副本做一次短暂的 GC 或网络抖动），但主节点要常驻更多内存。这是个值得按业务调的参数——大流量实例把它调到几十 MB 甚至上百 MB 很常见，目的是让常见的短断线都走部分重同步，避免动辄全量。</p>
-<p>这里还有一个容易忽略但关键的细节：故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。这正是 PSYNC2（Redis 4.0 引入）相比老 PSYNC 的核心增强：副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步——这放宽了"主节点更换必然触发全量"的旧限制。具体的 replid 切换与比对边界（如新主刚提升那一刻是否仍持有完整老 backlog）以实际实现为准。</p>
+<p>这里还有一个容易忽略但关键的细节：故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。这正是 PSYNC2（Redis 4.0 引入）相比老 PSYNC 的核心增强：副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步——这放宽了"主节点更换必然触发全量"的旧限制。本书只需要抓住这一层机制：PSYNC2 不只比较字节进度，也把"这段进度属于哪一任主节点"纳入判断。</p>
 <h3 id="s192">关键取舍：把同步强度做成可写门槛</h3>
 <p>Redis 本质上是 AP，但它给了一个弱保证旋钮：<code>min-replicas-to-write N</code> + <code>min-replicas-max-lag T</code>。这条规则的意思是——主节点接受写入的前提是：至少有 N 个副本在线（连接存活），且这些副本的延迟（<code>master_repl_offset - replica_offset</code> 折算到秒）不超过 T 秒。</p>
 <p>注意这不是强一致，它只是把"主可以完全单点"约束成"主至少有 N 个跟得上的副本"，否则拒绝写入。这是一个"软门槛"：达不到门槛的写会被拒绝，但已通过的写仍然可能丢失（因为副本是异步追赶）。这个设计很典型地体现了 Redis 的工程哲学——不追求理论上的强一致，但在关键路径上设置一道可观测、可配置的弱保证，避免数据在无感知情况下丢失。</p>
@@ -5398,13 +5398,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>五条规律不是并列的清单，而是一棵树：第一条是根，后四条都在服务它。下面这张图把这种递进关系画清楚。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_9_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_9_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_9_2_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_9_1_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_9_2_arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_9_1_arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
     </marker>
   </defs>
@@ -5420,7 +5420,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
 
   <!-- "服务"主箭头：从规律一向下分叉到四条 -->
-  <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_9_2_arrowRed)"/>
+  <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_9_1_arrowRed)"/>
   <text x="455" y="178" font-size="11.5" fill="#EF4444" font-weight="600">后四条皆为之服务</text>
 
   <!-- 横向汇流线 -->
@@ -5467,9 +5467,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="765" y="331" text-anchor="middle" font-size="11" fill="#6B7280">可控可恢复</text>
 
   <!-- 横向递进箭头：二 → 三 → 四 → 五（设计层面的递进） -->
-  <line x1="222" y1="284" x2="248" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_2_arrowDash)"/>
-  <line x1="432" y1="284" x2="458" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_2_arrowDash)"/>
-  <line x1="642" y1="284" x2="688" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_2_arrowDash)"/>
+  <line x1="222" y1="284" x2="248" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_1_arrowDash)"/>
+  <line x1="432" y1="284" x2="458" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_1_arrowDash)"/>
+  <line x1="642" y1="284" x2="688" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_9_1_arrowDash)"/>
   <text x="235" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
   <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
   <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
@@ -5511,15 +5511,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底注 -->
   <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示"服务关系"，灰虚线表示"设计递进"；五条规律不是并列清单，而是一条收束链。</text>
 </svg>
-</div><figcaption>图 9-2 五条共性规律的递进关系</figcaption></figure>
-<p>图 9-2 五条共性规律的递进关系：后四条规律都在服务第一条——让真相之源又快、又稳、又可控。</p>
+</div><figcaption>图 9-1 五条共性规律的递进关系</figcaption></figure>
+<p>图 9-1 五条共性规律的递进关系：后四条规律都在服务第一条——让真相之源又快、又稳、又可控。</p>
 <p>读这张图的关键是看箭头：规律一定下"真相之源"的位置，规律二让它实现可替换、演进可控，规律三让它更快，规律四让它更稳，规律五让它故障可恢复。换句话说，后四条都在把第一条的"真相之源"改造成一个快、稳、可控的工程对象。理解了这棵树，你就理解了三家用不同语言讲的其实是同一套骨架。</p>
 <hr>
 <h2 id="s239">9.3 取舍之道：把共性规律翻译成可操作的权衡框架</h2>
 <p>规律告诉你"是什么"，取舍告诉你"怎么选"。这一节给读者一套可打分的取舍框架 —— 先列五个永恒的权衡维度（每个维度都有三家的落点），再给一个选型决策树，最后给三道判断练习题。这是连接"懂规律"与"会设计"的桥。</p>
 <h3 id="s240">9.3.1 五个永恒的权衡维度</h3>
 <p>每个维度的结构固定为：一句话定义张力 → 三家各自押在哪一端 → 代价是什么 → 什么场景该倒向哪一端。</p>
-<p><strong>维度一：速度 vs 持久性</strong>。这个维度问的是"数据写下去多久才算数"。Redis 默认押在速度端，<code>appendfsync=everysec</code> 允许丢最多 1 秒数据换来单核十几万 QPS；MySQL 默认押在持久性端，"双 1"配置（<code>innodb_flush_log_at_trx_commit=1</code> + <code>sync_binlog=1</code>）让每条已提交事务都 fsync，换来"断电不丢"，代价是每事务一次磁盘同步；Kafka 押在持久性端，<code>acks=all</code> + 多副本让一条消息被 ISR 全部确认才算写入成功，付的是副本同步的 RTT。代价是清楚的：Redis 换来了吞吐、MySQL 换来了断电安全、Kafka 换来了多副本不丢。场景判断也清楚 —— 缓存、计数器、限流可偏速度端；账本、订单、支付必须偏持久性端。没有对错，只有"你这个场景丢得起吗"。</p>
+<p><strong>维度一：速度 vs 持久性</strong>。这个维度问的是"数据写下去多久才算数"。Redis 默认押在速度端，<code>appendfsync=everysec</code> 把风险控制在约 1 秒量级的数据窗口内，换来更低的写入开销；MySQL 默认押在持久性端，"双 1"配置（<code>innodb_flush_log_at_trx_commit=1</code> + <code>sync_binlog=1</code>）让每条已提交事务都 fsync，换来"断电不丢"，代价是每事务一次磁盘同步；Kafka 押在持久性端，<code>acks=all</code> + 多副本让一条消息被 ISR 全部确认才算写入成功，付的是副本同步的 RTT。代价是清楚的：Redis 换来了吞吐、MySQL 换来了断电安全、Kafka 换来了多副本不丢。场景判断也清楚 —— 缓存、计数器、限流可偏速度端；账本、订单、支付必须偏持久性端。没有对错，只有"你这个场景丢得起吗"。</p>
 <p><strong>维度二：一致性 vs 可用性（CAP 的实战投影）</strong>。这个维度问的是网络分区时，要"对"还是要"活"。Redis Cluster 偏 AP，分区时持有多数主节点的分区继续服务、少数派分区的槽短暂不可用，故障切换时可能丢失少量已确认的写（异步复制的固有代价）；MySQL MGR 偏 CP，少数派分区直接拒绝写，宁可不活也不写错；Kafka 可调，用多数派选主 + <code>min.insync.replicas</code> 控制一致性强度，业务能在 CP 倾向和可用性之间自己调。AP 换来了高可用，代价是故障切换时可能丢少量写；CP 换来了强一致，代价是分区时部分请求失败。场景判断 —— 金融核心偏 CP（宁可拒绝服务也不能错账），社交 feed 偏 AP（少量数据可修，但不能不活）。</p>
 <p><strong>维度三：空间 vs 时间</strong>。这个维度问的是用空间换查询时间，还是用计算时间换存储空间。Redis 用内存换 O(1) 访问，把数据全部驻留内存是"空间换时间"的极致；MySQL 用 B+树索引 + 缓冲池换查询时间，索引和数据页都是为查询提速的额外空间开销；Kafka 用稀疏索引省空间（索引只记里程碑），用顺序扫描花时间兜底定位，是"时间换空间"的典型。空间换时间要付内存/存储成本，时间换空间要付 CPU 与延迟成本。场景判断 —— 热点读、低延迟访问偏空间换时间；冷数据归档、高吞吐追加偏时间换空间。</p>
 <p><strong>维度四：简单 vs 灵活</strong>。这个维度问的是把决策写死换性能，还是留开关换灵活性。Redis 把"命令执行单线程"写死（即便 6.0 起可开启多线程 IO 卸载网络读写，数据访问仍单线程），换来无锁快、可重入逻辑简单的内核，代价是单个实例吃不满多核 CPU；MySQL 的 Handler 接口留了灵活性，换来可插拔存储引擎，但付虚函数开销和跨层上下文传递；Kafka 把副本、位移、事务做成显式原语，灵活但概念多、学习曲线陡。简单难演进，灵活易误用 —— 这是一对永恒的张力。场景判断 —— 规模可控、需求稳定偏简单；需求多变、要长期演进偏灵活。</p>
@@ -5529,7 +5529,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>五个维度摆开之后，真正的问题是"我该怎么把它走通"。下图把取舍框架做成一棵可以一步步走的决策树。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_9_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_9_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
@@ -5544,7 +5544,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="118" text-anchor="middle" font-size="12" fill="#374151">从根出发，依次回答四个问题</text>
 
   <!-- 主干连线 -->
-  <line x1="460" y1="130" x2="460" y2="156" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="460" y1="130" x2="460" y2="156" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_2_arrow)"/>
 
   <!-- ============ 问题一：能丢吗 ============ -->
   <polygon points="460,158 612,212 460,266 308,212" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
@@ -5554,12 +5554,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q1 左分支：不能丢 -->
   <line x1="308" y1="212" x2="180" y2="212" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="180" y1="212" x2="180" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="180" y1="212" x2="180" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="240" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">不能丢</text>
 
   <!-- Q1 右分支：可丢/可秒丢 -->
   <line x1="612" y1="212" x2="740" y2="212" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="740" y1="212" x2="740" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="740" y1="212" x2="740" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="680" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">可丢/可秒丢</text>
 
   <!-- Q1 叶子 - 左 -->
@@ -5575,7 +5575,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="740" y="345" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis everysec / 缓存场景</text>
 
   <!-- ============ 问题二：一致性多强（中间主干） ============ -->
-  <line x1="460" y1="266" x2="460" y2="298" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="460" y1="266" x2="460" y2="298" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_2_arrow)"/>
 
   <polygon points="460,300 600,348 460,396 320,348" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="460" y="338" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q2 · 一致性多强？</text>
@@ -5584,12 +5584,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q2 左：偏强一致 -->
   <line x1="320" y1="348" x2="200" y2="348" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="200" y1="348" x2="200" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="200" y1="348" x2="200" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="258" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 CP</text>
 
   <!-- Q2 右：偏高可用 -->
   <line x1="600" y1="348" x2="720" y2="348" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="720" y1="348" x2="720" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="720" y1="348" x2="720" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="662" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 AP</text>
 
   <!-- Q2 叶子 - 左 -->
@@ -5605,7 +5605,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
 
   <!-- ============ 问题三：读写模式 ============ -->
-  <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_2_arrow)"/>
 
   <polygon points="460,428 600,472 460,516 320,472" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="460" y="462" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q3 · 读写模式？</text>
@@ -5614,12 +5614,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q3 左：空间换时间 -->
   <line x1="320" y1="472" x2="200" y2="472" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="200" y1="472" x2="200" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="200" y1="472" x2="200" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="258" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">空间换时间</text>
 
   <!-- Q3 右：时间换空间 -->
   <line x1="600" y1="472" x2="720" y2="472" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="720" y1="472" x2="720" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="720" y1="472" x2="720" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="662" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">时间换空间</text>
 
   <!-- Q3 叶子 - 左 -->
@@ -5635,7 +5635,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="588" text-anchor="middle" font-size="11" fill="#6B7280">→ Kafka 稀疏索引 + 顺序扫描</text>
 
   <!-- ============ 问题四：是否长期演进 ============ -->
-  <line x1="460" y1="516" x2="460" y2="546" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="460" y1="516" x2="460" y2="546" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_9_2_arrow)"/>
 
   <polygon points="460,548 612,588 460,628 308,588" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="460" y="578" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q4 · 长期演进？</text>
@@ -5644,12 +5644,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q4 左：偏简单 -->
   <line x1="308" y1="588" x2="200" y2="588" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="200" y1="588" x2="200" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="200" y1="588" x2="200" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="258" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏简单</text>
 
   <!-- Q4 右：偏灵活 -->
   <line x1="612" y1="588" x2="720" y2="588" stroke="#4B5563" stroke-width="1.4"/>
-  <line x1="720" y1="588" x2="720" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_3_arrow)"/>
+  <line x1="720" y1="588" x2="720" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_9_2_arrow)"/>
   <text x="662" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏灵活</text>
 
   <!-- Q4 叶子 - 左 -->
@@ -5672,8 +5672,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底注 -->
   <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
 </svg>
-</div><figcaption>图 9-3 实践者选型决策树</figcaption></figure>
-<p>图 9-3 实践者选型决策树：从"我要建一个有状态系统"出发，依次回答四个问题，叶子节点指向"这种约束组合下该借鉴哪家设计"。</p>
+</div><figcaption>图 9-2 实践者选型决策树</figcaption></figure>
+<p>图 9-2 实践者选型决策树：从"我要建一个有状态系统"出发，依次回答四个问题，叶子节点指向"这种约束组合下该借鉴哪家设计"。</p>
 <p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）；② 一致性要求多强（决定 CP/AP 倾向）；③ 读写模式是什么（决定空间/时间换法）；④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三家里谁的设计可借鉴"。关键澄清一句：决策树不是为了帮你选 Redis 还是 MySQL 当生产系统，而是为了让你<strong>先回答清楚自己的约束</strong>，再去三家的设计里"借形不借器"。比如你做一个秒杀库存系统，决策树会把你带到"持久性优先 + CP 倾向 + 热点读"的叶子，那里指向 MySQL 的双 1 与 MGR —— 不是说必须用 MySQL，而是说在强一致场景下，对真相之源的保护机制就该长成那个样子。</p>
 <h3 id="s242">9.3.3 三道判断练习</h3>
 <p>光看决策树不够，得动手走一遍。下面三道练习帮你把框架用起来。每题结构固定：场景描述 → 给出错误直觉 → 用本章框架推导正确取舍 → 指出该借鉴三家的哪条机制。</p>
@@ -5687,16 +5687,16 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s244">9.4.1 架构设计 checklist：动手前先回答的 12 个问题</h3>
 <p>把 9.3 的五个维度拆成 12 个具体问题，按"数据 / 性能 / 可靠性 / 运维"四类组织。下面这张表把每个问题连同"三家如何回答"和"你的系统该回答什么"摆在一起，作为动手前的自检工具。</p>
 <p><strong>表 9-2 架构设计 checklist（12 问）</strong></p>
-<div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>谁是真相之源？</td><td>内存键空间</td><td>redo log</td><td>日志 Segment</td><td>写下一个名字，并说清派生物有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 位移定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、Page Cache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>亚毫秒到毫秒</td><td>毫秒到十毫秒</td><td>毫秒到百毫秒</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>单核十几万 QPS</td><td>单机数千到数万 TPS</td><td>单机百万级消息/秒</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单 partition 易成热点</td><td>标出最热的 key/行/partition 与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认最多 1 秒</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（RTO）？</td><td>RDB 加载或 AOF 重放</td><td>redo log 重做 + undo 回滚</td><td>leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换剧本</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加 partition 受限、加 broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>谁是真相之源？</td><td>内存键空间</td><td>redo log</td><td>日志 Segment</td><td>写下一个名字，并说清派生物有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 位移定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、Page Cache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>低延迟优先</td><td>稳定延迟优先</td><td>高吞吐下的可接受延迟</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>热点 key 与单线程上限</td><td>事务提交与锁冲突上限</td><td>批量、分区、Broker 数决定上限</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单 partition 易成热点</td><td>标出最热的 key/行/partition 与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认约 1 秒量级窗口</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（RTO）？</td><td>RDB 加载或 AOF 重放</td><td>redo log 重做 + undo 回滚</td><td>leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换剧本</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加 partition 受限、加 broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
 <p>这张表的用法不是照抄三家的答案，而是借三家的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，三家的默认值差异巨大，正好提醒你 —— 这不是技术问题，是业务问题，得让业务方拍板。收束一句：<strong>这 12 个问题答完，选型往往就自然确定了 —— 因为约束已经替决策做了大部分工作</strong>。</p>
 <h3 id="s245">9.4.2 认知跃迁的四层台阶</h3>
 <p>读这本书的过程，本质上是一次认知坐标系的变换。这个过程可以拆成四层台阶。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_9_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_9_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
-    <marker id="fig_9_4_arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="fig_9_3_arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
@@ -5736,7 +5736,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="660" y1="250" x2="680" y2="250" stroke="#4B5563" stroke-width="1.2"/>
 
   <!-- 向上跃迁的主箭头（红色，沿台阶斜向上） -->
-  <path d="M 165 410 Q 280 370 360 330 Q 480 290 565 250 Q 680 215 770 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#fig_9_4_arrow)"/>
+  <path d="M 165 410 Q 280 370 360 330 Q 480 290 565 250 Q 680 215 770 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#fig_9_3_arrow)"/>
   <text x="465" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">认知跃迁方向（坐标系变换）</text>
 
   <!-- ============ 本书 8 章 / 本章对应标注 ============ -->
@@ -5746,13 +5746,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="360" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4F46E5">本书第 1–8 章</text>
   <text x="360" y="529" text-anchor="middle" font-size="11" fill="#374151">带读者完成 L1 → L2 的跃迁</text>
   <!-- 连线指到 L1/L2 之间 -->
-  <line x1="360" y1="498" x2="360" y2="490" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#fig_9_4_arrowGray)"/>
+  <line x1="360" y1="498" x2="360" y2="490" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#fig_9_3_arrowGray)"/>
 
   <!-- 本章：L2 → L3 -->
   <rect x="540" y="498" width="190" height="36" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4,3"/>
   <text x="635" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#D97706">第 9 章（本章）</text>
   <text x="635" y="529" text-anchor="middle" font-size="11" fill="#374151">推动 L2 → L3 的跃迁</text>
-  <line x1="610" y1="498" x2="580" y2="335" stroke="#D97706" stroke-width="1.2" marker-end="url(#fig_9_4_arrowGray)"/>
+  <line x1="610" y1="498" x2="580" y2="335" stroke="#D97706" stroke-width="1.2" marker-end="url(#fig_9_3_arrowGray)"/>
 
   <!-- ============ L3 核心能力 ============ -->
   <rect x="80" y="112" width="560" height="62" rx="6" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
@@ -5768,8 +5768,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底注 -->
   <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四层不是职称阶梯，而是"看问题的坐标系"逐层升级；L3 是分水岭——从回答"是什么"转到回答"为什么/换我怎么做"。</text>
 </svg>
-</div><figcaption>图 9-4 认知跃迁的四层台阶</figcaption></figure>
-<p>图 9-4 认知跃迁的四层台阶：L1 使用者到 L4 创新者，四层之间的差距是"看问题的坐标系"在逐层升级，而不是知识量在累加；本书第 1–8 章带读者完成 L1→L2，本章推动 L2→L3。</p>
+</div><figcaption>图 9-3 认知跃迁的四层台阶</figcaption></figure>
+<p>图 9-3 认知跃迁的四层台阶：L1 使用者到 L4 创新者，四层之间的差距是"看问题的坐标系"在逐层升级，而不是知识量在累加；本书第 1–8 章带读者完成 L1→L2，本章推动 L2→L3。</p>
 <p>从下到上四层：L1 是使用者，标志是会配置、会调优、知道"怎么用 Redis/SQL"，问题以"是什么、怎么配"开头；L2 是理解者，标志是懂内部机制、能讲清"为什么这么设计"，问题以"为什么"开头；L3 是设计者，标志是能借鉴思想设计自己的系统，问题以"换我怎么做"开头；L4 是创新者，标志是能定义新的架构范式。本书的 8 章对应 L1→L2 的跃迁 —— 把你从"会用"带到"懂机制"；本章对应 L2→L3 的跃迁 —— 把你从"懂机制"带到"能迁移"。</p>
 <p>L3 是分水岭，因为从这里开始，你回答的不再是"它是什么"，而是"换我怎么做"。L3 的核心能力可以拆成三项，每一项都能在三家里找到印证。<strong>抽象能力</strong>：看到 B+树、跳表、稀疏索引背后的"索引"本质，看到 redo log、AOF、Kafka 日志背后的"预写日志"本质，看到 PSYNC、GTID、ISR 背后的"用位点对齐状态机"本质。抽象能力让你能从一万个细节里抽出五个模式。<strong>权衡能力</strong>：理解每个选项的机会成本，知道 Redis 用"命令执行单线程"换无锁快、付了多核扩展的代价，知道 MySQL 用 fsync 换断电不丢、付了吞吐的代价，知道 Kafka 用副本换高可用、付了延迟和复杂度的代价。权衡能力让你能说清"为什么不选另一个方案"。<strong>工程直觉</strong>：快速识别瓶颈（是 CPU、是 IO、是网络、还是锁），预判规模放大后的表现（数据量翻十倍哪个组件先崩）。直觉来自反复实验，不能只靠读。</p>
 <p>一句话收束这一节：<strong>从使用者走到设计者，换的不是知识量，是看问题的坐标系</strong>。你不是在记住更多 API，而是在换一套提问方式。</p>
@@ -5802,12 +5802,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s253">Kafka</h3>
 <ul><li>Kafka 官方文档：&lt;https://kafka.apache.org/documentation/&gt;</li><li>Kafka 设计文档（含 LinkedIn 早期设计原文）：&lt;https://kafka.apache.org/documentation/#design&gt;</li><li>KRaft 模式：&lt;https://kafka.apache.org/documentation/#kraft&gt;</li><li>Kafka 安全（SASL / TLS / ACL）：&lt;https://kafka.apache.org/documentation/#security&gt;</li></ul>
 <h2 id="s254">二、Kafka 改进提案（KIP）</h2>
-<p>正文中引用到的关键 KIP，按编号排列：</p>
-<ul><li><strong>KIP-32</strong>：为消息增加时间戳（Kafka 0.10，消息格式 V1）。</li><li><strong>KIP-480</strong>：粘性分区器（Sticky Partitioner），生产者默认攒批策略。</li><li><strong>KIP-679</strong>：生产者默认 <code>acks=all</code>（Kafka 3.0 起）。</li><li><strong>KIP-833</strong>：KRaft 模式的生产可用路线与版本标记（3.3 起对新集群生产可用）。</li><li><strong>KIP-866</strong>：既有 ZooKeeper 集群迁移到 KRaft 的工具（3.4 起逐步成熟）。</li></ul>
+<p>正文中引用到的关键 KIP，按编号排列。每条均给出 Apache Wiki 直达页，避免读者只拿到总索引后再手工检索。</p>
+<ul><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-32%2B-%2BAdd%2Btimestamps%2Bto%2BKafka%2Bmessage">KIP-32</a></strong>：为消息增加时间戳（Kafka 0.10，消息格式 V1）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-480%3A%2BSticky%2BPartitioner">KIP-480</a></strong>：粘性分区器（Sticky Partitioner），生产者默认攒批策略。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-679%3A%2BProducer%2Bwill%2Benable%2Bthe%2Bstrongest%2Bdelivery%2Bguarantee%2Bby%2Bdefault">KIP-679</a></strong>：生产者默认 <code>acks=all</code>（Kafka 3.0 起）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-833%3A%2BMark%2BKRaft%2Bas%2BProduction%2BReady">KIP-833</a></strong>：KRaft 模式的生产可用路线与版本标记（3.3 起对新集群生产可用）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-866%2BZooKeeper%2Bto%2BKRaft%2BMigration">KIP-866</a></strong>：既有 ZooKeeper 集群迁移到 KRaft 的工具（3.4 起逐步成熟）。</li></ul>
 <p>KIP 全文索引见：&lt;https://cwiki.apache.org/confluence/display/KAFKA/Kafka+Improvement+Proposals&gt;</p>
 <h2 id="s255">三、经典论文与算法</h2>
 <p>这些是本书多家机制背后的理论源头，正文在用到处均有标注。</p>
-<ul><li>**Lamport, L. <em>The Part-Time Parliament</em>（Paxos）**. 1998. —— MySQL MGR 的 XCom、Kafka KRaft 之外的另一类共识算法家族的起点。</li><li>**Ongaro, D. &amp; Ousterhout, J. *In Search of an Understandable Consensus Algorithm (Raft)***. 2014. —— Kafka KRaft、Redis Sentinel 选举（Raft-like）的思想来源。</li><li>**Mohan, C. et al. *ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging***. 1992. —— MySQL InnoDB 崩溃恢复（分析、重做、回滚三阶段）的理论基础。</li><li>**Gray, J. &amp; Reuter, A. *Transaction Processing: Concepts and Techniques***. 1993. —— 事务、WAL、两阶段提交的系统化论述。</li><li>**Morris, R. *Counting Large Numbers of Events in Small Registers***. 1978. —— Redis LFU 用的对数近似计数器原型。</li><li>**Schneider, F. B. *Implementing Fault-Tolerant Services Using the State Machine Approach***. 1990. —— 第 8 章"状态机复制"模型的经典表述。</li><li>**O'Neil, P. et al. *The Log-Structured Merge-Tree***. 1996. —— 顺序日志与分层压实思想的源头（Kafka compaction、各类 LSM 引擎的共同基础）。</li></ul>
+<ul><li>**Lamport, L. <a href="https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf"><em>The Part-Time Parliament</em></a>（Paxos）**. 1998. —— MySQL MGR 的 XCom、Kafka KRaft 之外的另一类共识算法家族的起点。</li><li>**Ongaro, D. &amp; Ousterhout, J. <a href="https://raft.github.io/raft.pdf"><em>In Search of an Understandable Consensus Algorithm (Raft)</em></a>**. 2014. —— Kafka KRaft、Redis Sentinel 选举（Raft-like）的思想来源。</li><li>**Mohan, C. et al. <a href="https://doi.org/10.1145/128765.128770"><em>ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging</em></a>**. 1992. —— MySQL InnoDB 崩溃恢复（分析、重做、回滚三阶段）的理论基础。</li><li>**Gray, J. &amp; Reuter, A. *Transaction Processing: Concepts and Techniques***. 1993. —— 事务、WAL、两阶段提交的系统化论述。</li><li>**Morris, R. <a href="https://doi.org/10.1145/359619.359627"><em>Counting Large Numbers of Events in Small Registers</em></a>**. 1978. —— Redis LFU 用的对数近似计数器原型。</li><li>**Schneider, F. B. <a href="https://doi.org/10.1145/98163.98167"><em>Implementing Fault-Tolerant Services Using the State Machine Approach</em></a>**. 1990. —— 第 8 章"状态机复制"模型的经典表述。</li><li>**O'Neil, P. et al. <a href="https://doi.org/10.1007/s002360050048"><em>The Log-Structured Merge-Tree</em></a>**. 1996. —— 顺序日志与分层压实思想的源头（Kafka compaction、各类 LSM 引擎的共同基础）。</li></ul>
 <h2 id="s256">四、推荐延伸阅读</h2>
 <h3 id="s257">综合与数据系统</h3>
 <ul><li>**Kleppmann, M. *Designing Data-Intensive Applications***（DDIA）. O'Reilly, 2017. —— 本书反复呼应的姊妹篇，从更广的视角讨论数据系统的取舍，强烈推荐配套阅读。</li><li>**Bailis, P. et al. *Readings in Database Systems***（Red Book）. —— 数据库经典论文选读，按主题组织。</li></ul>

@@ -1,116 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
-    </marker>
-    <marker id="arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
-    </marker>
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-2　五条共性规律的递进关系</text>
-  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让真相之源又快、又稳、又可控</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-3　实践者选型决策树</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不是选 Redis 还是 MySQL，而是先把约束答清楚，再去三家"借形不借器"</text>
 
-  <!-- ============ 规律一：真相之源（顶端，核心） ============ -->
-  <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定"真相之源"</text>
-  <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个真相之源，其余皆为派生物</text>
-  <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
+  <!-- ============ 根节点 ============ -->
+  <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="460" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">我要建一个有状态的系统</text>
+  <text x="460" y="118" text-anchor="middle" font-size="12" fill="#374151">从根出发，依次回答四个问题</text>
 
-  <!-- "服务"主箭头：从规律一向下分叉到四条 -->
-  <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
-  <text x="455" y="178" font-size="11.5" fill="#EF4444" font-weight="600">后四条皆为之服务</text>
+  <!-- 主干连线 -->
+  <line x1="460" y1="130" x2="460" y2="156" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
 
-  <!-- 横向汇流线 -->
-  <line x1="130" y1="200" x2="780" y2="200" stroke="#EF4444" stroke-width="1.4"/>
-  <line x1="130" y1="200" x2="130" y2="232" stroke="#EF4444" stroke-width="1.4"/>
-  <line x1="340" y1="200" x2="340" y2="232" stroke="#EF4444" stroke-width="1.4"/>
-  <line x1="550" y1="200" x2="550" y2="232" stroke="#EF4444" stroke-width="1.4"/>
-  <line x1="780" y1="200" x2="780" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <!-- ============ 问题一：能丢吗 ============ -->
+  <polygon points="460,158 612,212 460,266 308,212" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="200" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q1 · 数据能丢吗？</text>
+  <text x="460" y="220" text-anchor="middle" font-size="11.5" fill="#374151">（速度 vs 持久性）</text>
+  <text x="460" y="240" text-anchor="middle" font-size="11.5" fill="#374151">RPO 容忍度是多少？</text>
 
-  <!-- ============ 规律二：层包裹可变 ============ -->
-  <rect x="40" y="232" width="180" height="104" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
-  <text x="130" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律二</text>
-  <text x="130" y="275" text-anchor="middle" font-size="12.5" fill="#374151">用"层"把可变性</text>
-  <text x="130" y="291" text-anchor="middle" font-size="12.5" fill="#374151">关进笼子</text>
-  <line x1="58" y1="302" x2="202" y2="302" stroke="#4F46E5" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="130" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让实现可替换</text>
-  <text x="130" y="331" text-anchor="middle" font-size="11" fill="#6B7280">演进自由度</text>
+  <!-- Q1 左分支：不能丢 -->
+  <line x1="308" y1="212" x2="180" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="180" y1="212" x2="180" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="240" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">不能丢</text>
 
-  <!-- ============ 规律三：顺序批量 ============ -->
-  <rect x="250" y="232" width="180" height="104" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
-  <text x="340" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律三</text>
-  <text x="340" y="275" text-anchor="middle" font-size="12.5" fill="#374151">把随机变顺序</text>
-  <text x="340" y="291" text-anchor="middle" font-size="12.5" fill="#374151">把一次变一批</text>
-  <line x1="268" y1="302" x2="412" y2="302" stroke="#059669" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="340" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更快</text>
-  <text x="340" y="331" text-anchor="middle" font-size="11" fill="#6B7280">提升吞吐</text>
+  <!-- Q1 右分支：可丢/可秒丢 -->
+  <line x1="612" y1="212" x2="740" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="740" y1="212" x2="740" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="680" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">可丢/可秒丢</text>
 
-  <!-- ============ 规律四：一致性看价签 ============ -->
-  <rect x="460" y="232" width="180" height="104" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="550" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律四</text>
-  <text x="550" y="275" text-anchor="middle" font-size="12.5" fill="#374151">可靠性要用性能去买</text>
-  <text x="550" y="291" text-anchor="middle" font-size="12.5" fill="#374151">但要知道买的是什么</text>
-  <line x1="478" y1="302" x2="622" y2="302" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="550" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更稳</text>
-  <text x="550" y="331" text-anchor="middle" font-size="11" fill="#6B7280">权衡 RPO 与延迟</text>
+  <!-- Q1 叶子 - 左 -->
+  <rect x="70" y="290" width="220" height="62" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="180" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏持久性档位</text>
+  <text x="180" y="330" text-anchor="middle" font-size="11" fill="#374151">真相之源不能丢</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 双1 / Kafka acks=all</text>
 
-  <!-- ============ 规律五：状态显式建模 ============ -->
-  <rect x="690" y="232" width="150" height="104" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="765" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律五</text>
-  <text x="765" y="275" text-anchor="middle" font-size="12.5" fill="#374151">复杂状态显式建模</text>
-  <text x="765" y="291" text-anchor="middle" font-size="12.5" fill="#374151">故障恢复可预测</text>
-  <line x1="708" y1="302" x2="822" y2="302" stroke="#6B7280" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="765" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源</text>
-  <text x="765" y="331" text-anchor="middle" font-size="11" fill="#6B7280">可控可恢复</text>
+  <!-- Q1 叶子 - 右 -->
+  <rect x="630" y="290" width="220" height="62" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="740" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏速度档位</text>
+  <text x="740" y="330" text-anchor="middle" font-size="11" fill="#374151">可容忍秒级丢</text>
+  <text x="740" y="345" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis everysec / 缓存场景</text>
 
-  <!-- 横向递进箭头：二 → 三 → 四 → 五（设计层面的递进） -->
-  <line x1="222" y1="284" x2="248" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
-  <line x1="432" y1="284" x2="458" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
-  <line x1="642" y1="284" x2="688" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
-  <text x="235" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
-  <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
-  <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+  <!-- ============ 问题二：一致性多强（中间主干） ============ -->
+  <line x1="460" y1="266" x2="460" y2="298" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
 
-  <!-- ============ 底部：三家印证带 ============ -->
-  <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三家印证：同一条规律，三种语言</text>
+  <polygon points="460,300 600,348 460,396 320,348" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="338" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q2 · 一致性多强？</text>
+  <text x="460" y="356" text-anchor="middle" font-size="11.5" fill="#374151">（CP vs AP）</text>
+  <text x="460" y="374" text-anchor="middle" font-size="11.5" fill="#374151">分区时要"对"还是要"活"？</text>
 
-  <!-- Redis 列 -->
-  <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
-  <text x="182" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
-  <line x1="76" y1="442" x2="288" y2="442" stroke="#4F46E5" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存即真相，RDB/AOF 派生</text>
-  <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type 与 encoding 解耦</text>
-  <text x="76" y="502" font-size="11.5" fill="#374151">· 规律三：pipeline / Multi 压往返</text>
-  <text x="76" y="522" font-size="11.5" fill="#374151">· 规律四：appendfsync 三档价签</text>
-  <text x="76" y="542" font-size="11.5" fill="#374151">· 规律五：键空间 + RDB/AOF 恢复剧本</text>
+  <!-- Q2 左：偏强一致 -->
+  <line x1="320" y1="348" x2="200" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="348" x2="200" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 CP</text>
 
-  <!-- MySQL 列 -->
-  <rect x="318" y="412" width="244" height="180" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
-  <text x="440" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
-  <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为真相，缓冲池派生</text>
-  <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
-  <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer / group commit</text>
-  <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的价签</text>
-  <text x="334" y="542" font-size="11.5" fill="#374151">· 规律五：ARIES 三阶段 + GTID</text>
+  <!-- Q2 右：偏高可用 -->
+  <line x1="600" y1="348" x2="720" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="348" x2="720" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="341" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏 AP</text>
 
-  <!-- Kafka 列 -->
-  <rect x="576" y="412" width="244" height="180" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1"/>
-  <text x="698" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
-  <line x1="592" y1="442" x2="804" y2="442" stroke="#059669" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为真相，副本派生</text>
-  <text x="592" y="482" font-size="11.5" fill="#374151">· 规律二：Log 接口分层，冷段可挪</text>
-  <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：Record Batch + 零拷贝</text>
-  <text x="592" y="522" font-size="11.5" fill="#374151">· 规律四：acks / min.insync 价签</text>
-  <text x="592" y="542" font-size="11.5" fill="#374151">· 规律五：HW/LEO + Controller 重选</text>
+  <!-- Q2 叶子 - 左 -->
+  <rect x="90" y="414" width="220" height="58" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="200" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">少数派拒绝写</text>
+  <text x="200" y="453" text-anchor="middle" font-size="11" fill="#374151">金融核心 / 账本</text>
+  <text x="200" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL MGR / Kafka 多数派</text>
+
+  <!-- Q2 叶子 - 右 -->
+  <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区先接客</text>
+  <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
+  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
+
+  <!-- ============ 问题三：读写模式 ============ -->
+  <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <polygon points="460,428 600,472 460,516 320,472" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="462" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q3 · 读写模式？</text>
+  <text x="460" y="480" text-anchor="middle" font-size="11.5" fill="#374151">（空间 vs 时间）</text>
+  <text x="460" y="498" text-anchor="middle" font-size="11.5" fill="#374151">热点读 / 随机点查 / 顺序流？</text>
+
+  <!-- Q3 左：空间换时间 -->
+  <line x1="320" y1="472" x2="200" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="472" x2="200" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">空间换时间</text>
+
+  <!-- Q3 右：时间换空间 -->
+  <line x1="600" y1="472" x2="720" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="472" x2="720" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="465" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">时间换空间</text>
+
+  <!-- Q3 叶子 - 左 -->
+  <rect x="90" y="536" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">内存换 O(1) 访问</text>
+  <text x="200" y="575" text-anchor="middle" font-size="11" fill="#374151">热点读 / 随机点查</text>
+  <text x="200" y="588" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis / MySQL B+树索引</text>
+
+  <!-- Q3 叶子 - 右 -->
+  <rect x="610" y="536" width="220" height="58" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="720" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">顺序扫描兜底定位</text>
+  <text x="720" y="575" text-anchor="middle" font-size="11" fill="#374151">高吞吐追加 / 冷数据归档</text>
+  <text x="720" y="588" text-anchor="middle" font-size="11" fill="#6B7280">→ Kafka 稀疏索引 + 顺序扫描</text>
+
+  <!-- ============ 问题四：是否长期演进 ============ -->
+  <line x1="460" y1="516" x2="460" y2="546" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <polygon points="460,548 612,588 460,628 308,588" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="578" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q4 · 长期演进？</text>
+  <text x="460" y="596" text-anchor="middle" font-size="11.5" fill="#374151">（简单 vs 灵活）</text>
+  <text x="460" y="614" text-anchor="middle" font-size="11.5" fill="#374151">需求多变，还是规模可控？</text>
+
+  <!-- Q4 左：偏简单 -->
+  <line x1="308" y1="588" x2="200" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="588" x2="200" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="258" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏简单</text>
+
+  <!-- Q4 右：偏灵活 -->
+  <line x1="612" y1="588" x2="720" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="588" x2="720" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="662" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">偏灵活</text>
+
+  <!-- Q4 叶子 - 左 -->
+  <rect x="90" y="650" width="220" height="54" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">决策写死换性能</text>
+  <text x="200" y="688" text-anchor="middle" font-size="11" fill="#374151">规模可控、需求稳定</text>
+  <text x="200" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis 单线程无锁模型</text>
+
+  <!-- Q4 叶子 - 右 -->
+  <rect x="610" y="650" width="220" height="54" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="720" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">留开关换灵活性</text>
+  <text x="720" y="688" text-anchor="middle" font-size="11" fill="#374151">需求多变、长期演进</text>
+  <text x="720" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 可插拔引擎</text>
+
+  <!-- 中间收束提示 -->
+  <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
+  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型自己浮出来</text>
+  <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">约束已替你做了决定</text>
 
   <!-- 底注 -->
-  <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示"服务关系"，灰虚线表示"设计递进"；五条规律不是并列清单，而是一条收束链。</text>
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
 </svg>

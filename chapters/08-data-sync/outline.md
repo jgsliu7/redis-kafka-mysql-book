@@ -119,7 +119,7 @@
 - **第7章 磁盘存储格式**：binlog 格式、Kafka 日志段格式、RDB 格式，是同步传播单元的字节级载体。
 - **第9章 总结**：状态机复制 + 位点对齐 = 规律五核心印证。
 
-## 难点与不确定处（risks，撰写时逐条核验、不确定标"以实际实现为准"）
+## 难点与不确定处（risks，撰写时逐条核验）
 - 复制积压缓冲区 backlog 默认大小（约 1MB）与 `repl-backlog-size` / `repl-backlog-ttl` 需核 Redis 7.x 默认值。
 - PSYNC2 部分重同步窗口语义、replid 切换（故障转移后）细节需核。
 - 半同步 `after_commit` / `after_sync` 语义、8.0 统一为 source/replica 术语、`rpl_semi_sync_source_wait_for_replica_count` / `timeout` 需核 8.0.x。
