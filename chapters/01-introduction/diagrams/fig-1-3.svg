@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow-1-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　三家软件在五个维度上的定位雷达</text>
+  <text x="440" y="52" text-anchor="middle" font-size="12.5" fill="#374151">Redis 朝「低延迟」凸 · MySQL 朝「强一致 / 容量 / 查询」凸 · Kafka 朝「高吞吐」凸</text>
+
+  <!-- ============ 雷达网格（中心 300,330，R=200） ============ -->
+
+  <!-- 3 档同心五边形（score 1 / 3 / 5） -->
+  <polygon points="300.0,290.0 338.0,317.6 323.5,362.4 276.5,362.4 262.0,317.6"
+           fill="none" stroke="#E5E7EB" stroke-width="1"/>
+  <polygon points="300.0,210.0 414.1,292.9 370.5,427.1 229.5,427.1 185.9,292.9"
+           fill="none" stroke="#E5E7EB" stroke-width="1"/>
+  <polygon points="300.0,130.0 490.2,268.2 417.6,491.8 182.4,491.8 109.8,268.2"
+           fill="none" stroke="#D1D5DB" stroke-width="1.3"/>
+
+  <!-- 5 条轴线（中心 → 各顶点） -->
+  <g stroke="#D1D5DB" stroke-width="1">
+    <line x1="300" y1="330" x2="300.0" y2="130.0"/>
+    <line x1="300" y1="330" x2="490.2" y2="268.2"/>
+    <line x1="300" y1="330" x2="417.6" y2="491.8"/>
+    <line x1="300" y1="330" x2="182.4" y2="491.8"/>
+    <line x1="300" y1="330" x2="109.8" y2="268.2"/>
+  </g>
+
+  <!-- 刻度数字（在顶部轴上标 1/3/5） -->
+  <g font-size="9.5" fill="#9CA3AF" text-anchor="start">
+    <text x="305" y="293">1</text>
+    <text x="305" y="213">3</text>
+    <text x="305" y="133">5</text>
+  </g>
+
+  <!-- 中心点 -->
+  <circle cx="300" cy="330" r="2.2" fill="#6B7280"/>
+
+  <!-- 维度标签（轴顶端） -->
+  <g font-size="13" font-weight="700" fill="#111827" text-anchor="middle">
+    <text x="300.0" y="112">低延迟</text>
+    <text x="528" y="265">高吞吐</text>
+    <text x="442" y="514">强一致性</text>
+    <text x="158" y="514">数据容量</text>
+    <text x="72" y="265">查询灵活度</text>
+  </g>
+  <!-- 维度小注 -->
+  <g font-size="10.5" fill="#6B7280" text-anchor="middle">
+    <text x="300.0" y="126">越小越快</text>
+    <text x="528" y="280">每秒处理量</text>
+    <text x="442" y="528">不丢不重</text>
+    <text x="158" y="528">能存多少</text>
+    <text x="72" y="280">SQL/过滤/聚合</text>
+  </g>
+
+  <!-- ============ 三家多边形 ============ -->
+
+  <!-- Redis 多边形: 5,3,2,1,2 -->
+  <polygon points="300.0,130.0 414.1,292.9 347.0,394.7 276.5,362.4 223.9,305.3"
+           fill="#4F46E5" fill-opacity="0.18" stroke="#4F46E5" stroke-width="2"/>
+  <g fill="#4F46E5">
+    <circle cx="300.0" cy="130.0" r="3.5"/>
+    <circle cx="414.1" cy="292.9" r="3.5"/>
+    <circle cx="347.0" cy="394.7" r="3.5"/>
+    <circle cx="276.5" cy="362.4" r="3.5"/>
+    <circle cx="223.9" cy="305.3" r="3.5"/>
+  </g>
+
+  <!-- MySQL 多边形: 2,2,5,5,5 -->
+  <polygon points="300.0,250.0 376.1,305.3 417.6,491.8 182.4,491.8 109.8,268.2"
+           fill="#D97706" fill-opacity="0.18" stroke="#D97706" stroke-width="2"/>
+  <g fill="#D97706">
+    <circle cx="300.0" cy="250.0" r="3.5"/>
+    <circle cx="376.1" cy="305.3" r="3.5"/>
+    <circle cx="417.6" cy="491.8" r="3.5"/>
+    <circle cx="182.4" cy="491.8" r="3.5"/>
+    <circle cx="109.8" cy="268.2" r="3.5"/>
+  </g>
+
+  <!-- Kafka 多边形: 3,5,3,4,1 -->
+  <polygon points="300.0,210.0 490.2,268.2 370.5,427.1 206.0,459.4 262.0,317.6"
+           fill="#059669" fill-opacity="0.18" stroke="#059669" stroke-width="2"/>
+  <g fill="#059669">
+    <circle cx="300.0" cy="210.0" r="3.5"/>
+    <circle cx="490.2" cy="268.2" r="3.5"/>
+    <circle cx="370.5" cy="427.1" r="3.5"/>
+    <circle cx="206.0" cy="459.4" r="3.5"/>
+    <circle cx="262.0" cy="317.6" r="3.5"/>
+  </g>
+
+  <!-- ============ 右侧图例 + 评分表 ============ -->
+  <text x="600" y="120" font-size="14" font-weight="700" fill="#111827">图例与评分（0-5 分）</text>
+
+  <!-- Redis 图例 -->
+  <rect x="600" y="138" width="20" height="14" rx="2" fill="#4F46E5" fill-opacity="0.35" stroke="#4F46E5" stroke-width="1.8"/>
+  <text x="628" y="150" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
+  <text x="672" y="150" font-size="11.5" fill="#374151">在乎「快」</text>
+
+  <!-- MySQL 图例 -->
+  <rect x="600" y="162" width="20" height="14" rx="2" fill="#D97706" fill-opacity="0.35" stroke="#D97706" stroke-width="1.8"/>
+  <text x="628" y="174" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
+  <text x="678" y="174" font-size="11.5" fill="#374151">在乎「对」</text>
+
+  <!-- Kafka 图例 -->
+  <rect x="600" y="186" width="20" height="14" rx="2" fill="#059669" fill-opacity="0.35" stroke="#059669" stroke-width="1.8"/>
+  <text x="628" y="198" font-size="13" font-weight="700" fill="#059669">Kafka</text>
+  <text x="672" y="198" font-size="11.5" fill="#374151">在乎「多」</text>
+
+  <!-- 评分表 -->
+  <rect x="596" y="218" width="252" height="180" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <!-- 表头 -->
+  <text x="608" y="238" font-size="11.5" font-weight="700" fill="#374151">维度</text>
+  <text x="744" y="238" font-size="11.5" font-weight="700" fill="#4F46E5" text-anchor="middle">Redis</text>
+  <text x="788" y="238" font-size="11.5" font-weight="700" fill="#D97706" text-anchor="middle">MySQL</text>
+  <text x="832" y="238" font-size="11.5" font-weight="700" fill="#059669" text-anchor="middle">Kafka</text>
+  <line x1="604" y1="246" x2="840" y2="246" stroke="#E5E7EB" stroke-width="1"/>
+  <!-- 行 -->
+  <g font-size="11.5" fill="#374151">
+    <text x="608" y="264">低延迟</text>
+    <text x="744" y="264" text-anchor="middle" font-weight="700" fill="#4F46E5">5</text>
+    <text x="788" y="264" text-anchor="middle">2</text>
+    <text x="832" y="264" text-anchor="middle">3</text>
+
+    <text x="608" y="288">高吞吐</text>
+    <text x="744" y="288" text-anchor="middle">3</text>
+    <text x="788" y="288" text-anchor="middle">2</text>
+    <text x="832" y="288" text-anchor="middle" font-weight="700" fill="#059669">5</text>
+
+    <text x="608" y="312">强一致性</text>
+    <text x="744" y="312" text-anchor="middle">2</text>
+    <text x="788" y="312" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
+    <text x="832" y="312" text-anchor="middle">3</text>
+
+    <text x="608" y="336">数据容量</text>
+    <text x="744" y="336" text-anchor="middle">1</text>
+    <text x="788" y="336" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
+    <text x="832" y="336" text-anchor="middle">4</text>
+
+    <text x="608" y="360">查询灵活度</text>
+    <text x="744" y="360" text-anchor="middle">2</text>
+    <text x="788" y="360" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
+    <text x="832" y="360" text-anchor="middle">1</text>
+
+    <text x="608" y="388" font-size="10.5" fill="#6B7280" font-style="italic">粗体 = 该维度领先者</text>
+  </g>
+
+  <!-- ============ 下方解读卡片 ============ -->
+  <rect x="40" y="540" width="256" height="62" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：偏科「快」</text>
+  <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分独占鳌头，</text>
+  <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
+
+  <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：全能「对」</text>
+  <text x="328" y="580" font-size="11" fill="#374151">一致性 / 容量 / 查询三满，</text>
+  <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
+
+  <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：偏科「多」</text>
+  <text x="600" y="580" font-size="11" fill="#374151">高吞吐 5 分压满，</text>
+  <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
+</svg>
