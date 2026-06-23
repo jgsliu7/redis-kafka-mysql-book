@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 6 章 集群架构 — 从单点到分布式</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
+.toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
+.toc-title a{color:inherit;text-decoration:none}
+.toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
+nav.toc ul{list-style:none;padding:0;margin:0}
+nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc li>a:hover{background:var(--soft)}
+nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
+nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
+.content{padding:32px 48px 120px;max-width:1000px}
+.chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
+.page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
+.page-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.page-nav .empty{visibility:hidden}
+h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
+h1{font-size:1.9em;margin:0 0 .6em;padding-bottom:.3em}
+h2{font-size:1.42em;margin:1.8em 0 .6em}
+h3{font-size:1.18em;margin:1.5em 0 .5em}
+h4{font-size:1.04em;margin:1.3em 0 .4em;color:#24292f}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:700;color:#111827}
+em{font-style:normal;color:var(--mute)}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:.12em .4em;border-radius:4px;font-size:.9em;color:#24292f}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:8px;overflow-x:auto;line-height:1.55}
+pre code{background:none;color:inherit;padding:0;font-size:.86em}
+blockquote{margin:1.2em 0;padding:.6em 1em .6em 1.1em;border-left:4px solid var(--accent);background:#f7f8ff;color:#343a40;border-radius:0 6px 6px 0}
+blockquote strong{color:var(--accent)}
+ul,ol{margin:0 0 1em;padding-left:1.7em}
+li{margin:.25em 0}
+.table-wrap{overflow-x:auto;margin:1.2em 0}
+table{border-collapse:collapse;width:100%;font-size:.94em}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+thead th{background:#eef2ff;color:#3730a3;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.toc-toggle{display:none}
+.review-index{display:grid;gap:12px;margin:24px 0 0}
+.review-index a{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:#fff}
+.review-index a:hover{border-color:var(--accent);background:#f7f8ff}
+.review-index strong{display:block;color:var(--ink)}
+.review-index span{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+@media(max-width:1200px){figure.fig{margin:2em auto}}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  nav.toc.open{transform:translateX(0)}
+  .content{padding:20px 18px 80px;max-width:100%}
+  .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+  .backdrop.show{display:block}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="bd"></div>
+<button class="toc-toggle">目录</button>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="toc-title"><a href="../index.html">架构之道</a></div>
+  <div class="toc-sub">分页审阅版</div>
+  <ul>
+<li><a href="../index.html">首页目录</a></li>
+<li><a href="00-preface.html">序言</a>
+</li>
+<li><a href="01-introduction.html">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</a>
+</li>
+<li><a href="02-lifecycle.html">第 2 章 生命周期管理 — 优雅启动与关闭的艺术</a>
+</li>
+<li><a href="03-memory-disk.html">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</a>
+</li>
+<li><a href="04-layered-architecture.html">第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a>
+</li>
+<li><a href="05-security.html">第 5 章 安全机制 — 权限、加密、审计</a>
+</li>
+<li class="active"><a href="06-cluster.html">第 6 章 集群架构 — 从单点到分布式</a>
+<ul>
+<li class="nav-sub"><a href="#s124">本章导读</a></li>
+<li class="nav-sub"><a href="#s125">6.1 问题的本质</a></li>
+<li class="nav-sub"><a href="#s126">6.2 Redis 的做法</a></li>
+<li class="nav-sub"><a href="#s130">6.3 MySQL 的做法</a></li>
+<li class="nav-sub"><a href="#s136">6.4 Kafka 的做法</a></li>
+<li class="nav-sub"><a href="#s141">6.5 横向对比</a></li>
+<li class="nav-sub"><a href="#s142">6.6 架构启示</a></li>
+<li class="nav-sub"><a href="#s143">6.7 小结</a></li>
+</ul>
+</li>
+<li><a href="07-storage-format.html">第 7 章 磁盘存储格式 — 文件结构的设计哲学</a>
+</li>
+<li><a href="08-data-sync.html">第 8 章 数据同步机制 — 集群一致性的实现</a>
+</li>
+<li><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a>
+</li>
+<li><a href="10-epilogue.html">后记</a>
+</li>
+<li><a href="11-references.html">附录　参考文献与延伸阅读</a>
+</li>
+</ul>
+</nav>
+<main class="content">
+<article class="chapter"><h1 id="s123">第 6 章 集群架构 — 从单点到分布式</h1>
+<h2 id="s124">本章导读</h2>
+<p>业务跑顺了，流量却开始翻倍。某天你会发现一台机器扛不住了：CPU 打满、磁盘告急，再宕一次机整个服务就跟着瘫痪。这是每个成长中的后端系统迟早要撞上的墙——单机的 CPU、内存、磁盘都有物理上限，机器也总会坏，要跨过这道墙，只能把数据和服务分摊到多台机器上，对外还得装成一台。这就是集群架构要解决的问题。</p>
+<p>但分布式既是解药也是新病。一旦数据散到多台机器，四个新难题立刻冒出来：数据怎么切才均衡、副本之间怎么保持一致、某台挂了怎么自动发现和转移、集群的元数据到底谁说了算。Redis、MySQL、Kafka 在生产环境里把这些问题打磨了十几年，而且交出了三个几乎针锋相对的答案：同样面对"单点不够用"，Redis 优先保可用、容忍丢写（AP）；MySQL 守住"不丢一笔数据"的底线（CP）；Kafka 则把一致性做成了一个可调旋钮，把取舍直接交到你手里。读懂这一章，就读懂了三者最根本的取舍。</p>
+<p>读完本章，你会得到一条从"单点 → 多副本 → 分片 → 自动容错"的完整演进脉络，看清共识协议（Raft、Paxos 变种）、Gossip、ISR 三种元数据与一致性手段的本质差异，并能从中提炼出可复用的集群设计原则。需要先约定边界：本章聚焦集群的拓扑、角色、分片、容错与元数据管理；复制的字节级细节（binlog 格式、RDB/AOF、副本同步流）归第 8 章，本章只在必要处一笔带过。</p>
+<h2 id="s125">6.1 问题的本质</h2>
+<p>集群要解决的问题，看似只有一个——"单机容量或性能不够"——但展开看其实是两件完全不同的事。把它们混淆，是绝大多数集群设计失误的起点。</p>
+<p>第一件是<strong>水平扩展（scale-out）</strong>。一台机器的内存装不下全部数据，一块磁盘写满，一个 CPU 跑不动全部计算。解法是把数据切到多台机器上，每台只承担一部分。这件事技术上叫分片（sharding）或分区（partitioning）。它解决的是<strong>容量与吞吐</strong>。</p>
+<p>第二件是<strong>高可用（high availability）</strong>。一台机器必然会坏——电源故障、网卡失联、磁盘损坏、机房断电。如果数据只有一份，那这一台坏了，这部分数据就不可读不可写，业务随之中断。解法是把同一份数据存到多台机器上，一台坏了另一台接管，这件事叫复制（replication）。它解决的是<strong>可用性</strong>。</p>
+<p>分片和复制是正交的。你可以只分片不复制：容量上去了，但任何一台坏了，它负责的那份数据就没了；也可以只复制不分片：可用性上去了，但总容量仍受单机限制，顶不住数据增长。真正成熟的集群两件事都做，但分工清晰：分片扩容，副本保活。</p>
+<p>单机还有第三道天花板——<strong>单节点吞吐瓶颈</strong>。即便数据量不大，单机的网络带宽、磁盘 IOPS 也可能成为吞吐上限。分片天然也解决了这个问题，因为分片把流量分摊到了多台机器上。</p>
+<p>至此，问题清楚了。但分布式一上来，立刻引入四个新的难题，本章后面三家会逐一回应。</p>
+<p><strong>第一，数据怎么切。</strong> 是按范围切（如 0-999 在节点 A、1000-1999 在节点 B），还是按哈希切（<code>hash(key) % N</code>）？哈希分片分布均匀，但加节点就要重分片、数据大搬迁；范围分片支持范围查询，但容易热点。重分片的代价，是集群能不能平滑扩容的关键。</p>
+<p><strong>第二，副本怎么一致。</strong> 主节点写完一笔，要不要等从节点确认？不等（异步复制）最快，但主挂了可能丢已提交的写；全等（同步复制）不丢，但任何一个慢从都会拖垮写性能；折中是多数派确认——只要大多数副本确认了就算提交，这也是共识协议的核心思想。一致性强度与写延迟，永远是同一枚硬币的两面。</p>
+<p><strong>第三，故障怎么发现与转移。</strong> 一个节点多久没心跳算"死"？是单点判定（主观下线）还是多数派投票（客观下线）？选新主按什么规则（优先级、日志进度、ID）？分区时少数派该怎么办——继续写（可能脑裂）还是停服（宁可不可用）？这套机制决定了集群在故障时的表现。</p>
+<p><strong>第四，元数据谁说了算。</strong> 哪个节点负责哪些分片？谁是当前的主？副本同步到哪了？这些元数据（metadata）放哪——是集中存到一个协调者（Controller）上，还是去中心化地用 Gossip 让所有节点最终一致？集中式强一致但有单点风险，去中心化无单点但收敛慢。这是集群架构的另一条主轴。</p>
+<p>这四个难题之上，还横着一条更根本的约束：<strong>CAP 定理</strong>。网络分区（Partition）是分布式绕不开的现实，于是一致性（Consistency）与可用性（Availability）必须取舍。P 是给定的，C 和 A 之间只能偏一头。Redis 偏 A，MySQL 偏 C，Kafka 在两端之间可调——这条主轴贯穿全章。</p>
+<p>下面我们看三家各自怎么走这条路。图 6-1 把三家的演进主线并列出来，便于先建立一个总体印象。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_6_1_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_6_1_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-1　单点到集群的演进路径（三家并列）</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右是「不断还债」的过程：前一段留下什么痛点，后一段补上</text>
+
+  <!-- Column headers -->
+  <rect x="40"  y="70" width="270" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="175" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis（AP · 缓存优先）</text>
+
+  <rect x="325" y="70" width="270" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL（CP · 不丢数据）</text>
+
+  <rect x="610" y="70" width="270" height="34" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="745" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#059669">Kafka（可调 · 流管道）</text>
+
+  <!-- ===== Redis column ===== -->
+  <rect x="50" y="135" width="250" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="175" y="160" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">① 主从复制</text>
+  <text x="175" y="180" text-anchor="middle" font-size="12" fill="#374151">异步复制 · 写仍单主</text>
+  <text x="175" y="196" text-anchor="middle" font-size="12" fill="#374151">解决：可用性（手动）</text>
+
+  <line x1="175" y1="205" x2="175" y2="245" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="185" y="230" font-size="11" fill="#EF4444">故障转移需人工</text>
+
+  <rect x="50" y="245" width="250" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="175" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② Sentinel 哨兵</text>
+  <text x="175" y="290" text-anchor="middle" font-size="12" fill="#374151">SDOWN→ODOWN→Raft 选主</text>
+  <text x="175" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：自动故障转移</text>
+
+  <line x1="175" y1="315" x2="175" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="185" y="340" font-size="11" fill="#EF4444">仍不能水平扩写</text>
+
+  <rect x="50" y="355" width="250" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="175" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ Redis Cluster</text>
+  <text x="175" y="400" text-anchor="middle" font-size="12" fill="#374151">16384 槽分片 + Gossip</text>
+  <text x="175" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：扩展 + 自动容错</text>
+
+  <text x="175" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：AP（分区优先可用）</text>
+
+  <!-- ===== MySQL column ===== -->
+  <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="460" y="160" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">① 异步复制</text>
+  <text x="460" y="180" text-anchor="middle" font-size="12" fill="#374151">binlog 推送 · 主不等从</text>
+  <text x="460" y="196" text-anchor="middle" font-size="12" fill="#374151">问题：主挂可丢已提交事务</text>
+
+  <line x1="460" y1="205" x2="460" y2="245" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="470" y="230" font-size="11" fill="#EF4444">主挂可丢数据</text>
+
+  <rect x="335" y="245" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="460" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② 半同步复制</text>
+  <text x="460" y="290" text-anchor="middle" font-size="12" fill="#374151">主等 ≥1 个从 ACK 才返回</text>
+  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：不丢（超时降级回异步）</text>
+
+  <line x1="460" y1="315" x2="460" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="470" y="340" font-size="11" fill="#EF4444">仍无共识 · 脑裂风险</text>
+
+  <rect x="335" y="355" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="460" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ Group Replication (MGR)</text>
+  <text x="460" y="400" text-anchor="middle" font-size="12" fill="#374151">Paxos 多数派确认 · 不分片</text>
+  <text x="460" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：强一致 + 自动 View Change</text>
+
+  <text x="460" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：CP（少数派分区停服）</text>
+
+  <!-- ===== Kafka column ===== -->
+  <rect x="620" y="135" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="745" y="160" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">① Partition 分片</text>
+  <text x="745" y="180" text-anchor="middle" font-size="12" fill="#374151">Topic 切有序追加日志</text>
+  <text x="745" y="196" text-anchor="middle" font-size="12" fill="#374151">解决：并行度与吞吐</text>
+
+  <line x1="745" y1="205" x2="745" y2="245" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="755" y="230" font-size="11" fill="#EF4444">单分区无容错</text>
+
+  <rect x="620" y="245" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="745" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② Replica + ISR</text>
+  <text x="745" y="290" text-anchor="middle" font-size="12" fill="#374151">Leader/Follower · 动态门槛</text>
+  <text x="745" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：可用 + 不丢（ISR 内选主）</text>
+
+  <line x1="745" y1="315" x2="745" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_1_arrow-gray)"/>
+  <text x="755" y="340" font-size="11" fill="#EF4444">元数据外挂 ZK</text>
+
+  <rect x="620" y="355" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="745" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ KRaft 元数据</text>
+  <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 单进程强一致</text>
+  <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：百万分区 + 快速恢复</text>
+
+  <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：AP 默认 / CP 可配（acks=all）</text>
+
+  <!-- Bottom legend -->
+  <line x1="50" y1="495" x2="870" y2="495" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="460" y="520" text-anchor="middle" font-size="12" fill="#6B7280">
+    三家演进步数相似，终点方案却落到 CAP 的不同象限——这是产品定位决定的设计起点
+  </text>
+  <text x="460" y="540" text-anchor="middle" font-size="11" fill="#9CA3AF">（红色文字为前一段留下的痛点，箭头方向为演进顺序）</text>
+</svg>
+</div><figcaption>图 6-1 单点到集群的演进路径</figcaption></figure>
+<p>图 6-1　三家从单点到集群的演进主线并列：Redis 走主从→Sentinel→Cluster，MySQL 走异步→半同步→MGR，Kafka 走 Partition→Replica→KRaft。</p>
+<p>这张图想传达的核心是：三家虽然都从单点起步，但演进的步数和重点完全不同。Redis 三段式每一笔都是在补上一段的短板——主从补了单点故障、Sentinel 补了人工转移、Cluster 补了写扩展。MySQL 三段式则始终守着"不丢数据"这条线，从异步一路挤到多数派确认。Kafka 一上来就是分布式，分片和副本是从设计起点就内置的，它真正的演进是在元数据层（从 ZooKeeper 到 KRaft）。理解了这个起点的差异，后面的机制对比就有了坐标系。</p>
+<h2 id="s126">6.2 Redis 的做法</h2>
+<p>Redis 的集群演进，可以理解为不断补短板的过程。每一代方案都解决了上一代留下的某个具体局限，同时也会暴露新的局限。把这个脉络理顺，Redis 为什么是今天这个样子就一目了然。</p>
+<h3 id="s127">6.2.1 主从复制：高可用的地基，但还不是集群</h3>
+<p>Redis 最朴素的集群化，是主从复制（replication）。在从节点上执行 <code>REPLICAOF host port</code>（旧版叫 <code>SLAVEOF</code>），从节点就会去主节点拉数据。复制分两种情况：第一次建立连接时做全量同步——主节点 <code>fork</code> 出子进程，把内存打成一个 RDB（快照文件）发给从节点，期间主节点新产生的写命令先存进复制积压缓冲区（replication backlog），RDB 发完再补发这部分增量；之后如果从节点短暂断线又重连，且断线期间主节点的写位移（offset）没有超出积压缓冲区的范围，就只补差量，这叫部分重同步（partial resync）。字节级的复制流细节归第 8 章，这里只看它在集群中扮演的角色。</p>
+<p>主从复制解决了一个问题：读可以分担到从节点、主节点坏了可以从从节点恢复数据。但它有三个根本性的局限。第一，复制是<strong>异步</strong>的——主节点写完立即返回客户端，不等从节点确认。这是 Redis 的性能取舍：要快就不能等。代价是主节点刚确认的写、从节点还没收到时主节点宕机，这笔写就丢了。第二，<strong>写仍然集中在单主</strong>。主从复制解决了读扩展和高可用，但没有解决写扩展——所有写还是压在一个主节点上，单机内存仍然是容量天花板。第三，<strong>故障转移要人工</strong>。主节点宕了，运维得手动把某个从节点提升为主、再让其他从节点改连新主。对于"高可用"这个目标，人工转移显然不够格。</p>
+<p>主从复制是高可用的地基，但还不是集群。它把"单点故障"变成了"单点故障 + 自动恢复很难"，留下了自动化这笔债。</p>
+<h3 id="s128">6.2.2 Sentinel：把人工故障转移自动化</h3>
+<p>Sentinel（哨兵）就是来还这笔债的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，负责在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 <code>down-after-milliseconds</code> 没回应，这个 Sentinel 把主节点标记为<strong>主观下线</strong>（SDOWN，subjectively down）——这只是"我觉得它挂了"。然后它通过 Gossip 把这个判断扩散给其他 Sentinel，如果达到配置的 quorum 数量都认为主节点挂了，就升级为<strong>客观下线</strong>（ODOWN，objectively down）——这是"大家都觉得它挂了"。接下来 Sentinels 之间用一种 Raft 风格的选举（Redis 官方文档称之为 "Raft-like"，借鉴了 Raft 的任期号加多数派投票，但没有完整的 Raft 日志复制）选出一个 Leader Sentinel 主持转移，再按优先级、复制位移（offset）、runid 三个维度从从节点里挑一个提升为新主，给它发 <code>REPLICAOF NO ONE</code>，并通知其他从节点改连新主。</p>
+<p>这里有一个特别容易被误解的点：Sentinel 自身用了多数派投票（Gossip 传播判断 + Raft-like 选举）来防止单点误判，但<strong>数据层仍然是单主异步复制</strong>。也就是说，监控层的一致性（多数派投票决定谁挂了、谁来主持转移）和数据层的弱一致性（异步复制可丢写）是两件事——前者只对"决策"负责，不对"数据"负责。Sentinel 能保证"主节点真的挂了才转移"，但保证不了"转移后一笔都不丢"——主从异步复制的丢写风险原封不动地继承下来。</p>
+<p>Sentinel 解决了自动故障转移的问题，但又留下三个新局限：写仍然集中在单主，水平扩展写做不到。内存仍然受单机限制，应付不了数据量增长。客户端要懂 Sentinel 协议，得知道去问谁要当前主节点地址。这三个局限加在一起，本质上指向同一个诉求——既要能水平扩展，又要能自动容错。这就是 Redis Cluster 要解决的事。</p>
+<h3 id="s129">6.2.3 Redis Cluster：分片加自动容错，去中心化元数据</h3>
+<p>Redis Cluster 是 Redis 真正意义上的分布式集群方案。它的三个关键词是：分片、自动容错、去中心化。</p>
+<p><strong>分片用 16384 个槽（slot）。</strong> Redis Cluster 不直接把 key 映射到节点，而是先映射到 0–16383 这 16384 个槽，再把槽分配给节点。映射公式是 <code>CRC16(key) mod 16384</code>。每个主节点负责其中一段连续或不连续的槽。为什么不直接 <code>hash(key) mod 节点数</code>？因为节点数会变，节点一变所有 key 都要重映射，而引入槽这一层中间抽象后，加节点只是把部分槽从老节点迁移到新节点，大部分 key 不动。图 6-2 把这套槽位划分和路由语义画了出来。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_6_2_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_6_2_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_6_2_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-2　Redis Cluster 16384 槽分布与 MOVED/ASK 路由</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">key 经 CRC16 哈希到 0–16383 槽，槽映射到节点；迁移中与迁移完的两种重定向语义不同</text>
+
+  <!-- ===== Top: hash formula ===== -->
+  <rect x="240" y="68" width="460" height="44" rx="6" fill="#F3F4F6" stroke="#6B7280"/>
+  <text x="470" y="88" text-anchor="middle" font-size="13" fill="#374151">路由公式：</text>
+  <text x="470" y="106" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">槽号 = CRC16(key) mod 16384　→　查本地槽位表 → 命中节点</text>
+
+  <!-- ===== Three master nodes with slot ranges ===== -->
+  <!-- Node A -->
+  <rect x="50" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="180" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 A（主）</text>
+  <line x1="70" y1="180" x2="290" y2="180" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="180" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：0 – 5460</text>
+  <!-- slot bar -->
+  <rect x="70" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
+  <rect x="70" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
+  <text x="180" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5461 个槽</text>
+
+  <!-- Node B -->
+  <rect x="340" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="470" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 B（主）</text>
+  <line x1="360" y1="180" x2="580" y2="180" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="470" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：5461 – 10922</text>
+  <rect x="360" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
+  <rect x="360" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
+  <text x="470" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5462 个槽</text>
+
+  <!-- Node C (migrating out slot 8000 to B) -->
+  <rect x="630" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="760" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 C（主）</text>
+  <line x1="650" y1="180" x2="870" y2="180" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="760" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：10923 – 16383</text>
+  <rect x="650" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
+  <rect x="650" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
+  <text x="760" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5461 个槽</text>
+
+  <!-- migration note -->
+  <path d="M 760 268 Q 760 285 600 285 Q 470 285 470 270" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fig_6_2_arrow-red)"/>
+  <text x="615" y="300" text-anchor="middle" font-size="11" fill="#EF4444">槽 15000 正在从 C 迁移到 B（迁移中场景）</text>
+
+  <!-- ===== Client ===== -->
+  <rect x="380" y="320" width="180" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="470" y="344" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">客户端</text>
+  <text x="470" y="364" text-anchor="middle" font-size="11" fill="#374151">本地缓存：槽位 → 节点映射表</text>
+
+  <!-- ===== MOVED scenario box ===== -->
+  <rect x="40" y="400" width="430" height="180" rx="8" fill="#FFFFFF" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <rect x="40" y="400" width="430" height="28" rx="8" fill="#4F46E5"/>
+  <text x="255" y="419" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">MOVED：迁移已完成</text>
+
+  <text x="55" y="448" font-size="12" fill="#374151">① 客户端访问 key，算出槽 15000，发往节点 C</text>
+  <line x1="60" y1="470" x2="60" y2="520" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_2_arrow-gray)"/>
+  <text x="75" y="478" font-size="12" fill="#374151">② 节点 C 发现槽 15000 已迁出，返回：</text>
+  <rect x="75" y="486" width="380" height="34" rx="4" fill="#F3F4F6" stroke="#6B7280"/>
+  <text x="265" y="507" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#111827">-MOVED 15000 节点B 地址:端口</text>
+  <text x="75" y="540" font-size="12" fill="#374151">③ 客户端更新本地映射表，重发到节点 B</text>
+  <text x="75" y="560" font-size="12" font-style="italic" fill="#059669">语义：永久性重定向 · 后续请求直连 B</text>
+
+  <!-- ===== ASK scenario box ===== -->
+  <rect x="490" y="400" width="430" height="180" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <rect x="490" y="400" width="430" height="28" rx="8" fill="#D97706"/>
+  <text x="705" y="419" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">ASK：迁移进行中</text>
+
+  <text x="505" y="448" font-size="12" fill="#374151">① 客户端访问 key，算出槽 15000，发往节点 C</text>
+  <line x1="510" y1="470" x2="510" y2="520" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_2_arrow-gray)"/>
+  <text x="525" y="478" font-size="12" fill="#374151">② 节点 C：此 key 未迁出，但槽在迁移，返回：</text>
+  <rect x="525" y="486" width="380" height="34" rx="4" fill="#F3F4F6" stroke="#6B7280"/>
+  <text x="715" y="507" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#111827">-ASK 15000 节点B 地址:端口</text>
+  <text x="525" y="540" font-size="12" fill="#374151">③ 客户端临时重定向，并带 ASKING 打开 B</text>
+  <text x="525" y="560" font-size="12" font-style="italic" fill="#059669">语义：一次性重定向 · 不更新本地表</text>
+</svg>
+</div><figcaption>图 6-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由</figcaption></figure>
+<p>图 6-2　key 经 CRC16 哈希到 0–16383 槽，槽映射到节点；迁移中与迁移完的两种重定向语义不同。</p>
+<p>为什么是 16384 这个数，而不是更大或更小？社区的主流解释（以社区主流解释为准，官方未严格论证）是：Gossip 消息里每个节点要携带自己负责的槽位 bitmap，16384 个槽对应 16384/8 = 2KB 的 bitmap，这个大小在消息压缩与槽粒度之间是个折中——槽太少则单节点承载过重、迁移粒度太粗，槽太多则 bitmap 占用大、Gossip 消息膨胀。16384 既能让集群规模到上百节点仍每节点分到上百槽，又把 bitmap 控制在 2KB 量级。这是个典型的工程折中，目标在"够用且不浪费"之间取平衡。</p>
+<p><strong>客户端路由靠 MOVED 和 ASK 两种重定向。</strong> 客户端可以缓存一份槽到节点的映射表，绝大多数请求直接命中。但集群拓扑会变（扩容、缩容、故障转移），所以节点收到不属于自己槽的请求时，会返回一个 MOVED 或 ASK 重定向。MOVED 表示"这个槽已经永久不在你这了，去这个新地址"，客户端收到后更新本地映射表，以后都走新地址；ASK 表示"这个槽正在迁移中，本次请求请去临时地址试一下"，是一次性重定向，客户端不更新映射表——因为迁移完之后这槽还会回来或换地方。两者的区别在于：MOVED 是状态变更后的最终路由，ASK 是迁移过程中的临时跳板。此外，Redis Cluster 禁用了多数据库的 <code>SELECT</code> 命令（只有 0 号库），并要求多键命令（如 <code>MGET</code>、事务、Lua 脚本）涉及的所有 key 必须落在同一个槽——可以用哈希标签（hash tag）<code>{user:1001}.name</code>、<code>{user:1001}.email</code> 强制让带相同 <code>{...}</code> 的 key 落到同槽。</p>
+<p><strong>元数据完全去中心化，用 Gossip 传播。</strong> Redis Cluster 没有一个集中的协调者节点，所有节点对等，靠 Gossip 协议（PING/PONG/MEET/FAIL 消息）互相交换和传播集群状态——谁加入了、谁负责哪些槽、谁挂了。每个节点最终都会收敛到一致的集群视图，但"最终"意味着过程中可能短暂不一致。Gossip 的好处是无单点、自动发现、能容忍网络抖动；代价是收敛慢，故障感知到全集群达成共识可能要几秒到十几秒，期间部分客户端可能拿到过期视图。</p>
+<p><strong>容错靠从节点发起选举。</strong> 当某个主节点被多数主节点判定下线后，它的某个从节点会发起选举请求，向其他主节点拉票（用集群纪元 epoch 防止过期投票），拿到多数主节点票数后升级为新主，接管原主负责的槽，并通过 Gossip 广播新拓扑。这套机制保证新主是合法多数派选出来的，不会脑裂出两个主。但因为复制是异步的，新主未必有原主宕机前的全部数据——如果原主宕机前刚写入、还没来得及同步到从节点，这部分写就永久丢失了。这是 Redis Cluster 作为 AP 系统的必然代价。</p>
+<p><strong>Redis Cluster 是 AP 系统。</strong> 在网络分区时，它优先保证可用——拥有多数槽的分区继续服务，少数派分区里的槽可能短暂不可用但不会脑裂写脏数据（因为选举要多数派），但异步复制导致的丢写在所难免。最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
+<h2 id="s130">6.3 MySQL 的做法</h2>
+<p>如果用一个词概括 MySQL 的集群哲学，那就是"不丢数据"。这条底线从最古老的异步复制一路贯穿到最新的组复制，从来没有动摇过。MySQL 的集群演进，可以理解为在这条不可动摇的底线之上，一步步挤可用性、挤自动化、挤强一致性的过程。</p>
+<h3 id="s131">6.3.1 基于 binlog 的复制：单向、异步、行流</h3>
+<p>MySQL 复制的基础是二进制日志（binlog）。主节点把所有写操作记进 binlog，从节点的 I/O 线程连上来拉取 binlog，写到本地的中继日志（relay log），再由 SQL 线程回放 relay log 重做这些变更。这是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种）的取舍细节归第 8 章，本章只把它当作"变更流的载体"。</p>
+<p>老式复制靠 file + position 定位复制位点——从节点记录"我同步到了 mysql-bin.000003 的第 1580 字节"。这种方式很脆弱：主节点一换、binlog 一滚动，位点的语义就乱了。MySQL 5.6 引入了全局事务标识（GTID，Global Transaction Identifier），格式是 <code>source_id:transaction_id</code>，给每个事务一个全局唯一 ID。从节点只要记"我同步到了哪些 GTID"，主从切换、新从接入都能自动定位，不再依赖脆弱的文件位点。GTID 是 MySQL 复制从"能用"到"好用"的分水岭。</p>
+<p>异步复制的代价：主节点不等从节点，主节点宕机时，那些已经提交、但还没来得及发到从节点的事务就丢了。从延迟方面看也有问题：单 SQL 线程回放意味着从节点只能串行重做主节点的所有写，主节点写并发一高，从节点跟不上，复制延迟越拉越大。MySQL 的多线程复制（MTS，Multi-Threaded Slave）按主节点的组提交（group commit）粒度并行回放——主节点同一组提交的事务之间必然无锁冲突，从节点就可以放心并行——缓解了但不根治回放延迟。存储格式与回放机制见第 7、8 章。</p>
+<h3 id="s132">6.3.2 半同步复制：在异步与全同步之间</h3>
+<p>异步太激进（快但可丢），全同步太保守（不丢但慢）。半同步复制（semi-sync replication）是中间路线：主节点提交事务前，至少等一个从节点确认收到 binlog。它在 MySQL 的一致性光谱上位于异步复制和组复制之间——用一点延迟换"通常不丢"。参数方面，8.0.26 起半同步相关变量由 <code>master/slave</code> 统一重命名为 <code>source/replica</code>。</p>
+<p>半同步的精确提交流程（<code>AFTER_SYNC</code> vs <code>AFTER_COMMIT</code>）、超时降级语义、以及它为何仍然不能保证零丢失——这些细节见第 8 章 8.3.3 节。</p>
+<h3 id="s133">6.3.3 Group Replication：Paxos 多数派，CP 路线的正名</h3>
+<p>组复制（MGR，MySQL Group Replication）是 MySQL 集群方案的质变。它在 MySQL 5.7.17 首次作为 GA 特性提供，8.0 又做了大量增强（更完善的成员管理、更好的并发写性能）。它的核心是引入了共识协议——一个叫 XCom 的 Paxos 变种——让一组 MySQL 节点（一个"组"，group）对每一笔事务做<strong>多数派确认</strong>后才提交。具体流程大致是：客户端把事务发给主节点（单主模式下），主节点把事务广播给组内所有成员，XCom 在成员之间跑一轮 Paxos，超过半数成员确认后这笔事务才算"法定通过"，主节点才真正提交并返回客户端成功。</p>
+<p>这套机制把"不丢数据"从"尽力而为"提升到了"数学保证"：只要多数派成员活着，任何已提交的事务必然存在于至少一个多数派成员上，不会因主节点单独宕机而丢失。容错能力是经典的 (N-1)/2——3 个成员能容忍 1 个故障，5 个能容忍 2 个。成员故障或加入会触发 View Change，组内重新协商新的成员视图，并对齐 GTID 让所有成员知道彼此的同步进度。</p>
+<p>MGR 有两种模式。<strong>单主模式（single-primary）</strong> 是生产主流：组里只有一个主节点（Primary）可写，其他从节点（Secondary）只读，主节点故障时组内自动选新主。<strong>多主模式（multi-primary）</strong> 允许所有成员都可写，但写入要在组内做冲突检测（基于事务时间戳的 Certification），冲突的事务会被回滚。多主模式是能力存在、但生产实战极少——它的冲突检测开销和写冲突概率在真实业务负载下都不理想，绝大多数 MGR 部署都跑单主模式。本书不展开多主的冲突算法细节。</p>
+<p>MGR 是 CP 系统。这是它和 Redis Cluster 最本质的区别。当网络分区发生、组内凑不齐多数派时，少数派分区里的成员会<strong>直接停止服务</strong>——宁可不可用，也不允许脑裂写出脏数据。这与 Redis Cluster 优先保可用、容忍短暂不一致的策略形成鲜明对照。代价是写延迟：每笔事务都要走一轮跨节点的 Paxos 确认，写延迟随组成员数和跨机房网络延迟上升。强一致的标价就是写延迟——每笔事务都要走一轮跨节点的 Paxos 确认。</p>
+<h3 id="s134">6.3.4 MGR 不分片：一个有意的取舍</h3>
+<p>MGR 最关键、也最容易被忽略的一个取舍是：<strong>它不分片</strong>。组里每个成员都持有<strong>全量数据</strong>。加一个成员到组里，扩的是"副本数"——可用性更高、读吞吐更大——但<strong>不扩容量</strong>，单表的数据量仍然受单机磁盘限制，写吞吐仍然受单主瓶颈限制。</p>
+<p>这是 MySQL 生态有意的分工。MySQL 把"高可用、强一致副本组"做扎实（MGR），把"数据分片"交给上层中间件——ShardingSphere、Vitess、MyCAT 这类方案在 MySQL 之上做分库分表，跨多个 MySQL 实例分摊数据。这种分层让 MySQL 内核专注于它擅长的单机事务引擎和复制协议，分片逻辑由独立的中间件层处理，模块边界清晰。代价是用户体验上不那么"开箱即用"——你想要一个既能强一致又能水平扩展的 MySQL 集群，得自己把 MGR 和分片中间件拼起来。这是一个工程取舍：模块化、可组合，胜过大一统。</p>
+<h3 id="s135">6.3.5 InnoDB Cluster：把零件打包成方案</h3>
+<p>MGR 本身只是副本组，单靠它还不能直接给应用用——客户端怎么知道当前主节点是谁？主节点切换了客户端怎么自动重连？这层"可用性包装"由 MySQL Router 提供。Router 是一个代理，它连着 MGR 组、实时感知当前拓扑，对客户端暴露统一的读写端口：写请求路由到主节点，读请求按策略路由到主节点或从节点，主节点切换时 Router 自动把流量切到新主。再加上 MySQL Shell 提供的运维管理（建组、加成员、查看状态），三者打包起来叫 InnoDB Cluster。</p>
+<p>InnoDB Cluster 本质上没有引入新的集群机制——强一致副本组还是 MGR 提供的，Router 只是把 MGR 的使用门槛降到了"普通运维也能搭"的程度。它的取舍是工程整合而非机制创新：降低了使用复杂度，但底层特性（CP、单主、全量复制、不分片）原样继承自 MGR。如果业务能接受这些特性，InnoDB Cluster 是目前 MySQL 生态里最完整、最被推荐的高可用方案。</p>
+<h2 id="s136">6.4 Kafka 的做法</h2>
+<p>Kafka 天生就是分布式。与 Redis 和 MySQL 不同，Kafka 的分片和副本从设计起点就已内置——它从第一行代码就假设自己跑在多台机器上，单机版的 Kafka 在概念上不存在。这种"原生分布式"的基因，让 Kafka 在集群设计上比前两家从容得多，也做出了几处明确的取舍。</p>
+<h3 id="s137">6.4.1 Partition：分片即并行单位</h3>
+<p>Kafka 的分片单位叫分区（partition）。一个主题（topic）被切成 N 个分区，每个分区是一份有序的、只能追加（append-only）的日志。生产者发消息时按 key 决定去哪个分区：有 key 时默认用 <code>murmur2(key) % N</code> 做哈希路由，保证同一个 key 永远去同一个分区；没有 key 时，生产者（Kafka 2.4 起经 KIP-480 改为默认）用"粘性分区"（sticky partitioner）——把一批消息都发到同一个分区，攒够一批再换分区。这样在保持分区内有序的前提下，把批处理效率做到最高；老的轮询（round-robin）策略会把消息轮流分发到各分区，批更小、延迟更高。</p>
+<p>分区的第一个语义是<strong>并行度</strong>。Kafka 的吞吐靠分区并行：分区越多，能并行的生产者、消费者、Broker 落盘就越分散，整体吞吐越高。分区的第二个语义是<strong>顺序性的边界</strong>——顺序性只在单个分区内成立，跨分区不保证顺序。这是 Kafka 一致性承诺的核心边界：如果你要严格的全局有序，只能用一个分区，那就回到了单分区的串行瓶颈；如果你要高吞吐，就得接受"分区内有序、分区间无序"。</p>
+<p>分区数怎么选，是个经典的容量规划权衡。分区太少了，并行度上不去，吞吐受限；分区太多了，Broker 要为每个分区维护文件句柄、索引、内存结构，运维开销线性上升，故障时的 Leader 选举恢复时间也拉长（因为每个分区都要独立选主）。经验值大致是：单分区在普通硬件上能跑到约 10MB/s 或约 1 万条/秒的量级（以实际压测为准），按这个粗算你的峰值吞吐反推分区数，再留些余量。没有放之四海皆准的最优值，得按业务负载实测。</p>
+<h3 id="s138">6.4.2 Replica 与 ISR：副本的"够格"名单</h3>
+<p>每个分区在物理上有多个副本（replica），其中一个是 Leader、其余是 Follower。所有读写都走 Leader，Follower 主动从 Leader 拉取（fetch）数据追同步。这套 Leader-Follower 模型看着和 Redis、MySQL 的主从很像，但 Kafka 在"谁能当 Leader"上做了一个关键设计——<strong>ISR（In-Sync Replicas，同步副本集合）</strong>。</p>
+<p>ISR 是一个动态名单：只有那些能在 <code>replica.lag.time.max.ms</code> 这个时间窗口内跟上 Leader 进度的副本，才被算作"同步副本"，留在 ISR 里；跟不上（lag 超时）的副本会被 Leader 踢出 ISR。当 Leader 故障时，新 Leader <strong>只能从 ISR 里选</strong>——不在 ISR 里的副本，哪怕它数据更全，也没资格当选，因为它已经被判定为"落后太多，不可信"。这套设计的好处在于：它把"副本是否可信"从静态配置（比如写死"3 副本才算数"）变成了动态判定（按实际同步进度实时调整），既能在节点慢下来时自动剔除、不拖累整体，又能在节点恢复时自动加回。</p>
+<p>ISR 是 Kafka 一致性设计的核心。它比 MGR 的"全员多数派"松——MGR 要所有成员都参与 Paxos 确认，任何一个成员卡住都会拖累写；比 Redis 的"纯异步"紧——Redis 的从节点同步进度完全不参与"能否当主"的判定，宕机后任何从节点都能升主、哪怕数据落后。Kafka 在两者之间走了一条中间路线：用一个动态"够格名单"在多数派（强但不灵活）和纯异步（灵活但不保证）之间找平衡——Follower 慢了就踢出 ISR 不影响写性能，但 Leader 切换只在 ISR 内选，保证不丢已确认的消息。LEO/HW 的推进规则和 ISR 收缩/扩张的精确条件见第 8 章 8.4.3 节。</p>
+<h3 id="s139">6.4.3 acks：把一致性强度做成旋钮</h3>
+<p>Kafka 在生产者端有一个参数 <code>acks</code>，决定生产者写一条消息时要等多少确认才算成功。三档语义非常清晰：<code>acks=0</code>，生产者发完不等任何确认就走，最快但 Leader 没收到也不重试，可能丢；<code>acks=1</code>（Kafka 3.0 之前的默认），等 Leader 本地写入成功就返回，Leader 宕机而 Follower 还没同步到时仍会丢；<code>acks=all</code>（也叫 <code>-1</code>，<strong>自 Kafka 3.0 起成为默认</strong>，对应 KIP-679），等 ISR 里所有副本都确认才返回，只要 ISR 非空且 ISR 全部收到，这条消息就不会丢。</p>
+<p><code>acks</code> 这个旋钮的设计哲学，是 Kafka 与 Redis、MySQL 最不同的地方。Redis 把 AP（异步、可丢）写死在架构里，MySQL 把 CP（多数派确认）写死在 MGR 里——它们的取舍由设计者替你做了。Kafka 把这个取舍下放给了使用者：你要纯吞吐、能容忍偶尔丢，用 <code>acks=0</code>；你要快但不那么激进，用 <code>acks=1</code>（3.0 之前的默认）；你要绝不丢，用 <code>acks=all</code> 加 <code>min.insync.replicas</code>（3.0 起的默认组合）。代价是什么？是延迟——<code>acks</code> 越严，每条消息要等的副本确认越多，写延迟越高。这是一致性强度与延迟的明码标价，只不过账单交给了你而不是 Kafka。旋钮的价值在于让你按业务自己定档位。acks 参数与 min.insync.replicas 的精确交互、以及它们如何共同决定"消息算不算已提交"，见第 8 章 8.4.4 节。</p>
+<h3 id="s140">6.4.4 Controller 与 KRaft：元数据管理的两次跃迁</h3>
+<p>Kafka 的元数据管理——哪个 broker 活着、哪个分区的 Leader 是谁、ISR 是谁、副本怎么分配——经历了两次大的演进。</p>
+<p><strong>早期方案是 ZooKeeper + Controller。</strong> 元数据存在外部的 ZooKeeper 集群里，Kafka 集群里选出一个 broker 充当 Controller，负责元数据的读写和 partition 的 Leader 选举。这套方案能用，但痛点随规模暴露：第一，元数据和实际状态分离在两套系统里，broker 状态变更要双向同步，不一致风险大。第二，Controller 是单点（虽然有 failover），Controller 切换期间集群管理暂停。第三，ZooKeeper 本身不适合存大量元数据，分区数到几十万级别时 ZK 的 watch 通知就成了瓶颈。第四，运维要同时维护 Kafka 和 ZooKeeper 两套系统。更微妙的是 ZK 模式下有个潜在的脑裂风险：Controller 的 Leader 选举在 ZK 里做，partition 的 Leader 选举在 Controller 里做，两层状态可能不一致。</p>
+<p><strong>KRaft 模式（3.x 成熟）是第二次跃迁。</strong> KRaft 把元数据管理从 ZooKeeper 收回到 Kafka 内部——选一组 Controller 节点，它们之间跑 Raft 共识协议维护一份强一致的元数据日志，单进程、不再依赖外部系统。元数据本身也变成了 Kafka 的一个内部 topic（<code>@metadata</code>），Controller 用 Raft 维护它，所有 broker 从中同步。这套改造带来几个明显好处：单系统部署、运维简化。元数据强一致（Raft 保证）。分区数可以从几十万扩到百万级（不受 ZK 限制）。Controller 故障恢复更快（Raft 选举比 ZK session 超时快）。</p>
+<p>需要特别说明 KRaft 的成熟度口径：按 KIP-833 的官方路线，KRaft 在 <strong>Kafka 3.3</strong>（2022 年发布）才被标记为"对新集群生产可用"——这是稳定线的起点；<strong>Kafka 3.5</strong> 把 ZooKeeper 模式正式标记为 deprecated，迁移工具（KIP-866）在 3.4 起以 Early Access 引入、3.5–3.6 为 preview、3.8 起进入生产可用。<strong>Kafka 3.9</strong> 是最后一个支持 ZK 模式的 bridge release。直到后续大版本（Kafka 4.0）才彻底移除 ZK 支持。所以"Kafka 3.x 用 KRaft"这个说法要精确到 3.3+ 才算稳妥，3.0–3.2 的 KRaft 还在预览阶段，不应在生产使用（以官方 KIP-833/866 公告与实际版本为准）。</p>
+<p>最后要强调一个容易混淆的点：Kafka 里有<strong>两层独立的 Leader 选举</strong>。一层是 Controller 节点之间的 Raft 选举——决定谁是"活跃 Controller"，这是元数据层的事；另一层是 partition 的 Leader 选举——决定某个分区的 Leader 是哪个副本，这是数据层的事，由活跃 Controller 从该分区的 ISR 里选。两套机制别混：Raft 选举的是"元数据的老大"，ISR 选举的是"数据分区的老大"。Kafka 从 ZK 走到 KRaft，本质上是让元数据层同时具备强一致和可用性——以前元数据靠 ZK（强一致但外部依赖）、数据层靠 Controller（集中但有单点），现在元数据层用 Raft 内化、数据层继续靠 Controller 但 Controller 本身由 Raft 保证强一致和自动 failover。</p>
+<h2 id="s141">6.5 横向对比</h2>
+<p>把三家放进同一张坐标系，能更清楚地看到各自的设计取舍。下面的对比围绕六个维度展开：数据分片策略、副本一致性模型、故障检测与 Leader 选举、元数据管理、CAP 立场、横向扩展能力。表 6-1 把这些维度浓缩成一张可扫读的总表，表后是对每个维度的解读。</p>
+<p>表 6-1　三家集群方案横向对比总表（维度作为行，三家作为列）</p>
+<div class="table-wrap"><table><thead><tr><th>对比维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据分片策略</td><td>16384 槽哈希分片，客户端路由（MOVED/ASK）</td><td>不分片（MGR 全量复制），分片交给上层中间件</td><td>Partition 哈希/粘性分片，生产者端路由</td></tr><tr><td>副本一致性模型</td><td>异步复制（可丢写）</td><td>异步 / 半同步 / MGR 多数派确认</td><td>ISR 动态名单 + acks 可调</td></tr><tr><td>故障检测与 Leader 选举</td><td>Gossip 传播 + epoch 多数派投票（去中心化）</td><td>XCom/Paxos View Change（共识驱动）</td><td>活跃 Controller 从 ISR 选 Leader（集中仲裁）</td></tr><tr><td>元数据管理</td><td>Gossip 去中心化、最终一致</td><td>组内 Paxos 强一致</td><td>Controller（KRaft Raft）集中强一致</td></tr><tr><td>CAP 立场</td><td>AP（分区优先可用，异步复制可能丢写）</td><td>CP（少数派分区停服）</td><td>3.x 默认偏安全（acks=all），可由 acks / unclean.leader.election 在 AP↔CP 间滑动</td></tr><tr><td>横向扩展能力</td><td>分片同时扩写与容量</td><td>加副本只提可用，扩容量靠上层分片</td><td>加 Partition + Broker 同时扩吞吐与容量</td></tr></tbody></table></div>
+<p><strong>分片策略的差异，反映的是定位差异。</strong> Redis 和 Kafka 都做分片，但粒度不同：Redis 是"key → 槽 → 节点"两层映射，槽是可迁移的最小单位；Kafka 是"key → 分区"直接映射，分区既是分片单位也是并行单位，没有中间抽象。MySQL 选择不分片，把这事交给上层中间件，是生态分工——它专注单机事务引擎的极致。三种选择由定位决定：Redis 和 Kafka 要扛海量数据和高吞吐，必须分片；MySQL 要扛强一致事务，先把单机和复制做到极致。</p>
+<p><strong>副本一致性模型，是一条从弱到强的光谱。</strong> Redis 纯异步在最左（最快、可丢），MySQL MGR 多数派在最右（不丢、最慢），Kafka 的 ISR 加 acks 是中间的可滑动点。这条光谱的横轴是写延迟，纵轴是一致性强度——要多少一致性，就要付多少延迟。MySQL 选 CP 是因为它要当交易账本，丢一笔就是事故；Redis 选 AP 是因为它常被当缓存，丢了从后端回源就行；Kafka 把旋钮交给使用者，是因为它的使用场景跨度太大（从日志采集的"尽力而为"到金融级流的"绝不丢"），写死任何一个都太武断。</p>
+<p><strong>故障检测与 Leader 选举，三家走了三条完全不同的路。</strong> Redis 用 Gossip 让所有节点去中心化地传播和投票，无单点但收敛慢；MySQL 用 XCom 在组内跑 Paxos，强一致但要凑齐多数派；Kafka 由活跃 Controller 集中地从 ISR 里选 Leader，仲裁集中、速度快但 Controller 本身是关键节点（用 KRaft 保证它高可用）。三种机制对应三种取舍：去中心化的鲁棒性 vs 共识协议的强一致 vs 集中仲裁的效率。图 6-3 把同一条"选新主"的决策路径在三家的差别并排画了出来。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 680" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_6_3_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_6_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-3　三家故障转移决策流程对比</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三家走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
+
+  <!-- ===== Column headers ===== -->
+  <rect x="40"  y="70" width="280" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="180" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">Redis · Gossip + epoch 投票</text>
+
+  <rect x="330" y="70" width="280" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="470" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">MySQL · XCom/Paxos View Change</text>
+
+  <rect x="620" y="70" width="280" height="34" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="760" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">Kafka · Controller + ISR</text>
+
+  <!-- ===== Redis flow ===== -->
+  <rect x="55" y="120" width="250" height="48" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="180" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">主节点超时无响应</text>
+  <text x="180" y="160" text-anchor="middle" font-size="11" fill="#374151">（cluster-node-timeout）</text>
+
+  <line x1="180" y1="168" x2="180" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="55" y="186" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="180" y="205" text-anchor="middle" font-size="12" fill="#374151">从节点标记 PFAIL（主观下线）</text>
+  <text x="180" y="221" text-anchor="middle" font-size="11" fill="#6B7280">Gossip PING/PONG 携带标记</text>
+
+  <line x1="180" y1="230" x2="180" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="55" y="248" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="180" y="267" text-anchor="middle" font-size="12" fill="#374151">半数以上主节点确认 → FAIL</text>
+  <text x="180" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（客观下线，广播 FAIL）</text>
+
+  <line x1="180" y1="292" x2="180" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="55" y="310" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">故障主的从节点发起选举</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">申请其他主节点投票（currentEpoch+1）</text>
+
+  <line x1="180" y1="354" x2="180" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="55" y="372" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
+  <text x="180" y="391" text-anchor="middle" font-size="12" fill="#374151">获多数派主节点票 → 当选</text>
+  <text x="180" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（按优先级 / offset / runid 排序）</text>
+
+  <line x1="180" y1="416" x2="180" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="55" y="434" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="180" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">升级新主 + Gossip 广播新拓扑</text>
+  <text x="180" y="469" text-anchor="middle" font-size="11" fill="#374151">最终一致 · 客户端经 MOVED 重连</text>
+
+  <!-- Redis trait -->
+  <rect x="55" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
+  <text x="180" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
+  <text x="180" y="540" text-anchor="middle" font-size="11" fill="#374151">去中心化 · 无 Controller</text>
+  <text x="180" y="556" text-anchor="middle" font-size="11" fill="#374151">收敛慢 · 短暂不一致视图</text>
+
+  <!-- ===== MySQL flow ===== -->
+  <rect x="345" y="120" width="250" height="48" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="470" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员故障 / 失联</text>
+  <text x="470" y="160" text-anchor="middle" font-size="11" fill="#374151">（组内 XCom 心跳超时）</text>
+
+  <line x1="470" y1="168" x2="470" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="345" y="186" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="470" y="205" text-anchor="middle" font-size="12" fill="#374151">存活成员发起 View Change</text>
+  <text x="470" y="221" text-anchor="middle" font-size="11" fill="#6B7280">提议剔除故障成员的新视图</text>
+
+  <line x1="470" y1="230" x2="470" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="345" y="248" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="470" y="267" text-anchor="middle" font-size="12" fill="#374151">XCom（Paxos）对视图投票</text>
+  <text x="470" y="283" text-anchor="middle" font-size="11" fill="#6B7280">需多数派成员同意</text>
+
+  <line x1="470" y1="292" x2="470" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_6_3_arrow-red)"/>
+
+  <rect x="345" y="310" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="470" y="329" text-anchor="middle" font-size="12" fill="#374151">少数派？→ 直接停止服务</text>
+  <text x="470" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（CP 宁可不可用也不脑裂）</text>
+
+  <line x1="470" y1="354" x2="470" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="345" y="372" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
+  <text x="470" y="391" text-anchor="middle" font-size="12" fill="#374151">多数派达成 → 新视图生效</text>
+  <text x="470" y="407" text-anchor="middle" font-size="11" fill="#6B7280">自动选 Primary + GTID 对齐</text>
+
+  <line x1="470" y1="416" x2="470" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="345" y="434" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="470" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">新 Primary 提供读写服务</text>
+  <text x="470" y="469" text-anchor="middle" font-size="11" fill="#374151">强一致 · 写延迟含多数派往返</text>
+
+  <!-- MySQL trait -->
+  <rect x="345" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
+  <text x="470" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
+  <text x="470" y="540" text-anchor="middle" font-size="11" fill="#374151">共识驱动 · View Change 原子</text>
+  <text x="470" y="556" text-anchor="middle" font-size="11" fill="#374151">强一致 · 少数派停服</text>
+
+  <!-- ===== Kafka flow ===== -->
+  <rect x="635" y="120" width="250" height="48" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="760" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Partition Leader 故障</text>
+  <text x="760" y="160" text-anchor="middle" font-size="11" fill="#374151">（ZK session 失效 / KRaft 心跳超时）</text>
+
+  <line x1="760" y1="168" x2="760" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="635" y="186" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="760" y="205" text-anchor="middle" font-size="12" fill="#374151">Controller 监听到 Broker 下线</text>
+  <text x="760" y="221" text-anchor="middle" font-size="11" fill="#6B7280">（集中仲裁者，单点决策）</text>
+
+  <line x1="760" y1="230" x2="760" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="635" y="248" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="760" y="267" text-anchor="middle" font-size="12" fill="#374151">读取该分区当前 ISR 列表</text>
+  <text x="760" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（同步副本集合，动态门槛）</text>
+
+  <line x1="760" y1="292" x2="760" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_6_3_arrow-red)"/>
+
+  <rect x="635" y="310" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="760" y="329" text-anchor="middle" font-size="12" fill="#374151">ISR 为空？→ 等待 / 选非 ISR</text>
+  <text x="760" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（unclean.leader.election 可配丢数据）</text>
+
+  <line x1="760" y1="354" x2="760" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="635" y="372" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
+  <text x="760" y="391" text-anchor="middle" font-size="12" fill="#374151">从 ISR 中选首位副本为新 Leader</text>
+  <text x="760" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（已在 preferred 副本顺序靠前）</text>
+
+  <line x1="760" y1="416" x2="760" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_6_3_arrow-gray)"/>
+
+  <rect x="635" y="434" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="760" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">更新元数据 + 通知生产/消费者</text>
+  <text x="760" y="469" text-anchor="middle" font-size="11" fill="#374151">ISR 内选举 · 已确认消息不丢</text>
+
+  <!-- Kafka trait -->
+  <rect x="635" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
+  <text x="760" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
+  <text x="760" y="540" text-anchor="middle" font-size="11" fill="#374151">集中仲裁 · Controller 单点决策</text>
+  <text x="760" y="556" text-anchor="middle" font-size="11" fill="#374151">毫秒级恢复 · ISR 保不丢</text>
+
+  <!-- ===== Bottom summary ===== -->
+  <line x1="40" y1="590" x2="900" y2="590" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="470" y="615" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">
+    同一问题，三种哲学：去中心化投票（慢但无单点）· 共识协议（强但贵）· 集中仲裁（快但 Controller 是关键）
+  </text>
+  <text x="470" y="640" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
+    红色箭头标注的是「放弃可用性以保一致性」的取舍节点
+  </text>
+  <text x="470" y="662" text-anchor="middle" font-size="11" fill="#9CA3AF">注：Controller 自身的 Leader 选举（KRaft）与 Partition 的 Leader 选举是两套独立机制</text>
+</svg>
+</div><figcaption>图 6-3 三家故障转移决策流程对比</figcaption></figure>
+<p>图 6-3　同一个"谁来当新主"的问题，三家走出三条路：Redis 去中心化 Gossip+epoch 投票、MySQL XCom/Paxos View Change、Kafka 活跃 Controller 从 ISR 集中仲裁。</p>
+<p>图 6-3 里的三处红色箭头——它们都标记了"为保一致性而放弃可用性"的取舍点：Redis 在凑不齐多数派主节点票时让对应槽短暂不可用、MySQL 在少数派分区里直接停服、Kafka 在 ISR 为空时（默认）宁可等待也不选落后的非 ISR 副本。三家对"宁可不可用也不写脏数据"的边界各画在了一个不同的位置，这正是它们 CAP 立场的具体落点。</p>
+<p><strong>元数据管理决定了集群的扩展天花板。</strong> Redis 的 Gossip 最终一致，能容忍节点抖动但状态收敛慢，不适合超大规模（节点数上千时 Gossip 流量本身就成了负担）；MySQL 的组内 Paxos 强一致，但组的大小受 Paxos 性能限制（成员通常不超过个位数到十几个）；Kafka 的 KRaft 让元数据同时具备强一致和高可用，分区数可以到百万级，是三者里扩展性最好的。从 ZooKeeper 到 KRaft 的演进，本质上是 Kafka 在用共识协议把元数据层的强一致和可用性一起守住。</p>
+<p><strong>CAP 立场的根源是产品定位。</strong> Redis 是缓存（丢了能回源），所以选 AP；MySQL 是账本（丢了是事故），所以选 CP；Kafka 是流管道（不同场景要不同的可靠性），所以做可调。选型时先想清楚你的业务落在 CAP 的哪条边，再去选系统——选错 CAP 比选错参数严重得多。Redis 不该用来当账本，MySQL 不该用来当高吞吐缓存。</p>
+<p><strong>横向扩展能力，三家扩的不是同一件事。</strong> Redis 加分片同时扩写吞吐和容量。MySQL 加副本只扩可用性和读吞吐，扩容量要靠上层分片中间件。Kafka 加分区和 broker 同时扩数据吞吐和总容量。如果你的瓶颈是"单表数据太大"，MySQL 单靠 MGR 解不了，必须叠加分片方案；如果你的瓶颈是"读 QPS 上不去"，三家加副本都能解。</p>
+<h2 id="s142">6.6 架构启示</h2>
+<p>从三家具体的集群实现里，能提炼出几条可复用的设计原则。它们不只适用于这三个系统，对你自己设计任何分布式系统都有参考。每条启示后面附一句可独立引用的总结。</p>
+<p><strong>启示一：分片与副本是正交的两件事，先分开再谈集群。</strong> 这是最容易被忽视的一条。很多团队一上来就说"我们要做集群"，却没想清楚自己要扩的是容量、吞吐，还是可用性。先问自己三个问题。业务数据量在涨（要扩容量）？写吞吐扛不住（要扩吞吐）？单点宕机就要命（要扩可用）？前两个用分片解，最后一个用副本解。Redis 和 Kafka 两件事都做、分工清晰；MySQL 只做副本、把分片让给生态——定位决定选择。混为一谈的代价很具体：搭了一堆副本，数据量涨上去单机还是扛不住；或者做了分片却没做副本，一台机器坏了，那个分片的数据就没了。</p>
+<blockquote><strong>箴言：分片解决容量，副本解决可用——先把这两件事分开，再谈集群设计。</strong></blockquote>
+<p><strong>启示二：一致性强度是写延迟的函数。</strong> Redis 异步复制快但可丢——延迟低、一致性弱；MGR 多数派确认不丢，但每次写都要跨节点 Paxos 往返——一致性强、延迟高；Kafka 的 ISR 用"够格名单"在两端之间滑动。设计自己的系统时，先想清楚业务对一致性的真实需求。很多业务并不需要强一致，上了强一致只是白白付延迟税；反过来，把需要强一致的业务放在弱一致系统上，迟早会出事。看清这条光谱，在正确的位置停下，是架构师的基本功。</p>
+<blockquote><strong>箴言：没有免费的一致性，只有你愿意付多少延迟。</strong></blockquote>
+<p><strong>启示三：元数据管理决定集群的天花板。</strong> 集群能扩到多大、故障恢复多快、状态一致性多强，很大程度上取决于元数据怎么管。去中心化的 Gossip 无单点、抗抖动，但收敛慢、不适合超大规模；集中式的共识协议强一致，但协调者本身是瓶颈和关键节点。Kafka 从 ZooKeeper 走到 KRaft，本质上是让元数据同时具备强一致和可用性：以前是"强一致但外部依赖、Controller 单点"，KRaft 之后是"内嵌 Raft、Controller 自身强一致且自动 failover"。元数据层往往是被低估的复杂度来源——它要抗网络分区、要快速收敛、要支撑海量分区的状态。选错方案，整个集群的天花板就卡在这一层。</p>
+<blockquote><strong>箴言：元数据层是集群的天花板，常被低估，却决定了一切上限。</strong></blockquote>
+<p><strong>启示四：把失败当常态，把一致性做成旋钮。</strong> Kafka 的 <code>acks</code> 是教科书级的"把架构决策下放给使用者"。传统思路是设计者替使用者做完取舍、写死在系统里（Redis 写死 AP、MySQL 写死 CP）；Kafka 的思路是设计者提供机制，让使用者按业务调旋钮。两种思路各有适用场景：使用场景单一明确时，写死更简单（Redis 给缓存用就够了）；使用场景跨度大时，旋钮更灵活（Kafka 从日志到金融流都要扛）。设计自己的系统时，问一句：哪些取舍该写死，哪些该交给配置？做旋钮比写死更难，也更值钱——前者要求你把所有可能性都想清楚，后者只是替用户做了一个选择。</p>
+<blockquote><strong>箴言：把一致性做成旋钮，比把它写死更难，也更值钱。</strong></blockquote>
+<p><strong>启示五：CAP 不是选择题，是定位题。</strong> 很多人把 CAP 理解成"在 C 和 A 之间挑一个"，但三家的实践告诉我们：CAP 的选择由产品定位倒推出来。Redis 是缓存，宕了不能拖垮主流程，所以必须 AP；MySQL 是账本，数据丢了是法律和财务事故，所以必须 CP；Kafka 是流管道，场景跨度大，所以必须可调。先确定业务落在 CAP 的哪条边，再去选型——这是从需求倒推架构，而不是从架构正推需求。反过来想——"我手里有个 Redis，能不能拿它当账本用"——往往就是事故的开端。</p>
+<blockquote><strong>箴言：先定 CAP 的边，再选系统——选错定位比选错参数严重得多。</strong></blockquote>
+<p>这五条启示归结成一句话：好的集群设计，是在分片与副本、一致性与延迟、去中心化与集中式、写死与可调这四对取舍里，找到与你的产品定位最匹配的那一个点。三家之所以不同，是因为它们要解决的问题不同。</p>
+<h2 id="s143">6.7 小结</h2>
+<p>单点是故障的根源，分布式是解决方案，同时也带来新的复杂度。集群要同时回答数据怎么切、副本怎么一致、故障怎么转移、元数据谁说了算这四个问题，每一个都只能找到与你产品定位匹配的取舍。Redis 走 AP 路线，去中心化 Gossip、异步复制优先性能，对应的是缓存场景的需求；MySQL 走 CP 路线，Paxos 多数派确认保证强一致，对应的是账本场景的需求；Kafka 把一致性做成可调旋钮，用 ISR 在两端之间滑动，对应的是流管道场景跨度大的需求。三家的共性是同一套骨架——分片扩容、副本保活、共识协调——只是在这套骨架上，每家按自己的定位选择了不同的取舍。</p>
+<p>集群建起来了，节点之间的数据如何精确同步、字节级的复制流怎么走，是第 8 章的主题。这些同步机制最终要落到磁盘上的存储格式（日志段、RDB/AOF），那是第 7 章的内容。而 Router、Controller 这类协调层如何嵌入整体分层架构，可以回看第 4 章。本章建立的"分片—副本—共识"坐标系，会成为后续几章的共同语言。</p><nav class="page-nav"><a href="05-security.html">← 第 5 章 安全机制 — 权限、加密、审计</a><a href="07-storage-format.html">第 7 章 磁盘存储格式 — 文件结构的设计哲学 →</a></nav></article>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.getElementById('toc'),bd=document.getElementById('bd');
+  if(btn){btn.addEventListener('click',function(){nav.classList.toggle('open');if(bd)bd.classList.toggle('show',nav.classList.contains('open'))});}
+  if(bd){bd.addEventListener('click',function(){nav.classList.remove('open');bd.classList.remove('show');});}
+  // 当前章节高亮
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section.chapter'));
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-target]'));
+  if('IntersectionObserver' in window && links.length){
+    var map={};links.forEach(function(a){map[a.getAttribute('data-target')]=a;});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.parentElement.classList.remove('active');});
+          var a=map[e.target.id]; if(a)a.parentElement.classList.add('active');
+        }
+      });
+    },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>

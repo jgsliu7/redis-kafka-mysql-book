@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
+.toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
+.toc-title a{color:inherit;text-decoration:none}
+.toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
+nav.toc ul{list-style:none;padding:0;margin:0}
+nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc li>a:hover{background:var(--soft)}
+nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
+nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
+.content{padding:32px 48px 120px;max-width:1000px}
+.chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
+.page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
+.page-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.page-nav .empty{visibility:hidden}
+h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
+h1{font-size:1.9em;margin:0 0 .6em;padding-bottom:.3em}
+h2{font-size:1.42em;margin:1.8em 0 .6em}
+h3{font-size:1.18em;margin:1.5em 0 .5em}
+h4{font-size:1.04em;margin:1.3em 0 .4em;color:#24292f}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:700;color:#111827}
+em{font-style:normal;color:var(--mute)}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:.12em .4em;border-radius:4px;font-size:.9em;color:#24292f}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:8px;overflow-x:auto;line-height:1.55}
+pre code{background:none;color:inherit;padding:0;font-size:.86em}
+blockquote{margin:1.2em 0;padding:.6em 1em .6em 1.1em;border-left:4px solid var(--accent);background:#f7f8ff;color:#343a40;border-radius:0 6px 6px 0}
+blockquote strong{color:var(--accent)}
+ul,ol{margin:0 0 1em;padding-left:1.7em}
+li{margin:.25em 0}
+.table-wrap{overflow-x:auto;margin:1.2em 0}
+table{border-collapse:collapse;width:100%;font-size:.94em}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+thead th{background:#eef2ff;color:#3730a3;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.toc-toggle{display:none}
+.review-index{display:grid;gap:12px;margin:24px 0 0}
+.review-index a{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:#fff}
+.review-index a:hover{border-color:var(--accent);background:#f7f8ff}
+.review-index strong{display:block;color:var(--ink)}
+.review-index span{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+@media(max-width:1200px){figure.fig{margin:2em auto}}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  nav.toc.open{transform:translateX(0)}
+  .content{padding:20px 18px 80px;max-width:100%}
+  .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+  .backdrop.show{display:block}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="bd"></div>
+<button class="toc-toggle">目录</button>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="toc-title"><a href="../index.html">架构之道</a></div>
+  <div class="toc-sub">分页审阅版</div>
+  <ul>
+<li><a href="../index.html">首页目录</a></li>
+<li><a href="00-preface.html">序言</a>
+</li>
+<li><a href="01-introduction.html">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</a>
+</li>
+<li><a href="02-lifecycle.html">第 2 章 生命周期管理 — 优雅启动与关闭的艺术</a>
+</li>
+<li class="active"><a href="03-memory-disk.html">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</a>
+<ul>
+<li class="nav-sub"><a href="#s48">本章导读</a></li>
+<li class="nav-sub"><a href="#s49">3.1 问题的本质</a></li>
+<li class="nav-sub"><a href="#s50">3.2 Redis 的做法</a></li>
+<li class="nav-sub"><a href="#s54">3.3 MySQL 的做法</a></li>
+<li class="nav-sub"><a href="#s60">3.4 Kafka 的做法</a></li>
+<li class="nav-sub"><a href="#s66">3.5 横向对比</a></li>
+<li class="nav-sub"><a href="#s67">3.6 架构启示</a></li>
+<li class="nav-sub"><a href="#s73">3.7 小结</a></li>
+</ul>
+</li>
+<li><a href="04-layered-architecture.html">第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a>
+</li>
+<li><a href="05-security.html">第 5 章 安全机制 — 权限、加密、审计</a>
+</li>
+<li><a href="06-cluster.html">第 6 章 集群架构 — 从单点到分布式</a>
+</li>
+<li><a href="07-storage-format.html">第 7 章 磁盘存储格式 — 文件结构的设计哲学</a>
+</li>
+<li><a href="08-data-sync.html">第 8 章 数据同步机制 — 集群一致性的实现</a>
+</li>
+<li><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a>
+</li>
+<li><a href="10-epilogue.html">后记</a>
+</li>
+<li><a href="11-references.html">附录　参考文献与延伸阅读</a>
+</li>
+</ul>
+</nav>
+<main class="content">
+<article class="chapter"><h1 id="s47">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</h1>
+<h2 id="s48">本章导读</h2>
+<p>你的系统数据越堆越多。全放内存？快是快，可内存贵、容量有限，几十个 G 就到顶，断电还全没。全放磁盘？便宜量大也持久，可一次随机读写就要毫秒级，用户根本等不了。"既要快、又要稳、还要省"——这道三难，是任何存储软件都要面对的根本张力，绕不过去。</p>
+<p>面对同一道题，Redis、MySQL、Kafka 给出了三个几乎相反的答案：Redis 把内存当作家、磁盘只做备份；MySQL 把磁盘当作家、内存只做加速；Kafka 把磁盘上的顺序日志当作家，连加速都甩给了操作系统内核。这三个选择各自从要服务的访问模式倒推出来。理解了这个分叉，你就能理解它们后续几乎所有性能特征与取舍的根源——为什么 Redis 容量被内存锁死、为什么 MySQL 的延迟要靠缓冲池命中率撑、为什么 Kafka 能在合适的批量和硬件条件下把吞吐做得很高，却几乎不自己管内存。</p>
+<p>读完这一章，你会掌握三套"内存-磁盘"协作范式，并据此为自己的系统选型与调优。本章也是后续章节的根：第 6 章讲集群架构、第 8 章讲数据同步，都要回到这里"数据住哪里"这个问题上。</p>
+<h2 id="s49">3.1 问题的本质</h2>
+<p>任何存储软件都活在同一组物理约束之下。先把这组约束量化到你能感受的程度。</p>
+<p>先看一张把存储介质访问延迟摆出来的表，建立直觉。表中数字用于建立数量级，不是硬件基准；真实值会随 CPU、磁盘、文件系统、队列深度与负载模型变化。</p>
+<p><strong>表 3-1　存储介质的访问延迟数量级</strong></p>
+<div class="table-wrap"><table><thead><tr><th>存储介质</th><th>典型访问延迟</th><th>相对内存（以内存为 1）</th><th>是否持久</th></tr></thead><tbody><tr><td>CPU L1 缓存</td><td>~1 ns</td><td>0.01×</td><td>否</td></tr><tr><td>内存（DRAM）</td><td>~100 ns</td><td>1×</td><td>否</td></tr><tr><td>SSD（随机读）</td><td>~100 μs</td><td>~1000×</td><td>是</td></tr><tr><td>SSD（顺序写）</td><td>~300–500 MB/s 吞吐</td><td>吞吐可追平内存随机访问</td><td>是</td></tr><tr><td>机械盘（随机寻道）</td><td>~10 ms</td><td>~100 000×</td><td>是</td></tr><tr><td>机械盘（顺序写）</td><td>~100–200 MB/s 吞吐</td><td>吞吐远高于随机访问</td><td>是</td></tr></tbody></table></div>
+<p>这张表说明了三件事：内存比任何持久介质都快一个数量级以上。顺序 IO 在吞吐维度上能逼近内存随机访问。持久性总是以延迟或复杂度为代价。把这套数量级换算成体感：如果内存访问是 1 秒，SSD 一次随机访问就是 17 分钟，机械盘一次随机寻道就是 28 小时。纳秒、微秒、毫秒之间隔着三到五个数量级——这就是存储软件要架的那道桥，也是所有"内存-磁盘"设计的根本动因。</p>
+<p>这套数量级差距，用一张对数坐标图看会更直观——表格里的数字是抽象的，图上柱长的差异是肉眼可辨的。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_6_arrow-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_6_arrow-red-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-6　存储层次访问延迟的数量级（对数轴）</text>
+  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#6B7280">横轴每格放大 10 倍 —— 内存与磁盘之间隔着 6～7 个数量级</text>
+
+  <!-- ============ 绘图区参数 ============
+       X 轴起点 x0 = 240，终点 x1 = 820（宽 580）
+       对数刻度：1ns 在 x0，10ms(=10,000,000ns) 在 x1
+       跨 7 个 10 倍刻度 → 每格 580/7 ≈ 82.857
+       log10(value) -> x = x0 + (log10(value) - 0) / 7 * 580
+  -->
+
+  <!-- 对数刻度网格线（每 10 倍一条） -->
+  <g stroke="#E5E7EB" stroke-width="1">
+    <line x1="240"   y1="100" x2="240"   y2="430"/>
+    <line x1="322.9" y1="100" x2="322.9" y2="430"/>
+    <line x1="405.7" y1="100" x2="405.7" y2="430"/>
+    <line x1="488.6" y1="100" x2="488.6" y2="430"/>
+    <line x1="571.4" y1="100" x2="571.4" y2="430"/>
+    <line x1="654.3" y1="100" x2="654.3" y2="430"/>
+    <line x1="737.1" y1="100" x2="737.1" y2="430"/>
+    <line x1="820"   y1="100" x2="820"   y2="430"/>
+  </g>
+
+  <!-- X 轴底线 -->
+  <line x1="240" y1="430" x2="820" y2="430" stroke="#374151" stroke-width="1.5"/>
+
+  <!-- X 轴刻度标签 -->
+  <g font-size="11" fill="#6B7280" text-anchor="middle">
+    <text x="240"   y="448">1 ns</text>
+    <text x="322.9" y="448">10 ns</text>
+    <text x="405.7" y="448">100 ns</text>
+    <text x="488.6" y="448">1 μs</text>
+    <text x="571.4" y="448">10 μs</text>
+    <text x="654.3" y="448">100 μs</text>
+    <text x="737.1" y="448">1 ms</text>
+    <text x="820"   y="448">10 ms</text>
+  </g>
+  <text x="530" y="472" text-anchor="middle" font-size="12" fill="#374151">典型访问延迟（对数轴，每格 ×10）</text>
+
+  <!-- ============ 5 条横向柱 ============
+       柱高 36，间距 18；首柱 y=112
+       1: L1/L2   ~1 ns      -> x 终点 240
+       2: 主内存   ~100 ns    -> log10(100)=2 -> 240 + 2/7*580 = 405.7
+       3: SSD顺序 ~1000 ns   -> log10(1000)=3 -> 240 + 3/7*580 = 488.6  [红色高亮]
+       4: SSD随机 ~100000 ns -> log10(1e5)=5  -> 240 + 5/7*580 = 654.3  [红色高亮]
+       5: 机械盘   ~1e7 ns    -> log10(1e7)=7  -> 820
+  -->
+
+  <!-- 柱 1: L1/L2 缓存 -->
+  <text x="230" y="135" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">L1 / L2 缓存</text>
+  <text x="230" y="150" text-anchor="end" font-size="11" fill="#6B7280">CPU 片内 · ~1 ns</text>
+  <rect x="240" y="124" width="0.1" height="32" fill="#4F46E5" opacity="0.85"/>
+  <circle cx="240" cy="140" r="4" fill="#4F46E5"/>
+  <text x="252" y="144" font-size="11.5" font-weight="600" fill="#4F46E5">1 ns</text>
+
+  <!-- 柱 2: 主内存 -->
+  <text x="230" y="185" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">主内存访问</text>
+  <text x="230" y="200" text-anchor="end" font-size="11" fill="#6B7280">DRAM · ~100 ns</text>
+  <rect x="240" y="174" width="165.7" height="32" fill="#4F46E5" opacity="0.85"/>
+  <text x="415" y="194" font-size="11.5" font-weight="600" fill="#4F46E5">100 ns</text>
+
+  <!-- 柱 3: SSD 顺序读（红色高亮） -->
+  <text x="230" y="235" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 顺序读</text>
+  <text x="230" y="250" text-anchor="end" font-size="11" fill="#6B7280">顺序 · ~1 μs</text>
+  <rect x="240" y="224" width="248.6" height="32" fill="#EF4444" opacity="0.85"/>
+  <text x="498" y="244" font-size="11.5" font-weight="600" fill="#EF4444">1 μs (1,000 ns)</text>
+
+  <!-- 柱 4: SSD 随机读（红色高亮） -->
+  <text x="230" y="285" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 随机读</text>
+  <text x="230" y="300" text-anchor="end" font-size="11" fill="#6B7280">随机 · ~100 μs</text>
+  <rect x="240" y="274" width="414.3" height="32" fill="#EF4444" opacity="0.85"/>
+  <text x="664" y="294" font-size="11.5" font-weight="600" fill="#EF4444">100 μs (100,000 ns)</text>
+
+  <!-- 柱 5: 机械盘寻道 -->
+  <text x="230" y="335" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">机械盘寻道</text>
+  <text x="230" y="350" text-anchor="end" font-size="11" fill="#6B7280">随机 · ~10 ms</text>
+  <rect x="240" y="324" width="580" height="32" fill="#D97706" opacity="0.85"/>
+  <text x="830" y="344" font-size="11.5" font-weight="600" fill="#D97706" text-anchor="end">10 ms (10,000,000 ns)</text>
+
+  <!-- ============ 红色高亮：顺序 vs 随机 100× 标注 ============ -->
+  <!-- 在 SSD 顺序柱（y=240）与随机柱（y=290）之间画大括号式标注 -->
+  <line x1="500" y1="240" x2="660" y2="240" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+  <line x1="660" y1="240" x2="660" y2="290" stroke="#EF4444" stroke-width="1.5" marker-end="url(#fig_3_6_arrow-red-3-6)" marker-start="url(#fig_3_6_arrow-red-3-6)"/>
+  <rect x="538" y="256" width="244" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
+  <text x="660" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">同介质：顺序比随机快 100×</text>
+
+  <!-- 红字结论（柱状图右侧空白处） -->
+  <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
+  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 死磕「顺序写」的根因</text>
+  <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，等于白捡两个数量级</text>
+
+  <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
+  <!-- 在主内存柱（y=190）与机械盘柱（y=340）之间画纵向跨度线 -->
+  <line x1="225" y1="190" x2="225" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_3_6_arrow-3-6)" marker-start="url(#fig_3_6_arrow-3-6)"/>
+  <rect x="40" y="372" width="178" height="42" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="129" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">内存比机械盘快</text>
+  <text x="129" y="406" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">约 1,000 万倍（10⁷）</text>
+
+  <!-- 左侧分组提示：内存 vs 磁盘 -->
+  <text x="36" y="112" font-size="11" font-weight="700" fill="#4F46E5">┃ 内存</text>
+  <text x="36" y="320" font-size="11" font-weight="700" fill="#D97706">┃ 磁盘</text>
+
+  <!-- 底部图注 -->
+  <text x="440" y="500" text-anchor="middle" font-size="12" fill="#374151">数据为典型量级估值；实际值因硬件、负载、队列深度而异，但数量级关系稳定。</text>
+  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」—— 每一格都是 10 倍差距</text>
+</svg>
+</div><figcaption>图 3-6 存储层次访问延迟的数量级（对数轴）</figcaption></figure>
+<p><em>图 3-6　存储层次访问延迟数量级（对数坐标）：内存比机械盘快约一千万倍；同一块 SSD，顺序读比随机读快 100 倍。</em></p>
+<p>图中两处标注最该记住。其一，内存柱与机械盘柱的长度差——这就是"为什么要有缓冲池、为什么 Redis 把数据塞进内存"的全部理由。其二，SSD 顺序读与随机读两条柱的对比——同一块盘，访问模式从顺序换成随机，延迟就涨了两个数量级，这正是 Kafka 死磕顺序写、InnoDB 用 WAL 把随机写改造成顺序写的根因。</p>
+<p>这组数字背后藏着三个根本约束。</p>
+<p>第一，内存易失。断电瞬间内存里的内容归零，所有还没写到持久介质上的数据都会消失。任何承诺"持久化"的系统都必须在某个时刻把数据搬到一个断电也不丢的地方。</p>
+<p>第二，内存昂贵且容量有限，磁盘便宜且容量大。同价位下，磁盘容量通常是内存的上百倍。这意味着"全内存"系统天生有容量天花板，而"磁盘为主"系统天然适合存海量数据。</p>
+<p>第三，随机 IO 远慢于顺序 IO。这点是后面 Kafka 范式的伏笔，本节只点出，到 3.4 节再展开。机械盘的随机寻道是一次旋转加一次磁头移动，时间在毫秒级；而顺序读写可以让磁头连续扫过扇区，吞吐能到上百 MB/s。SSD 没有机械结构，但顺序写仍然比随机写对闪存更友好，因为它能减少写放大与擦除开销。</p>
+<p>把这三个约束翻译成对存储软件的要求，就得到一个共同难题：任何存储软件都是"读路径要快、写路径要可靠、容量要够、成本要控"这四件事的折中系统。可以把这个折中拆成两条轴。一条轴是<strong>数据住哪里</strong>：以内存为主、以磁盘为主，还是以磁盘上的顺序日志为主。另一条轴是<strong>持久化怎么做</strong>：同步落盘（每条写都等磁盘确认）、异步落盘（攒一批再落），还是干脆依赖操作系统的页缓存自己决定。</p>
+<p>Redis、MySQL、Kafka 在这两条轴上站到了三个不同的位置，构成了贯穿全章的三种范式：</p>
+<ul><li><strong>全内存范式</strong>（in-memory first）——数据以内存为家，磁盘只做备份。Redis 是代表。</li><li><strong>缓存磁盘范式</strong>（buffer-first）——数据以磁盘为家，内存做加速。MySQL（InnoDB）是代表。</li><li><strong>顺序日志范式</strong>（log-first）——数据以磁盘顺序日志为家，靠操作系统页缓存（PageCache）加速。Kafka 是代表。</li></ul>
+<p>三家服务的访问模式不同。Redis 服务"小而热"的快速读写，MySQL 服务"大而杂"的事务查询，Kafka 服务"大而流"的追加写与顺序消费。下面三节逐家分析它们如何架各自的桥。</p>
+<h2 id="s50">3.2 Redis 的做法</h2>
+<p>Redis 在官方文档里把自己定义为"内存数据结构存储（in-memory data structure store）"，而不是"带内存的缓存"。这一定位决定了它的一切取舍：所有数据默认住在内存里，跳表、紧凑列表（listpack）、哈希表等结构（详见第 4 章）原生跑在内存中，复杂度 O(1) 到 O(log N) 的操作直接在内存完成。这个假设带来的红利是低延迟——常见本地或同机房访问能落在亚毫秒到毫秒级；代价是容量被内存的物理上限锁死。</p>
+<p>Redis 敢假设"数据全在内存"，是因为它的目标场景就是"小而热"。一个会话缓存、一个排行榜、一个限流计数器，这些数据天然体量不大、访问频率极高、对延迟敏感。把这类数据放在内存里，每次访问都省掉了从磁盘捞页的开销，延迟通常能比磁盘随机访问低几个数量级。这种延迟优势是 Redis 在缓存市场立住脚的根本，也是它后来扩展出多种数据结构、Stream、Function 等能力的底座。</p>
+<p>但"全内存"假设一旦确立，两个绕不开的问题立刻浮现：内存满了怎么办，断电了数据还在不在。Redis 用"内存淘汰"回答第一个问题，用"持久化两条腿"回答第二个。</p>
+<h3 id="s51">内存淘汰的真实实现</h3>
+<p>教科书里的 LRU 维护一个双向链表，每次访问把节点移到链表头，淘汰时摘掉链表尾。这个方案准确但代价大：每次访问都要动链表指针，访问量上去之后链表操作的 CPU 开销不可忽视。</p>
+<p>Redis 没有用教科书版本，而是用了<strong>近似 LRU</strong>：淘汰时从全部键里随机采样 N 个（由 <code>maxmemory-samples</code> 控制，默认 5），从中淘汰最久未用的那一个。采样数越大越接近精确 LRU，CPU 开销也越高。这是一次典型的精度与性能取舍：取 5 个随机样本就足以近似真实 LRU，代价只是常量级的随机采样。</p>
+<p>近似 LRU 有一个老问题：只看时间维度，看不出"频率"。一个被扫描过一次的冷数据，会因为"刚被访问过"而排在热数据前面，把真正的热数据挤走。Redis 4.0 引入了 <strong>LFU（Least Frequently Used，最不经常使用）</strong> 来补这个洞。LFU 不记最后一次访问时间，而是给每个对象维护一个访问频次计数器。为了不在这个计数器上花太多内存，它用的是 <strong>Morris 近似计数器</strong>：一个 8 位的对数计数器，访问越频繁增长越慢，并用一个带衰减的机制让长时间没访问的计数器逐渐回落。关键参数是 <code>lfu-log-factor</code>（控制计数器增长的对数底）和 <code>lfu-decay-time</code>（控制衰减周期，单位分钟）。</p>
+<p>LFU 看频率、LRU 看时间，这是两者的本质差异。举个具体场景：你跑一次全表扫描把一批冷数据读进 Redis，过几秒又来一波真正的热点查询。LRU 下，刚被扫到的冷数据"最新"，会顶掉前面的热数据；LFU 下，冷数据的计数器还是低值，热数据因为高频访问计数器已经爬高，被顶掉的会是冷数据。这就是 LFU 存在的理由。</p>
+<p>Redis 把淘汰策略做成八种，可以归成三组。<code>noeviction</code> 是内存满了直接报错、不淘汰，适合"数据不能丢"的场景。<code>allkeys-lru</code> / <code>allkeys-lfu</code> / <code>allkeys-random</code> 在全部键里挑淘汰对象。<code>volatile-lru</code> / <code>volatile-lfu</code> / <code>volatile-random</code> / <code>volatile-ttl</code> 只在设置了过期时间（TTL）的键里挑淘汰对象。第三组的存在是为了混合场景：同一份 Redis 既当缓存（带 TTL，可淘汰）又当小型持久存储（不带 TTL，永不淘汰）。理解了这层意图，选策略就不会盲目。</p>
+<p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_1_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_3_1_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="470" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-1　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减</text>
+  <text x="470" y="56" text-anchor="middle" font-size="13" fill="#374151">LRU 看时间（采样池内淘汰最久未用）·LFU 看频率（Morris 近似计数器 + 衰减）</text>
+
+  <!-- ===== Left half: Approximate LRU ===== -->
+  <text x="220" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">近似 LRU（随机采样淘汰）</text>
+
+  <!-- Global key pool -->
+  <rect x="40" y="115" width="380" height="180" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <text x="60" y="135" font-size="12" fill="#374151">全部键（哈希表）</text>
+
+  <!-- key boxes -->
+  <g font-size="11" fill="#111827">
+    <rect x="60" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="83" y="168" text-anchor="middle">k1</text>
+    <rect x="112" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="135" y="168" text-anchor="middle">k2</text>
+    <rect x="164" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="187" y="168" text-anchor="middle">k3</text>
+    <rect x="216" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="239" y="168" text-anchor="middle">k4</text>
+    <rect x="268" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="291" y="168" text-anchor="middle">k5</text>
+    <rect x="320" y="150" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="343" y="168" text-anchor="middle">k6</text>
+    <rect x="60" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="83" y="204" text-anchor="middle">k7</text>
+    <rect x="112" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="135" y="204" text-anchor="middle">k8</text>
+    <rect x="164" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="187" y="204" text-anchor="middle">k9</text>
+    <rect x="216" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="239" y="204" text-anchor="middle">k10</text>
+    <rect x="268" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="291" y="204" text-anchor="middle">k11</text>
+    <rect x="320" y="186" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="343" y="204" text-anchor="middle">k12</text>
+    <rect x="60" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="83" y="240" text-anchor="middle">k13</text>
+    <rect x="112" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="135" y="240" text-anchor="middle">k14</text>
+    <rect x="164" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="187" y="240" text-anchor="middle">k15</text>
+    <rect x="216" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="239" y="240" text-anchor="middle">k16</text>
+    <rect x="268" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="291" y="240" text-anchor="middle">...</text>
+    <rect x="320" y="222" width="46" height="28" rx="4" fill="#EEF2FF" stroke="#4F46E5"/><text x="343" y="240" text-anchor="middle">kN</text>
+  </g>
+  <text x="60" y="275" font-size="11" fill="#6B7280">维护教科书双向链表代价大 → Redis 不维护全局链表</text>
+
+  <!-- sample box -->
+  <rect x="40" y="315" width="380" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="60" y="338" font-size="13" font-weight="700" fill="#111827">采样池（maxmemory-samples，默认 5）</text>
+  <g font-size="11" fill="#111827">
+    <rect x="60" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="83" y="368" text-anchor="middle">k3</text>
+    <rect x="112" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="135" y="368" text-anchor="middle">k7</text>
+    <rect x="164" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="187" y="368" text-anchor="middle">k11</text>
+    <rect x="216" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="239" y="368" text-anchor="middle">k2</text>
+    <rect x="268" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="291" y="368" text-anchor="middle">k9</text>
+  </g>
+
+  <!-- arrows: random pick -->
+  <path d="M 83 250 Q 83 300 83 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_1_arrowInd)"/>
+  <path d="M 239 250 Q 239 300 239 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_3_1_arrowInd)"/>
+  <text x="425" y="358" font-size="11" fill="#374151">← 随机抽 N 个</text>
+
+  <!-- evict -->
+  <rect x="40" y="410" width="380" height="76" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="60" y="432" font-size="13" font-weight="700" fill="#111827">淘汰：采样池中空闲时间最大者</text>
+  <rect x="60" y="444" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.6"/>
+  <text x="120" y="463" text-anchor="middle" font-size="12" fill="#EF4444" font-weight="700">k11 (最久未用)</text>
+  <text x="195" y="463" font-size="11" fill="#374151">→ DEL 释放内存</text>
+  <path d="M 187 380 L 120 406" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_1_arrowRed)"/>
+
+  <text x="220" y="510" text-anchor="middle" font-size="11" fill="#6B7280">精度换性能：采样数越大越接近真 LRU，但每次淘汰成本越高</text>
+
+  <!-- ===== Right half: LFU Morris counter ===== -->
+  <text x="720" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">LFU（Morris 近似计数器 + 衰减）</text>
+
+  <!-- redisObject header -->
+  <rect x="540" y="115" width="380" height="170" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="560" y="135" font-size="13" font-weight="700" fill="#111827">redisObject.lru 字段（24 bit）</text>
+  <line x1="540" y1="144" x2="920" y2="144" stroke="#C7D2FE" stroke-width="1"/>
+
+  <!-- counter bits -->
+  <rect x="560" y="158" width="150" height="48" rx="4" fill="#FFFFFF" stroke="#4F46E5"/>
+  <text x="635" y="178" text-anchor="middle" font-size="12" fill="#111827">高 8 位</text>
+  <text x="635" y="196" text-anchor="middle" font-size="11" fill="#374151">Morris 对数计数器</text>
+
+  <rect x="710" y="158" width="150" height="48" rx="4" fill="#FFFFFF" stroke="#4F46E5"/>
+  <text x="785" y="178" text-anchor="middle" font-size="12" fill="#111827">低 16 位</text>
+  <text x="785" y="196" text-anchor="middle" font-size="11" fill="#374151">上次访问时间（分钟）</text>
+
+  <!-- counter value -->
+  <text x="560" y="232" font-size="12" fill="#374151">计数器值 = log₂(实际访问次数)，以概率递增方式 +1</text>
+  <text x="560" y="252" font-size="12" fill="#374151">8 位可表达 0~255，足以覆盖千万级访问</text>
+  <text x="560" y="272" font-size="11" fill="#6B7280">lfu-log-factor（默认 10）控制计数增长斜率</text>
+
+  <!-- access increment -->
+  <rect x="540" y="305" width="180" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="630" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">每次访问</text>
+  <text x="630" y="346" text-anchor="middle" font-size="11" fill="#374151">按概率递增计数</text>
+  <text x="630" y="362" text-anchor="middle" font-size="11" fill="#374151">（越大概率越小）</text>
+
+  <!-- decay -->
+  <rect x="740" y="305" width="180" height="64" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="830" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">周期性衰减</text>
+  <text x="830" y="346" text-anchor="middle" font-size="11" fill="#374151">超过 lfu-decay-time</text>
+  <text x="830" y="362" text-anchor="middle" font-size="11" fill="#374151">（默认 1）分钟则 −1</text>
+
+  <line x1="720" y1="337" x2="736" y2="337" stroke="#4B5563" stroke-width="1.6"/>
+
+  <!-- result: hot vs cold -->
+  <rect x="540" y="395" width="180" height="64" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.6"/>
+  <text x="630" y="418" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">热数据</text>
+  <text x="630" y="436" text-anchor="middle" font-size="11" fill="#374151">高频率 → 计数大</text>
+  <text x="630" y="452" text-anchor="middle" font-size="11" fill="#374151">难以被淘汰</text>
+
+  <rect x="740" y="395" width="180" height="64" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="830" y="418" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">扫描来的冷数据</text>
+  <text x="830" y="436" text-anchor="middle" font-size="11" fill="#374151">访问一次 → 计数小</text>
+  <text x="830" y="452" text-anchor="middle" font-size="11" fill="#374151">优先被淘汰</text>
+
+  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU「扫描一次冷数据挤掉热数据」的痛点</text>
+
+  <!-- bottom: essence comparison -->
+  <rect x="40" y="540" width="880" height="90" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="564" font-size="13" font-weight="700" fill="#111827">本质差异</text>
+  <text x="60" y="586" font-size="12" fill="#374151">LRU 看时间：谁最久没被访问就淘汰谁（采样近似实现）。</text>
+  <text x="60" y="606" font-size="12" fill="#374151">LFU 看频率：谁访问得少就淘汰谁（Morris 计数器 + 衰减实现）。</text>
+  <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
+</svg>
+</div><figcaption>图 3-1 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
+<p>图 3-1 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰线程从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
+<h3 id="s52">持久化的两条腿</h3>
+<p>内存淘汰回答的是"满了怎么办"，持久化回答的是"断电了还在不在"。Redis 给了两条腿：RDB 和 AOF。</p>
+<p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程安心写快照，两者通过 COW 隔离，互不阻塞。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了——生产环境里这种卡顿通常表现为一波客户端超时告警，排查时若发现告警间隔正好等于 <code>save</code> 规则的触发周期，基本就能锁定是 fork。这就是大实例要控制容量的核心原因之一。</p>
+<p><strong>AOF（仅追加文件）</strong> 走另一条路：它不存数据本身，而是把每一条写命令追加到日志末尾。恢复时按顺序回放这些命令重建内存状态。AOF 的核心旋钮是 <code>appendfsync</code>，它决定了日志什么时候真正落到磁盘：</p>
+<ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把页缓存写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
+<p>这三档本质上是"可靠性 vs 性能"这条连续谱上的三个采样点。很多生产环境会选择 <code>everysec</code>，因为它把潜在丢失控制在约 1 秒量级，代价是每秒一次的 <code>fsync</code>。</p>
+<p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。注意，重写是按内存当前状态重新生成一份最小的命令集（把那一万条 <code>INCR</code> 压成一条 <code>SET key 10000</code>），不是回放旧日志。重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套机制保证了重写过程不丢数据。</p>
+<p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 自 7.0 起默认就是 <code>yes</code>，是当前推荐配置。</p>
+<p>需要特别说明的是 <strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 3-2 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。</p>
+<p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，揭示 Redis"内存为主、磁盘为辅"的根本姿态。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_2_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2　Redis 持久化数据流</text>
+  <text x="460" y="58" text-anchor="middle" font-size="13" fill="#374151">写命令通往内存与 RDB 快照 / AOF（含混合持久化）两类持久化产物</text>
+
+  <!-- Client -->
+  <rect x="60" y="100" width="120" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="120" y="134" text-anchor="middle" font-size="14" fill="#111827">客户端</text>
+  <text x="120" y="150" text-anchor="middle" font-size="11" fill="#374151">SET key val</text>
+
+  <!-- Redis Main Process (Memory) -->
+  <rect x="320" y="92" width="200" height="72" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
+  <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 主进程</text>
+  <text x="420" y="138" text-anchor="middle" font-size="12" fill="#374151">内存数据结构</text>
+  <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / 压缩列表）</text>
+
+  <!-- arrow client -> redis -->
+  <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_2_arrow)"/>
+
+  <!-- Branch label -->
+  <text x="545" y="156" font-size="12" fill="#374151">同时触发持久化 ↓</text>
+
+  <!-- Three paths: RDB / AOF / 混合 -->
+  <!-- RDB -->
+  <rect x="60" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="180" y="276" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">RDB（快照文件）</text>
+  <line x1="80" y1="288" x2="280" y2="288" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="80" y="308" font-size="12" fill="#374151">• fork 子进程 + COW 写时复制</text>
+  <text x="80" y="328" font-size="12" fill="#374151">• 某一时刻全量快照</text>
+  <text x="80" y="348" font-size="12" fill="#374151">• 二进制紧凑，恢复快</text>
+  <text x="80" y="368" font-size="12" fill="#374151">• fork 大实例可能阻塞数百毫秒</text>
+  <text x="80" y="392" font-size="11" fill="#6B7280">产物：dump.rdb</text>
+
+  <!-- AOF -->
+  <rect x="340" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="460" y="276" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">AOF（仅追加文件）</text>
+  <line x1="360" y1="288" x2="560" y2="288" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="360" y="308" font-size="12" fill="#374151">• 追加写命令日志</text>
+  <text x="360" y="328" font-size="12" fill="#374151">• appendfsync 三档：</text>
+  <text x="360" y="346" font-size="11" fill="#374151">　always / everysec(默认) / no</text>
+  <text x="360" y="368" font-size="12" fill="#374151">• 重写：按当前内存重生成</text>
+  <text x="360" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（7.x 多部 AOF）</text>
+
+  <!-- 混合 -->
+  <rect x="620" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="740" y="276" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">混合持久化（4.0+，推荐）</text>
+  <line x1="640" y1="288" x2="840" y2="288" stroke="#C7D2FE" stroke-width="1"/>
+  <text x="640" y="308" font-size="12" fill="#374151">• base = RDB 全量快照</text>
+  <text x="640" y="326" font-size="12" fill="#374151">　+ incr = AOF 增量命令</text>
+  <text x="640" y="348" font-size="12" fill="#374151">• 恢复快、丢失少</text>
+  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ 默认 aof-use-rdb-preamble</text>
+  <text x="640" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（base+incr+manifest）</text>
+
+  <!-- arrows from redis to three paths -->
+  <path d="M 380 164 Q 380 210 180 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
+  <path d="M 420 164 L 420 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
+  <path d="M 460 164 Q 460 210 660 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_2_arrow)"/>
+
+  <!-- Branch labels -->
+  <text x="200" y="220" font-size="11" fill="#374151" text-anchor="middle">触发 BGSAVE / 定时</text>
+  <text x="436" y="220" font-size="11" fill="#374151">每条命令</text>
+  <text x="680" y="220" font-size="11" fill="#374151">BGREWRITEAOF 触发</text>
+
+  <!-- Disk -->
+  <rect x="260" y="470" width="400" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="460" y="498" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（落盘）</text>
+  <text x="460" y="518" text-anchor="middle" font-size="12" fill="#374151">崩溃后用于恢复内存</text>
+
+  <!-- arrows to disk -->
+  <path d="M 180 412 L 320 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+  <path d="M 460 412 L 460 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+  <path d="M 740 412 L 600 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_2_arrowRed)"/>
+
+  <!-- Legend -->
+  <g transform="translate(60,560)">
+    <line x1="0" y1="10" x2="28" y2="10" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_2_arrow)"/>
+    <text x="36" y="14" font-size="11" fill="#374151">控制流 / 触发</text>
+    <line x1="160" y1="10" x2="188" y2="10" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_2_arrowRed)"/>
+    <text x="196" y="14" font-size="11" fill="#374151">数据落盘</text>
+    <rect x="300" y="2" width="14" height="14" rx="2" fill="#EEF2FF" stroke="#4F46E5"/>
+    <text x="320" y="14" font-size="11" fill="#374151">Redis 相关</text>
+  </g>
+</svg>
+</div><figcaption>图 3-2 Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
+<p>图 3-2 展示了一条写命令进入 Redis 后如何通往内存与持久化。命令先在内存里执行；RDB 是另一条独立的全量快照路径（fork 触发），而 AOF（含 7.x 默认的混合持久化）走的是追加日志路径，产物落在 <code>appendonlydir/</code>。这张图揭示了 Redis 的根本姿态：内存是主，磁盘是从，持久化只是给内存数据上保险。</p>
+<h3 id="s53">取舍总账</h3>
+<p>Redis 的取舍可以一句话概括：它用内存和秒级持久化，换来读写延迟低、原生支持多种数据结构。这套取舍在缓存和快速键值场景成立——访问频繁、对延迟敏感、数据可重建或可容忍少量丢失；但它要求容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见第 6 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
+<p>理解了 Redis 的"全内存 + 持久化兜底"，再看 MySQL 如何把"磁盘为主、内存加速"做成一套精密系统，会更清楚两家为什么差别这么大。</p>
+<h2 id="s54">3.3 MySQL 的做法</h2>
+<p>MySQL 默认的存储引擎是 InnoDB。InnoDB 的核心假设与 Redis 几乎相反：数据最终必须落盘，内存只是减少磁盘 IO 的缓冲。这个假设换来的是"容量几乎无限 + ACID 可靠"，代价是延迟受缓冲池命中率支配——一旦缓存未命中（cache miss），延迟立刻从内存级跌到磁盘级。</p>
+<h3 id="s55">核心假设</h3>
+<p>InnoDB 假设数据量会远超内存。这意味着任何一个时刻，磁盘上的大部分页都不在内存里。一次查询命中内存里的页通常很快，没命中就要去磁盘捞，延迟会明显抬高。所以 InnoDB 的一切设计都围绕一个目标：尽量让访问命中内存，尽量减少对磁盘的随机 IO。</p>
+<p>这个假设带来一个根本特征：MySQL 的延迟不是常数，它取决于"你访问的页此刻在不在内存里"。一个刚启动的实例缓冲池是空的，所有访问都打磁盘，延迟很高。跑稳之后热数据进了内存，延迟降下来。某次大扫描把热数据挤走了，延迟又会显著上升。在生产里这种现象很常见：平时几十毫秒的查询，某天有人跑了一个大报表，之后整个库的延迟集体飙上去，要等热数据重新被访问回暖才慢慢回落——这就是缓冲池被污染的代价。理解这一点，是理解 MySQL 性能波动的钥匙。</p>
+<h3 id="s56">缓冲池的三分链表</h3>
+<p>缓冲池（Buffer Pool）是 InnoDB 在内存里缓存磁盘页的地方。它由三条链表精密管理，不是简单的页数组：</p>
+<ul><li><strong>Free List</strong>：空闲页池。需要从磁盘读入新页时，从这里申请一个空闲页。</li><li><strong>LRU List</strong>：活跃页链表，按访问热度排序。这是缓冲池的主体。</li><li><strong>Flush List</strong>：脏页链表。被改过但还没刷盘的页按最早修改时间排队，后台线程依此做检查点（Checkpoint）刷盘。</li></ul>
+<p>LRU List 是缓冲池的核心，InnoDB 没有直接用朴素 LRU，而是把它改良成了"新老分区"。整个 LRU List 被一个叫 <code>midpoint</code> 的点分成两段：靠头的 <strong>New Sublist</strong> 占约 5/8，是热区；靠尾的 <strong>Old Sublist</strong> 占约 3/8，是冷区。一个从磁盘新读入的页不进热区头部，而是被插到 <code>midpoint</code>，也就是冷区的头部。它必须在冷区停留超过 <code>innodb_old_blocks_time</code>（默认 1000 毫秒）之后再次被访问，才有资格晋升进热区。</p>
+<p>这个改良专门为了对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们顶掉热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，下次被挤走时根本碰不到热区，真正的热数据安然无恙——在全表扫描场景下能把热数据命中率维持在高位，代价只是冷区管理的一点额外开销。</p>
+<p>下图把三分链表和 midpoint 的位置画出来。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_3_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_3_3_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3　InnoDB 缓冲池三分链表</text>
+  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">Free List（空闲页）·LRU List（新老分区 5/8 与 3/8）·Flush List（脏页排队刷盘）</text>
+
+  <!-- ===== Free List ===== -->
+  <rect x="40" y="90" width="240" height="200" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="160" y="114" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Free List（空闲页池）</text>
+  <line x1="60" y1="124" x2="260" y2="124" stroke="#FDE68A" stroke-width="1"/>
+  <g font-size="11" fill="#111827">
+    <rect x="60" y="138" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="85" y="156" text-anchor="middle">空闲页</text>
+    <rect x="116" y="138" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="141" y="156" text-anchor="middle">空闲页</text>
+    <rect x="172" y="138" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="197" y="156" text-anchor="middle">空闲页</text>
+    <rect x="60" y="172" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="85" y="190" text-anchor="middle">空闲页</text>
+    <rect x="116" y="172" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="141" y="190" text-anchor="middle">空闲页</text>
+    <rect x="172" y="172" width="50" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="197" y="190" text-anchor="middle">...</text>
+  </g>
+  <text x="160" y="226" text-anchor="middle" font-size="11" fill="#374151">读新页时从池中取一页</text>
+  <text x="160" y="244" text-anchor="middle" font-size="11" fill="#374151">用完后或淘汰后归还</text>
+  <text x="160" y="270" text-anchor="middle" font-size="11" fill="#6B7280">读路径的页来源</text>
+
+  <!-- ===== LRU List ===== -->
+  <rect x="320" y="90" width="600" height="200" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="620" y="114" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">LRU List（改良版，新老分区）</text>
+
+  <!-- New sublist (5/8) -->
+  <rect x="340" y="128" width="360" height="44" rx="4" fill="#FFFFFF" stroke="#D97706"/>
+  <text x="520" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">New Sublist（热区，5/8）</text>
+  <g font-size="10" fill="#111827">
+    <rect x="350" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="371" y="164" text-anchor="middle">热页</text>
+    <rect x="396" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="417" y="164" text-anchor="middle">热页</text>
+    <rect x="442" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="463" y="164" text-anchor="middle">热页</text>
+    <rect x="488" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="509" y="164" text-anchor="middle">热页</text>
+    <rect x="534" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="555" y="164" text-anchor="middle">热页</text>
+    <rect x="580" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="601" y="164" text-anchor="middle">...</text>
+    <rect x="626" y="152" width="42" height="16" rx="2" fill="#FEF3C7" stroke="#D97706"/><text x="647" y="164" text-anchor="middle">热页</text>
+  </g>
+
+  <!-- midpoint -->
+  <line x1="540" y1="120" x2="540" y2="200" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,3"/>
+  <rect x="500" y="104" width="80" height="18" rx="3" fill="#FEE2E2" stroke="#EF4444"/>
+  <text x="540" y="117" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">midpoint</text>
+
+  <!-- Old sublist (3/8) -->
+  <rect x="700" y="128" width="216" height="44" rx="4" fill="#FFFFFF" stroke="#D97706" stroke-dasharray="4,3"/>
+  <text x="808" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">Old Sublist（冷区，3/8）</text>
+  <g font-size="10" fill="#111827">
+    <rect x="710" y="152" width="42" height="16" rx="2" fill="#FFFBEB" stroke="#D97706"/><text x="731" y="164" text-anchor="middle">冷页</text>
+    <rect x="756" y="152" width="42" height="16" rx="2" fill="#FFFBEB" stroke="#D97706"/><text x="777" y="164" text-anchor="middle">冷页</text>
+    <rect x="802" y="152" width="42" height="16" rx="2" fill="#FFFBEB" stroke="#D97706"/><text x="823" y="164" text-anchor="middle">冷页</text>
+    <rect x="848" y="152" width="42" height="16" rx="2" fill="#FFFBEB" stroke="#D97706"/><text x="869" y="164" text-anchor="middle">...</text>
+  </g>
+
+  <!-- new page entry -->
+  <rect x="340" y="196" width="576" height="36" rx="4" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="360" y="218" font-size="11" fill="#374151">新读入页 → 插入 midpoint（Old 区头部），而非链表头部</text>
+
+  <!-- promotion -->
+  <text x="360" y="252" font-size="11" fill="#374151">Old 区停留 &gt; innodb_old_blocks_time（默认 1s）后再次被访问 →</text>
+  <text x="360" y="270" font-size="11" fill="#EF4444" font-weight="700">晋升 New 区</text>
+  <text x="560" y="270" font-size="11" fill="#374151">（全表扫描的页来不及晋升 → 被及时挤走，不污染热区）</text>
+
+  <!-- eviction -->
+  <text x="700" y="270" font-size="11" fill="#374151">← 尾部淘汰</text>
+  <path d="M 870 152 Q 900 152 900 250 Q 900 285 880 285" fill="none" stroke="#EF4444" stroke-width="1.4" marker-end="url(#fig_3_3_arrowRed)"/>
+
+  <!-- ===== Flush List ===== -->
+  <rect x="320" y="320" width="600" height="160" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="620" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Flush List（脏页队列，按最早修改时间排序）</text>
+  <g font-size="11" fill="#111827">
+    <rect x="340" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="372" y="383" text-anchor="middle">脏页①</text>
+    <rect x="410" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="442" y="383" text-anchor="middle">脏页②</text>
+    <rect x="480" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="512" y="383" text-anchor="middle">脏页③</text>
+    <rect x="550" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="582" y="383" text-anchor="middle">脏页④</text>
+    <rect x="620" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="652" y="383" text-anchor="middle">...</text>
+  </g>
+  <text x="340" y="416" font-size="11" fill="#374151">页被修改 → 进入 Flush List（同时仍在 LRU List 中，两链表交叉）</text>
+  <text x="340" y="436" font-size="11" fill="#374151">后台线程按此队列做 Checkpoint：顺序刷盘 → 磁盘</text>
+  <text x="340" y="458" font-size="11" fill="#6B7280">刷盘后从 Flush List 移除（仍留 LRU 直到被淘汰或换出）</text>
+
+  <!-- Free -> LRU arrow -->
+  <path d="M 280 180 L 316 180" fill="none" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_3_arrowInd)"/>
+  <text x="298" y="172" text-anchor="middle" font-size="10" fill="#D97706">取页</text>
+
+  <!-- LRU modify -> Flush -->
+  <path d="M 620 296 L 620 316" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
+  <text x="630" y="310" font-size="10" fill="#EF4444">页被改</text>
+
+  <!-- Disk -->
+  <rect x="320" y="520" width="600" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / 重做日志）</text>
+  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠重做日志重放补齐</text>
+
+  <!-- Flush -> Disk -->
+  <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_3_arrowRed)"/>
+  <text x="630" y="504" font-size="10" fill="#EF4444">Checkpoint 刷盘</text>
+
+  <!-- Evicted page returns to Free List -->
+  <path d="M 540 200 Q 200 200 160 200 Q 90 200 90 250 Q 90 290 100 290" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_3_3_arrow)"/>
+  <text x="230" y="240" font-size="10" fill="#6B7280">淘汰的页归还 Free List</text>
+
+  <!-- bottom note -->
+  <rect x="40" y="600" width="880" height="80" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="624" font-size="13" font-weight="700" fill="#111827">设计要点</text>
+  <text x="60" y="646" font-size="12" fill="#374151">1）三分链表各司其职：Free 管空闲、LRU 管命中、Flush 管刷盘；同一页可同时位于 LRU 与 Flush。</text>
+  <text x="60" y="666" font-size="12" fill="#374151">2）老区分流 + 停留时间门槛，专门对付「全表扫描污染缓冲池」这一陷阱。</text>
+</svg>
+</div><figcaption>图 3-3 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
+<p>图 3-3 把 Free List、改良版 LRU List（含 New / Old 子链表与 midpoint）、Flush List 并排画出，箭头标出页在链表间的流转路径：新页从 Free List 进入 LRU 的 midpoint，停留超时后晋升 New 区；被修改的页同时进入 Flush List，等待后台线程刷盘。这张图是理解 InnoDB 内存管理的骨架。</p>
+<h3 id="s57">WAL 与崩溃恢复</h3>
+<p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>重做日志（redo log）</strong>。重做日志是顺序追加写的。崩溃之后，InnoDB 用重做日志重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
+<p>为什么用顺序日志而不是直接随机写数据页？因为顺序写远快于随机写（呼应 3.1 节的伏笔）。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 IO；而把这些修改先打包成顺序日志追加写，只产生顺序 IO。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
+<p>下图展示一次写操作在时间轴上的全链路。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_4_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_3_4_arrowInd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-4　MySQL 一次写操作的全链路时序</text>
+  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写重做日志）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
+
+  <!-- Lifelines (actors) -->
+  <!-- Client -->
+  <rect x="40" y="90" width="120" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="100" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">客户端</text>
+  <line x1="100" y1="130" x2="100" y2="700" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- InnoDB -->
+  <rect x="220" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="290" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">InnoDB 引擎</text>
+  <text x="290" y="124" text-anchor="middle" font-size="10" fill="#374151">事务执行</text>
+  <line x1="290" y1="130" x2="290" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Buffer Pool -->
+  <rect x="420" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="490" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">缓冲池</text>
+  <text x="490" y="124" text-anchor="middle" font-size="10" fill="#374151">Buffer Pool</text>
+  <line x1="490" y1="130" x2="490" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Redo Log -->
+  <rect x="620" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">重做日志</text>
+  <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">redo log（顺序写）</text>
+  <line x1="690" y1="130" x2="690" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Disk -->
+  <rect x="820" y="90" width="120" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="880" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">磁盘</text>
+  <text x="880" y="124" text-anchor="middle" font-size="10" fill="#374151">表空间文件</text>
+  <line x1="880" y1="130" x2="880" y2="700" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- ===== Messages ===== -->
+  <!-- 1. UPDATE request -->
+  <line x1="100" y1="160" x2="284" y2="160" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_4_arrow)"/>
+  <text x="192" y="153" text-anchor="middle" font-size="11" fill="#374151">① UPDATE 请求</text>
+
+  <!-- 2. WAL: write redo log FIRST -->
+  <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
+  <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写重做日志（WAL，顺序写）</text>
+  <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">「这页要怎么改」先落盘，崩溃后可重放</text>
+
+  <!-- 3. modify buffer pool page (in memory) -->
+  <line x1="290" y1="250" x2="484" y2="250" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_3_4_arrowInd)"/>
+  <text x="387" y="243" text-anchor="middle" font-size="11" fill="#374151">③ 改缓冲池中的页 → 标记为脏页</text>
+
+  <!-- note: redo flushed (innodb_flush_log_at_trx_commit) -->
+  <rect x="620" y="270" width="140" height="34" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2"/>
+  <text x="690" y="285" text-anchor="middle" font-size="10" fill="#374151">innodb_flush_log_at_trx_commit</text>
+  <text x="690" y="299" text-anchor="middle" font-size="10" fill="#374151">=1 提交即落盘（默认）</text>
+  <line x1="690" y1="304" x2="876" y2="304" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
+  <text x="783" y="298" text-anchor="middle" font-size="10" fill="#EF4444">落盘</text>
+
+  <!-- 4. COMMIT -->
+  <line x1="284" y1="340" x2="100" y2="340" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_4_arrow)" stroke-dasharray="5,3"/>
+  <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（重做日志已落盘 → 持久化达成）</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="370" x2="940" y2="370" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="6,4"/>
+  <text x="490" y="386" text-anchor="middle" font-size="11" fill="#6B7280">── 提交后，脏页仍在内存，由后台线程异步刷盘 ──</text>
+
+  <!-- 5. Double Write Buffer -->
+  <rect x="420" y="410" width="460" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="650" y="432" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">⑤ 双写缓冲（Double Write Buffer）</text>
+  <text x="650" y="452" text-anchor="middle" font-size="11" fill="#374151">脏页先顺序写到独立双写文件（8.0.20+，#ib_*.dblwr），再写到表空间</text>
+
+  <!-- arrow buffer -> double write -->
+  <line x1="490" y1="408" x2="490" y2="408" stroke="#D97706" stroke-width="1.4"/>
+
+  <!-- 6. double write to disk -->
+  <line x1="876" y1="466" x2="880" y2="500" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_4_arrowRed)"/>
+  <text x="888" y="486" font-size="10" fill="#EF4444">半页损坏免疫</text>
+
+  <!-- 7. Checkpoint flush dirty pages -->
+  <rect x="420" y="510" width="460" height="50" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="650" y="532" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">⑥ Checkpoint：按 Flush List 顺序刷脏页</text>
+  <text x="650" y="550" text-anchor="middle" font-size="11" fill="#374151">后台线程依「最早修改时间」排队，批量顺序写回</text>
+
+  <!-- arrow checkpoint to disk -->
+  <line x1="876" y1="560" x2="880" y2="592" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
+  <text x="918" y="580" font-size="10" fill="#EF4444">刷盘</text>
+
+  <!-- 8. Crash recovery note -->
+  <rect x="40" y="612" width="880" height="76" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="634" font-size="13" font-weight="700" fill="#111827">崩溃恢复（重启时）</text>
+  <text x="60" y="656" font-size="12" fill="#374151">重做日志已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
+  <text x="60" y="676" font-size="11" fill="#6B7280">核心：随机写数据页慢且易损坏 → 用顺序日志保住可靠与速度。</text>
+
+  <!-- legend -->
+  <g transform="translate(40,705)">
+    <line x1="0" y1="8" x2="28" y2="8" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_3_4_arrow)"/>
+    <text x="36" y="12" font-size="10" fill="#374151">控制流</text>
+    <line x1="110" y1="8" x2="138" y2="8" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_3_4_arrowRed)"/>
+    <text x="146" y="12" font-size="10" fill="#374151">数据/落盘</text>
+    <line x1="240" y1="8" x2="268" y2="8" stroke="#D97706" stroke-width="1.8" marker-end="url(#fig_3_4_arrowInd)"/>
+    <text x="276" y="12" font-size="10" fill="#374151">内存操作</text>
+    <rect x="370" y="1" width="12" height="14" rx="2" fill="#FEF3C7" stroke="#D97706"/>
+    <text x="388" y="12" font-size="10" fill="#374151">MySQL 相关</text>
+  </g>
+</svg>
+</div><figcaption>图 3-4 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘）</figcaption></figure>
+<p>图 3-4 在时间轴上画出 WAL、双写缓冲、Checkpoint 三件事的先后与依赖：事务提交时先把重做日志写到日志文件并落盘（保证持久性）。脏页随后进入 Flush List。后台线程把脏页先写到双写缓冲再写到表空间。最后推进检查点，标记之前的日志可以回收。这条时间轴揭示了 InnoDB 写路径的多层防护。</p>
+<h3 id="s58">三个"防坑"结构</h3>
+<p>InnoDB 还有三个辅助结构，每一个都是为某个具体的故障或性能陷阱设计的。</p>
+<p><strong>双写缓冲（Double Write Buffer）</strong>：InnoDB 的页是 16 KB，操作系统和磁盘的扇区通常是 4 KB 或更小。如果写一个 16 KB 页写到一半断电，这个页就损坏了，而且损坏的不是日志、是数据本身——重做日志也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写区从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。文件名不是这里的重点，重点是双写区从“共享表空间内的一段区域”演进为“独立管理的文件”。如果写到一半断电，恢复时可以从双写区拿回完整的页。多写一份顺序数据，换来的是断电时页不会撕裂。这笔交易划算，因为顺序写本身很便宜。</p>
+<p><strong>修改缓冲（Change Buffer）</strong>：InnoDB 的二级索引是 B+ 树，更新一个二级索引项可能要修改一个当前不在缓冲池的页。如果每次都把这个页从磁盘捞上来，就是一次随机 IO。修改缓冲的做法是：先把这次修改记下来（缓存），等这个页因为别的原因被读入缓冲池时，再把缓存的修改合并（merge）进去。这样就把"为改一个索引项触发一次随机读"延迟成了"等页自然读入时顺便合并"。修改缓冲只对二级索引的非唯一索引生效，因为唯一索引必须立刻检查约束。这是"延迟随机 IO"的经典手法。</p>
+<p><strong>自适应哈希索引（AHI）</strong>：InnoDB 监控热点访问模式，如果发现某些 B+ 树路径被频繁遍历，就自动给这些路径建哈希，把 3 到 4 次页访问压成 1 次。它无需配置、对用户透明，但只在负载稳定、热点集中时才有收益；负载剧烈变化时它反而可能成为开销。这是"在通用引擎里嵌入专用优化"的取舍。</p>
+<h3 id="s59">取舍总账</h3>
+<p>总结 MySQL 的取舍：它用"复杂的缓冲池 + 多套日志 + 一堆辅助结构"换来"大容量 + ACID 可靠 + 通用 SQL 查询能力"。它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式买不起这个容量，Kafka 的顺序日志范式给不了随机查询，剩下能选的就是 MySQL 这种"磁盘为主、内存加速"的精密系统。</p>
+<p>理解了 MySQL 怎么把磁盘当主、内存当缓存，再看 Kafka 如何干脆把"自己管内存"这件事都省掉，会更明白三种范式之间的距离。</p>
+<h2 id="s60">3.4 Kafka 的做法</h2>
+<p>Kafka 给自己的定位是分布式事件流平台，核心使命是高吞吐地搬运消息。它的访问模式很纯粹：生产者只追加写，消费者只顺序读，几乎不存在随机点查。从这个访问模式倒推，Kafka 做了一个干脆的决定——不在进程里维护自己的缓冲池，把"加速"这件事几乎全部交给操作系统的页缓存（PageCache）。这个赌注决定了 Kafka 的极高吞吐与极简内存管理。</p>
+<h3 id="s61">核心假设</h3>
+<p>Kafka 假设自己的访问模式是"追加写 + 顺序读"，且数据量天然远超内存。在这种模式下，操作系统内核的预读（readahead）和回写（writeback）机制已经能把磁盘的顺序 IO 调度得很好，Kafka 再在用户态造一个缓冲池意义不大。</p>
+<p>这个假设带来一个关键取舍：放弃随机访问能力，换来几乎零成本的内存管理与进程重启后缓存还在。前者是 Kafka 不能当数据库查的根本原因（它只能按位移区间顺序消费，不能像 MySQL 那样按主键随机点查）；后者则是 Kafka 一个隐性红利——消费者读的数据如果还在 PageCache 里，Kafka 进程哪怕重启过，消费者依然按内存速度读，没有冷启动惩罚。这点是依赖操作系统换来的，自己管内存的 Redis 和 MySQL 都享受不到。</p>
+<h3 id="s62">顺序写为什么够快</h3>
+<p>先看数据。SSD 顺序写吞吐约 300 到 500 MB/s，机械盘顺序写约 100 到 200 MB/s，而内存随机读的吞吐大约在 100 MB/s 这个量级（取决于访问模式与并发）。也就是说，磁盘顺序写在吞吐维度上能追平甚至超过内存随机访问。这正是 Kafka 敢把数据放到磁盘上的物理依据。</p>
+<p>Kafka 的存储单位是<strong>日志段（segment）</strong>。一个分区（partition）的日志被切成多个段，每个段默认 1 GB（可配）。生产者写入的消息被追加到当前活跃段的末尾，绝不原地修改；段写满就滚动开新段。整个写路径天然顺序。删除是把整个旧段文件丢弃（按保留策略清理），不是原地删。这种"只追加、不修改、按段清理"的设计，让磁盘始终在做顺序写，把随机 IO 从根上消灭了。</p>
+<h3 id="s63">为什么不做自己的缓冲池</h3>
+<p>Kafka 不在用户态造缓冲池，有三个理由。</p>
+<p>第一，访问模式简单且顺序。Kafka 不需要 InnoDB 那种"新老分区 + 抗扫描污染"的复杂 LRU，因为它的读本身就是顺序的，操作系统预读机制能把"消费者将要读的下几 MB"提前加载进 PageCache，命中率天然就高。</p>
+<p>第二，自己管内存会和 PageCache 形成"双份缓存"。如果 Kafka 在用户态也缓存一份数据，那同一份数据就在内核 PageCache 和用户态各占一份内存，白白浪费一倍。在大吞吐场景下，这点浪费很可观。</p>
+<p>第三，进程重启后 PageCache 仍在。这是依赖操作系统换来的最隐蔽也最有价值的红利。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好——升级 Kafka 不等于把读性能打回原形。</p>
+<p>下图把 Kafka 生产-存储-消费的零拷贝数据流画出来，对比传统拷贝路径。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 740" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_3_5_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_3_5_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-5　Kafka 生产-存储-消费的零拷贝数据流</text>
+  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">传统读发 4 次拷贝 + 4 次切换　vs　零拷贝（sendfile）2 次 DMA 拷贝 + 2 次切换</text>
+
+  <!-- ===== TOP: Traditional read+send (4 copies) ===== -->
+  <rect x="40" y="80" width="880" height="290" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <text x="60" y="104" font-size="14" font-weight="700" fill="#D97706">传统 read() + write()：4 次拷贝 · 4 次上下文切换</text>
+  <text x="60" y="122" font-size="11" fill="#374151">数据必须经过用户空间，Kafka（或应用）才能「看到」并转交 Socket</text>
+
+  <!-- 4 buffer columns -->
+  <g font-size="11" fill="#111827">
+    <rect x="70" y="150" width="170" height="44" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
+    <text x="155" y="170" text-anchor="middle" font-weight="700">磁盘 / 日志段</text>
+    <text x="155" y="186" text-anchor="middle" font-size="10" fill="#374151">segment .log</text>
+
+    <rect x="290" y="150" width="170" height="44" rx="5" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+    <text x="375" y="170" text-anchor="middle" font-weight="700">内核缓冲</text>
+    <text x="375" y="186" text-anchor="middle" font-size="10" fill="#374151">PageCache（read buffer）</text>
+
+    <rect x="510" y="150" width="170" height="44" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.4"/>
+    <text x="595" y="170" text-anchor="middle" font-weight="700">用户缓冲</text>
+    <text x="595" y="186" text-anchor="middle" font-size="10" fill="#374151">Kafka 进程堆内</text>
+
+    <rect x="730" y="150" width="170" height="44" rx="5" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+    <text x="815" y="170" text-anchor="middle" font-weight="700">Socket 缓冲</text>
+    <text x="815" y="186" text-anchor="middle" font-size="10" fill="#374151">kernel socket</text>
+  </g>
+
+  <!-- arrows between -->
+  <line x1="240" y1="172" x2="288" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+  <text x="264" y="165" text-anchor="middle" font-size="10" fill="#EF4444">①DMA</text>
+  <line x1="460" y1="172" x2="508" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+  <text x="484" y="165" text-anchor="middle" font-size="10" fill="#EF4444">②CPU</text>
+  <line x1="680" y1="172" x2="728" y2="172" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+  <text x="704" y="165" text-anchor="middle" font-size="10" fill="#EF4444">③CPU</text>
+
+  <!-- nic + switch count -->
+  <rect x="730" y="220" width="170" height="40" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
+  <text x="815" y="237" text-anchor="middle" font-weight="700" font-size="11" fill="#111827">网卡</text>
+  <text x="815" y="252" text-anchor="middle" font-size="10" fill="#374151">④DMA → 网络</text>
+  <line x1="815" y1="194" x2="815" y2="218" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowRed)"/>
+
+  <!-- steps text -->
+  <text x="60" y="240" font-size="11" fill="#374151">read()：内核态→用户态（切换1）</text>
+  <text x="60" y="258" font-size="11" fill="#374151">　　　DMA 把数据搬进 PageCache（①）</text>
+  <text x="60" y="276" font-size="11" fill="#374151">　　　CPU 拷到用户缓冲（②），用户态→内核态（切换2）</text>
+  <text x="60" y="294" font-size="11" fill="#374151">write()：CPU 拷到 Socket 缓冲（③），内核态→用户态（切换3）</text>
+  <text x="60" y="312" font-size="11" fill="#374151">　　　DMA 拷到网卡（④），用户态→内核态（切换4）</text>
+  <text x="60" y="338" font-size="11" font-weight="700" fill="#EF4444">代价：4 次拷贝（2 CPU + 2 DMA）· 4 次上下文切换 · 2 份内存冗余</text>
+
+  <!-- ===== BOTTOM: zero-copy sendfile (2 copies) ===== -->
+  <rect x="40" y="390" width="880" height="260" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="60" y="414" font-size="14" font-weight="700" fill="#059669">零拷贝 sendfile() / Java NIO transferTo：2 次 DMA 拷贝 · 2 次上下文切换</text>
+  <text x="60" y="432" font-size="11" fill="#374151">数据不进用户空间，Kafka 只向内核「指」一段文件范围，由内核直接发给网卡</text>
+
+  <!-- 3 columns: disk -> pagecache -> nic -->
+  <g font-size="11" fill="#111827">
+    <rect x="80" y="460" width="180" height="48" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
+    <text x="170" y="481" text-anchor="middle" font-weight="700">磁盘 / 日志段</text>
+    <text x="170" y="498" text-anchor="middle" font-size="10" fill="#374151">segment .log</text>
+
+    <rect x="380" y="460" width="200" height="48" rx="5" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+    <text x="480" y="481" text-anchor="middle" font-weight="700">内核 PageCache</text>
+    <text x="480" y="498" text-anchor="middle" font-size="10" fill="#374151">OS 内核唯一缓存（无用户态副本）</text>
+
+    <rect x="700" y="460" width="180" height="48" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
+    <text x="790" y="481" text-anchor="middle" font-weight="700">网卡 → 消费者</text>
+    <text x="790" y="498" text-anchor="middle" font-size="10" fill="#374151">网络</text>
+  </g>
+
+  <!-- arrows -->
+  <line x1="260" y1="484" x2="378" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_5_arrowG)"/>
+  <text x="319" y="476" text-anchor="middle" font-size="10" fill="#059669">①DMA 读入</text>
+  <line x1="580" y1="484" x2="698" y2="484" stroke="#059669" stroke-width="1.8" marker-end="url(#fig_3_5_arrowG)"/>
+  <text x="639" y="476" text-anchor="middle" font-size="10" fill="#059669">②DMA 发出（带 gather）</text>
+
+  <!-- Kafka process ghost (not touching data) -->
+  <rect x="380" y="540" width="200" height="44" rx="5" fill="#ECFDF5" stroke="#059669" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="480" y="560" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Kafka 进程</text>
+  <text x="480" y="576" text-anchor="middle" font-size="10" fill="#374151">只调用 sendfile()，不拷贝数据</text>
+
+  <!-- steps -->
+  <text x="60" y="556" font-size="11" fill="#374151">sendfile()：用户态→内核态（切换1）</text>
+  <text x="60" y="574" font-size="11" fill="#374151">　　　DMA 把数据读入 PageCache（①）</text>
+  <text x="60" y="592" font-size="11" fill="#374151">　　　DMA 带 gather 直接发到网卡（②），内核态→用户态（切换2）</text>
+  <text x="60" y="618" font-size="11" font-weight="700" fill="#059669">收益：拷贝数减半 · 切换数减半 · 内存冗余为零 · 消费者按内存速度读已缓存数据</text>
+
+  <!-- caveat -->
+  <rect x="40" y="664" width="880" height="60" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="686" font-size="13" font-weight="700" fill="#111827">关键前提与边界</text>
+  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心红利。</text>
+</svg>
+</div><figcaption>图 3-5 Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
+<p>图 3-5 对比了传统发送路径与零拷贝路径。传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。需要说明的是，这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝。零拷贝只在消费者读"已经缓存在 PageCache 里的数据"时才生效；冷数据还是要走磁盘 IO，这是它的边界。</p>
+<h3 id="s64">可靠性旋钮</h3>
+<p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（攒多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后会显著损失吞吐，通常只在特殊合规要求下使用。这是"吞吐 vs 本地持久性"的旋钮。</p>
+<p>更常用的可靠性旋钮是生产者端的 <code>acks</code>：</p>
+<ul><li><code>acks=0</code>：生产者发出去就不管，不等任何确认。吞吐最高，可能丢消息。</li><li><code>acks=1</code>：只要主节点（leader）把消息写到本地日志就确认。主节点崩溃且未同步到从节点时，这条消息可能丢。</li><li><code>acks=all</code>（也叫 <code>acks=-1</code>）：消息必须被 ISR（同步副本集合，In-Sync Replicas）里的全部副本确认才算成功。配合合理的副本数和 <code>min.insync.replicas</code>，这是最强的"不丢"保证，吞吐也会下降。</li></ul>
+<p>这三档同样是"吞吐 vs 不丢"这条连续谱上的采样点，和 Redis 的 <code>appendfsync</code>、MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 同构——只是被搬到了分布式语境。</p>
+<p>下表把一个 Kafka 日志段相关的几类文件列出来，看清它们的职责。</p>
+<p><strong>表 3-2　Kafka 日志段（segment）与索引文件布局</strong></p>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>位移索引，记录"位移 → 物理偏移"的稀疏映射</td><td>每写入 <code>log.index.interval.bytes</code>（默认 4 KB）追加一条索引项</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 位移"的稀疏映射</td><td>与 <code>.index</code> 同步追加，支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>事务与幂等生产者周期性落盘</td></tr></tbody></table></div>
+<p>这张表说明了 Kafka 的存储是"数据 + 两套稀疏索引"的组合。索引是稀疏的（不是每条消息都建索引项），是为了让索引文件本身也保持紧凑、能放进 PageCache；消费者按位移定位消息时，先用索引二分找到最近的索引项，再在 <code>.log</code> 里顺序扫描到目标位移。</p>
+<h3 id="s65">取舍总账</h3>
+<p>Kafka 的取舍：它用"放弃随机访问 + 接受默认不强制落盘"换来"极高吞吐与极简内存管理"。代价是不能当数据库查——没有按主键点查、没有复杂过滤，只能按位移区间顺序消费。这是流式日志与通用数据库的分水岭。一旦你的场景从"流式搬运"变成了"随机查询"，就该换 MySQL 或别的检索系统了。</p>
+<p>理解了 Kafka 的"顺序日志 + OS 托底"，再回头看三家，就能在一张表里把三种"内存-磁盘"哲学并列摆出来了。</p>
+<h2 id="s66">3.5 横向对比</h2>
+<p>把三家"内存-磁盘"哲学并列，重点是说清楚每个选择背后的访问模式与业务约束。下面这张三栏表把六个关键维度摆出来，列序固定 Redis、MySQL、Kafka。</p>
+<p><strong>表 3-3　三家"内存-磁盘"哲学横向对比</strong></p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据住哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>重做日志（WAL）+ 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1)~O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按位移顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 回放 AOF（大实例数分钟）</td><td>重放重做日志 + 恢复脏页</td><td>几乎无（PageCache 热度取决于 OS）</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 IO 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
+<p>逐维度解读，要点都在"为什么不同"。</p>
+<p><strong>数据住哪里</strong>。三家在这条轴上的选择决定了容量上限。Redis 选内存，所以容量被内存物理上限锁死，单实例通常会被有意控制在便于 fork、备份和恢复的范围内。MySQL 选磁盘，所以容量上限主要由存储、索引和运维能力决定。Kafka 选磁盘顺序日志，容量也主要受磁盘和保留策略约束，但要付出"放弃随机访问"的代价。</p>
+<p><strong>持久化机制</strong>。三家的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的重做日志是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界——Redis 默认 <code>everysec</code> 是约 1 秒量级的数据窗口，MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>内存管理主体</strong>。这是三家最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 的运维门槛在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
+<p><strong>随机访问能力</strong>。Redis 和 MySQL 都原生支持随机读写，Redis 是 O(1) 到 O(log N) 的内存访问，MySQL 是 B+ 树的几次页访问。Kafka 不支持随机访问，只能按位移区间顺序消费。这条决定了适用场景——你需要按主键查一行数据，Kafka 直接出局。</p>
+<p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或回放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放重做日志通常较快（重做日志设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务。唯一受影响的是 PageCache 是否还热。</p>
+<p><strong>典型故障模式</strong>。每种范式都有自己最常踩的坑。Redis 是 fork 阻塞（大实例做 BGSAVE 时主线程卡顿）和淘汰风暴（突然的写入高峰把热数据挤走）。MySQL 是缓冲池抖动（热数据被扫描挤走导致延迟飙升）和磁盘 IO 打满（脏页刷不过来）。Kafka 是消费者追不上生产者（消费速度低于生产速度时，消费者读的数据被挤出 PageCache、落到磁盘读，延迟从毫秒级掉到十毫秒以上，监控上表现为消费 lag 和磁盘读 IO 同时上涨）。</p>
+<p>三个选择的关键是匹配。Redis 匹配"小而热"，MySQL 匹配"大而杂"，Kafka 匹配"大而流"。把场景套进这张表，该选哪家一目了然。</p>
+<h2 id="s67">3.6 架构启示</h2>
+<p>把三家的具体实现放在一起，能提炼出几条可复用的设计原则。这些原则不只适用于存储软件，任何要在"速度与持久化"之间做权衡的系统都能用上。</p>
+<h3 id="s68">启示一：先问访问模式，再选存储范式</h3>
+<p>这是本章最重要的一条。三种范式是按访问模式匹配的，不是按"先进程度"排序的。访问模式是顺序追加，日志范式最优。是随机读写加大容量，缓存磁盘范式最优。是小体量加复杂结构，全内存范式最优。脱离访问模式谈"谁更好"是伪命题。</p>
+<blockquote>选存储范式，真正决定的是你的访问模式是随机还是顺序、是点查还是扫描。</blockquote>
+<p>这条原则可以直接拿去用。做选型时，先画出你的读写比例、读写大小、访问是否随机、容量上限、延迟敏感度，再回这张表对照，结论会自动浮现。反过来，如果你发现某个团队用 Kafka 做随机查询、或用 Redis 存几十 TB 数据，几乎可以断定他们用错了访问模式。</p>
+<h3 id="s69">启示二：缓存层该建在哪一层</h3>
+<p>三家在"缓存建在哪一层"上的选择，构成一个清晰的谱系：Redis 把缓存建在进程内（它自己就是缓存）。MySQL 把缓存建在进程内的磁盘页缓冲（缓冲池）。Kafka 把缓存建在操作系统内核（PageCache）。层级越靠下，复用面越广（同一台机器上的所有进程共享 PageCache），但控制力越弱（你只能调 OS 参数，不能精细控制淘汰逻辑）。</p>
+<blockquote>能交给操作系统的缓存，就不要在用户态再造一份——除非你需要它给不了的精度。</blockquote>
+<p>Redis 和 MySQL 之所以要自己管内存，是因为它们要的精度操作系统给不了：Redis 要的是 O(1) 的精确淘汰、MySQL 要的是抗扫描污染的新老分区 LRU。Kafka 不要这种精度，所以它享受了 OS 缓存的复用面与"重启不冷"红利。这条原则在中间件设计里反复出现：你在用户态造的每一段缓存，都是在与 OS 缓存抢内存，要确认这份抢占换来的精度值这个价。</p>
+<h3 id="s70">启示三：持久化是"可靠性 vs 性能"的连续谱，不是开关</h3>
+<p>三家的每个刷盘旋钮，本质上都是同一道选择题的不同档位。Redis 的 <code>appendfsync</code>（always / everysec / no）、MySQL 的 <code>innodb_flush_log_at_trx_commit</code>（1 / 2 / 0）、Kafka 的 <code>acks</code>（all / 1 / 0）与 <code>log.flush.*</code>。把这些旋钮画在同一根轴上，你会发现它们的位置几乎一一对应：最严的那档"每条都落盘"对应最强不丢，最松的那档"交给 OS"对应最高吞吐。</p>
+<p>理解了谱系，调参才有方向。你该问的是"我愿意为多强的持久性牺牲多少吞吐"。很多时候答案是中间档——Redis 的 <code>everysec</code>、MySQL 的 1（或某些场景的 2）、Kafka 的 <code>acks=1</code>（3.0 之前的默认；3.0 起默认已升至 <code>acks=all</code>，这里指主动下调到中间档的场景）。</p>
+<h3 id="s71">启示四：用顺序写对抗随机写，是跨范式的共性手段</h3>
+<p>三家的写路径都把随机写转成了顺序写：Redis 的 AOF 把"修改内存数据结构"转成"追加写命令日志"。MySQL 的重做日志把"修改散落各处的数据页"转成"追加写物理变更记录"。Kafka 干脆让数据本身就是顺序日志。这是因为在所有持久介质上，顺序写都远快于随机写，并非巧合。</p>
+<p>这条规律在系统设计里普适。你要写一个高吞吐的审计日志、一个 WAL、一个事件溯源（event sourcing）系统，都该先想"能不能把写做成顺序追加"。任何把"高频随机写"当核心路径的设计，在数据量上来后都会因磁盘的随机寻道而性能急剧下降。</p>
+<h3 id="s72">给实践者的三条告诫</h3>
+<p>把上面四条浓缩成可操作的告诫：</p>
+<p>第一，别用 Redis 当主库存全量数据。Redis 的容量被内存锁死，大实例还有 fork 阻塞风险。当缓存和快速 KV 用，是它的舒适区；当唯一真相之源存几十 TB 数据，会同时撞上容量墙和 fork 阻塞两道坎。</p>
+<p>第二，别给 Kafka 强制 fsync 又期待高吞吐。Kafka 的范式假设就是"相信 OS 顺序写 + 不强制落盘"，强行开 <code>log.flush.interval.*</code> 等于违背它的设计前提，吞吐会断崖式下跌。要更强持久性，靠副本（<code>acks=all</code> + 合理副本数），不靠本地强制刷盘。</p>
+<p>第三，别忽略缓冲池命中率与 PageCache 命中率这两个核心指标。它们决定了你的延迟是内存级还是磁盘级。MySQL 的缓冲池命中率掉到 95% 以下、Kafka 的 PageCache 命中率掉下来，延迟立刻翻倍甚至翻十倍。监控这两个数字，比调任何参数都重要。</p>
+<h2 id="s73">3.7 小结</h2>
+<p>内存与磁盘的速度鸿沟不会消失，存储软件的职责就是在这道鸿沟上架桥。Redis、MySQL、Kafka 架的是三座不同的桥：Redis 是"内存为主、磁盘备份"的吊桥，快但容量小。MySQL 是"磁盘为主、内存加速"的公路桥，稳但复杂。Kafka 是"顺序日志、OS 托底"的高架桥，吞吐高但只能单向。</p>
+<p>本章最核心的一句话：内存-磁盘关系的最优解取决于匹配你访问模式的程度。先问访问模式是什么形状，再选范式，这是从"会用"升级到"懂取舍"的第一步。</p>
+<p>讲完了"数据住哪里"，下一章我们把镜头拉远一层，看软件本身怎么分层组织——第 4 章《分层架构》。</p><nav class="page-nav"><a href="02-lifecycle.html">← 第 2 章 生命周期管理 — 优雅启动与关闭的艺术</a><a href="04-layered-architecture.html">第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层 →</a></nav></article>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.getElementById('toc'),bd=document.getElementById('bd');
+  if(btn){btn.addEventListener('click',function(){nav.classList.toggle('open');if(bd)bd.classList.toggle('show',nav.classList.contains('open'))});}
+  if(bd){bd.addEventListener('click',function(){nav.classList.remove('open');bd.classList.remove('show');});}
+  // 当前章节高亮
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section.chapter'));
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-target]'));
+  if('IntersectionObserver' in window && links.length){
+    var map={};links.forEach(function(a){map[a.getAttribute('data-target')]=a;});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.parentElement.classList.remove('active');});
+          var a=map[e.target.id]; if(a)a.parentElement.classList.add('active');
+        }
+      });
+    },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>架构之道：分页审阅版</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
+.toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
+.toc-title a{color:inherit;text-decoration:none}
+.toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
+nav.toc ul{list-style:none;padding:0;margin:0}
+nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc li>a:hover{background:var(--soft)}
+nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
+nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
+.content{padding:32px 48px 120px;max-width:1000px}
+.chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
+.page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
+.page-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.page-nav .empty{visibility:hidden}
+h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
+h1{font-size:1.9em;margin:0 0 .6em;padding-bottom:.3em}
+h2{font-size:1.42em;margin:1.8em 0 .6em}
+h3{font-size:1.18em;margin:1.5em 0 .5em}
+h4{font-size:1.04em;margin:1.3em 0 .4em;color:#24292f}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:700;color:#111827}
+em{font-style:normal;color:var(--mute)}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:.12em .4em;border-radius:4px;font-size:.9em;color:#24292f}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:8px;overflow-x:auto;line-height:1.55}
+pre code{background:none;color:inherit;padding:0;font-size:.86em}
+blockquote{margin:1.2em 0;padding:.6em 1em .6em 1.1em;border-left:4px solid var(--accent);background:#f7f8ff;color:#343a40;border-radius:0 6px 6px 0}
+blockquote strong{color:var(--accent)}
+ul,ol{margin:0 0 1em;padding-left:1.7em}
+li{margin:.25em 0}
+.table-wrap{overflow-x:auto;margin:1.2em 0}
+table{border-collapse:collapse;width:100%;font-size:.94em}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+thead th{background:#eef2ff;color:#3730a3;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.toc-toggle{display:none}
+.review-index{display:grid;gap:12px;margin:24px 0 0}
+.review-index a{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:#fff}
+.review-index a:hover{border-color:var(--accent);background:#f7f8ff}
+.review-index strong{display:block;color:var(--ink)}
+.review-index span{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+@media(max-width:1200px){figure.fig{margin:2em auto}}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  nav.toc.open{transform:translateX(0)}
+  .content{padding:20px 18px 80px;max-width:100%}
+  .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+  .backdrop.show{display:block}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="bd"></div>
+<button class="toc-toggle">目录</button>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="toc-title"><a href="index.html">架构之道</a></div>
+  <div class="toc-sub">分页审阅版</div>
+  <ul>
+<li><a href="index.html">首页目录</a></li>
+<li><a href="chapters/00-preface.html">序言</a>
+</li>
+<li><a href="chapters/01-introduction.html">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</a>
+</li>
+<li><a href="chapters/02-lifecycle.html">第 2 章 生命周期管理 — 优雅启动与关闭的艺术</a>
+</li>
+<li><a href="chapters/03-memory-disk.html">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</a>
+</li>
+<li><a href="chapters/04-layered-architecture.html">第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a>
+</li>
+<li><a href="chapters/05-security.html">第 5 章 安全机制 — 权限、加密、审计</a>
+</li>
+<li><a href="chapters/06-cluster.html">第 6 章 集群架构 — 从单点到分布式</a>
+</li>
+<li><a href="chapters/07-storage-format.html">第 7 章 磁盘存储格式 — 文件结构的设计哲学</a>
+</li>
+<li><a href="chapters/08-data-sync.html">第 8 章 数据同步机制 — 集群一致性的实现</a>
+</li>
+<li><a href="chapters/09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a>
+</li>
+<li><a href="chapters/10-epilogue.html">后记</a>
+</li>
+<li><a href="chapters/11-references.html">附录　参考文献与延伸阅读</a>
+</li>
+</ul>
+</nav>
+<main class="content">
+
+<h1>架构之道：分页审阅版</h1>
+<p class="chapter-meta">源稿来自 Markdown；本目录用于逐章审阅和单独优化。每章页面已内联 SVG 图示，可直接浏览图片。</p>
+<div class="review-index">
+<a href="chapters/00-preface.html"><strong>序言</strong><span>chapters/00-preface.md</span></a>
+<a href="chapters/01-introduction.html"><strong>第 1 章 引言 — 为什么是这三款软件，架构视角的意义</strong><span>chapters/01-introduction/chapter.md</span></a>
+<a href="chapters/02-lifecycle.html"><strong>第 2 章 生命周期管理 — 优雅启动与关闭的艺术</strong><span>chapters/02-lifecycle/chapter.md</span></a>
+<a href="chapters/03-memory-disk.html"><strong>第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</strong><span>chapters/03-memory-disk/chapter.md</span></a>
+<a href="chapters/04-layered-architecture.html"><strong>第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</strong><span>chapters/04-layered-architecture/chapter.md</span></a>
+<a href="chapters/05-security.html"><strong>第 5 章 安全机制 — 权限、加密、审计</strong><span>chapters/05-security/chapter.md</span></a>
+<a href="chapters/06-cluster.html"><strong>第 6 章 集群架构 — 从单点到分布式</strong><span>chapters/06-cluster/chapter.md</span></a>
+<a href="chapters/07-storage-format.html"><strong>第 7 章 磁盘存储格式 — 文件结构的设计哲学</strong><span>chapters/07-storage-format/chapter.md</span></a>
+<a href="chapters/08-data-sync.html"><strong>第 8 章 数据同步机制 — 集群一致性的实现</strong><span>chapters/08-data-sync/chapter.md</span></a>
+<a href="chapters/09-summary.html"><strong>第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</strong><span>chapters/09-summary/chapter.md</span></a>
+<a href="chapters/10-epilogue.html"><strong>后记</strong><span>chapters/10-epilogue.md</span></a>
+<a href="chapters/11-references.html"><strong>附录　参考文献与延伸阅读</strong><span>chapters/11-references.md</span></a>
+</div>
+
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.getElementById('toc'),bd=document.getElementById('bd');
+  if(btn){btn.addEventListener('click',function(){nav.classList.toggle('open');if(bd)bd.classList.toggle('show',nav.classList.contains('open'))});}
+  if(bd){bd.addEventListener('click',function(){nav.classList.remove('open');bd.classList.remove('show');});}
+  // 当前章节高亮
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section.chapter'));
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-target]'));
+  if('IntersectionObserver' in window && links.length){
+    var map={};links.forEach(function(a){map[a.getAttribute('data-target')]=a;});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.parentElement.classList.remove('active');});
+          var a=map[e.target.id]; if(a)a.parentElement.classList.add('active');
+        }
+      });
+    },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>

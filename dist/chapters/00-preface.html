@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>序言</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
+.toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
+.toc-title a{color:inherit;text-decoration:none}
+.toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
+nav.toc ul{list-style:none;padding:0;margin:0}
+nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc li>a:hover{background:var(--soft)}
+nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
+nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
+.content{padding:32px 48px 120px;max-width:1000px}
+.chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
+.page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
+.page-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.page-nav .empty{visibility:hidden}
+h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
+h1{font-size:1.9em;margin:0 0 .6em;padding-bottom:.3em}
+h2{font-size:1.42em;margin:1.8em 0 .6em}
+h3{font-size:1.18em;margin:1.5em 0 .5em}
+h4{font-size:1.04em;margin:1.3em 0 .4em;color:#24292f}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:700;color:#111827}
+em{font-style:normal;color:var(--mute)}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:.12em .4em;border-radius:4px;font-size:.9em;color:#24292f}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:8px;overflow-x:auto;line-height:1.55}
+pre code{background:none;color:inherit;padding:0;font-size:.86em}
+blockquote{margin:1.2em 0;padding:.6em 1em .6em 1.1em;border-left:4px solid var(--accent);background:#f7f8ff;color:#343a40;border-radius:0 6px 6px 0}
+blockquote strong{color:var(--accent)}
+ul,ol{margin:0 0 1em;padding-left:1.7em}
+li{margin:.25em 0}
+.table-wrap{overflow-x:auto;margin:1.2em 0}
+table{border-collapse:collapse;width:100%;font-size:.94em}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+thead th{background:#eef2ff;color:#3730a3;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.toc-toggle{display:none}
+.review-index{display:grid;gap:12px;margin:24px 0 0}
+.review-index a{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:#fff}
+.review-index a:hover{border-color:var(--accent);background:#f7f8ff}
+.review-index strong{display:block;color:var(--ink)}
+.review-index span{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+@media(max-width:1200px){figure.fig{margin:2em auto}}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  nav.toc.open{transform:translateX(0)}
+  .content{padding:20px 18px 80px;max-width:100%}
+  .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+  .backdrop.show{display:block}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="bd"></div>
+<button class="toc-toggle">目录</button>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="toc-title"><a href="../index.html">架构之道</a></div>
+  <div class="toc-sub">分页审阅版</div>
+  <ul>
+<li><a href="../index.html">首页目录</a></li>
+<li class="active"><a href="00-preface.html">序言</a>
+</li>
+<li><a href="01-introduction.html">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</a>
+</li>
+<li><a href="02-lifecycle.html">第 2 章 生命周期管理 — 优雅启动与关闭的艺术</a>
+</li>
+<li><a href="03-memory-disk.html">第 3 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</a>
+</li>
+<li><a href="04-layered-architecture.html">第 4 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a>
+</li>
+<li><a href="05-security.html">第 5 章 安全机制 — 权限、加密、审计</a>
+</li>
+<li><a href="06-cluster.html">第 6 章 集群架构 — 从单点到分布式</a>
+</li>
+<li><a href="07-storage-format.html">第 7 章 磁盘存储格式 — 文件结构的设计哲学</a>
+</li>
+<li><a href="08-data-sync.html">第 8 章 数据同步机制 — 集群一致性的实现</a>
+</li>
+<li><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a>
+</li>
+<li><a href="10-epilogue.html">后记</a>
+</li>
+<li><a href="11-references.html">附录　参考文献与延伸阅读</a>
+</li>
+</ul>
+</nav>
+<main class="content">
+<article class="chapter"><h1 id="s1">序言</h1>
+<p>懂用法的人多，懂取舍的人少。</p>
+<p>这本书的起点，是一个再普通不过的疑问：Redis、MySQL、Kafka——这三款几乎撑起整个后端基础设施的软件——我们天天在用，却很少追问它们为什么长成现在这个样子。市面上的资料大多停在"怎么用"：Redis 的数据类型怎么配，MySQL 的索引怎么调，Kafka 的分区数设多少。这些当然重要，但对一个想真正做架构决策的人来说，远远不够。</p>
+<p>我想先把这本书最重要的一句话讲在最前面：<strong>这三个软件遇到的架构问题，不是它们独有的——你在自己开发任何有状态系统时，几乎都会撞上同一道题。</strong> 怎么启动才能不丢状态、怎么关闭才能不丢请求、内存和磁盘如何协同、怎么把系统分出清晰的层、怎么做权限与加密、单机扛不住时怎么分片和容错、文件该按什么格式落盘、副本之间怎么对齐。这些问题，Redis、MySQL、Kafka 已经在生产环境里反复打磨了十几年，交出过被千锤百炼的答案。学它们的架构，目的不是背诵这些答案，而是把它们解决问题的思路与取舍变成你自己的素材——下次你设计系统遇到同类问题，三套现成的参照就在手边。这才是读这本书真正的回报。</p>
+<p>这也是我想写这本书的私心。这几年我面试过上千位架构师候选人，有一个现象反复出现：绝大多数人能熟练说出 Redis 的数据类型、MySQL 的索引原理、Kafka 的分区配置，却很少有人能讲清"它为什么这么设计，换一种做法要付出什么代价"。会用一个软件，和理解它的架构设计，中间隔着一条很深的沟。能从优秀软件里汲取架构经验、沉淀成自己设计能力的人，少之又少——而这恰恰是普通开发者成长为架构师的关键一跃。这本书想做的，就是在这条沟上架一座桥：把这三款标杆软件的架构智慧，翻译成你能直接复用的设计判断力。</p>
+<p>回到这三款软件本身。我不把它们当成三个孤立的工具，而当成三次对同一组核心问题的不同回答。它们都要回答：怎么启动、怎么关闭、内存和磁盘如何协同、怎么分层、怎么保证安全、怎么组成集群、文件该长什么样、副本之间怎么对齐。问题是同一组，答案却截然不同——而正是这些不同，暴露了软件设计中最有价值的东西：取舍。</p>
+<p>为什么是这三款？因为它们恰好覆盖了后端三种最基础的能力形态：Redis 把"内存即数据"做到极致，MySQL 以"不丢不错"为第一原则，Kafka 以"追加写日志"为核心抽象。读懂它们如何各自回答同一组问题，等于掌握了后端架构的基本粒子。</p>
+<p>这本书不讲最新的调优技巧，也不逐行贴源码。它讲的是更稳定的东西：当面对一个有状态系统时，那些反复出现的设计抉择——速度还是持久、一致还是可用、简单还是灵活、通用还是专用——以及做出这些抉择时必须支付的代价。版本会更迭（本书基于 Redis 7.x、MySQL 8.0.x、Kafka 3.x），但这些抉择的逻辑长期不变。</p>
+<p>读这本书的方式，建议是带着比较去读。每一章都让三家同题作答，然后横向对比、提炼启示。你会渐渐发现，差异底下藏着同一套骨架：先定真相之源、用层包裹可变性、把随机变顺序、用性能买可靠性、把复杂状态显式建模。</p>
+<p>这本书面向的，是有一定使用经验、想跨过"会用"这道坎、走到"懂取舍"那一侧的人。如果你读完之后，再面对任何一个新系统，第一反应不再是"它怎么用"，而是"它为什么这么设计、反过来会怎样、这套取舍的边界在哪"——那么这本书就达到了它的目的。更理想的是，某天你设计自己的系统时，能下意识地调用从这三款软件里学到的判断——那才是这本书最希望在你身上发生的事。</p>
+<p>是为序。</p><nav class="page-nav"><span class="empty"></span><a href="01-introduction.html">第 1 章 引言 — 为什么是这三款软件，架构视角的意义 →</a></nav></article>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.getElementById('toc'),bd=document.getElementById('bd');
+  if(btn){btn.addEventListener('click',function(){nav.classList.toggle('open');if(bd)bd.classList.toggle('show',nav.classList.contains('open'))});}
+  if(bd){bd.addEventListener('click',function(){nav.classList.remove('open');bd.classList.remove('show');});}
+  // 当前章节高亮
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section.chapter'));
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-target]'));
+  if('IntersectionObserver' in window && links.length){
+    var map={};links.forEach(function(a){map[a.getAttribute('data-target')]=a;});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.parentElement.classList.remove('active');});
+          var a=map[e.target.id]; if(a)a.parentElement.classList.add('active');
+        }
+      });
+    },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>
