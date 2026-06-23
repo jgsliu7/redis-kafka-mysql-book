@@ -25,7 +25,7 @@ PAGE_CSS = """
 :root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
-.layout{display:grid;grid-template-columns:292px 1fr;max-width:1240px;margin:0 auto}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
 nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
 .toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
 .toc-title a{color:inherit;text-decoration:none}
@@ -35,7 +35,7 @@ nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);t
 nav.toc li>a:hover{background:var(--soft)}
 nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
 nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
-.content{padding:32px 44px 120px;max-width:880px}
+.content{padding:32px 48px 120px;max-width:1000px}
 .chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
 .page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
 .page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
@@ -64,9 +64,9 @@ table{border-collapse:collapse;width:100%;font-size:.94em}
 th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
 thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
-figure.fig{margin:2em calc((100% - 1140px)/2);text-align:center}
-.svg-wrap,.inline-svg{display:inline-block;max-width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1140px;height:auto;display:block;margin:0 auto}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 .toc-toggle{display:none}
 .review-index{display:grid;gap:12px;margin:24px 0 0}

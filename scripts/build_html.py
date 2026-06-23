@@ -169,7 +169,7 @@ CSS = """
 :root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
-.layout{display:grid;grid-template-columns:264px 1fr;max-width:1180px;margin:0 auto}
+.layout{display:grid;grid-template-columns:264px 1fr;max-width:1340px;margin:0 auto}
 nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
 .toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
 .toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
@@ -178,7 +178,7 @@ nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);t
 nav.toc li>a:hover{background:var(--soft)}
 nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
 nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
-.content{padding:32px 40px 120px;max-width:820px}
+.content{padding:32px 48px 120px;max-width:1000px}
 section.chapter{scroll-margin-top:20px}
 section.chapter+section.chapter{margin-top:64px;border-top:2px solid var(--line);padding-top:40px}
 h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
@@ -204,9 +204,9 @@ table{border-collapse:collapse;width:100%;font-size:.94em}
 th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
 thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
-figure.fig{margin:2em calc((100% - 1140px)/2);text-align:center}
-.svg-wrap,.inline-svg{display:inline-block;max-width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1140px;height:auto;display:block;margin:0 auto}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 .toc-toggle{display:none}
 @media(max-width:1200px){figure.fig{margin:2em auto}}
