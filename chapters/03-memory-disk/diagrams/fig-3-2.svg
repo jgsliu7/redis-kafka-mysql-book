@@ -58,7 +58,7 @@
   <text x="640" y="308" font-size="12" fill="#374151">• base = RDB 全量快照</text>
   <text x="640" y="326" font-size="12" fill="#374151">　+ incr = AOF 增量命令</text>
   <text x="640" y="348" font-size="12" fill="#374151">• 恢复快、丢失少</text>
-  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ 默认 aof-use-rdb-preamble</text>
+  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ base 始终为 RDB 格式（行为等效）</text>
   <text x="640" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（base+incr+manifest）</text>
 
   <!-- arrows from redis to three paths -->

@@ -15,7 +15,7 @@
 
   <!-- Column headers -->
   <rect x="40"  y="70" width="270" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="175" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis（AP · 缓存优先）</text>
+  <text x="175" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis（偏 AP · 缓存优先）</text>
 
   <rect x="325" y="70" width="270" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL（CP · 不丢数据）</text>
@@ -45,7 +45,7 @@
   <text x="175" y="400" text-anchor="middle" font-size="12" fill="#374151">16384 槽分片 + Gossip</text>
   <text x="175" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：扩展 + 自动容错</text>
 
-  <text x="175" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：AP（分区优先可用）</text>
+  <text x="175" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：偏 AP（分区时少数派停写，存在争议）</text>
 
   <!-- ===== MySQL column ===== -->
   <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
@@ -93,7 +93,7 @@
   <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 单进程强一致</text>
   <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：百万分区 + 快速恢复</text>
 
-  <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：AP 默认 / CP 可配（acks=all）</text>
+  <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：可调（acks=all 默认偏 CP，可下调）</text>
 
   <!-- Bottom legend -->
   <line x1="50" y1="495" x2="870" y2="495" stroke="#E5E7EB" stroke-width="1"/>

@@ -31,7 +31,7 @@
   <!-- Step 2: SAVE / NOSAVE branch -->
   <rect x="160" y="274" width="240" height="86" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="280" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">②a SHUTDOWN SAVE</text>
-  <text x="176" y="322" font-size="12" fill="#374151">触发 BGSAVE 同步落盘</text>
+  <text x="176" y="322" font-size="12" fill="#374151">触发 SAVE 同步落盘</text>
   <text x="176" y="340" font-size="12" fill="#374151">适用：Redis 当主存用</text>
 
   <rect x="480" y="274" width="240" height="86" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
