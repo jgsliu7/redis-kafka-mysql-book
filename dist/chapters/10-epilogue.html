@@ -101,12 +101,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </li>
 <li class="active"><a href="10-epilogue.html">后记</a>
 </li>
-<li><a href="11-references.html">附录　参考文献与延伸阅读</a>
+<li><a href="11-references.html">附录　参考文献与延伸阅读（按章索引）</a>
 </li>
 </ul>
 </nav>
 <main class="content">
-<article class="chapter"><h1 id="s246">后记</h1>
+<article class="chapter"><h1 id="s242">后记</h1>
 <p>九章走完，三款软件，八组问题，一种视角。</p>
 <p>如果要在结尾留一句话，大概不是一句结论，而是一个问题：下次面对一个设计决策，你能不能先放下"哪个更先进"，先问一句"它在替谁解决什么约束、又替谁背走了什么代价"？能把这两个问题答清楚，选型往往就不言自明。Redis 选了简单，MySQL 选了严谨，Kafka 选了吞吐——它们各自放弃了什么，比各自做到了什么更值得记住。</p>
 <p>全书反复出现的几条线索，其实可以收得更短：</p>
@@ -127,7 +127,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第二，找出一个你一直默认使用的参数，把它调到另一端试一次——哪怕只是在测试环境。<code>innodb_flush_log_at_trx_commit</code> 从 1 调到 2，吞吐能涨多少？<code>appendfsync</code> 从 everysec 调到 always，延迟会增加多少？感受一次"可靠性是用性能买来的"这句话发生在自己的终端里，远比读十遍记得住。</p>
 <p>第三，在下次技术评审时，试一次"先讲约束再讲方案"。不说"我们选 Kafka 因为它快"，而说"我们的峰值写入是 XX MB/s、消费者可以接受 YY 秒延迟、数据允许丢不超过 ZZ 条——在这些约束下，Kafka 的追加日志+顺序写是合适的"。你的评审通过率不会变低，但你的方案质量会明显提高。</p>
 <p>这三件事花不了两周。但它们可能就是使用者与设计者之间的那道分水岭。</p>
-<p>剩下的，留给你在自己的系统里去印证。</p><nav class="page-nav"><a href="09-summary.html">← 第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a><a href="11-references.html">附录　参考文献与延伸阅读 →</a></nav></article>
+<p>剩下的，留给你在自己的系统里去印证。</p><nav class="page-nav"><a href="09-summary.html">← 第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a><a href="11-references.html">附录　参考文献与延伸阅读（按章索引） →</a></nav></article>
 </main>
 </div>
 <script>

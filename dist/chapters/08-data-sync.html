@@ -99,19 +99,19 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul>
 <li class="nav-sub"><a href="#s179">本章导读</a></li>
 <li class="nav-sub"><a href="#s180">8.1 问题的本质</a></li>
-<li class="nav-sub"><a href="#s185">8.2 Redis 的做法</a></li>
-<li class="nav-sub"><a href="#s193">8.3 MySQL 的做法</a></li>
-<li class="nav-sub"><a href="#s203">8.4 Kafka 的做法</a></li>
-<li class="nav-sub"><a href="#s213">8.5 横向对比</a></li>
-<li class="nav-sub"><a href="#s217">8.6 架构启示</a></li>
-<li class="nav-sub"><a href="#s224">8.7 小结</a></li>
+<li class="nav-sub"><a href="#s182">8.2 Redis 的做法</a></li>
+<li class="nav-sub"><a href="#s190">8.3 MySQL 的做法</a></li>
+<li class="nav-sub"><a href="#s200">8.4 Kafka 的做法</a></li>
+<li class="nav-sub"><a href="#s210">8.5 横向对比</a></li>
+<li class="nav-sub"><a href="#s214">8.6 架构启示</a></li>
+<li class="nav-sub"><a href="#s221">8.7 小结</a></li>
 </ul>
 </li>
 <li><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道</a>
 </li>
 <li><a href="10-epilogue.html">后记</a>
 </li>
-<li><a href="11-references.html">附录　参考文献与延伸阅读</a>
+<li><a href="11-references.html">附录　参考文献与延伸阅读（按章索引）</a>
 </li>
 </ul>
 </nav>
@@ -119,18 +119,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <article class="chapter"><h1 id="s178">第 8 章 数据同步机制 — 集群一致性的实现</h1>
 <h2 id="s179">本章导读</h2>
 <p>你的系统长大了，开始有了"多份数据"：主库带几个从库、多机房多活、甚至只是 Redis 缓存配着 MySQL 数据库。一旦数据不止一份，一个要命的问题就冒出来：主库刚写入的那条记录，从库什么时候能看到？缓存和数据库不一致时，以谁为准？万一中间网络断了，重连之后怎么把漏掉的部分补上而不重复？处理不好，轻则用户看到旧数据，重则多卖了库存、转多了账。</p>
-<p>这就是"数据同步"。它的本质只有一句话：把一处状态变化，可靠、有界延迟地传播到其他副本。Redis 把它做成了命令流，MySQL 做成了 binlog event，Kafka 做成了有序消息——表面三种答案，背后是同一条主线：状态机复制。本章承接第 6 章《集群架构》：那一章回答"集群怎么组、谁来当主"，这一章回答"主的数据怎么传到副本、传到什么程度算数、断了怎么续"。读完本章你会获得一把通用骨架：传播单元、位点、一致性旋钮、故障恢复，它能解释你将来遇到的几乎任何一套复制系统。</p>
+<p>这就是"数据同步"。它的本质只有一句话：把一处状态变化，可靠、有界延迟地传播到其他副本。Redis 把它做成了命令流，MySQL 做成了 binlog event，Kafka 做成了有序消息——表面三种答案，背后是同一条主线：状态机复制。本章承接第 6 章《集群架构》：那一章回答"集群怎么组、谁来当主"，这一章回答"主的数据怎么传到副本、传到什么程度算数、断了怎么续"。三家用了三套完全不同的机制——PSYNC2、GTID、leader epoch——却在做同一件事：用可比较的进度坐标对齐两个状态机。这套骨架，能解释你将来遇到的几乎任何一套复制系统。</p>
 <h2 id="s180">8.1 问题的本质</h2>
-<h3 id="s181">多副本是单机的三道天花板逼出来的</h3>
-<p>单机迟早会撞上三道天花板。第一道是容量——一块盘装不下；第二道是可用性——机器一定会坏；第三道是读扩展——单机的 CPU 和网卡处理不了全量读请求。这三种限制引出的同一个动作是加副本：把同一份数据放到多台机器上。</p>
-<p>但多副本一旦落地，立刻引入一个新问题：状态扩散。主节点上一次 <code>SET k v</code>，副本们怎么知道？写入和扩散如果不是原子的——事实上也做不到原子——那么在某个时间窗口内，主节点和副本看到的世界就不一样。这正是分布式系统里一致性问题的源头：关键是多份数据"在某个时刻看起来像不像同一份"。</p>
-<h3 id="s182">数据同步的四个子问题</h3>
-<p>把"数据同步"这个大词拆开，背后其实是四个独立但彼此咬合的子问题。这四个子问题构成本章全篇的分析骨架，我们先在这里把它们立起来，后续三家深讲都围绕它们展开。</p>
+<p>单机迟早撞上容量、可用性或读扩展的天花板——加副本势在必行。DDIA 第 5 章已经充分论述了复制的基本模型、同步/异步分类与一致性-延迟权衡，本章不再重复。我们从一个更具体的问题出发：把"数据同步"这个笼统的大词拆开。</p>
+<h3 id="s181">数据同步的四个子问题</h3>
+<p>把"数据同步"这个大词拆开，背后其实是四个独立但彼此咬合的子问题。</p>
 <p><strong>第一，传播什么。</strong> 一次状态变化，到底把什么东西传给副本？是命令本身（"执行 <code>SET k v</code>"）、是事件（"行 k 的值变成了 v"）、还是消息（"编号 7 的记录内容是 v"）？传播单元的粒度，决定了下游几乎所有机制。</p>
 <p><strong>第二，怎么传播。</strong> 是主节点主动推，还是副本主动拉？推模式省一次往返但耦合主从，拉模式更解耦但副本要自己负责追赶节奏。</p>
-<p><strong>第三，传播到什么程度才算数。</strong> 主写完就告诉客户端"成功"，还是要等一个副本确认、多数派确认、所有副本确认？这是一个连续谱。</p>
+<p><strong>第三，传播到什么程度才算数。</strong> 主写完就告诉客户端"成功"，还是要等一个副本确认、多数派确认、所有副本确认？这是一个连续谱——一致性不是"有或没有"，而是一条按确认往返计价的曲线。后面 Redis 的 <code>min-replicas</code>、MySQL 的半同步、Kafka 的 <code>acks</code> 旋钮，都是这条曲线上不同位置的标价点。</p>
 <p><strong>第四，传播断了或乱了怎么办。</strong> 网络一定会断、副本一定会重启、主节点一定会换。断了之后能不能不重头来，从哪里接着传？这要求系统记一份"进度坐标"，并能在重启时用它对齐。</p>
-<p>数据同步的这四个子问题，构成全章的分析骨架，见图 8-1。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -198,17 +195,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-1 数据同步的四个子问题框架</figcaption></figure>
 <p>图 8-1　数据同步的四个子问题：传播什么、怎么传播、到什么程度、断了怎么办——底层主线是状态机复制。</p>
-<p>图中下半部分给出了一条贯穿全章的主线：状态机复制。它是这三家系统共用的底层模型。我们下面就来拆它。</p>
-<h3 id="s183">一致性是延迟的函数</h3>
-<p>第三个子问题（传播到什么程度）最容易引起误解，要在这里先澄清。一致性不是一个"有或没有"的属性，而是一个<strong>和延迟成正比的代价</strong>：你要求越强的同步保证，主节点就得等越多副本确认，延迟就越高。</p>
-<p>主写完立即返回（异步复制），延迟最低，但故障切换时可能丢已确认的写；等多数派确认（强一致），最安全，但每一次写都要承担一次跨节点的确认往返。所有的"半同步""ISR + acks"都是这条曲线上的中间点。理解这一点，后面看 Redis 的 <code>min-replicas</code>、MySQL 的半同步、Kafka 的 <code>acks</code> 旋钮时，你会一眼看出它们其实在做同一件事：把一致性强度做成一个可标价的旋钮，让使用者按业务愿意承担的延迟来选择。</p>
-<h3 id="s184">底层模型：状态机复制</h3>
-<p>把上面四个子问题统一起来的，是一个简洁到几乎像废话的命题：</p>
-<blockquote>如果每个副本都按<strong>相同的顺序</strong>执行<strong>相同的输入序列</strong>，那么它们的最终状态必然相同。</blockquote>
-<p>这就是状态机复制（state machine replication）模型。它把"一致性"这个模糊的目标，翻译成了一个可操作的约束：保证序列相同 + 保证执行顺序相同。剩下的工程问题，全部围绕"怎么构造这个序列"和"怎么保证顺序"展开。</p>
-<p>三家都在用这个模型，差异只在"序列"的载体和"执行"的方式：</p>
-<ul><li>Redis 的序列载体是命令流，副本直接执行命令；</li><li>MySQL 的序列载体是 binlog event，副本回放事件；</li><li>Kafka 的序列载体是分区日志里的消息，副本按位移追加。</li></ul>
-<p>状态机复制模型可以用图 8-2 一目了然地表达：同一份有序输入序列分别喂给三个副本，每个副本独立"执行"，最终状态必然相同。</p>
+<p>这四个子问题的底层，是同一个模型：<strong>状态机复制</strong>——所有副本按相同顺序执行相同输入序列，终态必然相同。DDIA 第 5 章对此已有展开。三家都在用这个模型，差异只在序列载体和执行方式：Redis 是命令流（副本直接执行），MySQL 是 binlog event（副本回放事件），Kafka 是分区日志消息（副本按位移追加）。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -309,17 +296,18 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-2 状态机复制模型</figcaption></figure>
 <p>图 8-2　状态机复制模型：相同的有序输入序列 + 相同的执行顺序，必然得到相同的最终状态——三家差异只在"序列载体"与"执行方式"。</p>
-<p>载体不同，但模型同构。这是本章最重要的一个抽象，也是第 9 章总结里"共性规律五"的核心印证。下面三节分别展开三家在这个模型下的具体做法。</p>
-<h2 id="s185">8.2 Redis 的做法</h2>
-<p>Redis 的同步设计目标很明确：在主节点保持极低延迟的前提下，把命令流可靠地推送给副本。这个目标决定了它几乎所有后续选择——异步、单向、命令即日志。</p>
-<h3 id="s186">传播单元：命令本身</h3>
+<p>载体不同，模型同构。下面三节分别展开三家在这四个子问题下的具体做法。</p>
+<blockquote><strong>关键数字</strong>  - <strong>Redis PSYNC backlog：默认 1 MB</strong>。1 万次写/秒的负载下覆盖约 1–2 分钟断线窗口；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。 - <strong>MySQL 半同步超时：<code>rpl_semi_sync_source_timeout</code> 默认 10 秒</strong>。超时自动降级回异步，一致性保障消失——降级可观测需配合告警。 - <strong>Kafka ISR 剔除阈值：<code>replica.lag.time.max.ms</code> 默认 30 秒</strong>。副本落后超过 30 秒即踢出 ISR，不再参与 Leader 选举，以此保证新主不丢已确认消息。</blockquote>
+<h2 id="s182">8.2 Redis 的做法</h2>
+<p>Redis 的同步设计目标很明确：在主节点保持极低延迟的前提下，把命令流可靠地推送给副本。由此引出后续的选择——异步、单向、命令即日志。</p>
+<h3 id="s183">传播单元：命令本身</h3>
 <p>Redis 选择把命令本身作为传播单元。主节点执行完一条写命令后，把这条命令（用 Redis 序列化协议 RESP 重写后）原样发送给所有副本；副本收到后本地执行一次，状态就对齐了。</p>
-<p>这个选择呼应了第 7 章"AOF 协议即文件"的设计：AOF 持久化记录的就是同一种命令流。于是 Redis 把持久化和复制<strong>复用同一种载体</strong>——一份命令流既写给磁盘（AOF）也写给网络（副本），二者天然一致。这种复用是 Redis 极简设计贯穿始终的取向：能用一种日志说清的事，就不引入第二种。</p>
-<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它抗不住<strong>语义歧义</strong>——比如非确定性命令（<code>TIME</code>、<code>RANDOMKEY</code>、依赖时间的脚本），不同副本执行结果可能不同。Redis 对此的处理是：复制链路上对这类命令做特殊改写（比如把 <code>TIME</code> 在主节点取到的时间作为参数下发），把潜在的分歧在源头消除。</p>
-<h3 id="s187">单向异步：把一致性换成低延迟</h3>
+<p>这个选择呼应了第 7 章"AOF 协议即文件"的设计：AOF 持久化记录的就是同一种命令流。于是 Redis 把持久化和复制<strong>复用同一种载体</strong>——一份命令流既写给磁盘（AOF）也写给网络（副本），二者天然一致。这种复用体现了 Redis 极简设计的取向：能用一种日志说清的事，就不引入第二种。</p>
+<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它抗不住<strong>语义歧义</strong>——比如非确定性命令（<code>SPOP</code>、<code>RANDOMKEY</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 对此的处理是：复制链路上对这类命令做特殊改写——比如把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，或将涉及随机性的 Lua 脚本通过 <code>redis.replicate_commands()</code> 开启脚本效果复制（只复制最终的写命令效果），把潜在的分歧在源头消除。</p>
+<h3 id="s184">单向异步：把一致性换成低延迟</h3>
 <p>Redis 复制是<strong>单向异步</strong>的。主节点写完后立即给客户端返回 OK，<strong>不等任何副本确认</strong>；副本通过一条长连接异步地接收命令流并追赶。副本只能有一个主（一个数据集的权威来源），形成树状的复制拓扑。</p>
-<p>这是一个明确的 AP（高可用优先）选择。主节点的延迟几乎不受副本数量和副本健康度影响——这正是 Redis 作为缓存/在线存储最看重的特性。代价同样明确：主节点故障时，已经返回给客户端但还没来得及传到副本的写，会永久丢失。Redis 接受这个代价，因为它把"丢失少量写"换成了"主永远快、永远可用"。</p>
-<h3 id="s188">全量同步：fork 出 RDB，传完补积压</h3>
+<p>这是 AP（高可用优先）的取向。主节点的延迟几乎不受副本数量和副本健康度影响——这正是 Redis 作为缓存/在线存储最看重的特性。代价同样明确：主节点故障时，已经返回给客户端但还没来得及传到副本的写，会永久丢失。Redis 接受这个代价，因为它把"丢失少量写"换成了"主永远快、永远可用"。</p>
+<h3 id="s185">全量同步：fork 出 RDB，传完补积压</h3>
 <p>副本第一次连上来，或者增量同步无法进行时，就要做全量同步。流程是：</p>
 <ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（表示"我什么都没有"），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存到复制积压缓冲区（replication backlog）</strong>。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把积压缓冲区里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
 <p>这里的巧妙之处是第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。backlog 正是连接"过去那一刻"和"当前"的桥梁。</p>
@@ -405,7 +393,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-3 Redis PSYNC2 全量 + 部分重同步流程</figcaption></figure>
 <p>图 8-3　PSYNC2 的核心是 offset 比对：断线后 offset 仍在 backlog 窗口内则部分重同步，否则退回全量。</p>
-<h3 id="s189">增量同步：PSYNC2 与复制积压缓冲区</h3>
+<h3 id="s186">增量同步：PSYNC2 与复制积压缓冲区</h3>
 <p>PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线重连能不能不重头"的问题。它靠两个东西：</p>
 <p><strong>第一是 replication offset。</strong> 主节点维护一个 <code>master_repl_offset</code>，表示"我已经把多少字节的命令流写进复制流了"；副本也维护自己的 <code>replica_offset</code>，表示"我已经从复制流里消费到第几字节了"。两者都是字节进度坐标，本质就是一份单调递增的位点。</p>
 <p><strong>第二是复制积压缓冲区（backlog）。</strong> 主节点维护一个固定大小（默认约 1MB，可调 <code>repl-backlog-size</code>）的环形缓冲区，存"最近 N 字节的复制流"。这是一个滑动窗口——新命令进来，老命令被覆盖。</p>
@@ -499,26 +487,26 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 8-4 Redis 复制积压缓冲区与 replication offset</figcaption></figure>
 <p>图 8-4　backlog 是滑动窗口，主从各持一个字节进度坐标；offset 在窗口内即可增量补差，否则全量。</p>
 <p>backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。窗口越大，能容忍越长时间的断线（典型场景：副本做一次短暂的 GC 或网络抖动），但主节点要常驻更多内存。这是个按业务调的参数——大流量实例把它调到几十 MB 甚至上百 MB 很常见，目的是让常见的短断线都走部分重同步，避免动辄全量。</p>
-<p>这里还有一个容易忽略但关键的细节：故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。这正是 PSYNC2（Redis 4.0 引入）相比老 PSYNC 的核心增强：副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步——这放宽了"主节点更换必然触发全量"的旧限制。本书只需要抓住这一层机制：PSYNC2 不只比较字节进度，也把"这段进度属于哪一任主节点"纳入判断。</p>
-<h3 id="s190">关键取舍：把同步强度做成可写门槛</h3>
+<p>一个容易忽略但关键的细节：故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。这是 PSYNC2（Redis 4.0 引入）相比老 PSYNC 的增强：副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步——这放宽了"主节点更换必然触发全量"的旧限制。本书只需要抓住这一层机制：PSYNC2 不只比较字节进度，也把"这段进度属于哪一任主节点"纳入判断。</p>
+<h3 id="s187">关键取舍：把同步强度做成可写门槛</h3>
 <p>Redis 本质上是 AP，但它给了一个弱保证旋钮：<code>min-replicas-to-write N</code> + <code>min-replicas-max-lag T</code>。这条规则的意思是——主节点接受写入的前提是：至少有 N 个副本在线（连接存活），且这些副本的延迟（<code>master_repl_offset - replica_offset</code> 折算到秒）不超过 T 秒。</p>
-<p>注意：它只是把"主可以完全单点"约束成"主至少有 N 个跟得上的副本"，否则拒绝写入。这是一个"软门槛"：达不到门槛的写会被拒绝，但已通过的写仍然可能丢失（因为副本是异步追赶）。这个设计很典型地体现了 Redis 的工程哲学——不追求理论上的强一致，但在关键路径上设置一道可观测、可配置的弱保证，避免数据在无感知情况下丢失。</p>
-<h3 id="s191">级联复制与延迟累积</h3>
+<p>注意：它只是把"主可以完全单点"约束成"主至少有 N 个跟得上的副本"，否则拒绝写入。这是一个"软门槛"：达不到门槛的写会被拒绝，但已通过的写仍然可能丢失（因为副本是异步追赶）。Redis 的工程哲学在此显现——不追求理论上的强一致，但在关键路径上设置一道可观测、可配置的弱保证，避免数据在无感知情况下丢失。</p>
+<h3 id="s188">级联复制与延迟累积</h3>
 <p>副本也可以作为下一级副本的主，形成链式（tree）复制拓扑。常见动机是分担主节点的出口带宽——主只推给少数几个一级副本，一级副本再推给二级副本。</p>
 <p>代价是延迟随链路深度累积：一级副本落后主一拍，二级副本落后一级一拍，依此类推。对于读副本来说这点延迟通常可接受，但要注意别把链路拉得太深，否则末端副本读到的状态会和主差好几个版本，造成"读到了旧数据"的体感问题。</p>
-<h3 id="s192">故障转移的数据语义</h3>
+<h3 id="s189">故障转移的数据语义</h3>
 <p>Sentinel 或 Cluster 选出新主后，新主未必拥有老主的全部数据——这正是异步复制的必然结果。老主在故障前已经确认给客户端的某些写，可能还没传到新主；老主恢复后以副本身份重新加入，新主会用自己的数据覆盖它。</p>
 <p>这就是经典的"已确认的写丢失"。Redis 把语义讲清楚：你换来的，是主节点永不因副本问题而停摆。取舍总结一句话：<strong>主节点的低延迟与高可用，代价是可能丢少量写</strong>。</p>
-<h2 id="s193">8.3 MySQL 的做法</h2>
-<p>如果说 Redis 是把一致性主动让位给延迟，那么 MySQL 的故事就要丰富得多——它在"完全异步可丢"到"多数派强一致"之间铺开了一条连续谱，让使用者按业务在谱上选位。MySQL 的同步以 binlog event 为传播单元，串起了从主从复制到组复制（MGR）的一整套机制。</p>
-<h3 id="s194">传播单元：binlog event</h3>
+<h2 id="s190">8.3 MySQL 的做法</h2>
+<p>MySQL 在"完全异步可丢"到"多数派强一致"之间铺开了一条连续谱，让使用者按业务在谱上选位。MySQL 的同步以 binlog event 为传播单元，串起了从主从复制到组复制（MGR）的一整套机制。</p>
+<h3 id="s191">传播单元：binlog event</h3>
 <p>MySQL 选择<strong>行变更的逻辑日志</strong>作为传播单元。当一条 SQL 改动了行，主节点把它转换成 binlog event——现代主流是 ROW 格式，记录的是"行 k 从值 v1 变成了 v2"这样的行级事件。</p>
-<p>为什么选 ROW 而不是语句？因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，绕开了所有歧义——这和 Redis 处理非确定性命令是同一类思路：<strong>把分歧在源头消除</strong>。</p>
+<p>选 ROW 而非语句，是因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，绕开了所有歧义——这和 Redis 处理非确定性命令是同一类思路：<strong>把分歧在源头消除</strong>。</p>
 <p>代价是日志更重：一条 <code>UPDATE ... WHERE id&lt;100</code> 影响一百行，ROW 格式会产生一百条事件。但换来的是确定性，对复制正确性是值得的。</p>
-<h3 id="s195">传统复制：两段式的拉取 + 回放</h3>
+<h3 id="s192">传统复制：两段式的拉取 + 回放</h3>
 <p>MySQL 的传统异步复制是<strong>两段式</strong>的，背后是两个独立的线程：</p>
 <ul><li><strong>IO 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志（relay log）。这一段是"网络拉取"。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
-<p>主节点写 binlog、从节点 IO 线程拉到 relay log、SQL 线程回放，这条链路见图 8-5。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。本质上这是推拉结合：从节点拉、relay log 缓冲、本地推。</p>
+<p>主节点写 binlog、从节点 IO 线程拉到 relay log、SQL 线程回放，这条链路见图 8-5。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。这是推拉结合：从节点拉、relay log 缓冲、本地推。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -616,20 +604,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-5 MySQL 异步 / 半同步复制与 GTID 链路</figcaption></figure>
 <p>图 8-5　异步复制主写完即返回；半同步增加 ACK 回路；GTID 把位点从文件偏移变成全局事务序号。</p>
-<h3 id="s196">异步复制：默认的 AP 形态</h3>
+<h3 id="s193">异步复制：默认的 AP 形态</h3>
 <p>默认配置下，MySQL 复制是异步的：主节点提交事务（写完 binlog 并落盘）就立刻给客户端返回 OK，不等任何副本。这和 Redis 一样是 AP 选择，故障切换时已提交事务可能丢失。MySQL 接受这个默认值，因为大量 OLTP 场景下，吞吐和延迟比强一致更重要。</p>
-<h3 id="s197">半同步复制：可降级的一致性</h3>
+<h3 id="s194">半同步复制：可降级的一致性</h3>
 <p>半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（副本 IO 线程把事件写到 relay log 即回 ACK，不等本地回放）才返回成功。它的 <code>AFTER_SYNC</code> / <code>AFTER_COMMIT</code> 两档语义、超时降级回异步、等待副本数等机制细节，已在第 6 章 6.3.2 节展开，这里不重复。</p>
-<p>从同步的视角看，半同步的设计要点只有一个：<strong>它的降级语义揭示了"一致性可以临时关掉，但关掉这件事必须可观测"</strong>。主节点等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）会自动降级回异步，不再阻塞——一致性被临时关掉了。如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。这条规律不只在 MySQL 成立：<strong>任何可降级的一致性机制，降级本身都必须是一等公民的可观测事件</strong>，Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩，都同理。</p>
+<p>从同步的视角看，半同步的设计要点只有一个：<strong>它的降级语义揭示了"一致性可以临时关掉，但关掉这件事必须可观测"</strong>。主节点等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）会自动降级回异步，不再阻塞——一致性被临时关掉了。如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>任何可降级的一致性机制，降级本身都必须是一等公民的可观测事件</strong>——Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩，都同理。</p>
 <blockquote>说明：8.0.26 起，半同步相关的 master/slave 命名变量统一重命名为 source/replica（如 <code>rpl_semi_sync_master_enabled</code> → <code>rpl_semi_sync_source_enabled</code>），旧名变量在过渡期仍可用但已标记弃用。本章统一以新名为准。</blockquote>
-<h3 id="s198">GTID：让位点从脆弱变得鲁棒</h3>
+<h3 id="s195">GTID：让位点从脆弱变得鲁棒</h3>
 <p>传统复制用"文件名 + 字节偏移"作为位点（比如 <code>mysql-bin.000123:4567</code>）。这个位点很脆弱：主节点换了，文件名和位置都对不上，故障切换时人工对位点既繁琐又容易出错。</p>
 <p>GTID（Global Transaction Identifier，全局事务标识）把位点升级成 <code>source_id:transaction_id</code> 的形式——<code>source_id</code> 是发起事务的源节点的 UUID，<code>transaction_id</code> 是该节点上单调递增的事务序号。每个事务在 binlog 里都有一个全局唯一的 GTID。</p>
-<p>GTID 带来的简化是结构性的：副本只要告诉新主"我这里有 GTID 1-100"，新主就自动从 101 开始追——不用人工对文件、不用查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此变得直观。位点从"实现细节"变成了"可推理的语义对象"，这是工程上的实质性进步。</p>
-<h3 id="s199">多线程并行复制：缓解单线程回放瓶颈</h3>
+<p>GTID 带来的简化在于：副本只要告诉新主"我这里有 GTID 1-100"，新主就自动从 101 开始追——不用人工对文件、不用查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此变得直观。位点从"实现细节"变成了"可推理的语义对象"。</p>
+<h3 id="s196">多线程并行复制：缓解单线程回放瓶颈</h3>
 <p>传统复制最大的痛点是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件，主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越后。</p>
 <p>8.0 的多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放——这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
-<p>这个设计的关键在于，它不在副本侧做复杂的冲突检测，而是借用主节点组提交时已经完成的事实判断，把并行性从主节点传递到从节点。配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。并行复制与 MGR 共识的关系见图 8-6。</p>
+<p>这个设计不在副本侧做复杂的冲突检测，而是借用主节点组提交时已经完成的事实判断，把并行性从主节点传递到从节点。配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。并行复制与 MGR 共识的关系见图 8-6。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -759,26 +747,26 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-6 MySQL 多线程并行复制与组复制（MGR）共识</figcaption></figure>
 <p>图 8-6　从节点按组提交边界并行回放；MGR 把 binlog event 当作共识 log entry，多数派确认才提交。</p>
-<h3 id="s200">组复制（MGR）：把复制升级为共识</h3>
+<h3 id="s197">组复制（MGR）：把复制升级为共识</h3>
 <p>MGR（MySQL Group Replication）是把 MySQL 的复制从"异步可丢"推进到"强一致"的关键一步。它的核心思想是：<strong>把 binlog event 当作共识协议（XCom，Paxos 变种）的 log entry，要求多数派确认才能提交</strong>。</p>
 <p>这是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务——只要多数派存活，已确认的事务就一定在。</p>
 <p>代价是延迟：每一次提交都要承担一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待），从弱到强有 <code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）几档——读写是否要等待本节点状态追平，按场景调档，再次体现了"一致性是可调旋钮"的思想。</p>
-<h3 id="s201">分布式恢复：新成员怎么追上</h3>
+<h3 id="s198">分布式恢复：新成员怎么追上</h3>
 <p>新成员加入 MGR 时，状态和老成员差很多，怎么追？8.0.17+ 提供了 clone 插件——新成员直接从现有成员克隆一份完整的数据目录（物理拷贝），跳过漫长的 binlog 回放；克隆完再用 binlog 增量追平克隆期间的新事务。这是"全量 + 增量"两段式的标准做法，和 Redis 全量同步的思路同构。</p>
-<h3 id="s202">取舍总结</h3>
+<h3 id="s199">取舍总结</h3>
 <p>MySQL 在数据同步上的取舍可以总结为一条连续谱：从异步（可丢、最快）到半同步（多数情况下不丢、超时降级）到组复制（多数派强一致、最慢）。<strong>参数选择就是延迟与安全之间的交易</strong>，业务方按场景在谱上选位。这是 MySQL 区别于 Redis 的重要特点——它把一致性展开成可选择的谱系。</p>
-<h2 id="s203">8.4 Kafka 的做法</h2>
-<p>Kafka 的同步设计有一个独特优势：它本身就是为"日志"而生的系统。当别的系统要想办法把状态变化塞进某种传播单元时，Kafka 的传播单元就是它的原生数据结构——分区日志里按位移追加的消息。这让 Kafka 的复制机制有一种天然的简洁：副本就是分区日志的一份拷贝，同步就是把这份日志从 Leader 拷到 Follower。</p>
-<h3 id="s204">传播单元：按分区有序的消息</h3>
+<h2 id="s200">8.4 Kafka 的做法</h2>
+<p>Kafka 本身就是为"日志"而生的系统。当别的系统要想办法把状态变化塞进某种传播单元时，Kafka 的传播单元就是它的原生数据结构——分区日志里按位移追加的消息。这让 Kafka 的复制机制变得简洁：副本就是分区日志的一份拷贝，同步就是把这份日志从 Leader 拷到 Follower。</p>
+<h3 id="s201">传播单元：按分区有序的消息</h3>
 <p>Kafka 的传播单元是<strong>消息</strong>。每个分区（partition）是一个独立的、按位移（offset）严格有序的追加日志；副本就是这份分区日志在不同 broker 上的拷贝。一条消息一旦按位移写入 Leader 的日志，它在分区内的顺序就固定了——这种顺序性来自日志的"只追加"本质，不需要额外的排序协议。</p>
-<p>这一点和第 4 章 Kafka 存储层的 Log 抽象直接呼应：日志天然提供了全序关系，所以"状态机复制里的有序输入序列"在 Kafka 这里是免费的——日志本身就是序列。这是 Kafka 复制机制相比 Redis/MySQL 的一个结构性优势：别的系统要构造序列，Kafka 的序列是它的核心数据结构。</p>
-<h3 id="s205">纯拉模式：和消费者走同一条路径</h3>
+<p>这一点和第 4 章 Kafka 存储层的 Log 抽象直接呼应：日志天然提供了全序关系，所以"状态机复制里的有序输入序列"在 Kafka 这里是免费的——日志本身就是序列。别的系统要构造序列，Kafka 的序列就是它的日志数据结构。</p>
+<h3 id="s202">纯拉模式：和消费者走同一条路径</h3>
 <p>Kafka 复制用的是<strong>纯拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis 的"主推"、MySQL 的"IO 线程拉 + relay log 缓冲"都不同。</p>
-<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>。Leader 不区分对面是副本还是消费者，统一按"给我从位移 X 开始的日志"来响应。这种复用的红利是实实在在的——Leader 端只需要一套日志读取逻辑，副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。Log 抽象一次设计、处处复用，第 4 章埋下的伏笔在这一章得到兑现。</p>
-<p>拉模式的代价是 Follower 要自己负责追赶节奏，副本数量多时 Leader 会被大量 FETCH 请求打到。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。</p>
-<h3 id="s206">LEO、HW 与 ISR：同步进度的标尺</h3>
-<p>Kafka 用 LEO（Log End Offset，日志末端位移）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。这三个概念的完整定义与动态收缩机制已在第 6 章 6.4.2 节展开，这里只从<strong>数据同步的视角</strong>点出它们的角色。</p>
-<p>从同步视角看，LEO 是每个副本的本地进度坐标，HW 是 Leader 据此计算出的"已确认边界"——HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交、消费者才读得到。这个设计的同步学含义是：<strong>副本间的同步进度，由 ISR 里最慢的那一个决定</strong>。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 <code>replica.lag.time.max.ms</code> 阈值之外就被踢出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出本质上是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见图 8-7。</p>
+<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>。Leader 不区分对面是副本还是消费者，统一按"给我从位移 X 开始的日志"来响应。这种复用的红利是实实在在的——Leader 端只需要一套日志读取逻辑，副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。Log 抽象一次设计、处处复用——第 4 章讨论的分层思想在这里具象化为"读路径不分副本还是消费者"。</p>
+<p>拉模式的代价是 Follower 要自己负责追赶节奏，副本数量多时 Leader 会被大量 FETCH 请求打到。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，Follower 拉取冷数据时可直接从远程存储读取而不再经过 Leader 出口带宽——这一变化不改变拉模式本身，只改变数据来源（详见第 7 章 7.4.6 节）。</p>
+<h3 id="s203">LEO、HW 与 ISR：同步进度的标尺</h3>
+<p>Kafka 用 LEO（Log End Offset，日志末端位移）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。这三个概念的完整定义与动态收缩机制已在第 6 章 6.4.2 节展开，这里直接看它们在同步中的角色。</p>
+<p>从同步视角看，LEO 是每个副本的本地进度坐标，HW 是 Leader 据此计算出的"已确认边界"——HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交、消费者才读得到。<strong>副本间的同步进度，由 ISR 里最慢的那一个决定</strong>。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 <code>replica.lag.time.max.ms</code> 阈值之外就被踢出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见图 8-7。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -889,70 +877,66 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-7 Kafka Follower FETCH + LEO/HW + leader epoch</figcaption></figure>
 <p>图 8-7　HW = ISR 中最小 LEO，只有 HW 以下算已提交；leader epoch 用任期号界定权威日志段，截断老 Leader 的脑裂尾部。</p>
-<h3 id="s207">leader epoch：解决老 Leader 复活的脑裂</h3>
+<h3 id="s204">leader epoch：解决老 Leader 复活的脑裂</h3>
 <p>老 Leader 复活导致的<strong>日志分叉（脑裂）</strong>是分布式复制里最难处理的边界。场景是这样的：Leader A 在任期 1 写了几条消息后假死，集群选出 Leader B 进入任期 2，B 又写了几条；此时 A 复活，带着任期 1 的旧日志回来——它认为自己是 Leader，但它的日志和 B 不一致。</p>
 <p>Kafka 用 <strong>leader epoch</strong>（单调递增的任期号）来截断这种不一致的尾部。每个任期对应一段"权威日志"，落盘到分区的 <code>leader-epoch-checkpoint</code> 文件里（一行 = 任期号 + 该任期起始位移）。副本恢复或重新追随时，在 FETCH 请求里带上自己最后一个已知的 <code>(epoch, offset)</code>；Leader 据此判断这段日志是否已被新任期否决，并在响应里回一个 <code>EndOffsetForEpoch</code>（"该 epoch 的权威日志到哪为止"）。副本发现自己的尾部超过了这个权威边界，就把它干净地截掉。这样老 Leader 的脑裂尾部被切掉，副本状态回到与新 Leader 一致。</p>
 <p>leader epoch 的引入是为了补 offset 的不足：offset 只描述"日志长度"，无法表达"某段日志是否被新任期否决"。epoch 给每段日志盖上了"由哪一任 Leader 写下"的戳，让截断决策有据可依。这和 MySQL 用 GTID 标识事务、Redis 用 replid 标识主节点身份，本质是同类思路：<strong>给日志段一个权威的归属标记</strong>。</p>
-<h3 id="s208">acks 旋钮：一致性强度的生产者级旋钮</h3>
+<h3 id="s205">acks 旋钮：一致性强度的生产者级旋钮</h3>
 <p>Kafka 把一致性强度做成了生产者侧的 <code>acks</code> 旋钮（0 / 1 / all 三档），它配合 <code>min.insync.replicas</code>（ISR 最少要有几个副本才允许写入）构成 Kafka 的可靠性语义。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在第 6 章 6.4.3 节展开。</p>
-<p>从同步的视角看，一个关键对比是 <code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义上的关键差别</strong>：MySQL 半同步超时会降级回异步（宁可弱化也要保可用），Kafka 在 ISR 不足 <code>min.insync.replicas</code> 时则是拒绝写入并抛 <code>NotEnoughReplicasException</code>（宁可不可用也要保住可靠性下限）。同一个"一致性 vs 可用性"的抉择，两家在生产者侧画在了相反的位置——这正是 CAP 取舍被具象成参数后的真实形态：不存在普适的最优解，只有"把这个抉择的代价显式暴露，让业务自己选"。一个常见的强可靠配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>，能容忍单副本故障而不丢数据。</p>
-<h3 id="s209">unclean leader 选举：CAP 取舍的显式开关</h3>
+<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步超时会降级回异步（宁可弱化也要保可用），Kafka 在 ISR 不足 <code>min.insync.replicas</code> 时则是拒绝写入并抛 <code>NotEnoughReplicasException</code>（宁可不可用也要保住可靠性下限）。同一个"一致性 vs 可用性"的抉择，两家在生产者侧画在了相反的位置——不存在普适的最优解，只有"把这个抉择的代价显式暴露，让业务自己选"。一个常见的强可靠配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>，能容忍单副本故障而不丢数据。</p>
+<h3 id="s206">unclean leader 选举：CAP 取舍的显式开关</h3>
 <p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。这是一个把 CAP 取舍暴露成显式开关的典型设计：</p>
 <ul><li><strong>允许（true）</strong>：ISR 全挂时，从落后副本中选一个当 Leader，系统恢复可用，但 HW 之后未同步的消息会丢——可用性优先。</li><li><strong>禁止（false，3.x 默认）</strong>：ISR 全挂时宁可不选主，等 ISR 成员恢复——一致性优先，但分区可能短时不可用。（这个默认值其实自 0.11 起就是 false，3.x 沿用并强化了这一取向。）</li></ul>
 <p>Kafka 3.x 把默认值定为 false，体现了现代实践对数据安全的偏向。但这个开关的存在本身比它的默认值更重要：它让你按业务（金融级 vs 日志采集级）显式选择要 AP 还是 CP。</p>
-<h3 id="s210">KRaft：元数据同步与数据同步同构</h3>
+<h3 id="s207">KRaft：元数据同步与数据同步同构</h3>
 <p>Kafka 用 KRaft（Kafka Raft）替代 ZooKeeper 管理集群元数据：KRaft 自 2.8 作为预览特性引入，在 3.3 达到生产可用。<strong>元数据本身也是一条 Raft 复制日志</strong>（由 Controller quorum 维护），它的复制机制和数据分区的复制<strong>同构</strong>——都是日志 + 副本 + Leader + epoch（Raft 用 term）。</p>
 <p>展开来看：Kafka 把"同步思想"从数据层延伸到了元数据层。无论同步的是用户消息还是集群元数据，机制本质相同——状态机复制。这种统一让 Kafka 的架构在去掉 ZooKeeper 后依然自洽：它复用了自己已有的那一套同步机制。</p>
-<h3 id="s211">幂等与事务：从状态一致到语义一致</h3>
+<h3 id="s208">幂等与事务：从状态一致到语义一致</h3>
 <p>生产者幂等（enable.idempotence=true）和事务（transactional）是 Kafka 把一致性推到更细粒度的两步。</p>
 <p>幂等靠 ProducerId + ProducerEpoch + BaseSequence 实现：每个生产者有一个 ID，每次发送的消息带一个单调递增的序列号；broker 据此去重，即使消息因重试被发送多次，最终也只生效一次。这把"网络重传导致的重复"在 broker 侧消除。</p>
 <p>事务更进一步：跨多个分区的一组写入要么全部成功要么全部不可见，靠 transaction coordinator 和两阶段提交（对消费者暴露 <code>committed</code> 标记）实现。这把"状态机复制"从"状态一致"延伸到了"操作语义一致"——不止副本们的数据状态相同，连"这条算不算生效"也一致。</p>
-<h3 id="s212">取舍总结</h3>
-<p>Kafka 的取舍哲学可以一句话概括：<strong>把一致性、可靠性、可用性全部参数化，把权衡的选择权显式交给使用者</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值，每一个都是一道旋钮。Kafka 不替你选答案，它给你一套可调的、语义清晰的参数，让你按业务自己定义"够好"的边界。</p>
-<h2 id="s213">8.5 横向对比</h2>
-<p>把三家的同步机制并到同一张表里，差异和共性才能同时看清。下面的对比以本章程清的六个维度为行，按 Redis | MySQL | Kafka 的固定列序排列。</p>
+<h3 id="s209">取舍总结</h3>
+<p>Kafka 的取舍哲学：<strong>把一致性、可靠性、可用性全部参数化，把权衡的选择权显式交给使用者</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值，每一个都是一道旋钮。Kafka 不替你选答案，它给你一套可调的、语义清晰的参数，让你按业务自己定义"够好"的边界。</p>
+<h2 id="s210">8.5 横向对比</h2>
+<p>把三家的同步机制并到同一张表里，以本章澄清的六个维度为行，按 Redis | MySQL | Kafka 的固定列序排列。</p>
 <p><strong>表 8-1 三家数据同步机制横向对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区位移有序）</td></tr><tr><td>传播方式</td><td>主推送命令</td><td>从拉取 + 本地回放分离（IO/SQL 双线程）</td><td>纯拉取（FETCH，与消费者同路径）</td></tr><tr><td>一致性模型</td><td>异步最终一致（AP）</td><td>异步 / 半同步 / 多数派强一致（连续谱）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务序号）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
 <p>表 8-1 把差异与共性同时摆出：六个维度上的选择不同，但背后都是共同的状态机复制模型。</p>
-<h3 id="s214">解读一：传播单元的选择决定一切下游设计</h3>
-<p>把传播单元拎出来看，会发现它是一切下游设计的起点。</p>
+<h3 id="s211">解读一：传播单元的选择决定一切下游设计</h3>
+<p>把传播单元拎出来看，会发现它是多数下游设计的起点。</p>
 <p>Redis 选命令流，好处是轻——序列化小、副本直接执行命令处理路径。代价是抗不住非确定性，要在源头改写命令。MySQL 选 binlog event（ROW），好处是确定性——下发的是行级事实，副本不会算出不同结果。代价是重，一条大更新可能展开成上百条事件。Kafka 选消息，好处是天然有序——日志本身就是序列，复制无需额外排序。代价是只追加，更新和删除要靠"追加 tombstone/新版本"来表达。</p>
-<p>一旦传播单元定下来，传播方式、位点形态、故障恢复粒度都跟着定型。<strong>传播单元是同步机制的基因</strong>，理解了一家选了什么单元，就理解了它后续一切选择的由来。</p>
-<h3 id="s215">解读二：位点（offset / GTID / 位移）是同步的通用语言</h3>
+<p>一旦传播单元定下来，传播方式、位点形态、故障恢复粒度都跟着定型。<strong>传播单元决定了下游一切机制</strong>，理解了一家选了什么单元，就理解了它后续一切选择的由来。</p>
+<h3 id="s212">解读二：位点（offset / GTID / 位移）是同步的通用语言</h3>
 <p>重点看第四行"位点语义"。三家的位点形态完全不同：</p>
 <ul><li>Redis 的 replication offset 是字节进度——粗，但够用，因为单元是字节流；</li><li>MySQL 的 GTID 是全局事务序号——细到事务级，且全局唯一，便于跨节点推理；</li><li>Kafka 的 offset + leader epoch 是位移加任期——位移描述进度，epoch 标定权威段。</li></ul>
 <p>形态不同，本质都是同一种东西：<strong>进度坐标</strong>。它们回答的都是同一个问题——"我已经处理到哪里了？"。这正是第 8.6 节要提炼的"位点是同步的通用货币"的原型：想给多份副本对齐，先给他们一把共同的尺子。</p>
-<h3 id="s216">解读三：一致性谱的位置差异</h3>
+<h3 id="s213">解读三：一致性谱的位置差异</h3>
 <p>第三行"一致性模型"展示了三家的谱位。Redis 把自己锁在 AP 一端（异步，可能丢少量写），MySQL 铺开了从 AP 到 CP 的整条谱（异步 / 半同步 / MGR），Kafka 则把谱位做成可调旋钮（acks + ISR 参数）。三种姿态反映三种产品定位：Redis 要极致延迟，MySQL 要适配从 OLTP 到金融级的不同场景，Kafka 要让使用者按消息价值自己选。每种选择都贴合自己的目标场景。</p>
-<h2 id="s217">8.6 架构启示</h2>
-<p>本章分析了 Redis、MySQL、Kafka 三家的数据同步机制。剥开具体协议和参数，下面五条启示是这三家共同印证的设计规律，它们可以迁移到你将来设计的任何一套复制系统。</p>
-<h3 id="s218">启示一：数据同步的本质是状态机复制</h3>
-<p>无论 Redis 的命令流、MySQL 的 binlog event 还是 Kafka 的消息，三家的同步都在做同一件事：让副本按相同顺序重放相同的输入序列。只要这个约束成立，副本终将一致——这是分布式复制里最底层的不变量。</p>
-<blockquote><strong>同步的本质是重放历史，而非直接传输当前状态。</strong></blockquote>
-<p>这句话点破了同步的本质：你传的不是"当前状态"，而是"导致当前状态的那串操作"。一旦换成这个视角，很多设计选择就变得自然——为什么 MySQL 把 binlog 设计成"事件流"而不是"全表镜像"？因为它在重放历史；为什么 Kafka 副本是日志拷贝而不是数据快照？因为它在重放历史。状态机复制不是某家系统的特殊技巧，它是所有正确复制系统的共同底座。</p>
-<h3 id="s219">启示二：进度坐标是同步的通用货币</h3>
-<p>三家用了完全不同形态的进度坐标——Redis 的复制偏移量（字节 offset）、MySQL 的事务位点（GTID）、Kafka 的消息位移（offset + leader epoch）——但本质上都是同一种东西：一份单调递增的、可比对的进度坐标。它解决了同步里最关键的工程问题：<strong>断点续传</strong>。没有这把坐标，副本断了就不知道从哪续；有了它，断点续传、增量同步、故障恢复都成了对齐坐标的简单操作。</p>
+<h2 id="s214">8.6 架构启示</h2>
+<p>本章分析了 Redis、MySQL、Kafka 三家的数据同步机制。以下五条启示是这三家共同印证的设计规律，可以迁移到你将来设计的任何一套复制系统。</p>
+<h3 id="s215">启示一：数据同步的本质是状态机复制</h3>
+<p>三家的同步都在做同一件事：让副本按相同顺序重放相同的输入序列。同步传输的是"导致当前状态的那串操作"，而非当前状态的快照——这是分布式复制最底层的不变量，也是 8.1 四个子问题的共同底座。</p>
+<h3 id="s216">启示二：进度坐标是同步的通用货币</h3>
+<p>三家用了完全不同形态的进度坐标——Redis 的复制偏移量（字节 offset）、MySQL 的事务位点（GTID）、Kafka 的消息位移（offset + leader epoch）——但都是同一种东西：一份单调递增的、可比对的进度坐标。它解决了同步里最关键的工程问题：<strong>断点续传</strong>。没有这把坐标，副本断了就不知道从哪续；有了它，断点续传、增量同步、故障恢复都成了对齐坐标的简单操作。</p>
 <blockquote><strong>想让多份副本对齐，先给他们一把共同的尺子。</strong></blockquote>
 <p>这把尺子要满足三个条件：单调（能比较前后）、持久（重启不丢）、唯一（跨节点不歧义）。GTID 把这三点做得最完备，是进度坐标设计的标杆；Redis 的字节偏移量和 Kafka 的位移则展示了"够用就好"的克制版本。设计自己的同步系统时，<strong>先把进度坐标想清楚</strong>，剩下的问题往往迎刃而解。</p>
-<h3 id="s220">启示三：增量同步必须先解决断点续传</h3>
+<h3 id="s217">启示三：增量同步必须先解决断点续传</h3>
 <p>全量同步是兜底手段。三家都在"怎么让断线尽量走增量"上投入了大量设计：Redis 的 PSYNC2 + backlog、MySQL 的 GTID 自动定位、Kafka 的 offset + leader epoch 截断——都是为了在断线后精准补差，避免重头来过。</p>
 <p>原因很简单：全量同步代价巨大。Redis 全量要 fork（阻塞 + 内存风险），MySQL 全量要克隆或长 binlog 回放，Kafka 全量要拷整个分区日志。频繁全量会拖垮主节点、消耗带宽、延长恢复时间。所以设计原则是：<strong>能增量就别全量</strong>，把全量降级为"实在没办法时的最后手段"。这要求你的位点设计足够鲁棒、你的缓冲窗口足够覆盖常见断线时长。</p>
-<h3 id="s221">启示四：一致性的代价是延迟的函数</h3>
-<p>一致性用延迟来交换。Redis 选了最低延迟（异步，可丢少量写）；MySQL 让你在异步到 MGR 之间选；Kafka 用 acks + ISR 参数让生产者自己选。这三家都在把同一条曲线暴露给使用者：要更强的一致性，就接受更高的延迟。</p>
-<blockquote><strong>一致性是一条可标价的连续谱。</strong></blockquote>
-<p>这条规律的价值在于它消除了"既要又要"的幻想。当你设计一套需要强一致的复制系统时，先问自己：业务能承受多少额外的确认往返？把这个延迟预算想清楚，一致性档位就自然定了。把一致性当作连续谱来定价，是成熟分布式设计的标志。</p>
-<h3 id="s222">启示五：故障恢复是同步的反向问题</h3>
+<h3 id="s218">启示四：一致性的代价是延迟的函数</h3>
+<p>Redis 选最低延迟（异步，可丢少量写），MySQL 铺开整条谱（异步到 MGR），Kafka 用 acks + ISR 做成旋钮。三家在同一条曲线上标了不同的价。设计自己的复制系统时，先问业务能承受多少额外确认往返——延迟预算定了，一致性档位自然就定了。</p>
+<h3 id="s219">启示五：故障恢复是同步的反向问题</h3>
 <p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：同一份日志、同一种位点、同一套截断规则。Redis 故障转移后副本重连走 PSYNC2 比对 offset，MySQL 新成员加入走 clone + GTID 增量，Kafka 副本恢复走 leader epoch 截断 + FETCH 追赶——都是"用同步的机制跑一遍恢复流程"。</p>
 <blockquote><strong>故障恢复是同步机制的反向应用。</strong></blockquote>
-<p>这个视角的意义是：<strong>一套设计良好的同步机制，自动也是一套设计良好的恢复机制</strong>。你不需要为恢复单独发明东西，只要保证日志可重放、位点可比对、截断有依据，恢复就水到渠成。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，故障时这些边界一定会出问题。</p>
-<h3 id="s223">反模式提醒</h3>
+<p>从这一视角看：<strong>一套设计良好的同步机制，自动也是一套设计良好的恢复机制</strong>。你不需要为恢复单独发明东西，只要保证日志可重放、位点可比对、截断有依据，恢复就水到渠成。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，故障时这些边界一定会出问题。</p>
+<h3 id="s220">反模式提醒</h3>
 <p>三个常见的反模式，都是从正面启示的反面衍生出来的：</p>
 <ul><li><strong>同步链路过深致延迟累积</strong>：Redis 链式副本拉得太长、MySQL 级联复制层级太多，末端副本读到的是几个版本前的状态。启示：控制拓扑深度，宁可主节点出口带宽多用一些，也别让延迟在链路上无限累积。</li><li><strong>位点丢失致全量重灌</strong>：backlog 太小、relay log 被清、offset 元数据损坏，都会让原本可以增量的同步退回全量。启示：把位点当作一等公民来运维，监控它的健康度。</li><li><strong>忽视脑裂致数据分叉</strong>：老 Leader 复活没被正确截断，两个副本对同一区间有不同数据。启示：必须有任期号（replid / GTID / leader epoch）这类权威标记，否则脑裂无法被检测和修复。</li></ul>
-<h2 id="s224">8.7 小结</h2>
-<p>回到导读提出的问题：数据放一份不够，多份就要让它们看起来像一份。Redis 用命令流、MySQL 用 binlog event、Kafka 用有序消息，三家给出了三种答案，但剥开外壳，里面都是同一个模型：状态机复制——保证相同输入序列、相同执行顺序，副本终将一致。</p>
+<h2 id="s221">8.7 小结</h2>
+<p>回到导读的问题：数据放一份不够，多份就要让它们看起来像一份。Redis 用命令流、MySQL 用 binlog event、Kafka 用有序消息，三家给出了三种答案，但剥开外壳，里面都是同一个模型：状态机复制——保证相同输入序列、相同执行顺序，副本终将一致。</p>
 <p>共性骨架只有四个部件：传播单元（传什么）、位点（传到哪了）、一致性旋钮（传到什么程度算数）、故障恢复（断了怎么续）。这套骨架不只能解释 Redis、MySQL、Kafka，也能解释你将来遇到的几乎任何复制系统——无论是新数据库、消息队列，还是自己设计的分布式状态服务。</p>
 <p>一致性是一条可标价的连续谱。三家把谱位做成参数和默认值，让使用者按延迟预算选择档位。理解这一点，你就从"会配置复制"升级到了"懂复制背后的权衡"。</p>
-<p>本章的状态机复制 + 位点对齐，正是第 9 章总结里全书共性规律之一（规律五）的核心印证。带着这把骨架读后面的总结，你会发现全书八章其实都在从不同侧面打磨同几条设计规律。</p><nav class="page-nav"><a href="07-storage-format.html">← 第 7 章 磁盘存储格式 — 文件结构的设计哲学</a><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道 →</a></nav></article>
+<p>本章的状态机复制 + 位点对齐，正是第 9 章总结里全书共性规律之一（规律五）的核心印证。从本章骨架出发，第 9 章会把八章的零散发现收敛成可迁移的设计规律。</p><nav class="page-nav"><a href="07-storage-format.html">← 第 7 章 磁盘存储格式 — 文件结构的设计哲学</a><a href="09-summary.html">第 9 章 万法归一 —— 架构设计的共性规律与取舍之道 →</a></nav></article>
 </main>
 </div>
 <script>

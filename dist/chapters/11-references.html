@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>附录　参考文献与延伸阅读</title>
+<title>附录　参考文献与延伸阅读（按章索引）</title>
 <style>
 *{box-sizing:border-box}
 :root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
@@ -101,44 +101,48 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </li>
 <li><a href="10-epilogue.html">后记</a>
 </li>
-<li class="active"><a href="11-references.html">附录　参考文献与延伸阅读</a>
+<li class="active"><a href="11-references.html">附录　参考文献与延伸阅读（按章索引）</a>
 <ul>
-<li class="nav-sub"><a href="#s248">一、官方文档</a></li>
-<li class="nav-sub"><a href="#s252">二、Kafka 改进提案（KIP）</a></li>
-<li class="nav-sub"><a href="#s253">三、经典论文与算法</a></li>
-<li class="nav-sub"><a href="#s254">四、推荐延伸阅读</a></li>
+<li class="nav-sub"><a href="#s244">第一章　为什么要比──比较的框架</a></li>
+<li class="nav-sub"><a href="#s245">第二章　启动与关闭──生命周期管理</a></li>
+<li class="nav-sub"><a href="#s246">第三章　内存与磁盘──速度与持久化的双人舞</a></li>
+<li class="nav-sub"><a href="#s247">第四章　分层架构──接口即契约</a></li>
+<li class="nav-sub"><a href="#s248">第五章　安全──认证、授权、加密、审计</a></li>
+<li class="nav-sub"><a href="#s249">第六章　集群──从单机到分布式</a></li>
+<li class="nav-sub"><a href="#s250">第七章　文件格式──磁盘上的架构抉择</a></li>
+<li class="nav-sub"><a href="#s251">第八章　数据同步──副本一致性的工程实现</a></li>
+<li class="nav-sub"><a href="#s252">第九章　融会贯通──模式提炼与取舍之道</a></li>
+<li class="nav-sub"><a href="#s253">综合推荐</a></li>
 </ul>
 </li>
 </ul>
 </nav>
 <main class="content">
-<article class="chapter"><h1 id="s247">附录　参考文献与延伸阅读</h1>
-<p>本书在正文中多处引用了官方文档、改进提案（KIP）、经典论文与社区资料。为便于读者按图索骥，这里按主题集中列出。版本与参数细节以官方最新文档为准——本书的分析基于 Redis 7.x、MySQL 8.0.x、Kafka 3.x，软件会持续演进，但书中的架构思想长期稳定。</p>
-<h2 id="s248">一、官方文档</h2>
-<h3 id="s249">Redis</h3>
-<ul><li>Redis 官方文档：&lt;https://redis.io/docs/&gt;</li><li>Redis 持久化（RDB / AOF / Multi-Part AOF）：&lt;https://redis.io/docs/management/persistence/&gt;</li><li>Redis 复制（Replication）与 PSYNC：&lt;https://redis.io/docs/management/replication/&gt;</li><li>Redis Cluster（槽位、Gossip、MOVED/ASK）：&lt;https://redis.io/docs/reference/cluster-spec/&gt;</li><li>Redis ACL 与安全：&lt;https://redis.io/docs/management/security/acl/&gt;</li></ul>
-<h3 id="s250">MySQL</h3>
-<ul><li>MySQL 8.0 参考手册：&lt;https://dev.mysql.com/doc/refman/8.0/en/&gt;</li><li>InnoDB 存储引擎：&lt;https://dev.mysql.com/doc/refman/8.0/en/innodb-introduction.html&gt;</li><li>二进制日志（binlog）与复制：&lt;https://dev.mysql.com/doc/refman/8.0/en/replication.html&gt;</li><li>组复制（Group Replication）：&lt;https://dev.mysql.com/doc/refman/8.0/en/group-replication.html&gt;</li><li>半同步复制：&lt;https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html&gt;</li></ul>
-<h3 id="s251">Kafka</h3>
-<ul><li>Kafka 官方文档：&lt;https://kafka.apache.org/documentation/&gt;</li><li>Kafka 设计文档（含 LinkedIn 早期设计原文）：&lt;https://kafka.apache.org/documentation/#design&gt;</li><li>KRaft 模式：&lt;https://kafka.apache.org/documentation/#kraft&gt;</li><li>Kafka 安全（SASL / TLS / ACL）：&lt;https://kafka.apache.org/documentation/#security&gt;</li></ul>
-<h2 id="s252">二、Kafka 改进提案（KIP）</h2>
-<p>正文中引用到的关键 KIP，按编号排列。每条均给出 Apache Wiki 直达页，避免读者只拿到总索引后再手工检索。</p>
-<ul><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-32%2B-%2BAdd%2Btimestamps%2Bto%2BKafka%2Bmessage">KIP-32</a></strong>：为消息增加时间戳（Kafka 0.10，消息格式 V1）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-480%3A%2BSticky%2BPartitioner">KIP-480</a></strong>：粘性分区器（Sticky Partitioner），生产者默认攒批策略。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-679%3A%2BProducer%2Bwill%2Benable%2Bthe%2Bstrongest%2Bdelivery%2Bguarantee%2Bby%2Bdefault">KIP-679</a></strong>：生产者默认 <code>acks=all</code>（Kafka 3.0 起）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-833%3A%2BMark%2BKRaft%2Bas%2BProduction%2BReady">KIP-833</a></strong>：KRaft 模式的生产可用路线与版本标记（3.3 起对新集群生产可用）。</li><li><strong><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-866%2BZooKeeper%2Bto%2BKRaft%2BMigration">KIP-866</a></strong>：既有 ZooKeeper 集群迁移到 KRaft 的工具（3.4 起逐步成熟）。</li></ul>
-<p>KIP 全文索引见：&lt;https://cwiki.apache.org/confluence/display/KAFKA/Kafka+Improvement+Proposals&gt;</p>
-<h2 id="s253">三、经典论文与算法</h2>
-<p>这些是本书多家机制背后的理论源头，正文在用到处均有标注。</p>
-<ul><li>**Lamport, L. <a href="https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf"><em>The Part-Time Parliament</em></a>（Paxos）**. 1998. —— MySQL MGR 的 XCom、Kafka KRaft 之外的另一类共识算法家族的起点。</li><li>**Ongaro, D. &amp; Ousterhout, J. <a href="https://raft.github.io/raft.pdf"><em>In Search of an Understandable Consensus Algorithm (Raft)</em></a>**. 2014. —— Kafka KRaft、Redis Sentinel 选举（Raft-like）的思想来源。</li><li>**Mohan, C. et al. <a href="https://doi.org/10.1145/128765.128770"><em>ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging</em></a>**. 1992. —— MySQL InnoDB 崩溃恢复（分析、重做、回滚三阶段）的理论基础。</li><li>**Gray, J. &amp; Reuter, A. *Transaction Processing: Concepts and Techniques***. 1993. —— 事务、WAL、两阶段提交的系统化论述。</li><li>**Morris, R. <a href="https://doi.org/10.1145/359619.359627"><em>Counting Large Numbers of Events in Small Registers</em></a>**. 1978. —— Redis LFU 用的对数近似计数器原型。</li><li>**Schneider, F. B. <a href="https://doi.org/10.1145/98163.98167"><em>Implementing Fault-Tolerant Services Using the State Machine Approach</em></a>**. 1990. —— 第 8 章"状态机复制"模型的经典表述。</li><li>**O'Neil, P. et al. <a href="https://doi.org/10.1007/s002360050048"><em>The Log-Structured Merge-Tree</em></a>**. 1996. —— 顺序日志与分层压实思想的源头（Kafka compaction、各类 LSM 引擎的共同基础）。</li></ul>
-<h2 id="s254">四、推荐延伸阅读</h2>
-<h3 id="s255">综合与数据系统</h3>
-<ul><li>**Kleppmann, M. *Designing Data-Intensive Applications***（DDIA）. O'Reilly, 2017. —— 本书反复呼应的姊妹篇，从更广的视角讨论数据系统的取舍，强烈推荐配套阅读。</li><li>**Bailis, P. et al. *Readings in Database Systems***（Red Book）. —— 数据库经典论文选读，按主题组织。</li></ul>
-<h3 id="s256">Redis</h3>
-<ul><li>**Sanfilippo, S.（antirez）*Redis 设计与实现***（博客与文档）. —— 作者本人对 Redis 设计取舍的第一手阐述。</li><li><strong>黄健宏《Redis 设计与实现》</strong>. —— 中文社区对 Redis 内部实现的清晰拆解。</li></ul>
-<h3 id="s257">MySQL</h3>
-<ul><li>**Schwartz, B. / Zaitsev, P. / Tkachenko, V. *High Performance MySQL***（第 4 版）. O'Reilly, 2022. —— MySQL 性能与架构优化的实战参考。</li><li><strong>InnoDB 引擎源码与官方文档</strong>. —— 页结构、B+ 树、redo/undo、MVCC 的一手资料。</li></ul>
-<h3 id="s258">Kafka</h3>
-<ul><li>**Kreps, J. *I Heart Logs***. O'Reilly, 2014. —— Kafka 核心贡献者对"日志即抽象"的精炼论述。</li><li>**Narkhede, N. / Kreps, J. / Rao, J. *Kafka: a Distributed Messaging System for Log Processing***. 2011. —— Kafka 最初的设计论文。</li></ul>
+<article class="chapter"><h1 id="s243">附录　参考文献与延伸阅读（按章索引）</h1>
+<p>本书正文引用大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-4 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。</p>
+<h2 id="s244">第一章　为什么要比──比较的框架</h2>
+<ul><li>**Kleppmann, M. <em>Designing Data-Intensive Applications</em>（DDIA）. O'Reilly, 2017.** —— 跨系统比较架构取舍的方法论范本，本书"同题作答"框架的直接参照，强烈推荐配套阅读。</li><li>**Kreps, J. <em>I Heart Logs</em>. O'Reilly, 2014.** —— Kafka 核心贡献者对"日志即统一抽象"的极简论述，全书核心抽象观的缩影。</li><li><strong>Sanfilippo, S.（antirez）Redis 设计与取舍（博客与文档）. redis.io.</strong> —— Redis 作者本人对"内存即数据"设计哲学的第一手阐述。</li></ul>
+<h2 id="s245">第二章　启动与关闭──生命周期管理</h2>
+<ul><li><strong>Redis 持久化文档（RDB / AOF / Multi-Part AOF）. redis.io/docs/management/persistence.</strong> —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。</li><li>**Mohan, C. et al. <em>ARIES: A Transaction Recovery Method</em>（1992）.** —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。</li><li><strong>Kafka 官方文档：Controlled Shutdown 协议. kafka.apache.org.</strong> —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</li></ul>
+<h2 id="s246">第三章　内存与磁盘──速度与持久化的双人舞</h2>
+<ul><li><strong>MySQL InnoDB 文档：Buffer Pool 与 WAL. dev.mysql.com.</strong> —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解"磁盘为真相、缓存为加速"范式的钥匙。</li><li>**O'Neil, P. et al. <em>The Log-Structured Merge-Tree</em>（1996）.** —— LSM-Tree 的理论论文，Kafka 段文件与 compaction 机制的设计源头，也是 MySQL 之外另一类存储引擎的共同基础。</li><li><strong>KIP-405: Tiered Storage in Kafka. Apache Kafka.</strong> —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。</li></ul>
+<h2 id="s247">第四章　分层架构──接口即契约</h2>
+<ul><li>**Parnas, D. L. <em>On the Criteria to Be Used in Decomposing Systems into Modules</em>（1972）.** —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。</li><li><strong>MySQL Internals Manual / Handler API 文档. dev.mysql.com.</strong> —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，见证分层灵活性的代价。</li><li><strong>Kafka 网络层文档（Acceptor / Processor / RequestChannel / Handler 模型）. kafka.apache.org.</strong> —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。</li></ul>
+<h2 id="s248">第五章　安全──认证、授权、加密、审计</h2>
+<ul><li><strong>Redis ACL 文档（6.0+）. redis.io.</strong> —— 从全局 <code>requirepass</code> 到基于命令类别与键模式细粒度 ACL 的演进设计，性能优先的安全 retrofit 案例。</li><li><strong>MySQL 安全文档（可插拔认证 / RBAC / TDE）. dev.mysql.com.</strong> —— 五级权限体系、基于系统表的 RBAC 在 8.0 的落地，以及表空间与日志加密的企业级安全分层。</li><li><strong>Kafka 安全文档（SASL / 委派令牌 / 监听器分离）. kafka.apache.org.</strong> —— SASL 认证框架 + 委派令牌解决多跳身份传播、分层信任监听器适配不同网络域的分布式安全模式。</li></ul>
+<h2 id="s249">第六章　集群──从单机到分布式</h2>
+<ul><li><strong>Redis Cluster 规范（antirez）. redis.io/topics/cluster-spec.</strong> —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。</li><li><strong>MySQL 组复制（MGR）与 XCom 文档. dev.mysql.com.</strong> —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。</li><li><strong>KIP-833: Mark KRaft as Production Ready. Apache Kafka.</strong> —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级到百万级的核心支撑。</li><li>**Gilbert, S. &amp; Lynch, N. <em>Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services</em>（2002）.** —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。</li></ul>
+<h2 id="s250">第七章　文件格式──磁盘上的架构抉择</h2>
+<ul><li><strong>KIP-98: Exactly Once Delivery and Transactional Messaging. Apache Kafka.</strong> —— RecordBatch V2 格式规范：批量元数据共享、偏移量和时间戳增量编码、ProducerId/ProducerEpoch 内嵌支持幂等与事务，Kafka 存储格式的里程碑。</li><li><strong>MySQL InnoDB 页结构文档. dev.mysql.com.</strong> —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。</li><li><strong>Redis RDB 格式文档与 RESP 协议规范. redis.io.</strong> —— 变长整数编码（SELECTOR 位标记 6/14/32 位长度）、CRC64 校验与 RESP 协议即文件格式的设计，快照范式文件结构的典型范例。</li></ul>
+<h2 id="s251">第八章　数据同步──副本一致性的工程实现</h2>
+<ul><li><strong>KIP-101: Replication Protocol Revamp / KIP-320: Leader Epochs. Apache Kafka.</strong> —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。</li><li><strong>Redis 复制与 PSYNC2 文档. redis.io.</strong> —— replid/replid2 双标识符、复制偏移量与环形积压缓冲区实现部分重同步的官方描述，PSYNC2 使故障转移后仍可增量同步。</li><li><strong>MySQL GTID 与 binlog 复制文档. dev.mysql.com.</strong> —— GTID（<code>source_id:transaction_id</code>）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。</li><li>**Lamport, L. <em>Time, Clocks, and the Ordering of Events in a Distributed System</em>（1978）.** —— 逻辑时钟与 happen-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。</li></ul>
+<h2 id="s252">第九章　融会贯通──模式提炼与取舍之道</h2>
+<ul><li>**Kleppmann, M. <em>Designing Data-Intensive Applications</em>（DDIA）. O'Reilly, 2017.** —— 贯穿全书的姊妹篇，更广视角的数据系统取舍论述，本章五大架构法则的上位参照。</li><li>**Gilbert, S. &amp; Lynch, N. <em>Brewer's Conjecture...</em>（2002）.** —— CAP 定理的形式化证明，本章"一致 vs 可用"这一永恒取舍维度的理论基础。</li><li>**Gray, J. &amp; Reuter, A. <em>Transaction Processing: Concepts and Techniques</em>（1993）.** —— 事务、WAL、两阶段提交、恢复语义的系统化集大成著作，"性能买可靠性"原则的经典源头。</li></ul>
 <hr>
-<blockquote>一点阅读建议：官方文档适合查证参数与版本细节，论文适合理解"为什么这么设计"，而像 DDIA 这样的综合书适合建立跨系统的坐标系。本书的目标是后者——不是替代上述任何一份资料，而是为读懂它们提供一副统一的眼镜。</blockquote><nav class="page-nav"><a href="10-epilogue.html">← 后记</a><span class="empty"></span></nav></article>
+<h2 id="s253">综合推荐</h2>
+<ul><li>**Kleppmann, M. <em>Designing Data-Intensive Applications</em>（DDIA）. O'Reilly, 2017.** —— 跨系统架构取舍的最佳入门，本书反复呼应的核心参照。</li><li>**Kreps, J. <em>I Heart Logs</em>. O'Reilly, 2014.** —— "日志即抽象"的精炼论述，适合快速建立数据系统统一视角。</li><li>**Bailis, P. et al. <em>Readings in Database Systems</em>（Red Book）.** —— 数据库经典论文按主题组织的导读索引，适合有论文阅读需求的读者。</li><li>**Schwartz, B. / Zaitsev, P. / Tkachenko, V. <em>High Performance MySQL</em>（4th ed.）. O'Reilly, 2022.** —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。</li><li>**Narkhede, N. / Kreps, J. / Rao, J. <em>Kafka: a Distributed Messaging System for Log Processing</em>（2011）.** —— Kafka 原始设计论文，首发于 NetDB 2011，十余年后核心架构依然忠实于此文。</li></ul>
+<hr>
+<blockquote>一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的幕后背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的坐标系。本书的目标不是替代上述任何资料——而是为读懂它们，提供一副统一的眼镜。</blockquote><nav class="page-nav"><a href="10-epilogue.html">← 后记</a><span class="empty"></span></nav></article>
 </main>
 </div>
 <script>
