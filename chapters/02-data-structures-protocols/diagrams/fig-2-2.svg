@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <text x="440" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-2 Kafka RecordBatch V2 字段布局</text>
+  <text x="440" y="50" text-anchor="middle" font-size="12" fill="#6B7280">KIP-98（0.11 引入），Magic = 2，Batch 级元数据 + 记录级差值编码</text>
+
+  <!-- Outer batch box -->
+  <rect x="40" y="70" width="800" height="420" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
+
+  <!-- Batch-level header fields -->
+  <rect x="60" y="110" width="180" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="150" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">baseOffset</text>
+  <text x="150" y="153" text-anchor="middle" font-size="10" fill="#6B7280">8B · 起始位移</text>
+
+  <rect x="250" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="310" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">batchLength</text>
+  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 总字节长</text>
+
+  <rect x="380" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="440" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">leaderEpoch</text>
+  <text x="440" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 任期号</text>
+
+  <rect x="510" y="110" width="80" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="550" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">magic</text>
+  <text x="550" y="153" text-anchor="middle" font-size="10" fill="#6B7280">1B·=2</text>
+
+  <rect x="600" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="660" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">CRC</text>
+  <text x="660" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · Batch 级</text>
+
+  <rect x="730" y="110" width="90" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="775" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">attributes</text>
+  <text x="775" y="153" text-anchor="middle" font-size="10" fill="#6B7280">2B · 压缩/TS</text>
+
+  <!-- Row 2: timestamp + delta fields -->
+  <rect x="60" y="175" width="200" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="160" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">baseTimestamp</text>
+  <text x="160" y="218" text-anchor="middle" font-size="10" fill="#6B7280">8B · 批最早时间戳</text>
+
+  <rect x="270" y="175" width="200" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="370" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">maxTimestamp</text>
+  <text x="370" y="218" text-anchor="middle" font-size="10" fill="#6B7280">8B · 批最晚时间戳</text>
+
+  <rect x="480" y="175" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="540" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">lastOffsetDelta</text>
+  <text x="540" y="218" text-anchor="middle" font-size="10" fill="#6B7280">4B · 末条偏移差</text>
+
+  <rect x="610" y="175" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="670" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">recordsCount</text>
+  <text x="670" y="218" text-anchor="middle" font-size="10" fill="#6B7280">4B · 记录数</text>
+
+  <!-- Row 3: Producer state (idempotent/transaction) -->
+  <rect x="60" y="240" width="160" height="55" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="140" y="263" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">producerId</text>
+  <text x="140" y="283" text-anchor="middle" font-size="10" fill="#6B7280">8B · 幂等/事务</text>
+
+  <rect x="230" y="240" width="130" height="55" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="295" y="263" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">producerEpoch</text>
+  <text x="295" y="283" text-anchor="middle" font-size="10" fill="#6B7280">2B · 任期</text>
+
+  <rect x="370" y="240" width="150" height="55" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="445" y="263" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">baseSequence</text>
+  <text x="445" y="283" text-anchor="middle" font-size="10" fill="#6B7280">4B · 首条序号</text>
+
+  <!-- Records body -->
+  <rect x="60" y="315" width="760" height="60" rx="6" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="440" y="340" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">Record 1 ... Record N（记录体）</text>
+  <text x="440" y="362" text-anchor="middle" font-size="11" fill="#374151">每条记录：length + attributes + timestampDelta + offsetDelta + key + value + headers</text>
+
+  <!-- Key insight box -->
+  <rect x="60" y="395" width="760" height="80" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <text x="440" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
+  <text x="440" y="440" text-anchor="middle" font-size="12" fill="#374151">Batch 头部约 61 字节（固定开销）· 每条记录 timestamp/offset 只存差值（省空间）</text>
+  <text x="440" y="458" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 3–10×）</text>
+  <text x="440" y="474" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 把批量、压缩、差分编码、幂等支持折进同一个格式</text>
+
+  <!-- V0→V1→V2 evolution note -->
+  <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+  <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">V0→V1：引入时间戳（8B/条，元数据膨胀）| V1→V2：Batch 级元数据 + 差值编码（消除每条独立的 offset/ts/CRC 冗余）</text>
+  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代精准针对上一代最贵的操作做手术——格式演进就是如此</text>
+
+  <!-- Producer/Consumer arrows -->
+  <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>
+  <line x1="55" y1="355" x2="55" y2="325" stroke="#4F46E5" stroke-width="1.2"/>
+  <text x="820" y="320" font-size="11" fill="#4F46E5">消费者</text>
+  <line x1="825" y1="325" x2="825" y2="355" stroke="#4F46E5" stroke-width="1.2"/>
+  <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-2　RecordBatch V2 字段布局</text>
+</svg>

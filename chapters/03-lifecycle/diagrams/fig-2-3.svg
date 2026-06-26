@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrowEm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-3　Redis 关闭流程</text>
+
+  <!-- Trigger box -->
+  <rect x="300" y="64" width="280" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="440" y="90" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">关闭触发</text>
+  <text x="316" y="112" font-size="12" fill="#374151">SHUTDOWN 命令　·　SIGTERM / SIGINT　·　守护条件</text>
+  <text x="316" y="128" font-size="12" fill="#374151">（内存超限 / 被父进程监视退出）</text>
+
+  <!-- arrow down -->
+  <path d="M440 138 L440 162" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 1: 子进程判定 (decision diamond -> rect) -->
+  <rect x="300" y="166" width="280" height="76" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
+  <text x="316" y="214" font-size="12" fill="#374151">是 → 等待其完成，或杀掉子进程</text>
+  <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
+
+  <path d="M440 246 L440 270" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 2: SAVE / NOSAVE branch -->
+  <rect x="160" y="274" width="240" height="86" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="280" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">②a SHUTDOWN SAVE</text>
+  <text x="176" y="322" font-size="12" fill="#374151">触发 SAVE 同步落盘</text>
+  <text x="176" y="340" font-size="12" fill="#374151">适用：Redis 当主存用</text>
+
+  <rect x="480" y="274" width="240" height="86" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="600" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">②b SHUTDOWN NOSAVE</text>
+  <text x="496" y="322" font-size="12" fill="#374151">不落盘，直接进入释放</text>
+  <text x="496" y="340" font-size="12" fill="#374151">适用：Redis 当缓存用（秒退）</text>
+
+  <!-- branch arrows from step1 -->
+  <path d="M380 246 C 320 256, 280 260, 280 272" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M500 246 C 560 256, 600 260, 600 272" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 3: 刷 AOF 缓冲 -->
+  <rect x="300" y="390" width="280" height="60" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="440" y="416" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 刷 AOF 缓冲</text>
+  <text x="316" y="438" font-size="12" fill="#374151">把内存里尚未落盘的追加命令 flush 出去</text>
+
+  <!-- merge arrows into step 3 -->
+  <path d="M280 362 C 280 376, 380 378, 380 388" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M600 362 C 600 376, 500 378, 500 388" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <path d="M440 452 L440 476" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 4: 关客户端连接 -->
+  <rect x="300" y="480" width="280" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="440" y="506" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">④ 关闭所有客户端连接</text>
+  <text x="316" y="526" font-size="12" fill="#374151">通知对端、释放连接资源</text>
+
+  <path d="M440 538 L440 562" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Step 5: 释放 + exit -->
+  <rect x="300" y="566" width="280" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="440" y="592" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">⑤ 释放资源 → exit()</text>
+  <text x="316" y="612" font-size="12" fill="#374151">交还文件锁、内存、进程身份</text>
+
+  <!-- Side annotation -->
+  <rect x="40" y="274" width="100" height="280" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="90" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">关键取舍</text>
+  <text x="50" y="328" font-size="12" fill="#374151">“存不存数据”</text>
+  <text x="50" y="346" font-size="12" fill="#374151">的决定权交给用户</text>
+  <text x="50" y="384" font-size="12" fill="#374151">包容缓存 / 主存</text>
+  <text x="50" y="402" font-size="12" fill="#374151">的双重定位</text>
+  <text x="50" y="440" font-size="12" fill="#374151">“配置即承诺”</text>
+  <text x="50" y="458" font-size="12" fill="#374151">——不替你假设</text>
+  <text x="50" y="476" font-size="12" fill="#374151">你是缓存还是主存</text>
+
+  <rect x="740" y="390" width="100" height="232" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="790" y="416" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">履约顺序</text>
+  <text x="752" y="444" font-size="12" fill="#374151">先清子进程</text>
+  <text x="752" y="472" font-size="12" fill="#374151">再决定落盘</text>
+  <text x="752" y="500" font-size="12" fill="#374151">刷缓冲</text>
+  <text x="752" y="528" font-size="12" fill="#374151">关连接</text>
+  <text x="752" y="556" font-size="12" fill="#374151">释放退出</text>
+  <text x="752" y="592" font-size="12" fill="#EF4444">数据先于</text>
+  <text x="752" y="610" font-size="12" fill="#EF4444">连接先于身份</text>
+</svg>

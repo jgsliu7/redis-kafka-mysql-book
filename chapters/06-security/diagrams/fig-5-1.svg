@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-1　一次请求链路上的安全四维分工</text>
+  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#374151">从客户端发起请求到数据落盘，认证 / 授权 / 加密 / 审计各负责哪一段</text>
+
+  <!-- Horizontal pipeline (y=180 baseline) -->
+  <!-- Stage 1: 客户端 -->
+  <rect x="40" y="150" width="90" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="85" y="184" text-anchor="middle" font-size="14" fill="#111827">客户端</text>
+  <text x="85" y="202" text-anchor="middle" font-size="11" fill="#374151">发起请求</text>
+
+  <!-- arrow -->
+  <line x1="130" y1="180" x2="168" y2="180" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <!-- Stage 2: 传输加密 TLS -->
+  <rect x="170" y="150" width="110" height="60" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="225" y="178" text-anchor="middle" font-size="14" fill="#111827" font-weight="600">传输加密</text>
+  <text x="225" y="196" text-anchor="middle" font-size="11" fill="#374151">TLS 隧道</text>
+
+  <!-- arrow -->
+  <line x1="280" y1="180" x2="318" y2="180" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <!-- Stage 3: 认证 -->
+  <rect x="320" y="150" width="110" height="60" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="375" y="178" text-anchor="middle" font-size="14" fill="#111827" font-weight="600">认证</text>
+  <text x="375" y="196" text-anchor="middle" font-size="11" fill="#374151">"你是谁"</text>
+
+  <!-- arrow -->
+  <line x1="430" y1="180" x2="468" y2="180" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <!-- Stage 4: 授权 -->
+  <rect x="470" y="150" width="110" height="60" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="525" y="178" text-anchor="middle" font-size="14" fill="#111827" font-weight="600">授权</text>
+  <text x="525" y="196" text-anchor="middle" font-size="11" fill="#374151">"你能做什么"</text>
+
+  <!-- arrow -->
+  <line x1="580" y1="180" x2="618" y2="180" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <!-- Stage 5: 操作执行 -->
+  <rect x="620" y="150" width="90" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="665" y="184" text-anchor="middle" font-size="14" fill="#111827">执行</text>
+  <text x="665" y="202" text-anchor="middle" font-size="11" fill="#374151">命令/SQL</text>
+
+  <!-- arrow down -->
+  <line x1="665" y1="210" x2="665" y2="248" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 6: 存储加密 -->
+  <rect x="610" y="250" width="110" height="60" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="665" y="278" text-anchor="middle" font-size="14" fill="#111827" font-weight="600">存储加密</text>
+  <text x="665" y="296" text-anchor="middle" font-size="11" fill="#374151">TDE / 落盘</text>
+
+  <!-- arrow down to disk -->
+  <line x1="665" y1="310" x2="665" y2="348" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- disk -->
+  <ellipse cx="665" cy="368" rx="50" ry="14" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="665" y="372" text-anchor="middle" font-size="13" fill="#111827">磁盘</text>
+
+  <!-- Audit banner (right side, vertical emphasis covering whole pipeline) -->
+  <rect x="760" y="120" width="90" height="280" rx="6" fill="#FFF7ED" stroke="#D97706" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="805" y="150" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">审计</text>
+  <text x="805" y="170" text-anchor="middle" font-size="11" fill="#92400E">Audit</text>
+  <line x1="775" y1="182" x2="835" y2="182" stroke="#D97706" stroke-width="1"/>
+  <text x="805" y="204" text-anchor="middle" font-size="11" fill="#92400E">事后</text>
+  <text x="805" y="222" text-anchor="middle" font-size="11" fill="#92400E">可追溯</text>
+  <text x="805" y="246" text-anchor="middle" font-size="11" fill="#92400E">记录：</text>
+  <text x="805" y="264" text-anchor="middle" font-size="10" fill="#92400E">谁</text>
+  <text x="805" y="280" text-anchor="middle" font-size="10" fill="#92400E">何时</text>
+  <text x="805" y="296" text-anchor="middle" font-size="10" fill="#92400E">做了什么</text>
+  <text x="805" y="332" text-anchor="middle" font-size="10" fill="#92400E">贯穿全链路</text>
+  <text x="805" y="348" text-anchor="middle" font-size="10" fill="#92400E">的旁路记录</text>
+
+  <!-- Audit arrows from pipeline to audit box (dashed) -->
+  <line x1="720" y1="180" x2="758" y2="180" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <line x1="720" y1="280" x2="758" y2="280" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+
+  <!-- Legend / four-dimension labels under pipeline -->
+  <g transform="translate(40, 410)">
+    <rect x="0" y="0" width="14" height="14" rx="2" fill="#FEE2E2" stroke="#EF4444"/>
+    <text x="20" y="12" font-size="11" fill="#374151">加密 + 认证 + 授权（链路主路径）</text>
+
+    <rect x="280" y="0" width="14" height="14" rx="2" fill="#FFF7ED" stroke="#D97706"/>
+    <text x="300" y="12" font-size="11" fill="#374151">审计（旁路记录，贯穿全程）</text>
+
+    <rect x="520" y="0" width="14" height="14" rx="2" fill="#F3F4F6" stroke="#6B7280"/>
+    <text x="540" y="12" font-size="11" fill="#374151">中性节点（客户端 / 执行 / 磁盘）</text>
+  </g>
+
+  <!-- Bracket annotation: 数据流方向 -->
+  <text x="225" y="138" text-anchor="middle" font-size="10" fill="#EF4444" font-weight="600">数据流方向 →</text>
+</svg>

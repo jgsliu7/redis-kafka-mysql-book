@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrowEm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 3-2　Redis 启动四段式时序</text>
+
+  <!-- Stage 1: 配置 -->
+  <rect x="60" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="180" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① 配置：默认值 + 覆盖</text>
+  <text x="76" y="120" font-size="12" fill="#374151">initServerConfig 设默认端口</text>
+  <text x="76" y="138" font-size="12" fill="#374151">读配置文件 → 命令行覆盖</text>
+  <text x="76" y="156" font-size="12" fill="#374151">取舍：先默认值再逐层覆盖</text>
+
+  <!-- Stage 2: 基础设施 -->
+  <rect x="330" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="450" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">② 基础设施就位</text>
+  <text x="346" y="120" font-size="12" fill="#374151">注册信号处理器</text>
+  <text x="346" y="138" font-size="12" fill="#374151">创建事件循环 aeCreateEventLoop</text>
+  <text x="346" y="156" font-size="12" fill="#374151">预分配数据库数组（不懒加载）</text>
+
+  <!-- Stage 3: 数据恢复 -->
+  <rect x="600" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="720" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 数据恢复（AOF 优先）</text>
+  <text x="616" y="120" font-size="12" fill="#374151">AOF 开启且存在？</text>
+  <text x="616" y="138" font-size="12" fill="#374151">是 → 加载 AOF（base=RDB + incr 重放）</text>
+  <text x="616" y="156" font-size="12" fill="#374151">否 → 加载 RDB（二进制快照）</text>
+
+  <!-- arrows between top row -->
+  <path d="M300 118 L328 118" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M570 118 L598 118" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: 事件循环 -->
+  <rect x="330" y="240" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="450" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">④ 进入事件循环 aeMain</text>
+  <text x="346" y="290" font-size="12" fill="#374151">此刻 Redis 才算“可服务”</text>
+  <text x="346" y="308" font-size="12" fill="#374151">打印 “Ready to accept connections”</text>
+  <text x="346" y="326" font-size="12" fill="#374151">这是状态机就绪的外显里程碑</text>
+
+  <!-- arrow from stage 3 down to stage 4 -->
+  <path d="M720 170 C 720 210, 450 210, 450 238" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- AOF/RDB branch detail box -->
+  <rect x="60" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="180" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">AOF / RDB 取舍</text>
+  <text x="76" y="290" font-size="12" fill="#374151">AOF：base(RDB) + incr，更完整</text>
+  <text x="76" y="308" font-size="12" fill="#374151">RDB：单点快照，只到上次快照点</text>
+  <text x="76" y="326" font-size="12" fill="#374151">优先级体现“完整 &gt; 快”</text>
+
+  <!-- right detail: 启动确定性 -->
+  <rect x="600" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="720" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动确定性取舍</text>
+  <text x="616" y="290" font-size="12" fill="#374151">预分配换取运行期内存确定性</text>
+  <text x="616" y="308" font-size="12" fill="#374151">代价：启动即占基线内存</text>
+  <text x="616" y="326" font-size="12" fill="#374151">Redis 选“确定”弃“零内存启动”</text>
+
+  <!-- bottom note -->
+  <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">信号即协议（Unix 服务经典范式）</text>
+  <text x="80" y="432" font-size="12.5" fill="#374151">SIGTERM / SIGINT　→　触发优雅关闭（不是立即终止）</text>
+  <text x="80" y="452" font-size="12.5" fill="#374151">SIGPIPE　　　　　→　忽略（避免写已关闭连接导致进程被杀）</text>
+  <text x="80" y="472" font-size="12.5" fill="#374151">SIGCHLD　　　　　→　回收 RDB / AOF 子进程</text>
+  <text x="80" y="500" font-size="12.5" fill="#374151">Redis 把信号当作“操作系统请求我优雅退出”的协商，而非被暴力杀死。</text>
+  <text x="80" y="524" font-size="12.5" fill="#374151">启动整体顺序：配置 → 基础设施 → 数据恢复 → 事件循环（依赖先行）。</text>
+</svg>

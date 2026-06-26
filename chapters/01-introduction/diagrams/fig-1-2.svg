@@ -25,21 +25,21 @@
   <!-- ============ 主体：第 2 - 4 章（生命周期 / 内存与磁盘 / 分层） ============ -->
   <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　从"生到死"到"骨架"</text>
 
-  <!-- 第 2 章 生命周期 -->
+  <!-- 第 3 章 生命周期 -->
   <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="56" y="218" font-size="14" font-weight="700" fill="#111827">第 2 章　生命周期管理</text>
+  <text x="56" y="218" font-size="14" font-weight="700" fill="#111827">第 3 章　生命周期管理</text>
   <text x="56" y="238" font-size="12" fill="#374151">核心问题：进程怎么优雅地启动与关闭？</text>
   <text x="56" y="258" font-size="11.5" fill="#6B7280">信号处理 · 初始化顺序 · 优雅停机</text>
 
-  <!-- 第 3 章 内存与磁盘 -->
+  <!-- 第 4 章 内存与磁盘 -->
   <rect x="340" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="356" y="218" font-size="14" font-weight="700" fill="#111827">第 3 章　内存与磁盘的舞蹈</text>
+  <text x="356" y="218" font-size="14" font-weight="700" fill="#111827">第 4 章　内存与磁盘的舞蹈</text>
   <text x="356" y="238" font-size="12" fill="#374151">核心问题：数据放哪？怎么不丢？</text>
   <text x="356" y="258" font-size="11.5" fill="#6B7280">缓冲池 · 页缓存 · WAL · 零拷贝</text>
 
-  <!-- 第 4 章 分层架构 -->
+  <!-- 第 5 章 分层架构 -->
   <rect x="640" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="656" y="218" font-size="14" font-weight="700" fill="#111827">第 4 章　分层架构</text>
+  <text x="656" y="218" font-size="14" font-weight="700" fill="#111827">第 5 章　分层架构</text>
   <text x="656" y="238" font-size="12" fill="#374151">核心问题：模块怎么切、层怎么叠？</text>
   <text x="656" y="258" font-size="11.5" fill="#6B7280">接口 / 引擎 / 存储的层次划分</text>
 
@@ -53,21 +53,21 @@
   <!-- ============ 主体：第 5 - 7 章（安全 / 集群与高可用 / 存储格式） ============ -->
   <text x="40" y="324" font-size="13" font-weight="600" fill="#374151">第二组　从"安全"到"规模化"到"落盘细节"</text>
 
-  <!-- 第 5 章 安全与权限 -->
+  <!-- 第 6 章 安全与权限 -->
   <rect x="40" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="56" y="360" font-size="14" font-weight="700" fill="#111827">第 5 章　安全与权限</text>
+  <text x="56" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全与权限</text>
   <text x="56" y="380" font-size="12" fill="#374151">核心问题：谁能访问、能做什么？</text>
   <text x="56" y="400" font-size="11.5" fill="#6B7280">认证 · ACL · 加密 · 审计</text>
 
-  <!-- 第 6 章 集群与高可用 -->
+  <!-- 第 7 章 集群与高可用 -->
   <rect x="340" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　集群与高可用</text>
+  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群与高可用</text>
   <text x="356" y="380" font-size="12" fill="#374151">核心问题：单点挂了怎么办？</text>
   <text x="356" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障切换</text>
 
-  <!-- 第 7 章 存储格式 -->
+  <!-- 第 8 章 存储格式 -->
   <rect x="640" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　存储格式</text>
+  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 8 章　存储格式</text>
   <text x="656" y="380" font-size="12" fill="#374151">核心问题：数据在磁盘上长什么样？</text>
   <text x="656" y="400" font-size="11.5" fill="#6B7280">页 · B+ 树 · 日志段 · 压实</text>
 
@@ -78,22 +78,22 @@
   <!-- 第二组 → 第三组 -->
   <line x1="480" y1="412" x2="480" y2="442" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- ============ 主体：第 8 章 数据同步 ============ -->
+  <!-- ============ 主体：第 9 章 数据同步 ============ -->
   <text x="40" y="466" font-size="13" font-weight="600" fill="#374151">第三组　把数据"搬"起来：复制与一致性</text>
 
-  <!-- 第 8 章 数据同步 -->
+  <!-- 第 9 章 数据同步 -->
   <rect x="340" y="478" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="356" y="502" font-size="14" font-weight="700" fill="#111827">第 8 章　数据同步</text>
+  <text x="356" y="502" font-size="14" font-weight="700" fill="#111827">第 9 章　数据同步</text>
   <text x="356" y="522" font-size="12" fill="#374151">核心问题：多副本间数据怎么保持一致？</text>
   <text x="356" y="542" font-size="11.5" fill="#6B7280">复制 · 二进制日志 · ISR · 一致性级别</text>
 
-  <!-- 第 8 章 → 第 9 章 -->
+  <!-- 第 9 章 → 第 10 章 -->
   <line x1="480" y1="554" x2="480" y2="590" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-end)"/>
   <text x="492" y="576" font-size="11.5" fill="#EF4444">共性升华</text>
 
-  <!-- ============ 终点：第 9 章 总结 ============ -->
+  <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
-  <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 9 章 · 总结</text>
+  <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
   <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">八章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把七章实现提炼成可复用的架构认知</text>
 

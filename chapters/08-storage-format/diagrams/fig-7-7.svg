@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-7　存储格式设计决策树</text>
+  <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">从访问模式三问，推到格式骨架选型——存储格式是访问模式的镜像</text>
+
+  <!-- ============ root ============ -->
+  <rect x="320" y="80" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="470" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
+  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">先回答三个判断题，再选骨架</text>
+
+  <!-- ============ Q1 ============ -->
+  <polygon points="470,170 620,220 470,270 320,220" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="470" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">Q1：数据会被原地改吗？</text>
+  <text x="470" y="228" text-anchor="middle" font-size="10" fill="#374151">（决定定长页 vs 追加日志）</text>
+
+  <line x1="470" y1="136" x2="470" y2="170" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Q1 branches -->
+  <!-- YES (in-place) → page -->
+  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="270" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
+
+  <!-- NO (append) -->
+  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="670" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否（追加）</text>
+
+  <!-- ============ Q2 left (page family) ============ -->
+  <polygon points="140,310 250,350 140,390 30,350" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="140" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">Q2：随机定位要快？</text>
+  <text x="140" y="362" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
+
+  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- page result -->
+  <line x1="140" y1="390" x2="140" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="30" y="430" width="220" height="80" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="140" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">页式范式（MySQL）</text>
+  <text x="140" y="475" text-anchor="middle" font-size="10" fill="#374151">16KB 定长页 · B+ 树</text>
+  <text x="140" y="491" text-anchor="middle" font-size="10" fill="#374151">原地改 + WAL + 双写</text>
+  <text x="140" y="505" text-anchor="middle" font-size="10" fill="#374151">页内 Page Directory 稀疏槽</text>
+
+  <!-- ============ Q2 right (append family) ============ -->
+  <polygon points="800,310 910,350 800,390 690,350" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="800" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Q3：批量流式进出？</text>
+  <text x="800" y="362" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
+
+  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Q3 branches -->
+  <!-- YES → log -->
+  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="655" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
+
+  <!-- NO → snapshot -->
+  <line x1="910" y1="350" x2="900" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="920" y="395" font-size="11" font-weight="700" fill="#374151">否</text>
+
+  <!-- log result (Kafka) -->
+  <rect x="380" y="430" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="500" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
+  <text x="500" y="475" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
+  <text x="500" y="491" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
+  <text x="500" y="505" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
+
+  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- snapshot result (Redis) -->
+  <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
+  <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
+  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是家，磁盘是保险</text>
+  <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
+
+  <!-- ============ bottom: 5th question reminder ============ -->
+  <rect x="40" y="540" width="860" height="100" rx="8" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="60" y="566" font-size="13" font-weight="700" fill="#EF4444">通用的第三问（适用于所有路径）：我的格式五年后还能被新代码读懂吗？</text>
+  <text x="60" y="588" font-size="11" fill="#374151">→ 预留版本号 / Magic / 编码切换位（ziplist→listpack、V1→V2、页类型位）。</text>
+  <text x="60" y="608" font-size="11" fill="#374151">→ 存储格式要为“五年后还要读今天的文件”设计，而不是为“今天能写就行”设计。</text>
+  <text x="60" y="628" font-size="11" font-weight="700" fill="#EF4444">箴言：存储格式是访问模式的镜像——骨架几乎是被读写约束推着长出来的。</text>
+</svg>
