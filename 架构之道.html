@@ -722,12 +722,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <section class="chapter" id="ch2"><h1 id="s24">第 2 章 数据结构与协议 —— 为各自的目标而设计</h1>
 <h2 id="s25">本章导读</h2>
 <p>三个系统，三种核心目标。Redis 要极致的延迟——每条命令微秒级返回。MySQL 要通用可靠——随便怎么查、随便怎么改，数据不能错。Kafka 要海量吞吐——每秒几十万条消息，顺序写入、批量发出。</p>
-<p>目标不同，盖楼用的砖和说的话，自然也不同。这一章不讲怎么用这些数据结构写业务代码，而是追问一个根问题：<strong>每个系统为了自己的核心目标，选了什么样的砖块（内部数据结构）、说了什么样的话（通信协议）？</strong> 砖块决定了它能做什么、不能做什么；协议决定了客户端和服务端怎么互相理解。读完这一章，你不会只记得"Redis 有跳表、Kafka 有 RecordBatch"，而是能看出来——每种数据结构都在偏爱某一种访问模式、每一种协议都在为某一种目标优化。这正是后面七章的起点：内存怎么管、磁盘怎么摆、副本怎么传——每一层的设计都在这些砖块上盖房子。</p>
+<p>目标不同，盖楼用的砖和说的话，自然也不同。这一章只问一个问题：<strong>每个系统为了自己的核心目标，选了什么样的砖块（内部数据结构）、说了什么样的话（通信协议）？</strong> 砖块决定了它能做什么、不能做什么；协议决定了客户端和服务端怎么互相理解。读完这一章，记住的不该只是"Redis 有跳表、Kafka 有 RecordBatch"——更能看出来，每种数据结构都在偏爱某一种访问模式、每一种协议都在为某一种目标优化。这正是后面七章的起点：内存怎么管、磁盘怎么摆、副本怎么传——每一层的设计都在这些砖块上盖房子。</p>
 <h2 id="s26">2.1 问题的本质</h2>
 <p>任何一个有客户端和服务端的软件，都要做两个最基础的决定。</p>
 <p>第一，数据在内部怎么表示。这个决定直接框定了操作复杂度、内存开销、以及"哪些查询快、哪些查询慢"。数据结构不是中性的——它天生偏爱某些访问模式、惩罚另一些。跳表偏范围扫描和有序操作，哈希表偏 O(1) 点查，B+ 树偏磁盘页对齐和范围扫描，紧凑列表偏内存密度和批量加载。</p>
 <p>第二，客户端和服务端怎么对话。是发纯文本还是紧凑二进制？是每条消息独立处理还是批量打包？协议是固定的还是带版本号可演进的？这三个问题对应三个张力——简单 vs 效率、可读 vs 紧凑、固定 vs 可演进。</p>
-<p>三家给出了三组完全不同的答案，各自的答案都由核心目标倒推出来。</p>
+<p>三个软件用了三套完全不同的方法，每一套都从自己的核心目标倒推出来。</p>
 <p>对 Redis 来说，核心目标是<strong>极低延迟</strong>。所以它的数据结构全部活在内存里，操作复杂度 O(1) 到 O(log N)，内存紧凑是第二考量。协议选了纯文本 RESP，调试时人眼就能读，服务端解析几乎不费 CPU——性能与可读性一把抓。</p>
 <p>对 MySQL 来说，核心目标是<strong>通用可靠</strong>。它要支持任意 SQL、事务 ACID、磁盘持久化，所以它的核心数据结构 B+ 树必须对齐磁盘的 16KB 页——让一次磁盘 IO 读到的每一字节都有用。协议选了紧凑二进制，因为多取一行、多传一个字段在 OLTP 场景下积少成多，且预编译语句能让 SQL 解析只做一次。</p>
 <p>对 Kafka 来说，核心目标是<strong>高吞吐</strong>。所以它的核心数据结构 RecordBatch 把多条消息打成一个包——压缩、传输、落盘都以 Batch 为单位，把"批量化"写进了格式本身。协议选了带版本号的请求/响应模型——统一头部 + 逐 API 版本化，让不同版本客户端可以和同一个 Broker 对话，"演进"变成了协议的一等公民。</p>
@@ -904,7 +904,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 2-2 Kafka RecordBatch V2 字段布局</figcaption></figure>
 <p>图 2-2　Kafka RecordBatch V2 字段布局：Batch 级头部存 BaseOffset/BatchLength/CRC/Producer 状态，记录级字段只存差值——批量压缩、差分编码、单 CRC 校验，全部为吞吐服务。</p>
-<p>这套设计的取舍极其清楚的：批量让压缩在相似消息聚集时达到 3-10 倍（zstd），差值编码让每条记录元数据开销降到个位数字节，Batch 级 CRC 省了逐条校验的 CPU，<code>magic</code> 让格式版本自描述、新旧格式可共存。代价同样明确：消费必须按 Batch 边界来，随机按 key 点查完全做不到——但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，所以 Batch 不是限制，而是对访问模式的精准匹配。</p>
+<p>这套设计的取舍极其清楚的：批量让压缩在相似消息聚集时达到 3-10 倍（zstd），差值编码让每条记录元数据开销降到个位数字节，Batch 级 CRC 省了逐条校验的 CPU，<code>magic</code> 让格式版本自描述、新旧格式可共存。代价同样明确：消费必须按 Batch 边界来，随机按 key 点查完全做不到——但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，所以 Batch 不是限制——它恰恰是对访问模式的精准匹配。</p>
 <h2 id="s31">2.3 通信协议：客户端和服务端怎么对话</h2>
 <h3 id="s32">2.3.1 Redis RESP：能被人眼读懂的极简协议</h3>
 <p>Redis 的协议叫 RESP（REdis Serialization Protocol）。它的设计目标非常明确：实现简单（服务端解析不费 CPU）、人眼可读（调试时 <code>nc</code> 连上去直接打字就能交互）、能表达所有 Redis 命令和返回值。</p>
@@ -1021,7 +1021,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本章分析了三家的内部数据结构和通信协议。以下四条启示是它们共同印证的设计规律。</p>
 <p><strong>启示一：数据结构是核心目标的翻译器。</strong> Redis 要快，所以 SDS 取长 O(1)、字典做渐进式 rehash、跳表牺牲缓存局部性换实现简洁。MySQL 要对齐磁盘页，所以 B+ 树内部节点只存键不存数据（树必须矮）、叶子和叶子之间用双向链表串起来（范围扫描不回头）。Kafka 要把吞吐做到极致，所以 RecordBatch 把一批消息当成一个不可分割的存储与传输单元——压缩、校验、读写全部以 Batch 为单位，且格式带 magic 版本号，新旧格式可以共存。每家的数据结构就是它核心目标的物化形态——不看文档也能从结构里读出它的追求。</p>
 <p><strong>启示二：协议是数据结构的外部映射。</strong> Redis 操作简单、返回轻量，适合偶尔单条交互——RESP 用短小的文本行匹配它。MySQL 动辄返回几十列几万行——预编译 + 二进制列式结果集，把"解析一次、复用千万次"做到极致。Kafka 有几十种请求类型、以 Batch 为单位收发——请求/响应头用 api_key + api_version，让同一集群同时服务不同版本客户端。<strong>设计自己的服务端协议时，先问你的数据结构的访问模式长什么样。</strong> 一条一条地小包收发，还是按批往返，决定了协议定长、变长、和版本管理策略。</p>
-<p><strong>启示三：简单协议的粘性远超复杂系统。</strong> RESP 只有五个前缀字符，任何语言在几分钟内就能写一个能用的 Redis 客户端——这个零门槛让 Redis 的生态覆盖了几乎所有编程语言和平台。协议的简单性强过了所有营销——Redis 成为基础设施不是因为它快，而是因为接入它几乎没有成本。评估一个服务端的对外接口时，看文档页数不如看协议用几行代码就能干活。</p>
+<p><strong>启示三：简单协议的粘性远超复杂系统。</strong> RESP 只有五个前缀字符，任何语言在几分钟内就能写一个能用的 Redis 客户端——这个零门槛让 Redis 的生态覆盖了几乎所有编程语言和平台。协议的简单性强过了所有营销——Redis 成为基础设施，不是因为快，是因为接入它几乎没有成本。评估一个服务端的对外接口时，看文档页数不如看协议用几行代码就能干活。</p>
 <p><strong>启示四：版本化能力是协议的生命线。</strong> MySQL 在握手时交换能力标志，Kafka 把版本号写进每个请求头。没有版本协商的协议（如 RESP）只能通过后续手工约定来补，而一旦客户端生态已经铺开，任何 Breaking Change 都是几乎不可能的。设计一个新协议时，先从第二个版本开始——第一个版本你肯定没把边界想全。留出能力标志或版本字段，是给未来做的第一笔投资，而且是利息远高于本金的投资。</p>
 <h2 id="s37">2.6 小结</h2>
 <p>三家为了各自的核心目标，选择了完全不同的内部数据结构和通信协议。Redis 为极低延迟选了全内存的简洁数据结构和文本协议，MySQL 为通用可靠选了 B+ 树页式结构和紧凑二进制协议，Kafka 为高吞吐选了 RecordBatch 批量和带版本号的请求/响应体系。每一组选择都是"核心目标 → 数据结构 → 协议形态"这条因果链的完整展开。读完这一章，再往后看它们怎么管理内存和磁盘（第 4 章）、怎么分层（第 5 章）、怎么同步数据（第 10 章），你会发现每一层都在为这些最底层的砖块服务——数据结构决定了内存怎么管、协议决定了分层怎么切。</p></section>
@@ -1093,6 +1093,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>图 3-1　启动与关闭作为状态机重建与快照的对称过程，三对矛盾贯穿全章。</p>
 <p>三家的约束差异在这里先用一句话带过，具体留到深讲节。Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式加追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。</p>
 <h2 id="s41">2.2 Redis 的做法</h2>
+<p>理解 Redis 的生命周期，得先理解一个基本事实：<strong>Redis 的全部数据都在内存里。</strong> 一旦进程重启，内存清空，所有键值对全部消失——不像 MySQL 有磁盘上的数据文件兜底，也不像 Kafka 有磁盘上的日志段接力。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条灌回内存、重建整个键空间。数据量越大，这个过程越久——一个几十 GB 的实例从加载到就绪可能要几分钟，期间整个实例不可用。所以 Redis 的启动链路被压到了极致：每一步能省则省、能并行则并行。反过来，Redis 的关闭也要快——但快的同时要回答一个核心问题：退出前要不要把内存里的最新数据再落一次盘？还是接受丢掉最近几秒的写？这个选择决定了 Redis 在你手里是缓存还是主存。</p>
 <p>Redis 的生命周期以"快"著称，但快的背后是一组很硬的设计取舍。本节把 Redis 从启动到关闭的完整链路拆成四段启动、两条关闭路径来理解，重点看它在每个分叉口选了什么、弃了什么。</p>
 <h3 id="s42">启动四段式</h3>
 <p><strong>第一段：配置默认值加覆盖。</strong> Redis 先用 <code>initServerConfig</code> 给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数逐层覆盖。这里的设计取舍是"先全量设默认值再逐层覆盖"，好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这个 bug 类别。很多线上事故就栽在某个配置项忘了初始化。</p>
@@ -3958,6 +3959,62 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>容错靠从节点发起选举。</strong> 当某个主节点被多数主节点判定下线后，它的某个从节点会发起选举请求，向其他主节点拉票（用集群纪元 epoch 防止过期投票），拿到多数主节点票数后升级为新主，接管原主负责的槽，并通过 Gossip 广播新拓扑。这套机制保证新主是合法多数派选出来的，不会脑裂出两个主。但因为复制是异步的，新主未必有原主宕机前的全部数据——如果原主宕机前刚写入、还没来得及同步到从节点，这部分写就永久丢失了。这种容忍丢写但优先可用的策略，使 Redis Cluster 在生产中常被归为 AP 系统；但从严格 CAP 定义看，网络分区时少数派主节点会在 <code>cluster-node-timeout</code> 后停止接受写入（牺牲 A 以限制数据分歧），这一行为更接近 CP。社区对此有持续讨论，本书不作绝对归类，而是强调理解其行为边界的实际影响。</p>
 <p><strong>Redis Cluster 在网络分区时优先保证可用</strong>——拥有多数槽的分区继续服务，少数派分区里的槽因为凑不齐多数派主节点无法完成选举，会短暂不可用但不会脑裂写脏数据。正因为选举要求多数派，少数派分区里的主节点在超时后停止写入，这实际上偏向 CP（一致性优先）行为。社区对此归类有争议（antirez 本人主张 CP），但生产实践中异步复制导致的丢写确实存在，因此本书不作绝对的 AP/CP 一刀切归类，而是强调理解其行为边界的实际影响。最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
 <h2 id="s143">6.3 MySQL 的做法</h2>
+<p>理解 MySQL 的集群，得先看清它的基本拓扑。MySQL 集群最核心的组件是<strong>主从复制</strong>：一台主库（Master）负责处理所有写请求，把每一条数据变更记进二进制日志（binlog）；一台或多台从库（Slave）通过订阅主库的 binlog 来保持数据同步。从库内部有两个独立线程——IO 线程负责从主库拉取 binlog 事件并写入本地的中继日志（relay log），SQL 线程负责从 relay log 里逐个回放事件。这种"拉取线程 + 回放线程"的分离设计，让网络拉取和本地回放互不阻塞：网络快了先拉下来囤着，回放慢了就慢慢追。</p>
+<p>从这个基础拓扑出发，MySQL 的集群演进走了三步：异步复制（默认，快但可能丢已提交事务）→ 半同步复制（至少等一个从库确认收到 binlog，弱一致）→ 组复制 MGR（多数派 Paxos 确认，强一致）。每一步都在为更强的一致性付更多的延迟。下面分别展开。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_6_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_6_4_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">图 7-1 MySQL 主从复制基础拓扑</text>
+  <text x="400" y="48" text-anchor="middle" font-size="12" fill="#6B7280">主库写 binlog → 从库 IO 线程拉取到 relay log → SQL 线程回放</text>
+
+  <!-- Master -->
+  <rect x="250" y="75" width="300" height="110" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">主库（Master）</text>
+  <rect x="280" y="118" width="240" height="28" rx="5" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="400" y="137" text-anchor="middle" font-size="12" fill="#1E40AF">写请求 → 事务提交 → 写 binlog</text>
+  <rect x="280" y="152" width="240" height="24" rx="5" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="400" y="169" text-anchor="middle" font-size="12" fill="#1E40AF">binlog = 所有数据变更的有序日志</text>
+
+  <!-- Arrow: Master binlog → Slave IO -->
+  <line x1="400" y1="185" x2="400" y2="215" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#fig_6_4_arrow-blue)"/>
+  <text x="420" y="204" font-size="11" fill="#4F46E5">binlog 流</text>
+
+  <!-- Slave -->
+  <rect x="200" y="220" width="400" height="140" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-size="15" font-weight="700" fill="#92400E">从库（Slave）</text>
+
+  <!-- IO Thread -->
+  <rect x="220" y="265" width="170" height="40" rx="6" fill="#FEF3C7" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="305" y="283" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">IO 线程</text>
+  <text x="305" y="300" text-anchor="middle" font-size="10" fill="#78716C">拉取 binlog → relay log</text>
+
+  <!-- Arrow IO → relay log -->
+  <line x1="390" y1="285" x2="420" y2="285" stroke="#92400E" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
+
+  <!-- Relay Log -->
+  <rect x="425" y="265" width="155" height="40" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="502" y="283" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">relay log</text>
+  <text x="502" y="300" text-anchor="middle" font-size="10" fill="#78716C">中继日志（缓冲）</text>
+
+  <!-- Arrow relay → SQL -->
+  <line x1="502" y1="305" x2="502" y2="320" stroke="#92400E" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
+
+  <!-- SQL Thread -->
+  <rect x="335" y="323" width="170" height="28" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="420" y="342" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">SQL 线程：逐条回放</text>
+
+  <!-- Three concurrent slaves hint -->
+  <text x="400" y="380" text-anchor="middle" font-size="11" fill="#9CA3AF">主库 → N 个从库（每个从库独立拉取，互不影响）</text>
+</svg>
+</div><figcaption>图 7-1 MySQL 主从复制基础拓扑</figcaption></figure>
+<p>图 7-1　MySQL 主从复制基础拓扑：主库写 binlog，从库 IO 线程拉取到 relay log，SQL 线程回放——三个角色各司其职。</p>
 <p>MySQL 的集群哲学是"不丢数据"。MySQL 从最古老的异步复制到最新的组复制，都守着不丢数据的底线，从来没有动摇过。MySQL 的集群演进，就是在这条底线之上，一步步挤可用性、挤自动化、挤强一致性的过程。</p>
 <h3 id="s144">6.3.1 基于 binlog 的复制：单向、异步、行流</h3>
 <p>MySQL 复制的基础是二进制日志（binlog）。主节点把所有写操作记进 binlog，从节点的 I/O 线程连上来拉取 binlog，写到本地的中继日志（relay log），再由 SQL 线程回放 relay log 重做这些变更。这是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种）的取舍细节归第 9 章，本章只把它当作"变更流的载体"。</p>
@@ -3978,7 +4035,77 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MGR 本身只是副本组，单靠它还不能直接给应用用——客户端怎么知道当前主节点是谁？主节点切换了客户端怎么自动重连？这层"可用性包装"由 MySQL Router 提供。Router 是一个代理，它连着 MGR 组、实时感知当前拓扑，对客户端暴露统一的读写端口：写请求路由到主节点，读请求按策略路由到主节点或从节点，主节点切换时 Router 自动把流量切到新主。再加上 MySQL Shell 提供的运维管理（建组、加成员、查看状态），三者打包起来叫 InnoDB Cluster。</p>
 <p>InnoDB Cluster 本质上没有引入新的集群机制——强一致副本组还是 MGR 提供的，Router 只是把 MGR 的使用门槛降到了"普通运维也能搭"的程度。它的取舍是工程整合而非机制创新：降低了使用复杂度，但底层特性（CP、单主、全量复制、不分片）原样继承自 MGR。如果业务能接受这些特性，InnoDB Cluster 是目前 MySQL 生态里最完整、最被推荐的高可用方案。</p>
 <h2 id="s149">6.4 Kafka 的做法</h2>
-<p>Kafka 天生就是分布式。与 Redis 和 MySQL 不同，Kafka 的分片和副本从设计起点就已内置——它从第一行代码就假设自己跑在多台机器上，单机版的 Kafka 在概念上不存在。Kafka 原生就是分布式的，因此集群设计上比前两家从容得多，也做出了几处明确的取舍。</p>
+<p>Kafka 天生就是分布式。与 Redis 和 MySQL 不同，Kafka 的分片和副本从设计起点就已内置——它从第一行代码就假设自己跑在多台机器上，单机版的 Kafka 在概念上不存在。先看清它的基本拓扑：一个 Topic 被切成多个 Partition（分片），每个 Partition 有多个 Replica（副本）分布在不同 Broker 上——其中一个 Replica 是 Leader、负责该分区的全部读写，其余是 Follower、只从 Leader 同步数据。Leader 分布在不同的 Broker 上，所以整集群的读写负载天然分摊到所有机器——没有单点瓶颈。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_6_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">图 7-2 Kafka 分区与副本拓扑</text>
+  <text x="400" y="46" text-anchor="middle" font-size="12" fill="#6B7280">Topic 切为 Partition，每个 Partition 有 1 个 Leader + N 个 Follower——Leader 负责所有读写</text>
+
+  <!-- Topic -->
+  <rect x="250" y="65" width="300" height="36" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="400" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Topic：user-events（3 分区，3 副本）</text>
+
+  <!-- Partition 0 -->
+  <rect x="30" y="125" width="740" height="80" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.2"/>
+  <text x="60" y="152" font-size="14" font-weight="700" fill="#4F46E5">Partition 0</text>
+
+  <rect x="140" y="135" width="180" height="58" rx="6" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="230" y="158" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Leader</text>
+  <text x="230" y="178" text-anchor="middle" font-size="11" fill="#3B82F6">Broker 1 · 读写</text>
+
+  <rect x="340" y="135" width="180" height="58" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.2"/>
+  <text x="430" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">Follower</text>
+  <text x="430" y="178" text-anchor="middle" font-size="11" fill="#9CA3AF">Broker 2 · 同步追赶</text>
+
+  <rect x="540" y="135" width="180" height="58" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.2"/>
+  <text x="630" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">Follower</text>
+  <text x="630" y="178" text-anchor="middle" font-size="11" fill="#9CA3AF">Broker 3 · 同步追赶</text>
+
+  <!-- ISR bracket for Partition 0 -->
+  <rect x="130" y="200" width="600" height="24" rx="4" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="430" y="217" text-anchor="middle" font-size="11" fill="#065F46">ISR = {Broker 1 (L), Broker 2 (F), Broker 3 (F)}——三个副本都在同步窗口内</text>
+
+  <!-- Partition 1 -->
+  <rect x="30" y="245" width="740" height="80" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.2"/>
+  <text x="60" y="272" font-size="14" font-weight="700" fill="#4F46E5">Partition 1</text>
+
+  <rect x="140" y="255" width="180" height="58" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.2"/>
+  <text x="230" y="278" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">Follower</text>
+  <text x="230" y="298" text-anchor="middle" font-size="11" fill="#9CA3AF">Broker 1 · 同步追赶</text>
+
+  <rect x="340" y="255" width="180" height="58" rx="6" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="430" y="278" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Leader</text>
+  <text x="430" y="298" text-anchor="middle" font-size="11" fill="#3B82F6">Broker 2 · 读写</text>
+
+  <rect x="540" y="255" width="180" height="58" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="630" y="278" text-anchor="middle" font-size="13" font-weight="600" fill="#DC2626">Follower（滞后）</text>
+  <text x="630" y="298" text-anchor="middle" font-size="11" fill="#EF4444">Broker 3 · 已踢出 ISR</text>
+
+  <!-- ISR bracket for Partition 1 -->
+  <rect x="130" y="320" width="600" height="24" rx="4" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="430" y="337" text-anchor="middle" font-size="11" fill="#DC2626">ISR = {Broker 2 (L), Broker 1 (F)}——Broker 3 落后超 30 秒，已踢出</text>
+
+  <!-- Partition 2 -->
+  <rect x="30" y="362" width="740" height="62" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.2"/>
+  <text x="60" y="388" font-size="14" font-weight="700" fill="#4F46E5">Partition 2</text>
+
+  <rect x="140" y="372" width="180" height="44" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.2"/>
+  <text x="230" y="399" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">Follower · Broker 1</text>
+
+  <rect x="340" y="372" width="180" height="44" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.2"/>
+  <text x="430" y="399" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">Follower · Broker 2</text>
+
+  <rect x="540" y="372" width="180" height="44" rx="6" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="630" y="399" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Leader · Broker 3</text>
+</svg>
+</div><figcaption>图 7-2 Kafka 分区与副本拓扑</figcaption></figure>
+<p>图 7-2　Kafka 分区与副本拓扑：Topic 切为 3 个 Partition，每个 Partition 有 1 个 Leader + 2 个 Follower——Leader 分散在不同 Broker 上，读写负载天然分摊。Partition 1 的 Broker 3 副本因落后超时被踢出 ISR，不再参与 Leader 选举。</p>
+<p>Kafka 原生就是分布式的，因此集群设计上比前两家从容得多，也做出了几处明确的取舍。</p>
 <h3 id="s150">6.4.1 Partition：分片即并行单位</h3>
 <p>Kafka 的分片单位叫分区（partition）。一个主题（topic）被切成 N 个分区，每个分区是一份有序的、只能追加（append-only）的日志。生产者发消息时按 key 决定去哪个分区：有 key 时默认用 <code>murmur2(key) % N</code> 做哈希路由，保证同一个 key 永远去同一个分区；没有 key 时，生产者（Kafka 2.4 起经 KIP-480 改为默认）用"粘性分区"（sticky partitioner）——把一批消息都发到同一个分区，攒够一批再换分区。这样在保持分区内有序的前提下，把批处理效率做到最高；老的轮询（round-robin）策略会把消息轮流分发到各分区，批更小、延迟更高。</p>
 <p>分区的第一个语义是<strong>并行度</strong>。Kafka 的吞吐靠分区并行：分区越多，能并行的生产者、消费者、Broker 落盘就越分散，整体吞吐越高。分区的第二个语义是<strong>顺序性的边界</strong>——顺序性只在单个分区内成立，跨分区不保证顺序。这是 Kafka 一致性承诺的核心边界：如果你要严格的全局有序，只能用一个分区，那就回到了单分区的串行瓶颈；如果你要高吞吐，就得接受"分区内有序、分区间无序"。</p>
