@@ -72,7 +72,7 @@
   <text x="330" y="468" text-anchor="middle" font-size="10" fill="#374151">页尾 LSN + 校验和（检测半写损坏）</text>
 
   <!-- link between trailer and header LSN -->
-  <path d="M 135 453 C 80 453, 80 113, 135 113" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowR)"/>
+  <path d="M 135 453 C 80 453, 80 113, 115 113 L 135 113" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowR)"/>
   <text x="55" y="285" text-anchor="middle" font-size="10" fill="#EF4444" transform="rotate(-90 55 285)">头尾 LSN 配对，校验页完整性</text>
 
   <!-- overflow page callout -->
