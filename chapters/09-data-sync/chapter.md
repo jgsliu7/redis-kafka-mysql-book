@@ -34,7 +34,7 @@
 
 > **关键数字**
 > 
-> - **Redis PSYNC backlog：默认 1 MB**。1 万次写/秒的负载下覆盖约 1–2 分钟断线窗口；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。
+> - **Redis PSYNC backlog：默认 1 MB**。1 万次写/秒、每条约 100 字节的负载下，约覆盖 **1 秒**的断线窗口（覆盖时长 = backlog 大小 ÷ 写入字节速率；大实例或高写入场景需调大 `repl-backlog-size`）；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。
 > - **MySQL 半同步超时：`rpl_semi_sync_source_timeout` 默认 10 秒**。超时自动降级回异步，一致性保障消失。降级可观测需配合告警。
 > - **Kafka ISR 剔除阈值：`replica.lag.time.max.ms` 默认 30 秒**。副本落后超过 30 秒即踢出 ISR，不再参与 Leader 选举，以此保证新主不丢已确认消息。
 
