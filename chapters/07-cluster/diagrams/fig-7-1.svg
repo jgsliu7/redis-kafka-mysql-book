@@ -10,7 +10,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　单点到集群的演进路径（三家并列）</text>
+  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　单点到集群的演进路径（三款软件并列）</text>
   <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右是「不断还债」的过程：前一段留下什么痛点，后一段补上</text>
 
   <!-- Column headers -->
@@ -98,7 +98,7 @@
   <!-- Bottom legend -->
   <line x1="50" y1="495" x2="870" y2="495" stroke="#E5E7EB" stroke-width="1"/>
   <text x="460" y="520" text-anchor="middle" font-size="12" fill="#6B7280">
-    三家演进步数相似，终点方案却落到 CAP 的不同象限，这是产品定位决定的设计起点
+    三款软件演进步数相似，终点方案却落到 CAP 的不同象限，这是产品定位决定的设计起点
   </text>
   <text x="460" y="540" text-anchor="middle" font-size="11" fill="#9CA3AF">（红色文字为前一段留下的痛点，箭头方向为演进顺序）</text>
 </svg>

@@ -59,7 +59,7 @@
   <rect x="210" y="332" width="400" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
   <text x="410" y="356" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">底层主线：状态机复制</text>
   <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">若每个副本按相同顺序执行相同输入序列</text>
-  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 三家差异只在"序列载体"与"执行方式"</text>
+  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 差异只在"序列载体"与"执行方式"</text>
 
   <!-- 底注 -->
   <text x="410" y="438" text-anchor="middle" font-size="12" fill="#6B7280">这四个子问题构成本章全篇的分析骨架</text>
