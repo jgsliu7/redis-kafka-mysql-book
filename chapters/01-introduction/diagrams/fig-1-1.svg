@@ -62,48 +62,48 @@
   <text x="720" y="288" text-anchor="middle" font-size="12" fill="#6B7280">不在乎：低延迟、灵活查询</text>
 
   <!-- 互补关系说明 -->
-  <text x="40" y="328" font-size="13" font-weight="600" fill="#374151">三类能力互补而非替代 —— 一个真实系统会同时用到三者：</text>
+  <text x="40" y="328" font-size="13" font-weight="600" fill="#374151">三类能力互补而非替代，一个真实系统会同时用到三者：</text>
 
   <!-- ============ 第 3 行：电商订单系统（三者协同） ============ -->
   <rect x="40" y="346" width="800" height="170" rx="8" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
   <text x="440" y="368" text-anchor="middle" font-size="13.5" font-weight="600" fill="#374151">真实场景：电商下单链路</text>
 
   <!-- 用户下单 -->
-  <rect x="60" y="386" width="120" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="120" y="411" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">用户下单</text>
-  <text x="120" y="430" text-anchor="middle" font-size="11.5" fill="#374151">读购物车 / 校验</text>
+  <rect x="63" y="386" width="138" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="132" y="411" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">用户下单</text>
+  <text x="132" y="430" text-anchor="middle" font-size="11.5" fill="#374151">读购物车 / 校验</text>
 
   <!-- Redis 购物车 -->
-  <rect x="216" y="386" width="120" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="276" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
-  <text x="276" y="430" text-anchor="middle" font-size="11.5" fill="#374151">购物车 / 库存计数缓存</text>
+  <rect x="217" y="386" width="138" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="286" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
+  <text x="286" y="430" text-anchor="middle" font-size="11.5" fill="#374151">购物车 / 库存计数缓存</text>
 
   <!-- MySQL 订单 -->
-  <rect x="372" y="386" width="120" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="432" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
-  <text x="432" y="430" text-anchor="middle" font-size="11.5" fill="#374151">订单 / 账户落库（事务）</text>
+  <rect x="371" y="386" width="138" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="440" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
+  <text x="440" y="430" text-anchor="middle" font-size="11.5" fill="#374151">订单 / 账户落库（事务）</text>
 
   <!-- Kafka 事件 -->
-  <rect x="528" y="386" width="120" height="56" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="588" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
-  <text x="588" y="430" text-anchor="middle" font-size="11.5" fill="#374151">发布"订单已创建"事件</text>
+  <rect x="525" y="386" width="138" height="56" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="594" y="408" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
+  <text x="594" y="430" text-anchor="middle" font-size="11.5" fill="#374151">发布"订单已创建"事件</text>
 
   <!-- 下游 -->
-  <rect x="684" y="386" width="136" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="752" y="408" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">下游消费者</text>
-  <text x="752" y="430" text-anchor="middle" font-size="11.5" fill="#374151">物流 / 积分 / 通知</text>
+  <rect x="679" y="386" width="138" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="748" y="408" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">下游消费者</text>
+  <text x="748" y="430" text-anchor="middle" font-size="11.5" fill="#374151">物流 / 积分 / 通知</text>
 
   <!-- 数据流箭头 -->
-  <line x1="180" y1="414" x2="214" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
-  <line x1="336" y1="414" x2="370" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
-  <line x1="492" y1="414" x2="526" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
-  <line x1="648" y1="414" x2="682" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
+  <line x1="201" y1="414" x2="215" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
+  <line x1="355" y1="414" x2="369" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
+  <line x1="509" y1="414" x2="523" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
+  <line x1="663" y1="414" x2="677" y2="414" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-flow)"/>
 
   <!-- 数据流标注 -->
-  <text x="197" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">读</text>
-  <text x="353" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
-  <text x="509" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发布</text>
-  <text x="665" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
+  <text x="208" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">读</text>
+  <text x="362" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
+  <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发布</text>
+  <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
 
   <!-- 底部结论 -->
   <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三家读懂，就等于掌握了后端架构的"基本粒子"</text>

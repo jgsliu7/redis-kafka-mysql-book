@@ -38,8 +38,8 @@
 
   <!-- 向下分发线 -->
   <line x1="260" y1="248" x2="260" y2="290" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow44)"/>
-  <line x1="420" y1="248" x2="420" y2="290" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow44)"/>
-  <line x1="580" y1="248" x2="580" y2="290" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow44)"/>
+  <line x1="490" y1="248" x2="490" y2="290" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow44)"/>
+  <line x1="650" y1="248" x2="650" y2="290" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow44)"/>
   <text x="180" y="276" font-size="11" fill="#D97706" font-style="italic">多态调用</text>
 
   <!-- ===== 三个引擎 ===== -->
@@ -74,5 +74,5 @@
   <rect x="120" y="530" width="600" height="0" rx="6" fill="none"/>
 
   <text x="60" y="546" font-size="11" fill="#EF4444" font-weight="600">代价：</text>
-  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用——这是 MySQL 为「可插拔」支付的固有开销。</text>
+  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是 MySQL 为「可插拔」支付的固有开销。</text>
 </svg>

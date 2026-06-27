@@ -83,12 +83,12 @@
   <!-- V0→V1→V2 evolution note -->
   <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
   <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">V0→V1：引入时间戳（8B/条，元数据膨胀）| V1→V2：Batch 级元数据 + 差值编码（消除每条独立的 offset/ts/CRC 冗余）</text>
-  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代精准针对上一代最贵的操作做手术——格式演进就是如此</text>
+  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代精准针对上一代最贵的操作做手术，格式演进就是如此</text>
 
   <!-- Producer/Consumer arrows -->
   <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>
-  <line x1="55" y1="355" x2="55" y2="325" stroke="#4F46E5" stroke-width="1.2"/>
-  <text x="820" y="320" font-size="11" fill="#4F46E5">消费者</text>
-  <line x1="825" y1="325" x2="825" y2="355" stroke="#4F46E5" stroke-width="1.2"/>
+  <line x1="55" y1="325" x2="55" y2="350" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
+  <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-2　RecordBatch V2 字段布局</text>
 </svg>

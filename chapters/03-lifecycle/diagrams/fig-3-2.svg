@@ -46,19 +46,19 @@
   <!-- arrow from stage 3 down to stage 4 -->
   <path d="M720 170 C 720 210, 450 210, 450 238" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
 
-  <!-- AOF/RDB branch detail box -->
+  <!-- left detail: 启动确定性（挨着 Stage 2 预分配） -->
   <rect x="60" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="180" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">AOF / RDB 取舍</text>
-  <text x="76" y="290" font-size="12" fill="#374151">AOF：base(RDB) + incr，更完整</text>
-  <text x="76" y="308" font-size="12" fill="#374151">RDB：单点快照，只到上次快照点</text>
-  <text x="76" y="326" font-size="12" fill="#374151">优先级体现“完整 &gt; 快”</text>
+  <text x="180" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动确定性取舍</text>
+  <text x="76" y="290" font-size="12" fill="#374151">预分配换取运行期内存确定性</text>
+  <text x="76" y="308" font-size="12" fill="#374151">代价：启动即占基线内存</text>
+  <text x="76" y="326" font-size="12" fill="#374151">Redis 选“确定”弃“零内存启动”</text>
 
-  <!-- right detail: 启动确定性 -->
+  <!-- right detail: AOF/RDB 取舍（挨着 Stage 3 数据恢复） -->
   <rect x="600" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="720" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动确定性取舍</text>
-  <text x="616" y="290" font-size="12" fill="#374151">预分配换取运行期内存确定性</text>
-  <text x="616" y="308" font-size="12" fill="#374151">代价：启动即占基线内存</text>
-  <text x="616" y="326" font-size="12" fill="#374151">Redis 选“确定”弃“零内存启动”</text>
+  <text x="720" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">AOF / RDB 取舍</text>
+  <text x="616" y="290" font-size="12" fill="#374151">AOF：base(RDB) + incr，更完整</text>
+  <text x="616" y="308" font-size="12" fill="#374151">RDB：单点快照，只到上次快照点</text>
+  <text x="616" y="326" font-size="12" fill="#374151">优先级体现“完整 &gt; 快”</text>
 
   <!-- bottom note -->
   <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>

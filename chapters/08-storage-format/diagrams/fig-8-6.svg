@@ -127,5 +127,5 @@
   <line x1="450" y1="550" x2="480" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
   <line x1="670" y1="550" x2="700" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
-  <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”——文件名本身是索引锚点</text>
+  <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”，文件名本身是索引锚点</text>
 </svg>

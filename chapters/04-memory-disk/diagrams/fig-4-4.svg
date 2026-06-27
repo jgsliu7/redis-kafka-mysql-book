@@ -61,7 +61,7 @@
   <text x="387" y="243" text-anchor="middle" font-size="11" fill="#374151">③ 改缓冲池中的页 → 标记为脏页</text>
 
   <!-- note: redo flushed (innodb_flush_log_at_trx_commit) -->
-  <rect x="620" y="270" width="140" height="34" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2"/>
+  <rect x="600" y="270" width="180" height="34" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2"/>
   <text x="690" y="285" text-anchor="middle" font-size="10" fill="#374151">innodb_flush_log_at_trx_commit</text>
   <text x="690" y="299" text-anchor="middle" font-size="10" fill="#374151">=1 提交即落盘（默认）</text>
   <line x1="690" y1="304" x2="876" y2="304" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>

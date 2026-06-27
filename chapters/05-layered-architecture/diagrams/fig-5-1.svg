@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 0 776 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -9,8 +9,8 @@
     </marker>
   </defs>
 
-  <text x="380" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1　Redis 命令处理流水线</text>
-  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#374151">交互层与逻辑层用 client 结构体衔接，全程无序列化</text>
+  <text x="372" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-1　Redis 命令处理流水线</text>
+  <text x="372" y="54" text-anchor="middle" font-size="13" fill="#374151">交互层与逻辑层用 client 结构体衔接，全程无序列化</text>
 
   <!-- 三层背景带（左侧标注）-->
   <rect x="36" y="76" width="4" height="170" rx="2" fill="#4F46E5" opacity="0.55"/>

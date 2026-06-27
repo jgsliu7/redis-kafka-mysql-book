@@ -95,5 +95,5 @@
   <!-- key tradeoff callout -->
   <rect x="40" y="460" width="820" height="60" rx="6" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
   <text x="60" y="484" font-size="12" font-weight="700" fill="#EF4444">关键取舍</text>
-  <text x="60" y="504" font-size="12" fill="#374151">取“加载快、文件小”，舍“可随机访问”——RDB 必须整体加载，不支持按 key 定位。</text>
+  <text x="60" y="504" font-size="12" fill="#374151">取“加载快、文件小”，舍“可随机访问”，RDB 必须整体加载，不支持按 key 定位。</text>
 </svg>

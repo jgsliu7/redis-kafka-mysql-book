@@ -110,5 +110,5 @@
   <!-- ============ bottom legend / principle ============ -->
   <rect x="40" y="540" width="860" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="60" y="564" font-size="12" font-weight="700" fill="#111827">每层可靠性买的是什么故障？</text>
-  <text x="60" y="584" font-size="11" fill="#374151">双写缓冲 → 页完整性（修半写）；redo log → 改动可重做（保事务）；CRC/校验和 → 损坏可检测。8.0 支持原子写设备时可关掉双写——硬件消灭了那类故障，软件冗余即可撤。</text>
+  <text x="60" y="584" font-size="11" fill="#374151">双写缓冲 → 页完整性（修半写）；redo log → 改动可重做（保事务）；CRC/校验和 → 损坏可检测。8.0 支持原子写设备时可关掉双写，硬件消灭了那类故障，软件冗余即可撤。</text>
 </svg>

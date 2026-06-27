@@ -96,13 +96,13 @@
   <!-- 标注交互层 / 逻辑层 -->
   <rect x="270" y="408" width="500" height="4" rx="2" fill="#059669" opacity="0.4"/>
   <text x="280" y="432" font-size="11" font-weight="600" fill="#059669">交互层（网络线程 + 队列）</text>
-  <text x="280" y="450" font-size="10" fill="#6B7280">Acceptor + Processor + RequestChannel：负责收发与协议适配</text>
+  <text x="280" y="450" font-size="10" fill="#6B7280">Acceptor / Processor / RequestChannel</text>
   <text x="520" y="432" font-size="11" font-weight="600" fill="#059669">逻辑层（业务线程）</text>
   <text x="520" y="450" font-size="10" fill="#6B7280">Handler：鉴权、配额、分派</text>
 
   <!-- 底部注释 -->
   <rect x="40" y="476" width="800" height="68" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="498" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程——单机要扛多分区、多副本的并发 IO。</text>
+  <text x="60" y="498" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要扛多分区、多副本的并发 IO。</text>
   <text x="60" y="518" font-size="11" fill="#374151">交互层是三者里最「重」的（多层线程 + 队列），换来单机榨干多核与水平扩展。延迟比 Redis 高，但吞吐量级不同。</text>
   <text x="60" y="536" font-size="11" fill="#374151">有界队列是天然的流量调节器：消费慢时回压到网络线程，避免内存被请求堆积拖垮。</text>
 </svg>

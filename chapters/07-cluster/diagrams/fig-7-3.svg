@@ -148,9 +148,7 @@
 
   <!-- ===== Bottom summary ===== -->
   <line x1="40" y1="590" x2="900" y2="590" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="470" y="615" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">
-    同一问题，三种哲学：去中心化投票（慢但无单点）· 共识协议（强但贵）· 集中仲裁（快但 Controller 是关键）
-  </text>
+  <text x="470" y="615" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同一问题，三种哲学：去中心化投票 · 共识协议 · 集中仲裁</text>
   <text x="470" y="640" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
     红色箭头标注的是「放弃可用性以保一致性」的取舍节点
   </text>

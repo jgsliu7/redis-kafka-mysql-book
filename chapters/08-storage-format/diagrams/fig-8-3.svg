@@ -40,7 +40,7 @@
   <text x="470" y="190" text-anchor="middle" font-size="10" fill="#374151">生成全量命令</text>
 
   <line x1="480" y1="200" x2="770" y2="200" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="625" y="192" text-anchor="middle" font-size="12" fill="#111827">② 写入 temp-rewrite.aof（混合：RDB 头 + AOF 尾）</text>
+  <text x="625" y="192" text-anchor="middle" font-size="12" fill="#111827">② 写 temp-rewrite.aof（混合格式）</text>
 
   <!-- step 3: meanwhile main writes -->
   <rect x="100" y="225" width="120" height="44" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>

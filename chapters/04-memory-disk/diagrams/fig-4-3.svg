@@ -34,7 +34,7 @@
 
   <!-- ===== LRU List ===== -->
   <rect x="320" y="90" width="600" height="200" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="620" y="114" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">LRU List（改良版，新老分区）</text>
+  <text x="620" y="114" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">LRU List</text>
 
   <!-- New sublist (5/8) -->
   <rect x="340" y="128" width="360" height="44" rx="4" fill="#FFFFFF" stroke="#D97706"/>
@@ -50,9 +50,9 @@
   </g>
 
   <!-- midpoint -->
-  <line x1="540" y1="120" x2="540" y2="200" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,3"/>
-  <rect x="500" y="104" width="80" height="18" rx="3" fill="#FEE2E2" stroke="#EF4444"/>
-  <text x="540" y="117" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">midpoint</text>
+  <line x1="700" y1="120" x2="700" y2="200" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,3"/>
+  <rect x="660" y="104" width="80" height="18" rx="3" fill="#FEE2E2" stroke="#EF4444"/>
+  <text x="700" y="117" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">midpoint</text>
 
   <!-- Old sublist (3/8) -->
   <rect x="700" y="128" width="216" height="44" rx="4" fill="#FFFFFF" stroke="#D97706" stroke-dasharray="4,3"/>
@@ -71,10 +71,10 @@
   <!-- promotion -->
   <text x="360" y="252" font-size="11" fill="#374151">Old 区停留 &gt; innodb_old_blocks_time（默认 1s）后再次被访问 →</text>
   <text x="360" y="270" font-size="11" fill="#EF4444" font-weight="700">晋升 New 区</text>
-  <text x="560" y="270" font-size="11" fill="#374151">（全表扫描的页来不及晋升 → 被及时挤走，不污染热区）</text>
+  <text x="560" y="270" font-size="11" fill="#374151">（全表扫描的页被及时挤走，不污染热区）</text>
 
   <!-- eviction -->
-  <text x="700" y="270" font-size="11" fill="#374151">← 尾部淘汰</text>
+  <text x="910" y="270" text-anchor="end" font-size="11" fill="#374151">← 尾部淘汰</text>
   <path d="M 870 152 Q 900 152 900 250 Q 900 285 880 285" fill="none" stroke="#EF4444" stroke-width="1.4" marker-end="url(#arrowRed)"/>
 
   <!-- ===== Flush List ===== -->

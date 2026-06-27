@@ -81,14 +81,14 @@
   <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW + LEO（位移末尾）</text>
   <text x="430" y="445" text-anchor="middle" font-size="11" fill="#6B7280">响应路径同样共享；Follower 用 HW 推进自己的副本位置</text>
 
-  <!-- 响应箭头回到两侧 -->
-  <line x1="180" y1="408" x2="120" y2="320" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arr47r)"/>
-  <line x1="680" y1="408" x2="620" y2="320" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arr47r)"/>
+  <!-- 响应箭头回到两侧（沿存储层外侧绕行，不穿子框） -->
+  <path d="M 90 420 L 72 420 L 72 312 L 178 312" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arr47r)"/>
+  <path d="M 770 420 L 788 420 L 788 312 L 622 312" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arr47r)"/>
 
   <!-- ===== 底部注释 ===== -->
   <rect x="40" y="492" width="780" height="92" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
   <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计红利：Log 抽象让存储层与复制层共享同一份代码</text>
   <text x="60" y="534" font-size="11" fill="#374151">· Follower 复制 = 「一个特殊的消费者」，无需为复制单独写读路径；新增功能只改一处。</text>
   <text x="60" y="554" font-size="11" fill="#374151">· sendfile 零拷贝对两条路径都生效：省掉 2 次内核↔用户态拷贝和 2 次上下文切换。</text>
-  <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快，但存储几乎不可插拔——复杂度被推到上层（索引、复制、压实）。</text>
+  <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>
 </svg>

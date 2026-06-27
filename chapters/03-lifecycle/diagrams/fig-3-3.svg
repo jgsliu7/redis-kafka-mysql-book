@@ -14,7 +14,7 @@
   <!-- Trigger box -->
   <rect x="300" y="64" width="280" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="90" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">关闭触发</text>
-  <text x="316" y="112" font-size="12" fill="#374151">SHUTDOWN 命令　·　SIGTERM / SIGINT　·　守护条件</text>
+  <text x="316" y="112" font-size="12" fill="#374151">SHUTDOWN 命令 · SIGTERM/SIGINT · 守护条件</text>
   <text x="316" y="128" font-size="12" fill="#374151">（内存超限 / 被父进程监视退出）</text>
 
   <!-- arrow down -->
@@ -25,8 +25,6 @@
   <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
   <text x="316" y="214" font-size="12" fill="#374151">是 → 等待其完成，或杀掉子进程</text>
   <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
-
-  <path d="M440 246 L440 270" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Step 2: SAVE / NOSAVE branch -->
   <rect x="160" y="274" width="240" height="86" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -70,11 +68,11 @@
   <rect x="40" y="274" width="100" height="280" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="90" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">关键取舍</text>
   <text x="50" y="328" font-size="12" fill="#374151">“存不存数据”</text>
-  <text x="50" y="346" font-size="12" fill="#374151">的决定权交给用户</text>
+  <text x="50" y="346" font-size="12" fill="#374151">决定权交给用户</text>
   <text x="50" y="384" font-size="12" fill="#374151">包容缓存 / 主存</text>
   <text x="50" y="402" font-size="12" fill="#374151">的双重定位</text>
   <text x="50" y="440" font-size="12" fill="#374151">“配置即承诺”</text>
-  <text x="50" y="458" font-size="12" fill="#374151">——不替你假设</text>
+  <text x="50" y="458" font-size="12" fill="#374151">不替你假设</text>
   <text x="50" y="476" font-size="12" fill="#374151">你是缓存还是主存</text>
 
   <rect x="740" y="390" width="100" height="232" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>

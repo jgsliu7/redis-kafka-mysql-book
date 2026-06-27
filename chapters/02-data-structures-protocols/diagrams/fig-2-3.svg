@@ -15,11 +15,11 @@
 
   <rect x="20" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
   <text x="155" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求示例：SET key val</text>
-  <rect x="40" y="158" width="230" height="32" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
-  <text x="155" y="179" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$3\r\nval\r\n</text>
-  <text x="155" y="210" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">响应示例：OK</text>
-  <rect x="40" y="220" width="230" height="32" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
-  <text x="155" y="241" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">+OK\r\n</text>
+  <rect x="40" y="156" width="230" height="74" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
+  <text x="155" y="176" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF"><tspan x="155">*3</tspan><tspan x="155" dy="17">$3 SET</tspan><tspan x="155" dy="17">$3 key</tspan><tspan x="155" dy="17">$3 val</tspan></text>
+  <text x="155" y="246" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">响应示例：OK</text>
+  <rect x="40" y="252" width="230" height="18" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
+  <text x="155" y="265" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">+OK</text>
 
   <rect x="30" y="285" width="250" height="20" rx="3" fill="#ECFDF5"/>
   <text x="155" y="300" text-anchor="middle" font-size="11" fill="#065F46">人眼可读 · nc 连上直接交互</text>

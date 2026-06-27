@@ -86,7 +86,7 @@
   <text x="182" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
   <line x1="76" y1="442" x2="288" y2="442" stroke="#4F46E5" stroke-width="0.7" stroke-dasharray="3,2"/>
   <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存即真相，RDB/AOF 派生</text>
-  <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type 与 encoding 解耦</text>
+  <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type/encoding 解耦</text>
   <text x="76" y="502" font-size="11.5" fill="#374151">· 规律三：pipeline / Multi 压往返</text>
   <text x="76" y="522" font-size="11.5" fill="#374151">· 规律四：appendfsync 三档价签</text>
   <text x="76" y="542" font-size="11.5" fill="#374151">· 规律五：键空间 + RDB/AOF 恢复剧本</text>
@@ -97,7 +97,7 @@
   <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
   <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为真相，缓冲池派生</text>
   <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
-  <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer / group commit</text>
+  <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer/group commit</text>
   <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的价签</text>
   <text x="334" y="542" font-size="11.5" fill="#374151">· 规律五：ARIES 三阶段 + GTID</text>
 

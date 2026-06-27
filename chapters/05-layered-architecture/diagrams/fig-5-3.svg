@@ -77,6 +77,6 @@
   <!-- 底部注释 -->
   <rect x="40" y="488" width="720" height="76" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
   <text x="60" y="510" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
-  <text x="60" y="530" font-size="11" fill="#374151">MySQL 用「一个贯穿全程的可变对象」替代「层层复制参数」——边界靠对象，不靠拷贝。</text>
+  <text x="60" y="530" font-size="11" fill="#374151">MySQL 用「一个贯穿全程的可变对象」替代「层层复制参数」，边界靠对象，不靠拷贝。</text>
   <text x="60" y="548" font-size="11" fill="#374151">代价：THD 是跨层共享状态，顶层的「分层」在连接↔服务之间是「软」的。</text>
 </svg>

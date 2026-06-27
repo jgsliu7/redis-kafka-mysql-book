@@ -11,7 +11,7 @@
 
   <!-- 标题 -->
   <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 4-6　存储层次访问延迟的数量级（对数轴）</text>
-  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#6B7280">横轴每格放大 10 倍 —— 内存与磁盘之间隔着 6～7 个数量级</text>
+  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#6B7280">横轴每格放大 10 倍，内存与磁盘之间隔着 6～7 个数量级</text>
 
   <!-- ============ 绘图区参数 ============
        X 轴起点 x0 = 240，终点 x1 = 820（宽 580）
@@ -113,5 +113,5 @@
 
   <!-- 底部图注 -->
   <text x="440" y="500" text-anchor="middle" font-size="12" fill="#374151">数据为典型量级估值；实际值因硬件、负载、队列深度而异，但数量级关系稳定。</text>
-  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」—— 每一格都是 10 倍差距</text>
+  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」，每一格都是 10 倍差距</text>
 </svg>

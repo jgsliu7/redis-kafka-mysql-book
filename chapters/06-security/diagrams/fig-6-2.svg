@@ -38,12 +38,9 @@
   <text x="440" y="153" text-anchor="middle" font-size="12" fill="#111827">① AUTH alice &lt;密码&gt;</text>
 
   <!-- 2. Server check -->
-  <rect x="600" y="180" width="180" height="0" />
-  <rect x="600" y="180" width="200" height="30" fill="none"/>
-  <text x="770" y="190" text-anchor="end" font-size="11" fill="#374151" font-style="italic">查 ACL 用户表，校验 SHA-256</text>
-  <line x1="600" y1="180" x2="600" y2="200" stroke="#9CA3AF" stroke-width="0"/>
-  <rect x="600" y="176" width="160" height="28" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1" stroke-dasharray="3 2"/>
-  <text x="680" y="195" text-anchor="middle" font-size="11" fill="#374151">绑定连接 → 用户 alice</text>
+  <rect x="580" y="168" width="200" height="46" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="680" y="186" text-anchor="middle" font-size="11" fill="#374151">查 ACL 用户表，校验 SHA-256</text>
+  <text x="680" y="204" text-anchor="middle" font-size="11" fill="#374151">绑定连接 → 用户 alice</text>
 
   <!-- 3. +OK -->
   <line x1="680" y1="220" x2="204" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -74,7 +71,7 @@
   <!-- authorization check box -->
   <rect x="600" y="402" width="200" height="56" rx="4" fill="#FEF2F2" stroke="#EF4444" stroke-width="1" stroke-dasharray="3 2"/>
   <text x="700" y="419" text-anchor="middle" font-size="11" fill="#374151">授权检查（自检）</text>
-  <text x="700" y="435" text-anchor="middle" font-size="10" fill="#111827">命令类别 @dangerous ✗　规则未授 +FLUSHALL</text>
+  <text x="700" y="435" text-anchor="middle" font-size="10" fill="#111827">命令类别 @dangerous ✗　规则未授权</text>
   <text x="700" y="450" text-anchor="middle" font-size="10" fill="#EF4444" font-weight="600">未命中 → 拒绝 + 写 ACL LOG</text>
 
   <line x1="680" y1="475" x2="204" y2="475" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>

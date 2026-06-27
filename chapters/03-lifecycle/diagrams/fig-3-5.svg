@@ -61,7 +61,7 @@
   <!-- Response queue -->
   <rect x="480" y="320" width="180" height="50" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="570" y="343" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">响应队列</text>
-  <text x="570" y="361" text-anchor="middle" font-size="11" fill="#374151">ResponseQueue（每 Processor 一个）</text>
+  <text x="570" y="361" text-anchor="middle" font-size="11" fill="#374151">ResponseQueue（每 Processor）</text>
 
   <!-- handler -> response queue -->
   <path d="M570 230 L570 318" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
