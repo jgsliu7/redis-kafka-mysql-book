@@ -9,7 +9,7 @@
     </marker>
   </defs>
 
-  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">图 7-1 MySQL 主从复制基础拓扑</text>
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">图 7-4 MySQL 主从复制基础拓扑</text>
   <text x="400" y="48" text-anchor="middle" font-size="12" fill="#6B7280">主库写 binlog → 从库 IO 线程拉取到 relay log → SQL 线程回放</text>
 
   <!-- Master -->
