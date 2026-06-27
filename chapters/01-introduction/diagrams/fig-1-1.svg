@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-1　后端基础设施的三种核心范式与三家代言</text>
+  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-1　后端基础设施的三种核心范式与代表软件</text>
 
   <!-- ============ 第 1 行：三类核心能力 ============ -->
   <text x="40" y="74" font-size="13" font-weight="600" fill="#374151">后端基础能力（拆到最底层绕不开三类）</text>
@@ -33,13 +33,13 @@
   <text x="720" y="132" text-anchor="middle" font-size="12.5" fill="#374151">消息 · 流 · 事件</text>
   <text x="720" y="148" text-anchor="middle" font-size="12.5" fill="#374151">流式型</text>
 
-  <!-- 代言箭头（能力 → 软件） -->
-  <text x="40" y="186" font-size="13" font-weight="600" fill="#374151">各自"代言人"</text>
+  <!-- 代表箭头（能力 → 软件） -->
+  <text x="40" y="186" font-size="13" font-weight="600" fill="#374151">各自"代表"</text>
   <line x1="160" y1="156" x2="160" y2="200" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="440" y1="156" x2="440" y2="200" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="720" y1="156" x2="720" y2="200" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- ============ 第 2 行：三家代言软件 ============ -->
+  <!-- ============ 第 2 行：代表软件 ============ -->
   <!-- Redis -->
   <rect x="40" y="204" width="240" height="92" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
   <text x="160" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Redis</text>
@@ -106,6 +106,6 @@
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
 
   <!-- 底部结论 -->
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三家读懂，就等于掌握了后端架构的"基本粒子"</text>
+  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三款软件读懂，就等于掌握了后端架构的"基本构件"</text>
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
 </svg>

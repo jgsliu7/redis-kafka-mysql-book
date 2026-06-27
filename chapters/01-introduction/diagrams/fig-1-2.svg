@@ -111,11 +111,11 @@
   <text x="40" y="658" font-size="11.5" fill="#374151">从"生与死"出发，经内存磁盘、分层、</text>
   <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
 
-  <!-- 右侧三家同题注释 -->
+  <!-- 右侧三款软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
   <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
 
   <!-- 底部图注 -->
-  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三家，对比出共性</text>
+  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
 </svg>
