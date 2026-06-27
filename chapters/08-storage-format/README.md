@@ -8,7 +8,7 @@
 
 - 正文：`chapter.md`
 - 大纲：`outline.md`
-- 图示：`diagrams/fig-7-1.svg` 至 `diagrams/fig-7-7.svg`
+- 图示：`diagrams/fig-8-1.svg` 至 `diagrams/fig-8-7.svg`
 
 ## 终校关注
 
