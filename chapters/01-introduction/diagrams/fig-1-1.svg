@@ -44,22 +44,22 @@
   <rect x="40" y="204" width="240" height="92" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
   <text x="160" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Redis</text>
   <text x="160" y="252" text-anchor="middle" font-size="12.5" fill="#374151">内存数据结构服务器</text>
-  <text x="160" y="272" text-anchor="middle" font-size="12" fill="#4F46E5">在乎：低延迟 · 极简</text>
-  <text x="160" y="288" text-anchor="middle" font-size="12" fill="#6B7280">不在乎：数据量、复杂计算</text>
+  <text x="160" y="272" text-anchor="middle" font-size="12" fill="#4F46E5">追求：低延迟 · 极简</text>
+  <text x="160" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：数据量、复杂计算</text>
 
   <!-- MySQL -->
   <rect x="320" y="204" width="240" height="92" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
   <text x="440" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">MySQL</text>
   <text x="440" y="252" text-anchor="middle" font-size="12.5" fill="#374151">关系库（表/行 + SQL + 引擎）</text>
-  <text x="440" y="272" text-anchor="middle" font-size="12" fill="#D97706">在乎：强一致 · 不丢不错</text>
-  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">不在乎：极致写性能</text>
+  <text x="440" y="272" text-anchor="middle" font-size="12" fill="#D97706">追求：强一致 · 不丢不错</text>
+  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：极致写性能</text>
 
   <!-- Kafka -->
   <rect x="600" y="204" width="240" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
   <text x="720" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Kafka</text>
   <text x="720" y="252" text-anchor="middle" font-size="12.5" fill="#374151">追加写日志的分布式流平台</text>
-  <text x="720" y="272" text-anchor="middle" font-size="12" fill="#059669">在乎：吞吐 · 可扩展</text>
-  <text x="720" y="288" text-anchor="middle" font-size="12" fill="#6B7280">不在乎：低延迟、灵活查询</text>
+  <text x="720" y="272" text-anchor="middle" font-size="12" fill="#059669">追求：吞吐 · 可扩展</text>
+  <text x="720" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：低延迟、灵活查询</text>
 
   <!-- 互补关系说明 -->
   <text x="40" y="328" font-size="13" font-weight="600" fill="#374151">三类能力互补而非替代，一个真实系统会同时用到三者：</text>
