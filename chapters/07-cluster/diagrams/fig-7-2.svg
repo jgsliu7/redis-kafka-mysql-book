@@ -51,7 +51,7 @@
   <text x="760" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5461 个槽</text>
 
   <!-- migration note -->
-  <path d="M 760 268 Q 760 285 600 285 Q 470 285 470 270" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
+  <path d="M 760 265 Q 760 290 615 290 Q 470 290 470 265" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
   <text x="615" y="300" text-anchor="middle" font-size="11" fill="#EF4444">槽 15000 正在从 C 迁移到 B（迁移中场景）</text>
 
   <!-- ===== Client ===== -->
