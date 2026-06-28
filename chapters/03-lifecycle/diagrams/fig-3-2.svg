@@ -43,8 +43,8 @@
   <text x="346" y="308" font-size="12" fill="#374151">打印 “Ready to accept connections”</text>
   <text x="346" y="326" font-size="12" fill="#374151">这是状态机就绪的外显里程碑</text>
 
-  <!-- arrow from stage 3 down to stage 4 -->
-  <path d="M720 170 C 720 210, 450 210, 450 238" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- arrow from stage 3 down to stage 4: 起点贴 ③ 底边(166), 终点贴 ④ 顶边(240) -->
+  <path d="M720 166 C 720 210, 450 210, 450 240" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- left detail: 启动确定性（挨着 Stage 2 预分配） -->
   <rect x="60" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>

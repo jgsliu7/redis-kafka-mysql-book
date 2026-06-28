@@ -43,18 +43,17 @@
   <line x1="450" y1="330" x2="470" y2="330" stroke="#4B5563" stroke-width="1.2"/>
   <line x1="660" y1="250" x2="680" y2="250" stroke="#4B5563" stroke-width="1.2"/>
 
-  <!-- 向上跃迁的主箭头（红色，沿台阶斜向上） -->
-  <path d="M 165 410 Q 280 370 360 330 Q 480 290 565 250 Q 680 215 770 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
-  <text x="465" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">认知跃迁方向（坐标系变换）</text>
+  <!-- 向上跃迁的主箭头（红色，沿各台阶左上角拾级而上，不穿框） -->
+  <path d="M 165 410 Q 220 375 270 330 Q 370 290 470 250 Q 575 210 680 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <text x="465" y="200" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">认知跃迁方向（坐标系变换）</text>
 
   <!-- ============ 本书 8 章 / 本章对应标注 ============ -->
-  <!-- 本书前 8 章：L1 → L2 -->
-  <line x1="360" y1="418" x2="360" y2="408" stroke="#4F46E5" stroke-width="0" />
+  <!-- 本书前 9 章：L1 → L2 -->
   <rect x="245" y="498" width="230" height="36" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="4,3"/>
   <text x="360" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4F46E5">本书第 1–9 章</text>
   <text x="360" y="529" text-anchor="middle" font-size="11" fill="#374151">带读者完成 L1 → L2 的跃迁</text>
-  <!-- 连线指到 L1/L2 之间 -->
-  <line x1="360" y1="498" x2="360" y2="490" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#arrowGray)"/>
+  <!-- 连线从标注框上指到 L1/L2 交界（L2 底边 y=410） -->
+  <line x1="360" y1="498" x2="360" y2="412" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#arrowGray)"/>
 
   <!-- 本章：L2 → L3 -->
   <rect x="540" y="498" width="190" height="36" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4,3"/>

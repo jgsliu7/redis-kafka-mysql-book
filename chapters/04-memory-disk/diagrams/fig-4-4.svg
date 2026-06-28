@@ -73,9 +73,7 @@
   <text x="360" y="270" font-size="11" fill="#EF4444" font-weight="700">晋升 New 区</text>
   <text x="560" y="270" font-size="11" fill="#374151">（全表扫描的页被及时挤走，不污染热区）</text>
 
-  <!-- eviction -->
-  <text x="910" y="270" text-anchor="end" font-size="11" fill="#374151">← 尾部淘汰</text>
-  <path d="M 870 152 Q 900 152 900 250 Q 900 285 880 285" fill="none" stroke="#EF4444" stroke-width="1.4" marker-end="url(#arrowRed)"/>
+  <!-- eviction: Old 区尾部淘汰，页归还 Free List（统一一条绕顶路径，避免穿框） -->
 
   <!-- ===== Flush List ===== -->
   <rect x="320" y="320" width="600" height="160" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
@@ -108,9 +106,9 @@
   <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>
   <text x="630" y="504" font-size="10" fill="#EF4444">Checkpoint 刷盘</text>
 
-  <!-- Evicted page returns to Free List -->
-  <path d="M 540 200 Q 200 200 160 200 Q 90 200 90 250 Q 90 290 100 290" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
-  <text x="230" y="240" font-size="10" fill="#6B7280">淘汰的页归还 Free List</text>
+  <!-- Evicted page returns to Free List: Old 区尾部 → 绕顶 → Free List 顶边 -->
+  <path d="M 920 170 L 936 170 L 936 80 L 160 80 L 160 88" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="548" y="74" text-anchor="middle" font-size="10" fill="#6B7280">淘汰页归还 Free List（Old 区尾部）</text>
 
   <!-- bottom note -->
   <rect x="40" y="600" width="880" height="80" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>

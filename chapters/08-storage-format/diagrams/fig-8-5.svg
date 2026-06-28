@@ -12,7 +12,7 @@
     </marker>
   </defs>
 
-  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-5　脏页落盘与崩溃恢复路径</text>
+  <text x="470" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-5　脏页刷盘与崩溃恢复路径</text>
   <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">上半部：正常落盘（双写缓冲 → 正式页）；下半部：崩溃后用双写修页 + redo 重做</text>
 
   <!-- ============ Normal flush path (top) ============ -->

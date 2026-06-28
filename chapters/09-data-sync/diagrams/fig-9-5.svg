@@ -41,7 +41,7 @@
   <rect x="50" y="318" width="200" height="58" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5 3"/>
   <text x="150" y="338" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">半同步：等至少一个从 ACK</text>
   <text x="150" y="356" text-anchor="middle" font-size="11" fill="#374151">超时则降级回异步（可观测、可告警）</text>
-  <text x="150" y="370" text-anchor="middle" font-size="10" fill="#6B7280">after_sync / after_commit</text>
+  <text x="150" y="370" text-anchor="middle" font-size="9" fill="#6B7280">两档：AFTER_COMMIT（图示）/ AFTER_SYNC</text>
 
   <!-- dump 线程 -->
   <rect x="50" y="394" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>

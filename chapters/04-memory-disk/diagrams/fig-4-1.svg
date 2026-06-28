@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="arrow-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
-    </marker>
     <marker id="arrow-red-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
@@ -89,11 +86,11 @@
   <text x="830" y="344" font-size="11.5" font-weight="600" fill="#D97706" text-anchor="end">10 ms (10,000,000 ns)</text>
 
   <!-- ============ 红色高亮：顺序 vs 随机 100× 标注 ============ -->
-  <!-- 在 SSD 顺序柱（y=240）与随机柱（y=290）之间画大括号式标注 -->
-  <line x1="500" y1="240" x2="660" y2="240" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
-  <line x1="660" y1="240" x2="660" y2="290" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrow-red-3-6)" marker-start="url(#arrow-red-3-6)"/>
-  <rect x="538" y="256" width="244" height="22" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
-  <text x="660" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">同介质：顺序比随机快 100×</text>
+  <!-- 横线走 bar3/bar4 间隙(y=265)，标注框让开竖线(x=666)，避免穿字/穿框 -->
+  <line x1="500" y1="265" x2="660" y2="265" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+  <line x1="660" y1="265" x2="660" y2="290" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrow-red-3-6)" marker-start="url(#arrow-red-3-6)"/>
+  <rect x="666" y="258" width="150" height="20" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
+  <text x="741" y="272" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序比随机快 100×</text>
 
   <!-- 红字结论（柱状图右侧空白处） -->
   <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
@@ -101,8 +98,7 @@
   <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，等于白捡两个数量级</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
-  <!-- 在主内存柱（y=190）与机械盘柱（y=340）之间画纵向跨度线 -->
-  <line x1="225" y1="190" x2="225" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow-3-6)" marker-start="url(#arrow-3-6)"/>
+  <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->
   <rect x="40" y="372" width="178" height="42" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="129" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">内存比机械盘快</text>
   <text x="129" y="406" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">约 1,000 万倍（10⁷）</text>

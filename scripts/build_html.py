@@ -14,6 +14,11 @@ def load_svg(path, prefix=''):
     s = open(path, encoding='utf-8').read()
     s = re.sub(r'<\?xml[^>]*\?>\s*', '', s)   # 去 XML 声明
     s = re.sub(r'<!DOCTYPE[^>]*>\s*', '', s)
+    # 剥离图内"图 X-Y 编号标题"行：下方 figcaption 已承担编号标题，留着会上下重复。
+    # 仅构建时剥离；.svg 源文件仍自带标题，单独打开不受影响。保留解释性副标题。
+    m = re.search(r'<text\b[^>]*>\s*图\s*\d+[-－]\d+\s*[^<]*</text>', s)
+    if m:
+        s = s[:m.start()] + s[m.end():]
     # 内联 SVG 没有 width/height 时浏览器会塌缩为 0×0；注入 width="100%" 保证可见
     s = re.sub(r'(<svg\b)(?![^>]*\swidth=)', r'\1 width="100%"', s)
     # 内联到同一 HTML 时，各 SVG 的 <marker id="arrow"> 等会跨文件冲突
@@ -134,12 +139,19 @@ def convert(md, svgmap, counter):
         im = re.match(r'^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$', line)
         if im:
             alt, url = im.group(1), im.group(2)
-            cap = '<figcaption>%s</figcaption>' % inline(alt, svgmap) if alt else ''
+            cap_text = alt
+            consumed = 1
+            # 若下一行是斜体图注（*图 X-Y …*），合并为唯一图注，避免「figcaption + 斜体图注」重复
+            if i + 1 < n:
+                mc = re.match(r'^\s*\*([^*]+)\*\s*$', lines[i + 1])
+                if mc:
+                    cap_text = mc.group(1); consumed = 2
+            cap = '<figcaption>%s</figcaption>' % inline(cap_text, svgmap) if cap_text else ''
             if url in svgmap:
                 out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))
             else:
                 out.append('<figure class="fig"><img src="%s" alt="%s">%s</figure>' % (url, alt, cap))
-            i += 1; continue
+            i += consumed; continue
         # paragraph
         buf = [line]; i += 1
         while i < n:

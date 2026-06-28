@@ -13,7 +13,7 @@
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">自上而下：文件头 → 页头 → 虚拟记录 → 用户记录 → 空闲 → 页目录 → 文件尾</text>
 
   <!-- page outline -->
-  <rect x="120" y="78" width="420" height="520" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <rect x="120" y="78" width="420" height="398" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
   <text x="560" y="92" font-size="13" font-weight="700" fill="#D97706">16KB 数据页</text>
 
   <!-- 1. FIL Header -->

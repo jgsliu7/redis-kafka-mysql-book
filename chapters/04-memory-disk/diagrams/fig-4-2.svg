@@ -57,9 +57,9 @@
     <rect x="268" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="291" y="368" text-anchor="middle">k9</text>
   </g>
 
-  <!-- arrows: random pick -->
-  <path d="M 83 250 Q 83 300 83 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrowInd)"/>
-  <path d="M 239 250 Q 239 300 239 346" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrowInd)"/>
+  <!-- arrows: random pick（从键池底下到采样池顶，避开键池说明文字与采样池标题） -->
+  <path d="M 83 295 L 83 315" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrowInd)"/>
+  <path d="M 239 295 L 239 315" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrowInd)"/>
   <text x="425" y="358" font-size="11" fill="#374151">← 随机抽 N 个</text>
 
   <!-- evict -->

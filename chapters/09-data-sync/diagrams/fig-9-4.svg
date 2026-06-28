@@ -54,7 +54,7 @@
 
     <!-- 环形回绕弧线：写指针越过右端后回绕覆盖最老命令（左端被挤出） -->
     <path d="M 670 60 Q 720 60 720 20 Q 720 0 40 0 Q 0 0 0 30" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="660" y="30" font-size="10" fill="#6B7280">回绕（覆盖最老）</text>
+    <text x="300" y="20" text-anchor="middle" font-size="10" fill="#6B7280">回绕（覆盖最老）</text>
 
     <!-- 左端：窗口下界=最老存活字节 -->
     <line x1="40" y1="100" x2="40" y2="120" stroke="#6B7280" stroke-width="1.5"/>

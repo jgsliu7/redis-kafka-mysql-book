@@ -40,8 +40,8 @@
   <line x1="550" y1="178" x2="550" y2="150" stroke="#4B5563" stroke-width="1" stroke-dasharray="3 3"/>
 
   <!-- 分支标签 -->
-  <text x="370" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（窗口内）</text>
-  <text x="710" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（窗口外）</text>
+  <text x="300" y="296" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（窗口内）</text>
+  <text x="760" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（窗口外）</text>
 
   <!-- 左分支：部分重同步 -->
   <rect x="60" y="320" width="320" height="158" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
