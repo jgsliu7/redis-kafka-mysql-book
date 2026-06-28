@@ -38,7 +38,7 @@
 
 **MySQL** 是全球使用最广的开源关系型数据库之一。自 1995 年起源以来，它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、多版本并发控制（MVCC，Multi-Version Concurrency Control）、B+ 树聚簇索引、预写日志（WAL，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的取舍。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。
 
-**Kafka** 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second），单台 broker 的典型吞吐也在十万到几十万量级。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。
+**Kafka** 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second），单台 Broker 的典型吞吐也在十万到几十万量级。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。
 
 三种范式各有候选，为什么最终落到这三款？因为它们各自把一种设计取向推到了别家不愿走、也走不到的程度。Redis 把"快"和"简单"做到底，代价是容量受内存约束；MySQL 把"对"和"稳"摆在第一位，宁可慢也不丢不错；Kafka 则把"多"和"广"做到底，用顺序写换来极致吞吐。这三种取向摆在一起，后端存储该在哪些维度上做取舍，也就基本涵盖了。
 
