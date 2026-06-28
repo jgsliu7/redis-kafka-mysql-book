@@ -51,7 +51,7 @@
   <!-- 本书前 8 章：L1 → L2 -->
   <line x1="360" y1="418" x2="360" y2="408" stroke="#4F46E5" stroke-width="0" />
   <rect x="245" y="498" width="230" height="36" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="4,3"/>
-  <text x="360" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4F46E5">本书第 1–8 章</text>
+  <text x="360" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4F46E5">本书第 1–9 章</text>
   <text x="360" y="529" text-anchor="middle" font-size="11" fill="#374151">带读者完成 L1 → L2 的跃迁</text>
   <!-- 连线指到 L1/L2 之间 -->
   <line x1="360" y1="498" x2="360" y2="490" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#arrowGray)"/>

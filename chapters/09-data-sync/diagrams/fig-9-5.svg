@@ -79,11 +79,11 @@
   <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 进度自动定位续传</text>
 
   <!-- ============ 中间链路连线 ============ -->
-  <!-- IO 线程 → Dump 线程：拉取 binlog -->
-  <line x1="688" y1="145" x2="252" y2="419" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Dump 线程 → IO 线程：binlog 数据流（主 → 从） -->
+  <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">网络拉取 binlog event</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，自动定位续传点</text>
+  <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 IO 线程主动拉取</text>
 
   <!-- 半同步 ACK 回路：从 → 主 -->
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrowRed)"/>
