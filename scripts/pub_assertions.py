@@ -39,6 +39,10 @@ for w in ["真相之源", "骨架", "取舍", "状态机", "同题作答"]:
     assert_present(f"锚点 {w}", w)
 
 # ── CAP 归类(应全 hedged,无绝对措辞) ────────────────────
+# ⚠️ 关键词兜底,不等于 CAP 已语义对齐:下面只拦几个"已知绝对措辞"字串(历史 CAP 措辞反复
+# 回弹,故锁死)。agent 换个说法(如"属于 AP""定位 AP""是个 AP 系统")就能绕过。权威检查 =
+# 派 agent 逐段通读 ch7/ch9/ch10 语义判断每处 CAP 是否 hedged(语义类不能用 grep,见
+# docs/去ai味道自查方法.md §1.3q "检查方法")。本断言仅"已知坏字串没回弹"的快速兜底。
 assert_zero("CAP 绝对措辞(本质上是/写死/必须/走/锁在 AP)",
             r"本质上是 ?AP|写死 ?AP|必须 ?AP|走 ?AP|把自己锁在 AP")
 
@@ -82,6 +86,7 @@ assert_zero("背压间隔(应退避 backoff)", r"背压间隔")
 assert_zero("分片单位叫分区(自相矛盾)", r"分片单位叫分区")
 assert_zero("Page Cache 带空格(应 PageCache 连写)", r"Page Cache")
 assert_zero("references 章名'第一章'中文数字(应阿拉伯)", r"## 第[一二三四五六七八九十]+章")
+# 关键词兜底:只确认这句 nuance 还在;不代表全书 CAP 都 hedged(那是语义通读的活,见上节注释)。
 assert_present("CAP nuance 已补(ch9 区分默认形态/产品定位)", r"这只是 MySQL 复制的默认形态，不是它的产品定位")
 assert_present("V0 单条 14 字节", r"V0 单条约 14 字节")
 
