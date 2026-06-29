@@ -8,7 +8,7 @@
 
   <!-- 标题 -->
   <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 4-1　存储层次访问延迟的数量级（对数轴）</text>
-  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#6B7280">横轴每格放大 10 倍，内存与磁盘之间隔着 6～7 个数量级</text>
+  <text x="440" y="52" text-anchor="middle" font-size="12" fill="#6B7280">横轴每格放大 10 倍，内存与磁盘之间隔着约 5 个数量级</text>
 
   <!-- ============ 绘图区参数 ============
        X 轴起点 x0 = 240，终点 x1 = 820（宽 580）
@@ -101,7 +101,7 @@
   <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->
   <rect x="40" y="372" width="178" height="42" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="129" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">内存比机械盘快</text>
-  <text x="129" y="406" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">约 1,000 万倍（10⁷）</text>
+  <text x="129" y="406" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">约十万倍（10⁵）</text>
 
   <!-- 左侧分组提示：内存 vs 磁盘 -->
   <text x="36" y="112" font-size="11" font-weight="700" fill="#4F46E5">┃ 内存</text>

@@ -49,12 +49,13 @@
 ## 第 8 章 磁盘存储格式 — 文件结构的设计哲学
 
 - Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2025-12-01]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把"日志即数据本体"落进字节布局的依据。
-- MySQL. InnoDB Page Structure[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16 KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。
+- MySQL. InnoDB Page Structure[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。
 - Redis. RDB File Format 与 RESP Specification[EB/OL]. [2025-12-01]. https://redis.io/docs/latest/operate/oss_and_stack/persistence/. —— 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议即文件格式的设计，快照范式文件结构的典型范例。
 
 ## 第 9 章 数据同步机制 — 集群一致性的实现
 
-- Apache Kafka. KIP-101: Replication Protocol Revamp / KIP-320: Leader Epochs[EB/OL]. [2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。
+- Apache Kafka. KIP-101: Replication Protocol Revamp[EB/OL]. (2015)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。
+- Apache Kafka. KIP-320: Leader Epochs[EB/OL]. (2018)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-320. —— Leader Epoch 在截断协议中的细化应用，避免副本恢复时按 HW 误截断造成数据丢失与不一致。
 - Redis. Replication 与 PSYNC2[EB/OL]. [2025-12-01]. https://redis.io/docs/latest/operate/oss_and_stack/management/replication/. —— replid/replid2 双标识符、复制偏移量与环形积压缓冲区实现部分重同步的官方描述，PSYNC2 使故障转移后仍可增量同步。
 - MySQL. GTID-Based Replication[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/replication-gtids.html. —— GTID（`source_id:transaction_id`）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。
 - Lamport L. Time, Clocks, and the Ordering of Events in a Distributed System[J]. Communications of the ACM, 1978, 21(7): 558-565. —— 逻辑时钟与 happens-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。
@@ -73,8 +74,8 @@
 - Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— "日志即抽象"的精炼论述，适合快速建立数据系统统一视角。
 - Bailis P, Stonebraker M, et al. Readings in Database Systems (Red Book)[M]. Cambridge: MIT Press, 2019. —— 数据库经典论文按主题组织的导读索引，适合有论文阅读需求的读者。
 - Schwartz B, Zaitsev P, Tkachenko V. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2022. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
-- Narkhede N, Kreps J, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，十余年后核心架构依然忠实于此文。
+- Narkhede N, Kreps J, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. Stockholm, 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，十余年后核心架构依然忠实于此文。
 
 ---
 
-> 一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的坐标系。本书的目标不是替代上述资料，而是为读懂它们先搭一个共同的坐标系。
+> 一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的坐标系。本书替代不了这些资料，能做的是先帮你搭一个共同的坐标系，再去读它们就顺了。
