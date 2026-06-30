@@ -1,156 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 680" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 404" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
     </marker>
   </defs>
 
-  <!-- Title -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-3　三款软件故障转移决策流程对比</text>
-  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三款软件走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">图 7-3 MySQL 主从复制基础拓扑</text>
+  <text x="400" y="48" text-anchor="middle" font-size="12" fill="#6B7280">主库写 binlog → 从库 IO 线程拉取到 relay log → SQL 线程回放</text>
 
-  <!-- ===== Column headers ===== -->
-  <rect x="40"  y="70" width="280" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="180" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">Redis · Gossip + epoch 投票</text>
+  <!-- Master -->
+  <rect x="250" y="75" width="300" height="110" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">主库（Master）</text>
+  <rect x="280" y="118" width="240" height="28" rx="5" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="400" y="137" text-anchor="middle" font-size="12" fill="#1E40AF">写请求 → 事务提交 → 写 binlog</text>
+  <rect x="280" y="152" width="240" height="24" rx="5" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="400" y="169" text-anchor="middle" font-size="12" fill="#1E40AF">binlog = 所有数据变更的有序日志</text>
 
-  <rect x="330" y="70" width="280" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">MySQL · XCom/Paxos View Change</text>
+  <!-- Arrow: Master binlog → Slave IO -->
+  <line x1="400" y1="185" x2="400" y2="215" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+  <text x="420" y="204" font-size="11" fill="#4F46E5">binlog 流</text>
 
-  <rect x="620" y="70" width="280" height="34" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="760" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">Kafka · Controller + ISR</text>
+  <!-- Slave -->
+  <rect x="200" y="220" width="400" height="140" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-size="15" font-weight="700" fill="#92400E">从库（Slave）</text>
 
-  <!-- ===== Redis flow ===== -->
-  <rect x="55" y="120" width="250" height="48" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">主节点超时无响应</text>
-  <text x="180" y="160" text-anchor="middle" font-size="11" fill="#374151">（cluster-node-timeout）</text>
+  <!-- IO Thread -->
+  <rect x="220" y="265" width="170" height="40" rx="6" fill="#FEF3C7" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="305" y="283" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">IO 线程</text>
+  <text x="305" y="300" text-anchor="middle" font-size="10" fill="#78716C">拉取 binlog → relay log</text>
 
-  <line x1="180" y1="168" x2="180" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <!-- Arrow IO → relay log -->
+  <line x1="390" y1="285" x2="420" y2="285" stroke="#92400E" stroke-width="1.2" marker-end="url(#arrow)"/>
 
-  <rect x="55" y="186" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="205" text-anchor="middle" font-size="12" fill="#374151">从节点标记 PFAIL（主观下线）</text>
-  <text x="180" y="221" text-anchor="middle" font-size="11" fill="#6B7280">Gossip PING/PONG 携带标记</text>
+  <!-- Relay Log -->
+  <rect x="425" y="265" width="155" height="40" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="502" y="283" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">relay log</text>
+  <text x="502" y="300" text-anchor="middle" font-size="10" fill="#78716C">中继日志（缓冲）</text>
 
-  <line x1="180" y1="230" x2="180" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <!-- Arrow relay → SQL -->
+  <line x1="502" y1="305" x2="502" y2="320" stroke="#92400E" stroke-width="1.2" marker-end="url(#arrow)"/>
 
-  <rect x="55" y="248" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="267" text-anchor="middle" font-size="12" fill="#374151">半数以上主节点确认 → FAIL</text>
-  <text x="180" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（客观下线，广播 FAIL）</text>
+  <!-- SQL Thread -->
+  <rect x="335" y="323" width="170" height="28" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="420" y="342" text-anchor="middle" font-size="13" font-weight="600" fill="#92400E">SQL 线程：逐条回放</text>
 
-  <line x1="180" y1="292" x2="180" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="55" y="310" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">故障主的从节点发起选举</text>
-  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">申请其他主节点投票（currentEpoch+1）</text>
-
-  <line x1="180" y1="354" x2="180" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="55" y="372" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="391" text-anchor="middle" font-size="12" fill="#374151">获多数派主节点票 → 当选</text>
-  <text x="180" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（按优先级 / offset / runid 排序）</text>
-
-  <line x1="180" y1="416" x2="180" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="55" y="434" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="180" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">升级新主 + Gossip 广播新拓扑</text>
-  <text x="180" y="469" text-anchor="middle" font-size="11" fill="#374151">最终一致 · 客户端经 MOVED 重连</text>
-
-  <!-- Redis trait -->
-  <rect x="55" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
-  <text x="180" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
-  <text x="180" y="540" text-anchor="middle" font-size="11" fill="#374151">去中心化 · 无 Controller</text>
-  <text x="180" y="556" text-anchor="middle" font-size="11" fill="#374151">收敛慢 · 短暂不一致视图</text>
-
-  <!-- ===== MySQL flow ===== -->
-  <rect x="345" y="120" width="250" height="48" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员故障 / 失联</text>
-  <text x="470" y="160" text-anchor="middle" font-size="11" fill="#374151">（组内 XCom 心跳超时）</text>
-
-  <line x1="470" y1="168" x2="470" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="345" y="186" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="205" text-anchor="middle" font-size="12" fill="#374151">存活成员发起 View Change</text>
-  <text x="470" y="221" text-anchor="middle" font-size="11" fill="#6B7280">提议剔除故障成员的新视图</text>
-
-  <line x1="470" y1="230" x2="470" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="345" y="248" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="267" text-anchor="middle" font-size="12" fill="#374151">XCom（Paxos）对视图投票</text>
-  <text x="470" y="283" text-anchor="middle" font-size="11" fill="#6B7280">需多数派成员同意</text>
-
-  <line x1="470" y1="292" x2="470" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
-
-  <rect x="345" y="310" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="329" text-anchor="middle" font-size="12" fill="#374151">少数派？→ 直接停止服务</text>
-  <text x="470" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（CP 宁可不可用也不脑裂）</text>
-
-  <line x1="470" y1="354" x2="470" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="345" y="372" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="391" text-anchor="middle" font-size="12" fill="#374151">多数派达成 → 新视图生效</text>
-  <text x="470" y="407" text-anchor="middle" font-size="11" fill="#6B7280">自动选 Primary + GTID 对齐</text>
-
-  <line x1="470" y1="416" x2="470" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="345" y="434" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="470" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">新 Primary 提供读写服务</text>
-  <text x="470" y="469" text-anchor="middle" font-size="11" fill="#374151">强一致 · 写延迟含多数派往返</text>
-
-  <!-- MySQL trait -->
-  <rect x="345" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
-  <text x="470" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
-  <text x="470" y="540" text-anchor="middle" font-size="11" fill="#374151">共识驱动 · View Change 原子</text>
-  <text x="470" y="556" text-anchor="middle" font-size="11" fill="#374151">强一致 · 少数派停服</text>
-
-  <!-- ===== Kafka flow ===== -->
-  <rect x="635" y="120" width="250" height="48" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Partition Leader 故障</text>
-  <text x="760" y="160" text-anchor="middle" font-size="11" fill="#374151">（ZK session 失效 / KRaft 心跳超时）</text>
-
-  <line x1="760" y1="168" x2="760" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="635" y="186" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="205" text-anchor="middle" font-size="12" fill="#374151">Controller 监听到 Broker 下线</text>
-  <text x="760" y="221" text-anchor="middle" font-size="11" fill="#6B7280">（集中仲裁者，单点决策）</text>
-
-  <line x1="760" y1="230" x2="760" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="635" y="248" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="267" text-anchor="middle" font-size="12" fill="#374151">读取该分区当前 ISR 列表</text>
-  <text x="760" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（同步副本集合，动态门槛）</text>
-
-  <line x1="760" y1="292" x2="760" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
-
-  <rect x="635" y="310" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="329" text-anchor="middle" font-size="12" fill="#374151">ISR 为空？→ 等待 / 选非 ISR</text>
-  <text x="760" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（unclean.leader.election 可配丢数据）</text>
-
-  <line x1="760" y1="354" x2="760" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="635" y="372" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="391" text-anchor="middle" font-size="12" fill="#374151">从 ISR 中选首位副本为新 Leader</text>
-  <text x="760" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（已在 preferred 副本顺序靠前）</text>
-
-  <line x1="760" y1="416" x2="760" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-
-  <rect x="635" y="434" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="760" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">更新元数据 + 通知生产/消费者</text>
-  <text x="760" y="469" text-anchor="middle" font-size="11" fill="#374151">ISR 内选举 · 已确认消息不丢</text>
-
-  <!-- Kafka trait -->
-  <rect x="635" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
-  <text x="760" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
-  <text x="760" y="540" text-anchor="middle" font-size="11" fill="#374151">集中仲裁 · Controller 单点决策</text>
-  <text x="760" y="556" text-anchor="middle" font-size="11" fill="#374151">毫秒级恢复 · ISR 保不丢</text>
-
-  <!-- ===== Bottom summary ===== -->
-  <line x1="40" y1="590" x2="900" y2="590" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="470" y="615" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同一问题，三种哲学：去中心化投票 · 共识协议 · 集中仲裁</text>
-  <text x="470" y="640" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
-    红色箭头标注的是「放弃可用性以保一致性」的取舍节点
-  </text>
-  <text x="470" y="662" text-anchor="middle" font-size="11" fill="#9CA3AF">注：Controller 自身的 Leader 选举（KRaft）与 Partition 的 Leader 选举是两套独立机制</text>
+  <!-- Three concurrent slaves hint -->
+  <text x="400" y="380" text-anchor="middle" font-size="11" fill="#9CA3AF">主库 → N 个从库（每个从库独立拉取，互不影响）</text>
 </svg>

@@ -126,9 +126,9 @@ assert_zero("fig-4-5 零长度线(⑤框缺入箭头)", r'x1="490" y1="408" x2="
 # fig-5-6:返回箭头改为绕画布外侧落到 ReplicaManager 框侧边(原悬空 y=312)
 assert_present("fig-5-6 返回箭头落 ReplicaManager(非悬空)", r'L 40 260 L 58 260',
                text=_svgs['chapters/05-layered-architecture/diagrams/fig-5-6.svg'])
-# fig-7-4:底部文字曾贴画布底被裁 → viewBox 高 380→404
-assert_present("fig-7-4 viewBox 加高(防底部裁切)", r'viewBox="0 0 800 404"',
-               text=_svgs['chapters/07-cluster/diagrams/fig-7-4.svg'])
+# fig-7-3(原fig-7-4,ch7图序重排后):底部文字曾贴画布底被裁 → viewBox 高 380→404
+assert_present("fig-7-3 viewBox 加高(防底部裁切)", r'viewBox="0 0 800 404"',
+               text=_svgs['chapters/07-cluster/diagrams/fig-7-3.svg'])
 # fig-9-6:并行复制绿色箭头与 Worker 框中心对齐(原错位 10px)
 assert_present("fig-9-6 Worker 箭头对齐(235/355)", r'x1="235" y1="238" x2="235" y2="258"',
                text=_svgs['chapters/09-data-sync/diagrams/fig-9-6.svg'])

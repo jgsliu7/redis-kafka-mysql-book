@@ -13,95 +13,95 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-4　Kafka 同一 Broker 的监听器分层</text>
-  <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">内部 SASL_SSL / 外部 SSL / 控制面 KRaft 三条路径并行，按网络域分级信任</text>
+  <text x="440" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-4　MySQL 五级权限表的层级收窄检查流程</text>
+  <text x="440" y="50" text-anchor="middle" font-size="12" fill="#374151">授权检查从全局到列逐层收窄，命中即停；细粒度优先于粗粒度</text>
 
-  <!-- Three sources (left column) -->
-  <!-- 内部应用客户端 -->
-  <rect x="30" y="95" width="150" height="56" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="105" y="118" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">内部应用客户端</text>
-  <text x="105" y="136" text-anchor="middle" font-size="11" fill="#374151">受信内网 / VPC</text>
+  <!-- Left column: 权限表层级 (stacked boxes) -->
+  <!-- Level 1: 全局 mysql.user -->
+  <rect x="60" y="85" width="240" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="80" y="108" font-size="14" font-weight="700" fill="#111827">① 全局</text>
+  <text x="80" y="128" font-size="11" fill="#374151">mysql.user（账号+主机 → 全库）</text>
 
-  <!-- 外部应用客户端 -->
-  <rect x="30" y="265" width="150" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="105" y="288" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">外部应用客户端</text>
-  <text x="105" y="306" text-anchor="middle" font-size="11" fill="#374151">公网 / 跨云</text>
+  <line x1="180" y1="141" x2="180" y2="160" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="155" font-size="10" fill="#6B7280">未命中</text>
 
-  <!-- Controller 节点 -->
-  <rect x="30" y="435" width="150" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="105" y="458" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Controller 节点</text>
-  <text x="105" y="476" text-anchor="middle" font-size="11" fill="#374151">KRaft 控制面</text>
+  <!-- Level 2: 数据库 mysql.db -->
+  <rect x="60" y="163" width="240" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="80" y="186" font-size="14" font-weight="700" fill="#111827">② 数据库</text>
+  <text x="80" y="206" font-size="11" fill="#374151">mysql.db（+库 → 单库）</text>
 
-  <!-- Three listeners on the Broker (middle column) -->
-  <!-- Broker container -->
-  <rect x="290" y="80" width="320" height="420" rx="10" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="450" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">同一个 Broker 进程</text>
-  <text x="450" y="121" text-anchor="middle" font-size="11" fill="#374151">listeners + listener.security.protocol.map</text>
+  <line x1="180" y1="219" x2="180" y2="238" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="233" font-size="10" fill="#6B7280">未命中</text>
 
-  <!-- Listener 1: INTERNAL (SASL_SSL) -->
-  <rect x="310" y="135" width="280" height="100" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
-  <text x="325" y="158" font-size="13" font-weight="700" fill="#111827">监听器 INTERNAL</text>
-  <text x="325" y="178" font-size="12" fill="#374151">协议：SASL_SSL（强制认证 + 加密）</text>
-  <text x="325" y="196" font-size="12" fill="#374151">端口 9092 · SASL=SCRAM-SHA-512</text>
-  <text x="325" y="214" font-size="11" fill="#059669" font-weight="600">信任级别：高（内网互信证书）</text>
-  <text x="325" y="228" font-size="11" fill="#374151">advertised.listeners=内网域名</text>
+  <!-- Level 3: 表 mysql.tables_priv -->
+  <rect x="60" y="241" width="240" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="80" y="264" font-size="14" font-weight="700" fill="#111827">③ 表</text>
+  <text x="80" y="284" font-size="11" fill="#374151">mysql.tables_priv（+表 → 单表）</text>
 
-  <!-- Listener 2: EXTERNAL (SSL only / SASL_PLAINTEXT? here SSL) -->
-  <rect x="310" y="305" width="280" height="100" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="325" y="328" font-size="13" font-weight="700" fill="#111827">监听器 EXTERNAL</text>
-  <text x="325" y="348" font-size="12" fill="#374151">协议：SSL（加密 + 双向证书认证）</text>
-  <text x="325" y="366" font-size="12" fill="#374151">端口 9093 · 公网 CA 签发证书</text>
-  <text x="325" y="384" font-size="11" fill="#D97706" font-weight="600">信任级别：中（公网，证书强校验）</text>
-  <text x="325" y="398" font-size="11" fill="#374151">advertised.listeners=公网域名</text>
+  <line x1="180" y1="297" x2="180" y2="316" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="311" font-size="10" fill="#6B7280">未命中</text>
 
-  <!-- Listener 3: CONTROLLER (KRaft) -->
-  <rect x="310" y="435" width="280" height="55" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="325" y="456" font-size="13" font-weight="700" fill="#111827">监听器 CONTROLLER</text>
-  <text x="325" y="474" font-size="12" fill="#374151">协议：SSL · 端口 9094 · 元数据 Raft 复制</text>
-  <text x="325" y="487" font-size="11" fill="#374151">信任级别：最高（节点互信，专网）</text>
+  <!-- Level 4: 列 mysql.columns_priv -->
+  <rect x="60" y="319" width="240" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="80" y="342" font-size="14" font-weight="700" fill="#111827">④ 列</text>
+  <text x="80" y="362" font-size="11" fill="#374151">mysql.columns_priv（+列 → 列级）</text>
 
-  <!-- arrows: sources -> listeners -->
-  <line x1="180" y1="123" x2="306" y2="160" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="180" y1="293" x2="306" y2="330" stroke="#D97706" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="180" y1="463" x2="306" y2="455" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="180" y1="375" x2="180" y2="394" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="389" font-size="10" fill="#6B7280">未命中</text>
 
-  <!-- Right column: inside broker security layers -->
-  <!-- After listener: shared authz + audit core -->
-  <rect x="650" y="135" width="200" height="355" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="750" y="160" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">共享安全内核</text>
-  <line x1="670" y1="172" x2="830" y2="172" stroke="#059669" stroke-width="1"/>
+  <!-- Level 5: 存储程序 -->
+  <rect x="60" y="397" width="240" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="80" y="420" font-size="14" font-weight="700" fill="#111827">⑤ 存储程序</text>
+  <text x="80" y="440" font-size="11" fill="#374151">mysql.procs_priv（例程级）</text>
 
-  <!-- Authorizer -->
-  <rect x="670" y="186" width="160" height="58" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
-  <text x="750" y="208" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">授权 Authorizer</text>
-  <text x="750" y="226" text-anchor="middle" font-size="11" fill="#374151">Principal + Operation</text>
-  <text x="750" y="240" text-anchor="middle" font-size="11" fill="#374151">+ Resource 三元组</text>
+  <!-- funnel label -->
+  <text x="300" y="276" font-size="11" fill="#D97706" font-style="italic">作用域</text>
+  <text x="300" y="292" font-size="11" fill="#D97706" font-style="italic">逐层收窄</text>
+  <line x1="300" y1="300" x2="300" y2="320" stroke="#D97706" stroke-width="1" stroke-dasharray="3 3"/>
+  <polygon points="296,318 304,318 300,326" fill="#D97706"/>
+  <text x="310" y="330" font-size="11" fill="#D97706" font-style="italic">粒度变细</text>
 
-  <!-- ACL store -->
-  <rect x="670" y="258" width="160" height="58" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
-  <text x="750" y="280" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">ACL 存储</text>
-  <text x="750" y="298" text-anchor="middle" font-size="11" fill="#374151">KRaft 元数据日志</text>
-  <text x="750" y="312" text-anchor="middle" font-size="11" fill="#374151">前缀授权 app-a.*</text>
+  <!-- Right column: 检查决策路径 -->
+  <!-- Start: 用户执行 SELECT phone FROM users -->
+  <rect x="430" y="85" width="380" height="50" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="620" y="108" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">示例：SELECT phone FROM db.users</text>
+  <text x="620" y="125" text-anchor="middle" font-size="11" fill="#374151">alice@%.example.com 要查 db.users 的 phone 列</text>
 
-  <!-- audit log -->
-  <rect x="670" y="330" width="160" height="58" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
-  <text x="750" y="352" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">审计日志</text>
-  <text x="750" y="370" text-anchor="middle" font-size="11" fill="#374151">Authorizer 决策</text>
-  <text x="750" y="384" text-anchor="middle" font-size="11" fill="#374151">+ 请求拦截器</text>
+  <!-- Step 1: 查全局 -->
+  <rect x="430" y="155" width="380" height="48" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
+  <text x="445" y="176" font-size="12" font-weight="600" fill="#111827">查 mysql.user：alice@%.example.com 是否有全局 SELECT？</text>
+  <text x="445" y="194" font-size="11" fill="#EF4444">否（无全局权限）→ 继续下钻</text>
 
-  <!-- topic store -->
-  <rect x="670" y="402" width="160" height="68" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
-  <text x="750" y="424" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">主题分区</text>
-  <text x="750" y="442" text-anchor="middle" font-size="11" fill="#374151">日志段读写</text>
-  <text x="750" y="458" text-anchor="middle" font-size="11" fill="#374151">副本同步（亦 TLS）</text>
+  <!-- Step 2: 查库 -->
+  <rect x="430" y="215" width="380" height="48" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
+  <text x="445" y="236" font-size="12" font-weight="600" fill="#111827">查 mysql.db：alice 对 db 是否有 SELECT？</text>
+  <text x="445" y="254" font-size="11" fill="#EF4444">否（未在 db 级授权）→ 继续下钻</text>
 
-  <!-- arrows from listeners into shared core -->
-  <line x1="590" y1="185" x2="666" y2="215" stroke="#059669" stroke-width="1.6" marker-end="url(#arrow-green)"/>
-  <line x1="590" y1="355" x2="666" y2="240" stroke="#D97706" stroke-width="1.6" marker-end="url(#arrow)"/>
-  <line x1="590" y1="460" x2="666" y2="265" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <!-- Step 3: 查表 -->
+  <rect x="430" y="275" width="380" height="48" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
+  <text x="445" y="296" font-size="12" font-weight="600" fill="#111827">查 mysql.tables_priv：alice 对 db.users 是否有 SELECT？</text>
+  <text x="445" y="314" font-size="11" fill="#EF4444">否（表级只授了 INSERT）→ 继续下钻</text>
 
-  <!-- Bottom note: design takeaway -->
-  <rect x="30" y="515" width="820" height="52" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="440" y="535" text-anchor="middle" font-size="12" fill="#374151">设计要点：同一进程多监听器并存，每条路径独立配置协议、端口、证书与 advertised 域名 → 按网络域分级信任。</text>
-  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；但任何一段明文都是漏洞，故副本同步、控制面、客户端三跳都必须独立 TLS。</text>
+  <!-- Step 4: 查列 (命中) -->
+  <rect x="430" y="335" width="380" height="48" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="445" y="356" font-size="12" font-weight="600" fill="#111827">查 mysql.columns_priv：alice 对 phone 列是否有 SELECT？</text>
+  <text x="445" y="374" font-size="11" fill="#059669" font-weight="600">是（列级授权命中）→ 停止，返回结果</text>
+
+  <!-- Result -->
+  <line x1="620" y1="383" x2="620" y2="408" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <rect x="470" y="412" width="300" height="42" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="620" y="430" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">放行：返回 phone 列值</text>
+  <text x="620" y="446" text-anchor="middle" font-size="11" fill="#374151">（其余列即使表级无权，列级命中也允许）</text>
+
+  <!-- connector arrows between right steps -->
+  <line x1="620" y1="135" x2="620" y2="153" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="620" y1="203" x2="620" y2="213" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="620" y1="263" x2="620" y2="273" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="620" y1="323" x2="620" y2="333" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- bottom note: 缓存优化 -->
+  <rect x="60" y="478" width="760" height="80" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 把"账号+库表"的检查结果缓存在内存（权限 bitmap），命中即 O(1)。</text>
+  <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>
