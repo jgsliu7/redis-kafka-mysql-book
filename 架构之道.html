@@ -942,7 +942,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s35">2.3.2 MySQL 二进制协议：为效率和预编译而生</h3>
 <p>MySQL 的协议和 Redis 正相反。它选了<strong>紧凑二进制</strong>。原因在 OLTP 场景下客户端和服务端之间的通信量：一条 SQL 可能返回几百列、几万行，用文本协议传输的膨胀会倍数级放大；同时 SQL 解析本身很贵，频繁提交相同结构的 SQL 时重复解析是巨大的无谓 CPU 开销。</p>
 <p>MySQL 协议分为几个阶段：握手（服务端发送能力标志和认证随机数、客户端回传加密后的凭证）、命令（客户端发送 SQL 或预编译语句 ID）、响应（服务端返回结果集或 OK/ERR）。整个过程中，整数用定长小端编码（<code>LengthEncodedInteger</code>，1/3/4/8 字节自适应），字符串用长度前缀（<code>LengthEncodedString</code>），结果集列信息先发列数和每列的类型/长度元数据，再发行数据。接收方在收到第一个字节时就知道后面还有多少字节。</p>
-<p><strong>预编译语句</strong> 是 MySQL 协议在"效率"上做到的最关键设计。客户端先发 <code>COM_STMT_PREPARE</code> 把一条带占位符 <code>?</code> 的 SQL 模板发给服务端，服务端解析一次生成执行计划、返回一个 <code>statement_id</code>。此后每次执行只需发 <code>COM_STMT_EXECUTE</code> + <code>statement_id</code> + 占位符的值。解析和优化只做一次，反复执行时省掉最贵的 CPU 步骤。这和 Redis Pipeline 的"少轮 RTT（网络往返，Round-Trip Time）"不同：Pipeline 少的是网络往返，预编译语句少的是服务端 CPU。同一类效率问题，两种解法对应两个不同的瓶颈。</p>
+<p><strong>预编译语句</strong> 是 MySQL 协议在"效率"上做到的最关键设计。客户端先发 <code>COM_STMT_PREPARE</code> 把一条带占位符 <code>?</code> 的 SQL 模板发给服务端，服务端解析一次生成执行计划、返回一个 <code>statement_id</code>。此后每次执行只需发 <code>COM_STMT_EXECUTE</code> + <code>statement_id</code> + 占位符的值。解析和优化只做一次，反复执行时省掉最贵的 CPU 步骤。这和 Redis Pipeline 的"省掉 RTT（网络往返，Round-Trip Time）"不同：Pipeline 省的是网络往返，预编译语句省的是服务端 CPU。同一类效率问题，两种解法对应两个不同的瓶颈。</p>
 <p><strong>二进制结果集</strong> 让行数据以紧凑的二进制格式传输，比同等数据的文本表示体积更小（数值与字符串列越密集，省得越多）。代价是：你没法用 <code>nc</code> 连 MySQL 看结果集，每一字节都是编码过的。如果不对照协议文档，无法直接从字节流里辨读内容。人不可读这个代价，是为省下 OLTP 场景的带宽和解析开销而支付的。</p>
 <h3 id="s36">2.3.3 Kafka 请求/响应协议：统一头部、版本化、批量优先</h3>
 <p>Kafka 的协议模型换了思路。它是一个<strong>分门别类的请求/响应体系</strong>，而不是"客户端发命令、服务端回结果"的问答题。Produce、Fetch、Metadata、JoinGroup、SyncGroup……几十种请求类型，每种请求有自己独立的 Schema，每种 Schema 有自己的版本号。</p>
