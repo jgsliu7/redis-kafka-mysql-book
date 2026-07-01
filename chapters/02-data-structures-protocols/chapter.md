@@ -61,9 +61,9 @@ Kafka 的数据结构要同时满足三件事：**磁盘顺序追加 + 批量压
 
 **RecordBatch 就是 Kafka 的基本存储单元。** 生产者会把消息攒够一批（按 `batch.size` 或 `linger.ms`）再压成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。
 
-**RecordBatch 的字段布局讲了 Kafka 的所有设计取向。** 从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部包括：`baseOffset`（这批消息的起始位移）、`batchLength`（整个 Batch 的字节长度，用于快速跳到下一个 Batch）、`partitionLeaderEpoch`（哪一任 Leader 写了这批）、`magic`（格式版本号，V2 = 2）、`CRC`（整批一条校验，而非每条消息各自 CRC）、`attributes`（压缩类型 + 时间戳类型 + 事务标记）、`lastOffsetDelta`（最后一条消息距离 baseOffset 的差值）、`baseTimestamp` 和 `maxTimestamp`（这批的时间范围）、`producerId` / `producerEpoch` / `baseSequence`（幂等+事务所需的 Producer 状态）、`recordsCount`（这批有几条记录）。
+**RecordBatch 的字段布局讲了 Kafka 的所有设计取向。** 从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部包括：`baseOffset`（这批消息的起始偏移量）、`batchLength`（整个 Batch 的字节长度，用于快速跳到下一个 Batch）、`partitionLeaderEpoch`（哪一任 Leader 写了这批）、`magic`（格式版本号，V2 = 2）、`CRC`（整批一条校验，而非每条消息各自 CRC）、`attributes`（压缩类型 + 时间戳类型 + 事务标记）、`lastOffsetDelta`（最后一条消息距离 baseOffset 的差值）、`baseTimestamp` 和 `maxTimestamp`（这批的时间范围）、`producerId` / `producerEpoch` / `baseSequence`（幂等+事务所需的 Producer 状态）、`recordsCount`（这批有几条记录）。
 
-头部之后是实际的消息记录。**每条记录不存绝对 offset 和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0/V1 每条消息存绝对位移和绝对时间戳、每条消息带独立的 CRC，V2 把这些冗余全部消除。
+头部之后是实际的消息记录。**每条记录不存绝对 offset 和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0/V1 每条消息存绝对偏移量和绝对时间戳、每条消息带独立的 CRC，V2 把这些冗余全部消除。
 
 ![图 2-2 Kafka RecordBatch V2 字段布局](diagrams/fig-2-2.svg)
 图 2-2　Kafka RecordBatch V2 字段布局：Batch 级头部存 BaseOffset/BatchLength/CRC/Producer 状态，记录级字段只存差值；批量压缩、差分编码、单 CRC 校验，全部为吞吐服务。
