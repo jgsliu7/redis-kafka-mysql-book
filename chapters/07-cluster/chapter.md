@@ -153,7 +153,7 @@ Kafka 的分区（partition）就是并行单位。一个主题（topic）被切
 
 每个分区在物理上有多个副本（replica），其中一个是 Leader、其余是 Follower。所有读写都走 Leader，Follower 主动从 Leader 拉取（fetch）数据追同步。这套 Leader-Follower 模型看着和 Redis、MySQL 的主从很像，但 Kafka 在"谁能当 Leader"上做了一个关键设计：**ISR（In-Sync Replicas，同步副本集合）**。
 
-ISR 是一个动态名单：只有那些能在 `replica.lag.time.max.ms` 这个时间窗口内跟上 Leader 进度的副本，才被算作"同步副本"，留在 ISR 里；跟不上（lag 超时）的副本会被 Leader 踢出 ISR。当 Leader 故障时，新 Leader **只能从 ISR 里选**：不在 ISR 里的副本，哪怕它数据更全，也没资格当选，因为它已经被判定为"落后太多，不可信"。这套设计把"副本是否可信"从静态配置（比如写死"3 副本才算数"）变成动态判定（按实际同步进度实时调整）。节点慢下来时自动剔除、不拖累整体，恢复时自动加回。
+ISR 是一个动态名单：只有那些能在 `replica.lag.time.max.ms` 这个时间窗口内跟上 Leader 进度的副本，才被算作"同步副本"，留在 ISR 里；跟不上（lag 超时）的副本会被 Leader 踢出 ISR。当 Leader 故障时，新 Leader **只能从 ISR 里选**：不在 ISR 里的副本，哪怕它数据更全，也没资格当选。ISR 判定的是"副本是否可信"，不是"谁的数据更全"。这套设计把"副本是否可信"从静态配置（比如写死"3 副本才算数"）变成动态判定（按实际同步进度实时调整）。节点慢下来时自动剔除、不拖累整体，恢复时自动加回。
 
 ISR 定义了 Kafka 副本同步的边界。它比 MGR 的"全员多数派"松：MGR 要所有成员都参与 Paxos 确认，任何一个成员卡住都会拖累写；比 Redis 的"纯异步"紧：Redis 的从节点同步进度完全不参与"能否当主"的判定，宕机后任何从节点都能升主、哪怕数据落后。Kafka 在两者之间走了一条中间路线，用一个动态"够格名单"在多数派（强但不灵活）和纯异步（灵活但不保证）之间找平衡。Follower 慢了就踢出 ISR，不影响写性能；但 Leader 切换只在 ISR 内选，保证不丢已确认的消息。LEO（Log End Offset，日志末端位移）与 HW（High Watermark，高水位）的推进规则、ISR 收缩/扩张的精确条件见第 9 章"LEO、HW 与 ISR"一节。
 
