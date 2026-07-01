@@ -30,7 +30,9 @@
 - **纯现代技术散文**。不使用古风 / 文言表述。README 中原有的"吾观……初心不忘"等将在终校阶段改写为现代散文，使全书文风统一。
 - 句子有主语、有断句；避免长定语堆叠。能用短句就不用长句。
 - 第二人称统一用"你"。
-- 技术名词首次出现给英文原词，如"重做日志（redo log）"，之后用中文。
+- **术语首次出现时以'中文（英文）'或'英文（中文）'标注**。后续使用遵循两档制：
+  - **英文优先**（工程界通用缩写和日常口语化的英文术语）：ISR、GTID、MVCC、WAL、binlog、redo log、undo log、offset、compaction、fsync 等——首次标注全称后**以英文为主**，不强制转中文。
+  - **中文优先**（中文已充分沉淀）：缓冲池、分区、快照、副本、主节点、从节点、多数派、刷盘、日志段——**继续用中文**。
 - **解释优于堆术语**：每个概念先用一句大白话说清"它在解决什么问题"，再展开机制。
 - 允许适度比喻，但每个比喻必须服务于理解，且不超过两句；比喻之后要落回技术事实。
 - 禁止：空话套话、营销腔、过度感叹号、emoji、"众所周知""不言而喻"。
@@ -104,31 +106,33 @@
 
 ### 术语对照表（核心）
 
-| 英文 | 统一中文 |
-|------|---------|
-| redo log | 重做日志 |
-| undo log | 回滚日志 |
-| binlog | 二进制日志 |
-| Buffer Pool | 缓冲池 |
-| WAL, write-ahead log | 预写日志 |
-| append-only log | 追加写日志 |
-| MVCC | 多版本并发控制 |
-| replication | 复制 |
-| partition | 分区 |
-| replica / follower | 副本 / 从节点 |
-| leader / master / primary | 主节点 |
-| follower / slave / secondary | 从节点 |
-| quorum | 多数派 |
-| epoch / term | 任期 |
-| flush | 刷盘 |
-| fsync | 落盘（fsync） |
-| snapshot | 快照 |
-| compaction | 压实（compaction） |
-| segment | 日志段 |
-| offset | 位移 |
-| ISR | ISR（同步副本集合） |
-| AOF | AOF（仅追加文件） |
-| RDB | RDB（快照文件） |
+首次出现后，后续使用的语种策略见"后续用"列：
+
+| 英文 | 首次标注 | 后续用 | 说明 |
+|------|---------|--------|------|
+| redo log | 重做日志（redo log） | **英文** | 工程界日常用语，说"redo log"不做"重做日志" |
+| undo log | 回滚日志（undo log） | **英文** | 同上 |
+| binlog | binlog（二进制日志） | **英文** | 工程师只说 binlog |
+| WAL | WAL（预写日志，Write-Ahead Log） | **英文** | 缩写优先 |
+| MVCC | MVCC（多版本并发控制） | **英文** | 缩写优先 |
+| offset | 偏移量（offset） | **英文** | 非"位移"（displacement），工程师说 offset |
+| compaction | compaction（压实） | **中英** | 均可 |
+| fsync | fsync（落盘） | **中英** | 均可 |
+| flush | 刷盘 | **中文** | |
+| Buffer Pool | 缓冲池（Buffer Pool） | **中文** | |
+| append-only log | 追加写日志 | **中文** | |
+| replication | 复制 | **中文** | |
+| partition | 分区 | **中文** | |
+| replica / follower | 副本 / 从节点 | **中文** | |
+| leader / master / primary | 主节点 | **中文** | |
+| follower / slave / secondary | 从节点 | **中文** | |
+| quorum | 多数派 | **中文** | |
+| epoch / term | 任期 | **中文** | |
+| snapshot | 快照 | **中文** | |
+| segment | 日志段 | **中文** | |
+| ISR | ISR（同步副本集合） | **英文** | 缩写 |
+| AOF | AOF（仅追加文件） | **英文** | 缩写 |
+| RDB | RDB（快照文件） | **英文** | 缩写 |
 
 ---
 
