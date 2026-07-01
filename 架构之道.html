@@ -5728,7 +5728,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步：主提交后等从 ACK（落 relay log）才返回；半同步超时自动降级回异步</text>
 </svg>
 </div><figcaption>图 9-5 MySQL 异步 / 半同步复制与 GTID 链路</figcaption></figure>
-<p>图 9-5　异步复制主写完即返回；半同步增加 ACK 回路；GTID 把位点从文件偏移变成全局事务序号。</p>
+<p>图 9-5　异步复制主写完即返回；半同步增加 ACK 回路；GTID 把位点从文件偏移变成全局事务标识。</p>
 <h3 id="s209">异步复制：默认的 AP 形态</h3>
 <p>默认配置下，MySQL 复制是异步的：主节点提交事务（写完 binlog 并落盘）就立刻给客户端返回 OK，不等任何副本。就这一默认形态而言，它和 Redis 一样是异步可丢写的偏 AP 选择，故障切换时已提交事务可能丢失。但要注意，这只是 MySQL 复制的默认形态，不是它的产品定位：MySQL 通过半同步和组复制把一致性一路推到强一致（见 9.3 节、第 7 章），整体定位偏 CP。MySQL 接受异步作为默认值，因为大量 OLTP 场景下，吞吐和延迟比强一致更重要。</p>
 <h3 id="s210">半同步复制：可降级的一致性</h3>
@@ -6025,7 +6025,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s226">9.5 横向对比</h2>
 <p>把这三款软件的同步机制并到同一张表里，以本章澄清的六个维度为行，按 Redis | MySQL | Kafka 的固定列序排列。</p>
 <p><strong>表 9-1 三款软件数据同步机制横向对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区位移有序）</td></tr><tr><td>传播方式</td><td>主推送命令</td><td>从拉取 + 本地回放分离（I/O/SQL 双线程）</td><td>纯拉取（FETCH，与消费者同路径）</td></tr><tr><td>一致性模型</td><td>默认偏 AP（异步可丢写，分区时偏 CP；归类有争议）</td><td>异步 / 半同步 / 多数派强一致（连续谱）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务序号）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区位移有序）</td></tr><tr><td>传播方式</td><td>主推送命令</td><td>从拉取 + 本地回放分离（I/O/SQL 双线程）</td><td>纯拉取（FETCH，与消费者同路径）</td></tr><tr><td>一致性模型</td><td>默认偏 AP（异步可丢写，分区时偏 CP；归类有争议）</td><td>异步 / 半同步 / 多数派强一致（连续谱）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务标识）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
 <p>表 9-1 把差异与共性同时摆出：六个维度上的选择不同，但背后都是共同的状态机复制模型。</p>
 <h3 id="s227">解读一：传播单元的选择决定一切下游设计</h3>
 <p>把传播单元单拿出来看，会发现它是多数下游设计的起点。</p>
@@ -6033,7 +6033,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>一旦传播单元定下来，传播方式、位点形态、故障恢复粒度就都跟着定型。<strong>所以看一款软件选了什么单元，就能预判它后面整套机制长什么样</strong>。</p>
 <h3 id="s228">解读二：位点（offset / GTID / 位移）是同步的通用语言</h3>
 <p>重点看第四行"位点语义"。这三款软件的位点形态各异：</p>
-<ul><li>Redis 的 replication offset 是字节进度，粗但够用，因为单元是字节流；</li><li>MySQL 的 GTID 是全局事务序号，细到事务级，且全局唯一，便于跨节点推理；</li><li>Kafka 的 offset + leader epoch 是位移加任期：位移描述进度，epoch 标定权威段。</li></ul>
+<ul><li>Redis 的 replication offset 是字节进度，粗但够用，因为单元是字节流；</li><li>MySQL 的 GTID 是全局事务标识，细到事务级，且全局唯一，便于跨节点推理；</li><li>Kafka 的 offset + leader epoch 是位移加任期：位移描述进度，epoch 标定权威段。</li></ul>
 <p>形态不同，底下都是同一种东西：<strong>进度坐标</strong>，都在回答同一个问题："我已经处理到哪里了？"。位点是副本同步的通用货币：想让多份副本对齐，先给它们一把共同的尺子。</p>
 <h3 id="s229">解读三：一致性谱的位置差异</h3>
 <p>第三行"一致性模型"展示了这三款软件的谱位。Redis 默认偏 AP（异步，可能丢少量写；归类有争议），MySQL 铺开了从偏 AP 到偏 CP 的整条谱（异步 / 半同步 / MGR），Kafka 则把谱位做成可调旋钮（acks + ISR 参数）。三种姿态对应三种产品定位：Redis 要最低延迟，MySQL 要适配从 OLTP 到金融级的不同场景，Kafka 要让使用者按消息价值自己选。</p>
