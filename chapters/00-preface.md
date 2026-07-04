@@ -34,8 +34,4 @@
 
 需要说明：本书的技术判断、架构取舍、案例选择与全部文责，由作者独立承担。AI 不是本书作者，也不对本书内容负责。技术细节会随版本演进变化，采纳任何技术决策前，请以 Redis、MySQL、Kafka 的官方文档与最新源码为准。
 
-## 商标声明
-
-Redis® 是 Redis Ltd. 的注册商标。MySQL® 与 InnoDB 是 Oracle Corporation 及/或其关联公司的商标或注册商标。Apache Kafka®、Kafka、Apache ZooKeeper® 及 ZooKeeper 是 Apache 软件基金会在美国和/或其他国家的商标或注册商标。本书出于指代便利常以简称 Redis、MySQL、Kafka、ZooKeeper 称呼相应软件，均指各自权利人的产品；本书与上述权利人不存在关联、背书或赞助关系。书中提及的其他产品名称与标志，分属各自所有者，仅作指代用途。
-
 是为序。
