@@ -69,7 +69,7 @@
   <text x="460" y="400" text-anchor="middle" font-size="12" fill="#374151">Paxos 多数派确认 · 不分片</text>
   <text x="460" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：强一致 + 自动 View Change</text>
 
-  <text x="460" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：CP（少数派分区停服）</text>
+  <text x="460" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：偏 CP（少数派分区停服）</text>
 
   <!-- ===== Kafka column ===== -->
   <rect x="620" y="135" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669"/>
