@@ -234,6 +234,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这本书面向的，是有一定使用经验、想从"会用"进阶为真正可以设计决策的人。如果读完之后，再面对一个新系统时，能多问一句这类问题。更理想的是，某天我们自己设计系统时，能下意识地去考虑不同方案的取舍问题。到那时，这本书才算真正发挥了作用。</p>
 <h2 id="s2">关于本书的创作过程</h2>
 <p>本书写作借助生成式 AI 工具（Claude、GPT 系列）辅助资料查证、文字润色与 SVG 插图绘制。全书的论点框架、技术判断、案例选择与文字审定由作者主导，并独立承担文责。</p>
+<p>本书提及的商标与产品名称均属其各自所有者。Redis® 是 Redis Ltd. 的注册商标。MySQL® 与 InnoDB® 是 Oracle Corporation 及其附属公司的注册商标。Apache Kafka® 与 Apache ZooKeeper™ 是 Apache 软件基金会在美国及/或其他国家的注册商标或商标。</p>
 <p>是为序。</p></section>
 <section class="chapter" id="ch1"><h1 id="s3">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</h1>
 <h2 id="s4">本章导读</h2>
@@ -386,7 +387,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的历史是一部商业与工程交织的演化史。它 1995 年起源于瑞典 MySQL AB，2008 年被 Sun Microsystems 收购，2010 年随 Sun 被 Oracle 收购后正式归入 Oracle 旗下。这条路径并不平坦：它经历过商业化收购的震荡、催生了 MariaDB 这样的分支分叉，也经历了存储引擎从 MyISAM 到 InnoDB 默认化的更迭。但至今它仍是 Web 应用最常用的关系型数据库，原因在于它把一件最难的事做得足够稳，即<strong>保证数据不丢、不错</strong>。</p>
 <p>MySQL 的核心抽象是<strong>关系（表与行）+ SQL + 可插拔存储引擎</strong>。上层是统一的 SQL 接口与基于成本的查询优化器，对应用屏蔽底层差异；下层是 InnoDB 等可替换的引擎，负责真正的存取。这种分层让 MySQL 既能提供标准化的访问方式，又能在存储层做差异化取舍。InnoDB 是默认引擎，本书讨论 MySQL 时以它为主，它把数据组织成<strong>页（page，默认 16KB）</strong>，以 B+ 树聚簇索引为中心来管理整张表。</p>
 <p>支撑 MySQL 设计哲学的，是一整套为正确性服务的机制。InnoDB 提供完整的 ACID（原子性、一致性、隔离性、持久性）事务、靠 MVCC 实现的非阻塞读、行级锁；它维护着三套日志：重做日志（redo log）记录物理修改、回滚日志（undo log）支撑回滚与 MVCC、二进制日志（binlog）用于复制与时间点恢复；查询靠基于成本的优化器自动选择执行计划；数据访问先经过缓冲池（Buffer Pool），把热点页留在内存里减少磁盘随机 I/O。这些机制不是图快，它们的目的只有一个：让数据在并发和故障面前都对得上。</p>
-<p>代价当然存在。为保证持久性，事务提交要做日志落盘（fsync）；为保证一致性，写操作伴随 redo 与 binlog 的两阶段提交开销；为支持 MVCC，旧版本数据要靠 undo 链维护，长事务会拖累性能；调优门槛高，缓冲池、刷新策略、隔离级别都需要根据负载仔细配置。此外，单机扩展有天花板，纵向加内存加 CPU 容易，横向分库分表则代价不菲。MySQL 由此付出的代价是。它的优先级一直是"对"排在"快"前面：可以慢，但不能错。</p>
+<p>代价当然存在。为保证持久性，事务提交要做日志落盘（fsync）；为保证一致性，写操作伴随 redo 与 binlog 的两阶段提交开销；为支持 MVCC，旧版本数据要靠 undo 链维护，长事务会拖累性能；调优门槛高，缓冲池、刷新策略、隔离级别都需要根据负载仔细配置。此外，单机扩展有天花板，纵向加内存加 CPU 容易，横向分库分表则代价不菲。它的优先级一直是"对"排在"快"前面：可以慢，但不能错。</p>
 <p>典型场景因此集中在核心业务：交易系统、订单与账户、任何需要强一致与复杂查询的主数据存储。这些场景的共同点是数据价值高、查询模式复杂、容错空间小。</p>
 <p>一句话定位：<strong>MySQL 是事务关系型数据库领域应用最广泛的存储方案。</strong></p>
 <h3 id="s12">1.2.3 Kafka：以"日志"为核心抽象的流平台</h3>
@@ -1921,7 +1922,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把 PageCache 写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
 <p>这三档本质上是"可靠性 vs 性能"这条连续谱上的三个采样点。很多生产环境会选择 <code>everysec</code>，因为它把潜在丢失控制在约 1 秒量级，代价是每秒一次的 <code>fsync</code>。需要说明：<code>appendfsync</code> 的默认值确实是 <code>everysec</code>，但 Redis 7.x 出厂默认并不开启 AOF（<code>appendonly no</code>，即 RDB-only）；只有显式打开 AOF 后，<code>appendfsync</code> 才以 <code>everysec</code> 为默认档（详见第 8 章）。</p>
 <p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。重写是按内存当前状态重新生成一份最小的命令集（把那一万条 <code>INCR</code> 压成一条 <code>SET key 10000</code>）。重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套机制保证了重写过程不丢数据。</p>
-<p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>；7.0 多部 AOF 改造后该配置项已移除，base 文件始终为 RDB 格式，行为等效。</p>
+<p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义调整为控制 base 文件是否使用 RDB 格式，base 文件始终为 RDB 格式，行为等效。</p>
 <p><strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>做了几件事。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 4-3 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。7.0 多部 AOF 的字节级布局详见 8.2.4。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，呈现 Redis"内存为主、磁盘为辅"的根本定位。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -3348,7 +3349,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>6.0 引入 ACL（Access Control List，访问控制列表）是一次结构性补回。ACL 的核心是"用户"这个一等概念，每个用户有自己的密码集合、命令权限和键模式。一条典型的规则长这样：</p>
 <pre><code class="lang-redis">ACL SETUSER alice on &gt;pwd ~keys:* +get +set</code></pre>
 <p>这条语句创建用户 alice，启用状态、设置密码、允许访问匹配 <code>keys:*</code> 的键、授予 <code>GET</code> 和 <code>SET</code>。每一项都是"最小可表达单元"的取舍。Redis 不做 RBAC（基于角色的访问控制）角色，因为内核要轻。Redis 实例上的用户数通常很少，几台应用机器各对应一个用户就够，引入"角色—用户"两层语义会让内核背上不必要的复杂度。把组角色这类复杂语义留给外部的身份管理系统（IAM），是 Redis 一贯的边界划法。</p>
-<p>凭证存储上，密码用 SHA-256 哈希存（通过 <code>ACL SAVE</code> 持久化到 <code>aclfile</code> 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 <code>ACL LOAD</code> 重新加载），不存明文。这是凭证落盘的最小安全要求。SHA-256 是哈希不是加密，且无加盐，对弱密码仍有字典攻击风险，因此 Redis 文档强调密码要足够长且随机。</p>
+<p>凭证存储上，密码用 SHA-256 哈希存（通过 <code>ACL SAVE</code> 持久化到 <code>aclfile</code> 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 <code>ACL LOAD</code> 重新加载），不存明文。这是凭证落盘的最小安全要求。SHA-256 是哈希不是加密；虽 16 字节随机加盐（salt 明文存储在 aclfile 中），但属快哈希而非慢 KDF，对弱密码仍有字典攻击风险，因此 Redis 文档强调密码要足够长且随机。</p>
 <p>与 Redis 不同，MySQL 从第一天就把认证当作企业级功能来设计。</p>
 <h3 id="s117">MySQL：可插拔认证插件是核心抽象</h3>
 <p>MySQL 面向企业市场，从早期就把安全纳入了核心设计：强密码、多层级权限、可审计、可插拔认证。它的安全设计绕不开两点：层级权限表和可插拔认证。</p>
@@ -3688,7 +3689,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的授权模型是 ACL，每条规则绑定三元组：主体（Principal，通常是服务账号或用户）、操作（Operation）、资源（Resource）。资源类型有 Topic、Group、Cluster、TransactionalId、DelegationToken，每类资源有自己的操作集：Read、Write、Create、Delete、Alter、Describe、ClusterAction、All。</p>
 <p>Kafka 原生只有 ACL，没有 RBAC。原因和 Redis 类似但语境不同，流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。</p>
 <p>前缀授权（prefixed resource pattern）是多租户场景的便利设计。一条规则 <code>--resource-pattern-type prefixed --topic app-a.</code> 就能把所有 <code>app-a.</code> 开头的主题的读写权限授予 app-a 这个服务，避免逐主题授权。在一个集群承载几十上百个服务的场景下，前缀授权让权限管理退化成"前缀约定加少量例外"，运维成本随之下降。</p>
-<p>Kafka 的默认策略偏保守：<code>allow.everyone.if.no.acl.found</code> 这个参数（对 <code>AclAuthorizer</code> 生效；KRaft 下的 <code>StandardAuthorizer</code> 同样遵循"默认拒绝"）从 1.x 起默认就是 false，即无 ACL 即拒绝，3.x 沿用这一默认。新引入的 <code>StandardAuthorizer</code>（KRaft 模式下的内置授权器）同样遵循"默认拒绝"。也就是说，3.x 基线下默认已经是安全的。注：真正在版本间改过默认值的是 <code>unclean.leader.election.enable</code>（0.11 起从 true 改为 false，KAFKA-4711），别把它和 ACL 这个参数混为一谈。但生产部署时仍建议显式确认这个值并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。</p>
+<p>Kafka 的默认策略偏保守：<code>allow.everyone.if.no.acl.found</code> 这个参数（对 <code>AclAuthorizer</code> 生效；KRaft 下的 <code>StandardAuthorizer</code> 同样遵循"默认拒绝"）从 2.0（KIP-303）起默认改为 false（1.x 默认为 true），即无 ACL 即拒绝，3.x 沿用这一默认。新引入的 <code>StandardAuthorizer</code>（KRaft 模式下的内置授权器）同样遵循"默认拒绝"。也就是说，3.x 基线下默认已经是安全的。注：真正在版本间改过默认值的是 <code>unclean.leader.election.enable</code>（0.11 起从 true 改为 false，KAFKA-4711），别把它和 ACL 这个参数混为一谈。但生产部署时仍建议显式确认这个值并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。</p>
 <p>授权粒度跟随数据模型。MySQL 能到列级，因为关系模型本来就有"列"这个概念；Redis 只能到键模式，键值模型里没有列；Kafka 只到资源类型级，因为流的主语是服务而不是人。</p>
 <h2 id="s123">6.4 加密</h2>
 <p>加密在传输途中和落盘之后保护数据的安全。三款软件的传输加密都选了 TLS，但补上 TLS 的时机和方式各不相同：Redis 拖到 6.0 才原生支持，且做成可选；MySQL 从一开始就把它和账号权限绑在一起；Kafka 因为多跳，必须每条路径都覆盖。</p>
@@ -4411,7 +4412,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-1 三款软件数据真正住在哪里</figcaption></figure>
 <p>图 8-1 三款软件"数据真正住在哪里"的内存/磁盘权重示意。</p>
-<p>这张图把三款软件的内存与磁盘权重摆在同一坐标系下：Redis 内存占绝对主导，磁盘只是恢复副本；MySQL 磁盘是真相之源，内存缓冲池只是磁盘页的缓存副本；Kafka 磁盘就是数据本体，内核页缓存承担内存层角色。权重的倒置，也是它们格式选择不同的原因。：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，自然就是三种样子。</p>
+<p>这张图把三款软件的内存与磁盘权重摆在同一坐标系下：Redis 内存占绝对主导，磁盘只是恢复副本；MySQL 磁盘是真相之源，内存缓冲池只是磁盘页的缓存副本；Kafka 磁盘就是数据本体，内核页缓存承担内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，自然就是三种样子。</p>
 <blockquote><strong>关键数字</strong>  <strong>InnoDB 16KB 页：约 15/16 存数据，1/16 存页头+目录</strong>。每页容纳约 2–200 行（依行宽而定）；页号即文件偏移，O(1) 随机定位是页式骨架的效率根基。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条约 14 字节、V1 约 22 字节）。Batch 级压缩在同类消息上可达 2-6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制/已压缩数据近下限），带宽与存储成本结构性下降。  <strong>Redis RDB 压缩比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。紧凑二进制编码（变长整数 + LZF）使磁盘文件远小于内存实际占用，恢复时快速灌入。</blockquote>
 <blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件 + 后台合并（compaction）"实现高写入吞吐。本书这三款软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》第 4 章是很好的起点。</blockquote>
 <h2 id="s164">8.2 Redis 的做法</h2>
@@ -4532,7 +4533,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>AOF 还有一个绕不开的难题：随着命令不断追加，文件只会越来越大，里面会堆积大量被覆盖、被删除的过时命令：比如一百万次 INCR 同一个 key，真正有效的只有最后一次。Redis 的解法是重写（rewrite）。重写的关键取舍是：<strong>fork 子进程从当前内存直接生成新 AOF</strong>。这一步绕开了"解析越积越大的日志"这个坑：重写复杂度只跟当前内存数据量有关，跟 AOF 已经积累了多少无关。</p>
 <p>但 fork 那一刻之后，父进程还在处理新写命令，这些命令既不能丢也不能让重写卡住。Redis 的解法是双缓冲：重写期间的新写命令进 aof_rewrite_buffer，重写完成的子进程产出新文件后，父进程把 buffer 里的命令原子追加到新文件尾部，再做 rename 替换。这是"追加日志如何做在线 compaction"的经典手法。</p>
 <h3 id="s168">8.2.4 混合持久化：RDB 头加 AOF 尾</h3>
-<p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）；7.0 起 Multi-Part AOF 改造后该配置项已移除，base 文件始终为 RDB 格式，效果等同混合持久化常开。</p>
+<p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义调整为控制 base 文件是否使用 RDB 格式，base 文件始终为 RDB 格式，效果等同混合持久化常开。</p>
 <p>Multi-Part AOF 的真正变化不在"混合"，而在文件结构的重构。7.0 之前，AOF 是单个大文件，重写靠 rename 替换——旧文件删掉、新文件顶上。这个设计在重写中断时可能留下损坏的旧文件。7.0 把它拆成了一个目录，里面由清单文件（manifest）统一管理三类文件：至多一个基础文件（base，RDB 格式）、零或多个增量文件（incr，AOF 命令）、以及重写后被标记为历史（history）待删的旧文件。重写不再是 rename 替换，而是生成新 base + 新 manifest 的原子切换。这和 git 的 commit 指针切换是同一种思路：数据不动，指针换。这个结构变化让 AOF 的重写从"危险的单文件替换"变成了"安全的多文件原子切换"，同时让增量文件可以单独轮转清理。</p>
 <p>文件头是 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（大头走二进制快速灌入）加上 AOF 的"少丢"（尾部增量精确回放自上次 RDB 之后的所有写命令）。一次重启，先用 RDB 快速把内存主体建起来，再回放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -5013,100 +5014,78 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一。它修正了 8.4.1 的判断："磁盘就是日志本体。" 改为：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
 <p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者或 Follower 读取时，先尝试本地磁盘，未命中则从远程拉取并缓存到本地（fetch-through 语义）。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 三件套在远程和本地是同一套文件结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"分层让可替换成为可能"在这里正好是一个现成的例子。</p>
 <p>第一，"磁盘就是日志本体"需要修正：真相之源仍是日志 Segment，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式是访问模式的镜像"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_8_7_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
-    </marker>
-    <marker id="fig_8_7_arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    <marker id="fig_8_7_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
     </marker>
   </defs>
 
+  <!-- Title -->
   
-  <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">从访问模式三问，推到格式骨架选型，存储格式是访问模式的镜像</text>
 
-  <!-- ============ root ============ -->
-  <rect x="320" y="80" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
-  <text x="470" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
-  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">先回答三个判断题，再选骨架</text>
+  <!-- Phase labels -->
+  <text x="160" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">① 本地热段</text>
+  <text x="440" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">② 段关闭 → 异步上传</text>
+  <text x="720" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">③ 远程存储 + 本地可选</text>
 
-  <!-- ============ Q1 ============ -->
-  <polygon points="470,170 620,220 470,270 320,220" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">Q1：数据会被原地改吗？</text>
-  <text x="470" y="228" text-anchor="middle" font-size="10" fill="#374151">（决定定长页 vs 追加日志）</text>
+  <!-- ===== Phase 1: Local hot segments ===== -->
+  <rect x="40" y="90" width="240" height="100" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="160" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">Kafka Broker 本地磁盘</text>
+  <rect x="60" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="90" y="145" text-anchor="middle" font-size="11" fill="#374151">.log</text>
+  <rect x="125" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="155" y="145" text-anchor="middle" font-size="11" fill="#374151">.index</text>
+  <rect x="190" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
+  <text x="220" y="145" text-anchor="middle" font-size="11" fill="#374151">.timeindex</text>
+  <text x="160" y="178" text-anchor="middle" font-size="11" fill="#6B7280">活跃段：正在追加写入</text>
 
-  <line x1="470" y1="136" x2="470" y2="170" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
+  <!-- Arrow 1->2 -->
+  <line x1="280" y1="140" x2="330" y2="140" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
+  <text x="305" y="130" text-anchor="middle" font-size="10" fill="#6B7280">关闭</text>
 
-  <!-- Q1 branches -->
-  <!-- YES (in-place) → page -->
-  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
-  <text x="270" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
+  <!-- ===== Phase 2: Upload ===== -->
+  <rect x="340" y="90" width="200" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="440" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">RemoteStorageManager</text>
+  <text x="440" y="140" text-anchor="middle" font-size="12" fill="#374151">异步上传 S3/GCS/Azure</text>
+  <text x="440" y="160" text-anchor="middle" font-size="11" fill="#6B7280">格式不变 · 三件套原样传输</text>
+  <text x="440" y="180" text-anchor="middle" font-size="11" fill="#6B7280">本地可保留可丢弃</text>
 
-  <!-- NO (append) -->
-  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
-  <text x="670" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否（追加）</text>
+  <!-- Arrow 2->3 -->
+  <line x1="540" y1="140" x2="590" y2="140" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
 
-  <!-- ============ Q2 left (page family) ============ -->
-  <polygon points="140,310 250,350 140,390 30,350" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="140" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">Q2：随机定位要快？</text>
-  <text x="140" y="362" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
+  <!-- ===== Phase 3: Remote storage ===== -->
+  <rect x="600" y="90" width="250" height="100" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+  <text x="725" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">对象存储（S3 / GCS / Blob）</text>
+  <rect x="620" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
+  <text x="650" y="145" text-anchor="middle" font-size="11" fill="#374151">.log</text>
+  <rect x="685" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
+  <text x="715" y="145" text-anchor="middle" font-size="11" fill="#374151">.index</text>
+  <rect x="750" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
+  <text x="780" y="145" text-anchor="middle" font-size="11" fill="#374151">.timeindex</text>
+  <text x="725" y="178" text-anchor="middle" font-size="11" fill="#6B7280">冷段：低频访问</text>
 
-  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_7_arrow)"/>
+  <!-- ===== Read path (bottom) ===== -->
+  <rect x="40" y="250" width="810" height="32" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者 / Follower 请求 → 先查本地 → 未命中则回源远程（fetch-through） → 缓存到本地</text>
 
-  <!-- page result -->
-  <line x1="140" y1="390" x2="140" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
-  <rect x="30" y="430" width="220" height="80" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="140" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">页式范式（MySQL）</text>
-  <text x="140" y="475" text-anchor="middle" font-size="10" fill="#374151">16KB 定长页 · B+ 树</text>
-  <text x="140" y="491" text-anchor="middle" font-size="10" fill="#374151">原地改 + WAL + 双写</text>
-  <text x="140" y="505" text-anchor="middle" font-size="10" fill="#374151">页内 Page Directory 稀疏槽</text>
+  <!-- Arrow from read path to local -->
+  <line x1="120" y1="250" x2="120" y2="195" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#fig_8_7_arrow-blue)"/>
+  <text x="95" y="225" text-anchor="middle" font-size="10" fill="#4F46E5">本地命中</text>
 
-  <!-- ============ Q2 right (append family) ============ -->
-  <polygon points="800,310 910,350 800,390 690,350" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="800" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Q3：批量流式进出？</text>
-  <text x="800" y="362" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
+  <!-- Arrow from read path to remote -->
+  <line x1="700" y1="250" x2="700" y2="195" stroke="#10B981" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#fig_8_7_arrow)"/>
+  <text x="670" y="225" text-anchor="middle" font-size="10" fill="#10B981">远程回源</text>
 
-  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_7_arrow)"/>
-
-  <!-- Q3 branches -->
-  <!-- YES → log -->
-  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
-  <text x="655" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
-
-  <!-- NO → snapshot -->
-  <line x1="910" y1="350" x2="900" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_7_arrow)"/>
-  <text x="920" y="395" font-size="11" font-weight="700" fill="#374151">否</text>
-
-  <!-- log result (Kafka) -->
-  <rect x="380" y="430" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="500" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
-  <text x="500" y="475" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
-  <text x="500" y="491" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
-  <text x="500" y="505" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
-
-  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_7_arrow)"/>
-
-  <!-- snapshot result (Redis) -->
-  <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
-  <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
-  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是家，磁盘是保险</text>
-  <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
-
-  <!-- ============ bottom: 5th question reminder ============ -->
-  <rect x="40" y="540" width="860" height="100" rx="8" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="60" y="566" font-size="13" font-weight="700" fill="#EF4444">通用的第三问（适用于所有路径）：我的格式五年后还能被新代码读懂吗？</text>
-  <text x="60" y="588" font-size="11" fill="#374151">→ 预留版本号 / Magic / 编码切换位（ziplist→listpack、V1→V2、页类型位）。</text>
-  <text x="60" y="608" font-size="11" fill="#374151">→ 存储格式要为“五年后还要读今天的文件”设计，而不是为“今天能写就行”设计。</text>
-  <text x="60" y="628" font-size="11" font-weight="700" fill="#EF4444">箴言：存储格式是访问模式的镜像，骨架几乎是被读写约束推着长出来的。</text>
+  <!-- ===== Key insight box ===== -->
+  <rect x="40" y="310" width="810" height="90" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心洞察</text>
+  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无缝迁移</text>
+  <text x="445" y="380" text-anchor="middle" font-size="12" fill="#374151">Log 抽象封装了"数据在哪"，上层 API 层和复制层完全无感</text>
+  <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
 </svg>
 </div><figcaption>图 8-7 Kafka Tiered Storage 日志段生命周期</figcaption></figure>
 <p>图 8-7 Kafka Tiered Storage 日志段生命周期：本地热段关闭后异步上传到远程对象存储，消费者和 Follower 读取时先尝试本地、未命中则回源远程。</p>
@@ -5151,78 +5130,100 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>存储格式的设计，要为"五年后还要读今天的文件"做好准备。 这条原则的反面例子不少：很多自研系统第一版格式图省事，没留版本号、没留保留字段，几年后业务一变，要么写迁移脚本痛苦地转一遍，要么干脆弃用老数据。在格式设计阶段多花一周想清楚兼容性，能为未来省下几个月的迁移债。</p>
 <h3 id="s191">8.6.6 给实践者的三问</h3>
 <p>把五条原则落到实践，面对自己的存储设计先回答三个问题。第一问，数据会被原地改吗？这是最根本的分叉。会原地改，选定长页骨架（像 MySQL，页号即偏移，原地改加 WAL）。不会原地改，进下一问。第二问，访问是随机定位要快，还是批量流式进出？随机定位要快，走定长页加索引（B+ 树加页内稀疏槽）。批量流式进出且写远多于点查，走追加日志骨架（像 Kafka，纯追加加稀疏索引）。既不原地改也不批量流式、只需要崩溃后整体重建，走快照骨架（像 Redis 的 RDB 加 AOF）。其中"怕丢一小段还是怕全量重建慢"决定快照与增量日志的组合方式。怕丢，选快照加增量日志（Redis 的混合持久化）；怕恢复慢，就提高快照频率、压缩增量。第三问是格式的长期可读性：靠预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位）来保证。不能，就现在补上。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_8_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_8_8_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4F46E5"/>
+    <marker id="fig_8_8_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+    <marker id="fig_8_8_arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
 
-  <!-- Title -->
   
+  <text x="470" y="54" text-anchor="middle" font-size="13" fill="#374151">从访问模式三问，推到格式骨架选型，存储格式是访问模式的镜像</text>
 
-  <!-- Phase labels -->
-  <text x="160" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">① 本地热段</text>
-  <text x="440" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">② 段关闭 → 异步上传</text>
-  <text x="720" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">③ 远程存储 + 本地可选</text>
+  <!-- ============ root ============ -->
+  <rect x="320" y="80" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="470" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
+  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">先回答三个判断题，再选骨架</text>
 
-  <!-- ===== Phase 1: Local hot segments ===== -->
-  <rect x="40" y="90" width="240" height="100" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="160" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">Kafka Broker 本地磁盘</text>
-  <rect x="60" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
-  <text x="90" y="145" text-anchor="middle" font-size="11" fill="#374151">.log</text>
-  <rect x="125" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
-  <text x="155" y="145" text-anchor="middle" font-size="11" fill="#374151">.index</text>
-  <rect x="190" y="125" width="60" height="30" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
-  <text x="220" y="145" text-anchor="middle" font-size="11" fill="#374151">.timeindex</text>
-  <text x="160" y="178" text-anchor="middle" font-size="11" fill="#6B7280">活跃段：正在追加写入</text>
+  <!-- ============ Q1 ============ -->
+  <polygon points="470,170 620,220 470,270 320,220" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="470" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">Q1：数据会被原地改吗？</text>
+  <text x="470" y="228" text-anchor="middle" font-size="10" fill="#374151">（决定定长页 vs 追加日志）</text>
 
-  <!-- Arrow 1->2 -->
-  <line x1="280" y1="140" x2="330" y2="140" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
-  <text x="305" y="130" text-anchor="middle" font-size="10" fill="#6B7280">关闭</text>
+  <line x1="470" y1="136" x2="470" y2="170" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
 
-  <!-- ===== Phase 2: Upload ===== -->
-  <rect x="340" y="90" width="200" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
-  <text x="440" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">RemoteStorageManager</text>
-  <text x="440" y="140" text-anchor="middle" font-size="12" fill="#374151">异步上传 S3/GCS/Azure</text>
-  <text x="440" y="160" text-anchor="middle" font-size="11" fill="#6B7280">格式不变 · 三件套原样传输</text>
-  <text x="440" y="180" text-anchor="middle" font-size="11" fill="#6B7280">本地可保留可丢弃</text>
+  <!-- Q1 branches -->
+  <!-- YES (in-place) → page -->
+  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="270" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
 
-  <!-- Arrow 2->3 -->
-  <line x1="540" y1="140" x2="590" y2="140" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <!-- NO (append) -->
+  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="670" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否（追加）</text>
 
-  <!-- ===== Phase 3: Remote storage ===== -->
-  <rect x="600" y="90" width="250" height="100" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
-  <text x="725" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">对象存储（S3 / GCS / Blob）</text>
-  <rect x="620" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="650" y="145" text-anchor="middle" font-size="11" fill="#374151">.log</text>
-  <rect x="685" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="715" y="145" text-anchor="middle" font-size="11" fill="#374151">.index</text>
-  <rect x="750" y="125" width="60" height="30" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="780" y="145" text-anchor="middle" font-size="11" fill="#374151">.timeindex</text>
-  <text x="725" y="178" text-anchor="middle" font-size="11" fill="#6B7280">冷段：低频访问</text>
+  <!-- ============ Q2 left (page family) ============ -->
+  <polygon points="140,310 250,350 140,390 30,350" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="140" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">Q2：随机定位要快？</text>
+  <text x="140" y="362" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
 
-  <!-- ===== Read path (bottom) ===== -->
-  <rect x="40" y="250" width="810" height="32" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者 / Follower 请求 → 先查本地 → 未命中则回源远程（fetch-through） → 缓存到本地</text>
+  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
 
-  <!-- Arrow from read path to local -->
-  <line x1="120" y1="250" x2="120" y2="195" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#fig_8_8_arrow-blue)"/>
-  <text x="95" y="225" text-anchor="middle" font-size="10" fill="#4F46E5">本地命中</text>
+  <!-- page result -->
+  <line x1="140" y1="390" x2="140" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <rect x="30" y="430" width="220" height="80" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="140" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">页式范式（MySQL）</text>
+  <text x="140" y="475" text-anchor="middle" font-size="10" fill="#374151">16KB 定长页 · B+ 树</text>
+  <text x="140" y="491" text-anchor="middle" font-size="10" fill="#374151">原地改 + WAL + 双写</text>
+  <text x="140" y="505" text-anchor="middle" font-size="10" fill="#374151">页内 Page Directory 稀疏槽</text>
 
-  <!-- Arrow from read path to remote -->
-  <line x1="700" y1="250" x2="700" y2="195" stroke="#10B981" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#fig_8_8_arrow)"/>
-  <text x="670" y="225" text-anchor="middle" font-size="10" fill="#10B981">远程回源</text>
+  <!-- ============ Q2 right (append family) ============ -->
+  <polygon points="800,310 910,350 800,390 690,350" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="800" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Q3：批量流式进出？</text>
+  <text x="800" y="362" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
 
-  <!-- ===== Key insight box ===== -->
-  <rect x="40" y="310" width="810" height="90" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心洞察</text>
-  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无缝迁移</text>
-  <text x="445" y="380" text-anchor="middle" font-size="12" fill="#374151">Log 抽象封装了"数据在哪"，上层 API 层和复制层完全无感</text>
-  <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
+  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
+
+  <!-- Q3 branches -->
+  <!-- YES → log -->
+  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="655" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
+
+  <!-- NO → snapshot -->
+  <line x1="910" y1="350" x2="900" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="920" y="395" font-size="11" font-weight="700" fill="#374151">否</text>
+
+  <!-- log result (Kafka) -->
+  <rect x="380" y="430" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="500" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
+  <text x="500" y="475" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
+  <text x="500" y="491" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
+  <text x="500" y="505" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
+
+  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
+
+  <!-- snapshot result (Redis) -->
+  <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
+  <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
+  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是家，磁盘是保险</text>
+  <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
+
+  <!-- ============ bottom: 5th question reminder ============ -->
+  <rect x="40" y="540" width="860" height="100" rx="8" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="60" y="566" font-size="13" font-weight="700" fill="#EF4444">通用的第三问（适用于所有路径）：我的格式五年后还能被新代码读懂吗？</text>
+  <text x="60" y="588" font-size="11" fill="#374151">→ 预留版本号 / Magic / 编码切换位（ziplist→listpack、V1→V2、页类型位）。</text>
+  <text x="60" y="608" font-size="11" fill="#374151">→ 存储格式要为“五年后还要读今天的文件”设计，而不是为“今天能写就行”设计。</text>
+  <text x="60" y="628" font-size="11" font-weight="700" fill="#EF4444">箴言：存储格式是访问模式的镜像，骨架几乎是被读写约束推着长出来的。</text>
 </svg>
 </div><figcaption>图 8-8 存储格式设计决策树</figcaption></figure>
 <p>图 8-8 存储格式设计决策树：从访问模式推到格式骨架。</p>
@@ -6216,7 +6217,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>规律告诉你"是什么"，取舍告诉你"怎么选"。五个永恒的权衡维度加上一棵选型决策树和三道判断练习题，让规律落到实践。</p>
 <h3 id="s249">10.3.1 五个永恒的权衡维度</h3>
 <p>每个维度的结构固定为：一句话定义张力 → 各自偏向哪一端 → 代价是什么 → 什么场景该倒向哪一端。</p>
-<p><strong>维度一：速度 vs 持久性</strong>。数据写下去多久才算数，是这一维度要回答的问题。Redis 默认偏向速度，<code>appendfsync=everysec</code> 把风险控制在约 1 秒量级的数据窗口内，因此写入开销更低。MySQL 默认偏向持久性（<code>innodb_flush_log_at_trx_commit=1</code> 是默认），若再开启 <code>sync_binlog=1</code> 即"双 1"配置，让每条已提交事务都 fsync，从而做到"断电不丢"，代价是每事务一次磁盘同步。Kafka 偏向持久性，<code>acks=all</code> + 多副本让一条消息被 ISR 全部确认才算写入成功，付的是副本同步的 RTT。三者各取所需：Redis 用秒级窗口换吞吐，MySQL 用每事务一次 fsync 换断电安全，Kafka 用副本同步换多副本下的数据不丢。缓存、计数器、限流可偏速度端；账本、订单、支付必须偏持久性端。核心问题是"这个场景丢得起吗"。</p>
+<p><strong>维度一：速度 vs 持久性</strong>。数据写下去多久才算数，是这一维度要回答的问题。Redis 默认偏向速度，<code>appendfsync=everysec</code> 把风险控制在约 1 秒量级的数据窗口内，因此写入开销更低。MySQL 默认偏向持久性（<code>innodb_flush_log_at_trx_commit=1</code> 与 <code>sync_binlog=1</code> 均为默认值，合称"双 1"配置），让每条已提交事务都 fsync，从而做到"断电不丢"，代价是每事务一次磁盘同步。Kafka 偏向持久性，<code>acks=all</code> + 多副本让一条消息被 ISR 全部确认才算写入成功，付的是副本同步的 RTT。三者各取所需：Redis 用秒级窗口换吞吐，MySQL 用每事务一次 fsync 换断电安全，Kafka 用副本同步换多副本下的数据不丢。缓存、计数器、限流可偏速度端；账本、订单、支付必须偏持久性端。核心问题是"这个场景丢得起吗"。</p>
 <p><strong>维度二：一致性 vs 可用性（CAP 的实战投影）</strong>。网络分区一来，你要么写对要么继续服务，没有两全。Redis Cluster 默认偏 AP（分区时少数派槽短暂停写偏 CP，社区归类有争议，本书不作绝对归类），分区时持有多数主节点的分区继续服务、少数派分区的槽短暂不可用，故障切换时可能丢失少量已确认的写（异步复制的固有代价）；MySQL MGR 偏 CP，少数派分区直接拒绝写，宁可不活也不写错；Kafka 可调，用多数派选主 + <code>min.insync.replicas</code> 控制一致性强度，业务能在 CP 倾向和可用性之间自己调。AP 优先高可用，代价是故障切换时可能丢少量写；CP 优先强一致，代价是分区时部分请求失败。金融核心偏 CP（宁可拒绝服务也不能错账），社交 feed 偏 AP（少量数据可修，但不能不活）。</p>
 <p><strong>维度三：空间 vs 时间</strong>。要么拿空间买查询时间，要么拿计算时间省存储空间。Redis 用内存换 O(1) 访问，把数据全部驻留内存，是"空间换时间"最彻底的做法；MySQL 用 B+树索引 + 缓冲池换查询时间，索引和数据页都是为查询提速的额外空间开销；Kafka 用稀疏索引省空间（索引只记里程碑），用顺序扫描花时间补上定位，是"时间换空间"的典型。空间换时间要付内存/存储成本，时间换空间要付 CPU 与延迟成本。热点读、低延迟访问偏空间换时间，冷数据归档、高吞吐追加偏时间换空间。</p>
 <p><strong>维度四：简单 vs 灵活</strong>。把决策写死换来性能，留开关换来灵活性，两头只能站一头。Redis 把"命令执行单线程"写死（即便 6.0 起可开启多线程 I/O 卸载网络读写，数据访问仍单线程），因此内核无锁快、可重入逻辑简单，代价是单个实例吃不满多核 CPU；MySQL 的 Handler 接口留了灵活性，支撑可插拔存储引擎，但付虚函数开销和跨层上下文传递；Kafka 把副本、偏移量、事务做成显式原语，灵活但概念多、学习曲线陡。简单难演进，灵活易误用：这是一对长期存在的张力。规模可控、需求稳定偏简单；需求多变、要长期演进偏灵活。</p>

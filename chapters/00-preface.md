@@ -32,4 +32,6 @@
 
 本书写作借助生成式 AI 工具（Claude、GPT 系列）辅助资料查证、文字润色与 SVG 插图绘制。全书的论点框架、技术判断、案例选择与文字审定由作者主导，并独立承担文责。
 
+本书提及的商标与产品名称均属其各自所有者。Redis® 是 Redis Ltd. 的注册商标。MySQL® 与 InnoDB® 是 Oracle Corporation 及其附属公司的注册商标。Apache Kafka® 与 Apache ZooKeeper™ 是 Apache 软件基金会在美国及/或其他国家的注册商标或商标。
+
 是为序。
