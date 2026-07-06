@@ -2,7 +2,7 @@
 
 本书正文引用大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-4 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。
 
-## 第 1 章 引言 — 为什么是这三款软件，架构视角的意义
+## 第 1 章 引言 — 为什么是这三个软件，架构视角的意义
 
 [1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书"同题作答"框架的直接参照，强烈推荐配套阅读。
 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者对"日志即统一抽象"的极简论述，全书核心抽象观的缩影。
@@ -24,7 +24,7 @@
 ## 第 4 章 内存与磁盘的舞蹈 — 速度与持久化的平衡
 
 [11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解"磁盘为真相、缓存为加速"范式的钥匙。
-[12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三款软件均未采用 LSM，但与之在"顺序写"的精神上呼应。
+[12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但与之在"顺序写"的精神上呼应。
 [13] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。
 
 ## 第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层

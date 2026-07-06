@@ -105,7 +105,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </li>
 <li class="active"><a href="11-references.html">附录　参考文献与延伸阅读（按章索引）</a>
 <ul>
-<li class="nav-sub"><a href="#s261">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</a></li>
+<li class="nav-sub"><a href="#s261">第 1 章 引言 — 为什么是这三个软件，架构视角的意义</a></li>
 <li class="nav-sub"><a href="#s262">第 2 章 数据结构与协议 —— 为各自的目标而设计</a></li>
 <li class="nav-sub"><a href="#s263">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</a></li>
 <li class="nav-sub"><a href="#s264">第 4 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</a></li>
@@ -123,14 +123,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <main class="content">
 <article class="chapter"><h1 id="s260">附录　参考文献与延伸阅读（按章索引）</h1>
 <p>本书正文引用大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-4 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。</p>
-<h2 id="s261">第 1 章 引言 — 为什么是这三款软件，架构视角的意义</h2>
+<h2 id="s261">第 1 章 引言 — 为什么是这三个软件，架构视角的意义</h2>
 <p>[1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书"同题作答"框架的直接参照，强烈推荐配套阅读。 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者对"日志即统一抽象"的极简论述，全书核心抽象观的缩影。 [3] Sanfilippo S (antirez). Redis Design and Trade-offs[EB/OL]. (2020)[2025-12-01]. https://redis.io/docs/latest/. —— Redis 作者本人对"内存即数据"设计哲学的第一手阐述。</p>
 <h2 id="s262">第 2 章 数据结构与协议 —— 为各自的目标而设计</h2>
 <p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2025-12-01]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现"协议即存储格式"的统一设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2025-12-01]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，展现 Redis"按数据特征自适应"的精髓。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
 <h2 id="s263">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</h2>
 <p>[8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2025-12-01]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Pre-Image Logging[R]. IBM Research Report RJ 1821, 1992. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。 [10] Apache Kafka. Controlled Shutdown[EB/OL]. [2025-12-01]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</p>
 <h2 id="s264">第 4 章 内存与磁盘的舞蹈 — 速度与持久化的平衡</h2>
-<p>[11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解"磁盘为真相、缓存为加速"范式的钥匙。 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三款软件均未采用 LSM，但与之在"顺序写"的精神上呼应。 [13] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。</p>
+<p>[11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解"磁盘为真相、缓存为加速"范式的钥匙。 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但与之在"顺序写"的精神上呼应。 [13] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2025-12-01]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。</p>
 <h2 id="s265">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</h2>
 <p>[14] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。 [15] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，见证分层灵活性的代价。 [16] Apache Kafka. Network Threading Design[EB/OL]. [2025-12-01]. https://kafka.apache.org/documentation/. —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。</p>
 <h2 id="s266">第 6 章 安全机制 — 权限、加密、审计</h2>
