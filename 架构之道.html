@@ -1436,7 +1436,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 3-3 Redis 关闭流程</figcaption></figure>
 <p>图 3-3　Redis 关闭流程：先处理 RDB/AOF 重写子进程，再按 SAVE/NOSAVE 决定存盘与否。</p>
 <p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，要么等它完成，要么杀掉子进程。这是为了不留下半成品文件。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上，虽然不影响正确性（rename 不会发生），但会留下垃圾。等子进程完成更干净，代价是关闭耗时增加。</p>
-<p><strong>第二步：刷盘与否由用户决定。</strong> <code>SHUTDOWN SAVE</code> 会触发一次阻塞式 <code>SAVE</code> 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；<code>SHUTDOWN NOSAVE</code> 直接跳过落盘，适合 Redis 当缓存用的场景，能做到秒级退出。这个设计兼顾了 Redis 两种用法。它不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定。这种"配置即承诺"的思路在后文 MySQL 那里会以另一种形式出现。</p>
+<p><strong>第二步：刷盘与否由用户决定。</strong> <code>SHUTDOWN SAVE</code> 会触发一次阻塞式 <code>SAVE</code> 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；<code>SHUTDOWN NOSAVE</code> 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。注意 NOSAVE 跳过的只是 RDB 写盘——如果 AOF 已开启，第三步仍然会把 AOF 缓冲区刷出。这个设计兼顾了 Redis 两种用法。它不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定。这种"配置即承诺"的思路在后文 MySQL 那里会以另一种形式出现。</p>
 <p><strong>第三步刷 AOF 缓冲</strong>，把内存里尚未落盘的追加命令 flush（刷盘）出去（如果开了 AOF）。<strong>第四步关闭所有客户端连接</strong>，通知对端、释放连接资源。<strong>第五步释放资源并 exit</strong>，交还文件锁、内存、进程身份。</p>
 <h3 id="s44">信号即协议</h3>
 <p>Redis 把 SIGTERM/SIGINT 当作"操作系统请求我优雅退出"的信号，收到后走完整的关闭流程，而非立即终止。这是 Unix 服务程序的经典范式。进程和操作系统之间通过信号协商着退出，避免被暴力杀死。<code>systemctl stop redis</code> 背后其实就是发一个 SIGTERM，Redis 收到后走完整的关闭流程。只有 SIGKILL（<code>kill -9</code>）才是操作系统不可屏蔽的"立即终止"，会跳过所有清理逻辑直接结束进程，留下没刷完的脏数据和没清理的临时文件。</p>
