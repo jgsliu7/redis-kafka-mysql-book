@@ -89,7 +89,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <ul>
   <li class="nav-sub"><a href="#s25">本章导读</a></li>
   <li class="nav-sub"><a href="#s26">2.1 问题的本质</a></li>
-  <li class="nav-sub"><a href="#s27">2.2 内部数据结构：为目标而定</a></li>
+  <li class="nav-sub"><a href="#s27">2.2 内部数据结构：为核心目标而设计</a></li>
   <li class="nav-sub"><a href="#s31">2.3 通信协议：客户端和服务端怎么对话</a></li>
   <li class="nav-sub"><a href="#s35">2.4 横向对比</a></li>
   <li class="nav-sub"><a href="#s36">2.5 架构启示</a></li>
@@ -738,24 +738,327 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s26">2.1 问题的本质</h2>
 <p>任何一个有客户端和服务端的软件，都绕不过这两个问题：</p>
 <p>第一，数据用什么格式来组织。这个问题直接关系到操作复杂度、内存开销、以及"哪些查询快、哪些查询慢"。跳表偏范围扫描和有序操作，哈希表偏 O(1) 点查，B+ 树偏磁盘页对齐和范围扫描，紧凑列表偏内存密度和批量加载。</p>
-<p>第二，客户端和服务端怎么对话。有三个决策：发纯文本还是紧凑二进制（可读 vs 紧凑），每条消息独立处理还是批量打包（简单 vs 效率），协议固定还是带版本号可演进（固定 vs 可演进）。</p>
+<p>第二，客户端和服务端怎么对话。有三个关键点：发纯文本还是紧凑二进制（可读 vs 紧凑），每条消息独立处理还是批量打包（简单 vs 效率），协议固定还是带版本号可演进（固定 vs 可演进）。</p>
 <p>对 Redis 来说，核心目标是<strong>极低延迟</strong>。所以它的数据结构全部在内存里，操作复杂度 O(1) 到 O(log N)，内存紧凑是第二考量。协议选了纯文本 RESP，调试时人眼就能读，服务端解析几乎不费CPU。 对 MySQL 来说，核心目标是<strong>通用可靠</strong>。它要支持任意 SQL、事务 ACID、磁盘持久化，所以它的核心数据结构 B+ 树必须对齐磁盘的 16KB 页，让一次磁盘 I/O 读到的每一页都装满了索引键，而不是半页索引半页无用数据。协议选了紧凑二进制，因为多取一行、多传一个字段在 OLTP 高并发下会被放大为可观的带宽差异，且预编译语句能让 SQL 解析只做一次。 对 Kafka 来说，核心目标是<strong>高吞吐</strong>。所以它的核心数据结构 RecordBatch 把多条消息打成一个包，压缩、传输、落盘都以 Batch 为单位，批量化成了格式本身的内置属性。协议选了带版本号的请求/响应模型。统一头部 + 逐 API 版本化，让不同版本客户端可以和同一个 Broker 对话，演进能力直接靠版本号字段实现。</p>
-<h2 id="s27">2.2 内部数据结构：为目标而定</h2>
+<h2 id="s27">2.2 内部数据结构：为核心目标而设计</h2>
 <h3 id="s28">2.2.1 Redis：活在内存里的简洁数据结构</h3>
 <p>Redis 的数据结构都受同一个约束限制：<strong>全部驻留内存</strong>。内存意味着随机访问几乎免费、CPU 开销比 I/O 更敏感、容量被物理上限锁死，所以数据结构要尽量省内存、尽量少 CPU 操作。</p>
-<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了三样东西：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code>，SDS 看一眼 <code>len</code> 字段就知道——O(1)。C 的字符串碰到值为 0 的字节就认为结束了，而 SDS 凭 <code>len</code> 判断长度，任意二进制数据都能存——不需要依赖 <code>\0</code> 做终止符。</p>
-<p>追加和缩短也做了优化。<strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。<strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 和 <code>alloc</code> 字段，把多余空间留作未来的追加缓冲。只有当缩短量超过 1MB 阈值时才会真正调用 <code>realloc</code> 回收多余内存。这套策略把频繁操作中的系统调用次数压到最低——让 Redis 在最常用的路径上永远 O(1)。</p>
-<p><strong>跳表（skiplist）</strong> 是 Redis 有序集合（ZSET）底层两种结构之一。一个跳表是多层有序链表。最底层是一条完整的有序双向链表，上面几层是"快速通道"，每隔几个节点跳一次。查找时从最顶层快速定位到目标附近，再逐层下沉到精确位置。平均 O(log N) 的查找、插入、删除；范围扫描只需在底层链表前进（O(log N + M)），比红黑树的中序遍历更直接。实现比红黑树简单得多——跳表的插入只需要改前后节点的指针，不需要旋转和染色。antirez 选跳表而非红黑树，就是出于实现简单和内存友好的考量。跳表的缓存局部性确实不如红黑树，但在内存里这点差异被 DRAM 的随机访问速度盖过了。</p>
+<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code>才能知道，SDS只通过<code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
+<p><strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。 <strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 和 <code>alloc</code> 字段，把多余空间留作未来的追加缓冲。只有当缩短量超过 1MB 阈值时才会真正调用 <code>realloc</code> 回收多余内存。这组策略把频繁操作中的系统调用次数压到最低，让Redis在最频繁的操作上永远 O(1)。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 450" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_2_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  
+
+  <!-- ============ 上半：C 字符串 ============ -->
+  <text x="60" y="70" font-size="14" font-weight="700" fill="#374151">C 语言字符串（char*）</text>
+
+  <!-- 6 个字节格 x=60 起，每格 46 宽 -->
+  <rect x="60"  y="84" width="46" height="44" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="106" y="84" width="46" height="44" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="152" y="84" width="46" height="44" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="198" y="84" width="46" height="44" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="244" y="84" width="46" height="44" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="290" y="84" width="46" height="44" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+  <text x="83"  y="112" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">h</text>
+  <text x="129" y="112" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">e</text>
+  <text x="175" y="112" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">l</text>
+  <text x="221" y="112" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">l</text>
+  <text x="267" y="112" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">o</text>
+  <text x="313" y="112" text-anchor="middle" font-size="14" font-family="ui-monospace, monospace" fill="#92400E">\0</text>
+
+  <!-- 遍历箭头 -->
+  <line x1="60" y1="144" x2="336" y2="144" stroke="#4B5563" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#fig_2_1_arrow)"/>
+  <text x="198" y="162" text-anchor="middle" font-size="11.5" fill="#6B7280">逐字节遍历到 \0 才知长度</text>
+
+  <text x="380" y="102" font-size="12.5" fill="#374151">· 取长度：从头扫到 \0 → O(n)</text>
+  <text x="380" y="126" font-size="12.5" fill="#374151">· \0 作终止符 → 无法存二进制数据</text>
+
+  <!-- ============ 下半：SDS ============ -->
+  <text x="60" y="222" font-size="14" font-weight="700" fill="#4F46E5">SDS（简单动态字符串）</text>
+
+  <!-- 分区标签 -->
+  <text x="186" y="250" text-anchor="middle" font-size="11.5" fill="#6B7280">header（头部，记录元信息）</text>
+  <text x="450" y="250" text-anchor="middle" font-size="11.5" fill="#6B7280">buf（实际数据，紧跟头部之后）</text>
+
+  <!-- header 三格 x=60 起，每格 84 宽 -->
+  <rect x="60"  y="258" width="84" height="46" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <rect x="144" y="258" width="84" height="46" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <rect x="228" y="258" width="84" height="46" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="102" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">len=5</text>
+  <text x="186" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">alloc=8</text>
+  <text x="270" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">flags</text>
+
+  <!-- buf 6 格 x=312 起，每格 46 宽 -->
+  <rect x="312" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="358" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="404" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="450" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="496" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <rect x="542" y="258" width="46" height="46" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+  <text x="335" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">h</text>
+  <text x="381" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">e</text>
+  <text x="427" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">l</text>
+  <text x="473" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">l</text>
+  <text x="519" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#111827">o</text>
+  <text x="565" y="287" text-anchor="middle" font-size="15" font-family="ui-monospace, monospace" fill="#6B7280">\0</text>
+
+  <!-- len 指向说明 -->
+  <line x1="102" y1="304" x2="102" y2="340" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_1_arrow)"/>
+  <text x="60" y="360" font-size="12.5" fill="#374151">读 len 字段直接得长度 → O(1)</text>
+
+  <text x="380" y="332" font-size="12.5" fill="#374151">· buf 可存任意字节（含 \0）→ 二进制安全</text>
+  <text x="380" y="356" font-size="12.5" fill="#374151">· alloc 记已分配空间 → 预分配 / 惰性释放</text>
+
+  <!-- 底部一句话 -->
+  <rect x="60" y="386" width="760" height="42" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
+  <text x="440" y="412" text-anchor="middle" font-size="12.5" fill="#92400E">用一个头部换来 O(1) 取长、二进制安全与更少的 realloc，内存里这点头部开销远比反复遍历划算</text>
+</svg>
+</div><figcaption>图 2-1　SDS 内存布局：头部记录 len/alloc/flags，取长度直接读 len 字段（O(1)）；C 字符串靠遍历到 <code>\0</code> 才知长度（O(n)），且无法存二进制数据。</figcaption></figure>
+<p><strong>跳表（skiplist）</strong> 是 Redis 有序集合（ZSET）底层两种结构之一。跳表是多层有序链表，最底层是一条完整的有序双向链表，上面几层是"快速通道"，每隔几个节点跳一次。查找时从最顶层快速定位到目标附近，再逐层下沉到精确位置。平均 O(log N) 的查找、插入、删除；范围扫描只需在底层链表前进（O(log N + M)），比红黑树的中序遍历更直接，而跳表的插入也只需要改前后节点的指针。这里选跳表而非红黑树，就是出于实现简单和内存友好的考量。跳表的缓存局部性确实不如红黑树，但在内存里这点差异被DRAM的随机访问速度盖过了。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 400" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_2_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="fig_2_2_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  
+
+  <!-- 层标签 -->
+  <text x="42" y="124" font-size="12" fill="#6B7280">第 3 层</text>
+  <text x="42" y="199" font-size="12" fill="#6B7280">第 2 层</text>
+  <text x="42" y="274" font-size="12" fill="#6B7280">第 1 层</text>
+  <text x="42" y="290" font-size="10" fill="#9CA3AF">完整链表</text>
+
+  <!-- ===== 竖向 tower 连线（同一节点跨层，浅灰）===== -->
+  <g stroke="#9CA3AF" stroke-width="1" stroke-dasharray="2 2">
+    <line x1="100" y1="138" x2="100" y2="175"/><line x1="100" y1="213" x2="100" y2="250"/>
+    <line x1="400" y1="138" x2="400" y2="175"/><line x1="400" y1="213" x2="400" y2="250"/>
+    <line x1="600" y1="213" x2="600" y2="250"/>
+    <line x1="700" y1="138" x2="700" y2="175"/><line x1="700" y1="213" x2="700" y2="250"/>
+  </g>
+
+  <!-- ===== 第 3 层横向链（灰）===== -->
+  <line x1="127" y1="119" x2="371" y2="119" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="427" y1="119" x2="671" y2="119" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <!-- ===== 第 2 层横向链 ===== -->
+  <line x1="127" y1="194" x2="371" y2="194" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="427" y1="194" x2="571" y2="194" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="627" y1="194" x2="671" y2="194" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <!-- ===== 第 1 层横向链（全节点）===== -->
+  <line x1="127" y1="269" x2="171" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="227" y1="269" x2="271" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="327" y1="269" x2="371" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="427" y1="269" x2="471" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="527" y1="269" x2="571" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="627" y1="269" x2="671" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
+
+  <!-- ===== 节点框 ===== -->
+  <!-- head 塔 -->
+  <rect x="73" y="100" width="54" height="38" rx="5" fill="#E5E7EB" stroke="#6B7280" stroke-width="1.3"/><text x="100" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">head</text>
+  <rect x="73" y="175" width="54" height="38" rx="5" fill="#E5E7EB" stroke="#6B7280" stroke-width="1.3"/><text x="100" y="199" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">head</text>
+  <rect x="73" y="250" width="54" height="38" rx="5" fill="#E5E7EB" stroke="#6B7280" stroke-width="1.3"/><text x="100" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">head</text>
+  <!-- 3 (L1) -->
+  <rect x="173" y="250" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="200" y="274" text-anchor="middle" font-size="14" fill="#4F46E5">3</text>
+  <!-- 6 (L1) -->
+  <rect x="273" y="250" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="300" y="274" text-anchor="middle" font-size="14" fill="#4F46E5">6</text>
+  <!-- 9 塔 (L3,L2,L1) -->
+  <rect x="373" y="100" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="400" y="124" text-anchor="middle" font-size="14" fill="#4F46E5">9</text>
+  <rect x="373" y="175" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="400" y="199" text-anchor="middle" font-size="14" fill="#4F46E5">9</text>
+  <rect x="373" y="250" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="400" y="274" text-anchor="middle" font-size="14" fill="#4F46E5">9</text>
+  <!-- 12 (L1) -->
+  <rect x="473" y="250" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="500" y="274" text-anchor="middle" font-size="14" fill="#4F46E5">12</text>
+  <!-- 17 塔 (L2,L1) — 目标 -->
+  <rect x="573" y="175" width="54" height="38" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/><text x="600" y="199" text-anchor="middle" font-size="14" font-weight="700" fill="#B91C1C">17</text>
+  <rect x="573" y="250" width="54" height="38" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/><text x="600" y="274" text-anchor="middle" font-size="14" font-weight="700" fill="#B91C1C">17</text>
+  <!-- 25 塔 (L3,L2,L1) -->
+  <rect x="673" y="100" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="700" y="124" text-anchor="middle" font-size="14" fill="#4F46E5">25</text>
+  <rect x="673" y="175" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="700" y="199" text-anchor="middle" font-size="14" fill="#4F46E5">25</text>
+  <rect x="673" y="250" width="54" height="38" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/><text x="700" y="274" text-anchor="middle" font-size="14" fill="#4F46E5">25</text>
+
+  <!-- ===== 红色查找路径：查 17（下沉到底层再横移，符合 Redis 严格 < 比较）===== -->
+  <!-- head-L3 → 9-L3 -->
+  <line x1="127" y1="112" x2="373" y2="112" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+  <!-- 9-L3 下沉到 9-L2（L2 中 9 的下一个是 17，但 17 不小于目标，无法右移 → 继续下沉）-->
+  <line x1="392" y1="138" x2="392" y2="175" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+  <!-- 9-L2 下沉到 9-L1 -->
+  <line x1="392" y1="213" x2="392" y2="250" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+  <!-- 9-L1 → 12-L1 -->
+  <line x1="427" y1="262" x2="473" y2="262" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+  <!-- 12-L1 → 17-L1（命中）-->
+  <line x1="527" y1="262" x2="573" y2="262" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+
+  <!-- 图例 + 说明 -->
+  <line x1="500" y1="330" x2="530" y2="330" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_2_arrow-red)"/>
+  <text x="538" y="334" font-size="12" fill="#374151">查找 17：顶层快速逼近，下沉到底层后沿链表命中</text>
+
+  <rect x="60" y="352" width="760" height="34" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
+  <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是"快速通道"，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
+</svg>
+</div><figcaption>图 2-2　跳表查找 O(log N)：底层是完整有序链表，上层是"快速通道"。查找从顶层快速逼近目标，再逐层下沉到精确位置，跳过大量节点。</figcaption></figure>
 <p><strong>字典（dict）</strong> 是 Redis 哈希类型的底层结构，也是 Redis 内部键空间本身。它是一个链式哈希表，用 SipHash 做哈希函数（Redis 4.0 起为防 hash 洪泛攻击，从 MurmurHash2 改用带随机种子的 SipHash），冲突用链表解决。</p>
 <p>渐进式 rehash 是 Redis 字典最特别的设计，实现上依赖一个双表结构：每个字典内部同时持有两张哈希表——<code>ht[0]</code> 和 <code>ht[1]</code>。正常情况下只用 <code>ht[0]</code>，<code>ht[1]</code> 是空的。当负载因子（<code>used / size</code>）超过阈值——通常是 1（扩容条件）或小于 0.1（缩容条件）——Redis 不会一次性把所有键从 <code>ht[0]</code> 搬到 <code>ht[1]</code>，因为那会阻塞主线程。它先给 <code>ht[1]</code> 分配一个更大的（或更小的）空间，设一个游标 <code>rehashidx = 0</code>，表示"搬迁进行中"。此后每次对这个字典做增删改查时，Redis 会把 <code>rehashidx</code> 指向的那一个桶里的所有键搬到 <code>ht[1]</code>，然后 <code>rehashidx++</code>。同时，新写入的键直接进 <code>ht[1]</code>，查找和删除则先查 <code>ht[0]</code> 再查 <code>ht[1]</code>。当 <code>rehashidx</code> 走完所有桶，<code>ht[1]</code> 变成新的 <code>ht[0]</code>，旧表释放，<code>rehashidx</code> 重置为 -1，rehash 结束。</p>
 <p>这套机制保证单次字典操作不会因为搬迁而卡顿——每次只搬一个桶，摊还到后续所有操作里。这和其他地方提到的 Redis 设计思想一致：<strong>用摊还替换集中，把不能删的活拆成碎片，塞进每次操作的缝隙里</strong>。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  
+  <text x="440" y="52" text-anchor="middle" font-size="12.5" fill="#6B7280">某次操作触发搬迁进行中的快照：rehashidx 指向当前要搬的桶</text>
+
+  <!-- ============ ht[0] 旧表（左）============ -->
+  <text x="150" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">ht[0]　旧表（size=4）</text>
+
+  <!-- 4 个桶，y=100 起，每桶高 56 -->
+  <!-- 桶0 已搬空 -->
+  <rect x="70" y="100" width="160" height="52" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.3"/>
+  <text x="52" y="130" text-anchor="end" font-size="12" fill="#6B7280">桶0</text>
+  <text x="150" y="131" text-anchor="middle" font-size="12" fill="#9CA3AF">已搬空</text>
+  <!-- 桶1 已搬空 -->
+  <rect x="70" y="160" width="160" height="52" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.3"/>
+  <text x="52" y="190" text-anchor="end" font-size="12" fill="#6B7280">桶1</text>
+  <text x="150" y="191" text-anchor="middle" font-size="12" fill="#9CA3AF">已搬空</text>
+  <!-- 桶2 正在搬 rehashidx -->
+  <rect x="70" y="220" width="160" height="52" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="52" y="250" text-anchor="end" font-size="12" font-weight="700" fill="#B91C1C">桶2</text>
+  <text x="150" y="251" text-anchor="middle" font-size="12.5" font-family="ui-monospace, monospace" fill="#B91C1C">k7 → k3 → k9</text>
+  <!-- 桶3 待搬 -->
+  <rect x="70" y="280" width="160" height="52" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/>
+  <text x="52" y="310" text-anchor="end" font-size="12" fill="#6B7280">桶3</text>
+  <text x="150" y="311" text-anchor="middle" font-size="12.5" font-family="ui-monospace, monospace" fill="#4F46E5">k2 → k5</text>
+
+  <!-- rehashidx 指针 -->
+  <text x="150" y="360" text-anchor="middle" font-size="12.5" font-weight="700" fill="#EF4444">rehashidx = 2</text>
+  <text x="150" y="378" text-anchor="middle" font-size="11" fill="#6B7280">本次只搬这一个桶，然后 +1</text>
+
+  <!-- ============ 搬迁箭头（中）：从桶2右缘指向新表左列 ============ -->
+  <line x1="234" y1="246" x2="486" y2="246" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_3_arrow-red)"/>
+  <text x="360" y="238" text-anchor="middle" font-size="11.5" fill="#B91C1C">搬迁桶2的键到新表</text>
+
+  <!-- ============ ht[1] 新表（右）============ -->
+  <text x="590" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">ht[1]　新表（size=8，更大）</text>
+
+  <!-- 8 个桶，两列，x=490/670，y=100 起每桶高 40 -->
+  <!-- 左列 桶0-3 -->
+  <rect x="490" y="100" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="123" text-anchor="end" font-size="11" fill="#6B7280">0</text><text x="570" y="123" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k1</text>
+  <rect x="490" y="144" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="167" text-anchor="end" font-size="11" fill="#6B7280">1</text><text x="570" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k7</text>
+  <rect x="490" y="188" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="211" text-anchor="end" font-size="11" fill="#6B7280">2</text>
+  <rect x="490" y="232" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="255" text-anchor="end" font-size="11" fill="#6B7280">3</text><text x="570" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k3</text>
+  <!-- 右列 桶4-7 -->
+  <rect x="670" y="100" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="123" text-anchor="end" font-size="11" fill="#6B7280">4</text>
+  <rect x="670" y="144" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="167" text-anchor="end" font-size="11" fill="#6B7280">5</text><text x="745" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k9</text>
+  <rect x="670" y="188" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="211" text-anchor="end" font-size="11" fill="#6B7280">6</text>
+  <rect x="670" y="232" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="255" text-anchor="middle" font-size="11" fill="#6B7280"> </text><text x="662" y="255" text-anchor="end" font-size="11" fill="#6B7280">7</text><text x="745" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k…</text>
+
+  <text x="655" y="300" text-anchor="middle" font-size="11.5" fill="#6B7280">新写入的键直接进 ht[1]</text>
+
+  <!-- ============ 底部：读写路径规则 ============ -->
+  <rect x="70" y="398" width="360" height="54" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.3"/>
+  <text x="250" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4F46E5">搬迁期间的读写</text>
+  <text x="250" y="440" text-anchor="middle" font-size="11.5" fill="#374151">查找/删除：先查 ht[0] 再查 ht[1]；新写入只进 ht[1]</text>
+
+  <rect x="460" y="398" width="360" height="54" rx="6" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/>
+  <text x="640" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065F46">搬完之后</text>
+  <text x="640" y="440" text-anchor="middle" font-size="11.5" fill="#374151">rehashidx 走到底 → ht[1] 变 ht[0]，旧表释放</text>
+</svg>
+</div><figcaption>图 2-3　渐进式 rehash：扩容时不一次性搬迁，而是每次操作顺带把 <code>rehashidx</code> 指向的一个桶从 <code>ht[0]</code> 搬到 <code>ht[1]</code>；期间新写入直接进 <code>ht[1]</code>，查找先查 <code>ht[0]</code> 再查 <code>ht[1]</code>，搬完游标走到底则两表交换。</figcaption></figure>
 <p><strong>压缩列表（ziplist）与紧凑列表（listpack）</strong> 是 Redis 把内存密度推到最高的数据结构。ziplist 是一块连续内存，所有元素紧挨着存，没有指针开销。每个元素存的是"前一个元素长度 + 自己的编码 + 自己的数据"。这带来极高的内存密度，但也带来连锁更新问题：如果一个元素变长，它的"前一个元素长度"字段可能从 1 字节扩成 5 字节，导致后一个元素的同名字段也跟着扩，最坏退化成 O(n²)。listpack（7.0 起逐步替代 ziplist）把"前一个元素长度"改成了"自己的长度"。每个元素只自记长度，不再管前面是谁，连锁更新从根上消除。内存密度不降，写复杂度从 O(n²) 回到 O(n)。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_2_4_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+  
+
+  <!-- ============ ziplist（上）============ -->
+  <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录「前一元素的长度」</text>
+
+  <!-- 元素结构说明标签 -->
+  <text x="60" y="90" font-size="11.5" fill="#6B7280">元素 = ［prevlen 前一元素长度］＋［encoding］＋［data］</text>
+
+  <!-- 变更前 -->
+  <text x="60" y="122" font-size="12.5" font-weight="700" fill="#374151">变更前：entry1 长度 = 60 字节（&lt; 254）</text>
+  <!-- entry1 -->
+  <rect x="60"  y="132" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="150" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry1（60 字节）</text>
+  <text x="150" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
+  <!-- entry2 -->
+  <rect x="250" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="325" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry2</text>
+  <text x="325" y="166" text-anchor="middle" font-size="10.5" fill="#065F46">prevlen=1B（记 60）</text>
+  <!-- entry3 -->
+  <rect x="410" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="485" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry3</text>
+  <text x="485" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
+
+  <!-- 触发：entry1 变长 -->
+  <text x="60" y="212" font-size="12.5" font-weight="700" fill="#B91C1C">变更后：entry1 增大到 ≥ 254 字节 → 触发连锁</text>
+  <!-- entry1 变大 -->
+  <rect x="60"  y="222" width="180" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="150" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry1（≥254 字节）</text>
+  <text x="150" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">变长了</text>
+  <!-- entry2 prevlen 撑大 1→5 -->
+  <rect x="250" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="325" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry2 撑大</text>
+  <text x="325" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- entry3 跟着撑大 -->
+  <rect x="410" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="485" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry3 跟着撑大</text>
+  <text x="485" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- 继续 -->
+  <text x="580" y="248" font-size="12" fill="#B91C1C">…继续向后</text>
+
+  <!-- 连锁箭头 -->
+  <line x1="240" y1="244" x2="250" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_4_arrow-red)"/>
+  <line x1="400" y1="244" x2="410" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_4_arrow-red)"/>
+  <line x1="560" y1="244" x2="574" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_4_arrow-red)"/>
+
+  <text x="60" y="292" font-size="12" fill="#374151">一个元素变长，可能逐个撑大后面所有元素的 prevlen 字段 → 最坏退化成 <tspan font-weight="700" fill="#B91C1C">O(n²)</tspan></text>
+
+  <!-- 分隔线 -->
+  <line x1="60" y1="312" x2="820" y2="312" stroke="#E5E7EB" stroke-width="1.2"/>
+
+  <!-- ============ listpack（下）============ -->
+  <text x="60" y="342" font-size="14" font-weight="700" fill="#4F46E5">listpack：每个元素只记录「自己的长度」</text>
+
+  <rect x="60"  y="356" width="180" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="150" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry1（变长）</text>
+  <text x="150" y="392" text-anchor="middle" font-size="10.5" fill="#6B7280">len＝自己的长度</text>
+  <rect x="250" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="325" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry2 不受影响</text>
+  <text x="325" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
+  <rect x="410" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="485" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry3 不受影响</text>
+  <text x="485" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
+
+  <!-- 断开的连锁：打叉 -->
+  <line x1="243" y1="366" x2="247" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="247" y1="366" x2="243" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="403" y1="366" x2="407" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="407" y1="366" x2="403" y2="390" stroke="#059669" stroke-width="2"/>
+
+  <text x="60" y="426" font-size="12" fill="#374151">元素不再记前一个是谁 → 从根上消除连锁，写复杂度回到 <tspan font-weight="700" fill="#065F46">O(n)</tspan>，内存密度不降</text>
+</svg>
+</div><figcaption>图 2-4　连锁更新：ziplist 每个元素记录"前一元素长度"，一个元素变长使该字段从 1 字节涨到 5 字节，撑大后一元素，可能逐个向后连锁（最坏 O(n²)）；listpack 改为每元素只记"自己的长度"，从根上消除连锁。</figcaption></figure>
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素——能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。注意编码只升不降——哪怕后来所有大值都被删了，编码仍然是宽的。这是因为升级是一次性的内存重分配，而降级意味着又一次全量重分配，在 Redis 的场景里"删掉大值"的概率太低，不值得为了降级多付一次开销。</p>
 <p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，自动升级为哈希表。这和 ziplist → listpack 或 hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后无缝切换到复杂结构</strong>。所有升级对上层命令透明。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 520" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
@@ -797,8 +1100,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="650" y="286" text-anchor="middle" font-size="11" fill="#6B7280">插入非整数 → 自动升级为 dict</text>
 
   <!-- Upgrade arrows -->
-  <line x1="270" y1="300" x2="270" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_1_arrow)"/>
-  <line x1="610" y1="300" x2="610" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_1_arrow)"/>
+  <line x1="270" y1="300" x2="270" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_5_arrow)"/>
+  <line x1="610" y1="300" x2="610" y2="340" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_5_arrow)"/>
 
   <!-- Upgrade box -->
   <rect x="120" y="345" width="640" height="60" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
@@ -811,23 +1114,23 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，无缝切换是内存效率的核心杠杆</text>
   <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
-</div><figcaption>图 2-1 Redis 五种底层数据结构的适用场景与升级路径</figcaption></figure>
-<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-1-gpt.png" alt="图 2-1 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版"><figcaption>图 2-1 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版</figcaption></figure>
+</div><figcaption>图 2-5 Redis 五种底层数据结构的适用场景与升级路径</figcaption></figure>
+<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-5-gpt.png" alt="图 2-5 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版"><figcaption>图 2-5 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版</figcaption></figure>
 <h3 id="s29">2.2.2 MySQL：为磁盘页和通用查询而生的 B+ 树与行格式</h3>
-<p>MySQL（InnoDB）的数据结构受另一个约束：<strong>数据在磁盘上，一次 I/O 取一页（16KB）</strong>。这个约束是决定性的。内存访问是纳秒级，磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构只有一个目标：<strong>让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用</strong>。</p>
-<p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（几百个键就能挤进一个 16KB 页，树极矮），叶子节点存完整行数据，且叶子之间用双向链表串联。这套设计同时解决三个查询需求：点查（从根走到叶，O(log n)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。第 8 章会展开 InnoDB 页内七段布局和 Page Directory 的细节，本章只抓一个核心。B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只改前后指针，没有页分裂——这正是 MySQL 为通用查询能力付出的代价。<strong>B+ 树就是以 16KB 页为基本 I/O 单位的磁盘友好索引。</strong></p>
+<p>MySQL（InnoDB）的数据结构受到一个关键限制：<strong>数据在磁盘上，一次 I/O 取一页（16KB）</strong>。这个限制是决定性的。内存访问是纳秒级，而磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构要尽量解决这个核心问题：<strong>让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用</strong>。</p>
+<p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（几百个键就能挤进一个 16KB 页，树极矮），叶子节点存完整行数据，且叶子之间用双向链表串联。这套设计同时解决三个查询需求：点查（从根走到叶，O(log n)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。第 8 章会展开 InnoDB 页内七段布局和 Page Directory 的细节。B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只改前后指针，没有页分裂，这也是 MySQL 为通用查询能力付出的代价。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_4_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_6_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
     </marker>
-    <marker id="fig_2_4_arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_6_arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
     </marker>
-    <marker id="fig_2_4_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_6_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
     </marker>
-    <marker id="fig_2_4_arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_6_arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EA580C"/>
     </marker>
   </defs>
@@ -849,13 +1152,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="135" text-anchor="middle" font-size="9" fill="#92400E">装满键</text>
 
   <!-- Arrows from root to internal nodes -->
-  <line x1="390" y1="145" x2="230" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_4_arrow-blue)"/>
+  <line x1="390" y1="145" x2="230" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
   <text x="300" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 &lt; 30</text>
 
-  <line x1="450" y1="145" x2="450" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_4_arrow-blue)"/>
+  <line x1="450" y1="145" x2="450" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
   <text x="470" y="175" font-size="9" fill="#2563EB">30 ≤ 键值 &lt; 65</text>
 
-  <line x1="510" y1="145" x2="670" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_4_arrow-blue)"/>
+  <line x1="510" y1="145" x2="670" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
   <text x="600" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 ≥ 65</text>
 
   <!-- ===== INTERNAL LEVEL ===== -->
@@ -881,16 +1184,16 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
 
   <!-- Arrows from internal to leaf -->
-  <line x1="150" y1="270" x2="130" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
-  <line x1="230" y1="270" x2="230" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
-  <line x1="310" y1="270" x2="330" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
+  <line x1="150" y1="270" x2="130" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
+  <line x1="230" y1="270" x2="230" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
+  <line x1="310" y1="270" x2="330" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
 
-  <line x1="430" y1="270" x2="400" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
-  <line x1="470" y1="270" x2="550" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
+  <line x1="430" y1="270" x2="400" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
+  <line x1="470" y1="270" x2="550" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
 
-  <line x1="590" y1="270" x2="620" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
-  <line x1="670" y1="270" x2="700" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
-  <line x1="750" y1="270" x2="760" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_4_arrow-gray)"/>
+  <line x1="590" y1="270" x2="620" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
+  <line x1="670" y1="270" x2="700" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
+  <line x1="750" y1="270" x2="760" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
 
   <!-- ===== LEAF LEVEL ===== -->
   <!-- Leaf 1 -->
@@ -933,17 +1236,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="825" y="355" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
 
   <!-- Bidirectional arrows between leaf nodes -->
-  <line x1="200" y1="395" x2="208" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
-  <line x1="210" y1="385" x2="202" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
+  <line x1="200" y1="395" x2="208" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
+  <line x1="210" y1="385" x2="202" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
 
-  <line x1="350" y1="395" x2="358" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
-  <line x1="360" y1="385" x2="352" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
+  <line x1="350" y1="395" x2="358" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
+  <line x1="360" y1="385" x2="352" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
 
-  <line x1="500" y1="395" x2="508" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
-  <line x1="510" y1="385" x2="502" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
+  <line x1="500" y1="395" x2="508" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
+  <line x1="510" y1="385" x2="502" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
 
-  <line x1="650" y1="395" x2="658" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
-  <line x1="660" y1="385" x2="652" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_4_arrow-green)"/>
+  <line x1="650" y1="395" x2="658" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
+  <line x1="660" y1="385" x2="652" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
 
   <!-- Range scan annotation -->
   <rect x="120" y="440" width="650" height="42" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
@@ -972,20 +1275,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="450" y="612" text-anchor="middle" font-size="11" fill="#7F1D1D">内部节点只存键 → 几百个键挤进 16KB → 树极矮（2-3 层）→ 点查 2-3 次 I/O</text>
   <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
 </svg>
-</div><figcaption>图 2-4 MySQL InnoDB B+ 树结构</figcaption></figure>
-<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-4-gpt.png" alt="图 2-4 MySQL InnoDB B+ 树结构 GPT 生成版"><figcaption>图 2-4 MySQL InnoDB B+ 树结构 GPT 生成版</figcaption></figure>
-<p>图 2-4　InnoDB B+ 树三层结构：根节点和内部节点只存键与子节点指针，把几百个键挤进 16KB；叶子节点存完整行数据，双向链表串联支持高效范围扫描。</p>
-<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么摆。以 8.0 默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。不让大对象拖累整页，也不让跨页撕裂把一次读变成多次 I/O。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
-<p><strong>自适应哈希索引（Adaptive Hash Index）</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。这是"冷数据走磁盘、热数据走内存、极热数据走哈希"的三级加速。数据结构会随访问模式自动调整。</p>
+</div><figcaption>图 2-6 MySQL InnoDB B+ 树结构</figcaption></figure>
+<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-6-gpt.png" alt="图 2-6 MySQL InnoDB B+ 树结构 GPT 生成版"><figcaption>图 2-6 MySQL InnoDB B+ 树结构 GPT 生成版</figcaption></figure>
+<p>图 2-6　InnoDB B+ 树三层结构：根节点和内部节点只存键与子节点指针，把几百个键挤进 16KB；叶子节点存完整行数据，双向链表串联支持高效范围扫描。</p>
+<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以 8.0 默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。不让大对象拖累整页，也不让跨页撕裂把一次读变成多次 I/O。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
+<p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。这是"冷数据走磁盘、热数据走内存、极热数据走哈希"的三级加速。数据结构会随访问模式自动调整。</p>
 <h3 id="s30">2.2.3 Kafka：为批量、顺序和演进而生的 RecordBatch</h3>
 <p>Kafka 的数据结构要同时满足三件事：<strong>磁盘顺序追加 + 批量压缩 + 格式可演进</strong>。满足这三件事的结构就是 RecordBatch，一个专为"把多条消息打成一个包"设计的结构，既不是树也不是哈希。</p>
 <p><strong>RecordBatch 就是 Kafka 的基本存储单元。</strong> 生产者会把消息攒够一批（按 <code>batch.size</code> 或 <code>linger.ms</code>）再压成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。</p>
 <p><strong>RecordBatch 的字段布局讲了 Kafka 的所有设计取向。</strong> 从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部包括：<code>baseOffset</code>（这批消息的起始偏移量）、<code>batchLength</code>（整个 Batch 的字节长度，用于快速跳到下一个 Batch）、<code>partitionLeaderEpoch</code>（哪一任 Leader 写了这批）、<code>magic</code>（格式版本号，V2 = 2）、<code>CRC</code>（整批一条校验，而非每条消息各自 CRC）、<code>attributes</code>（压缩类型 + 时间戳类型 + 事务标记）、<code>lastOffsetDelta</code>（最后一条消息距离 baseOffset 的差值）、<code>baseTimestamp</code> 和 <code>maxTimestamp</code>（这批的时间范围）、<code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code>（幂等+事务所需的 Producer 状态）、<code>recordsCount</code>（这批有几条记录）。</p>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0/V1 每条消息存绝对偏移量和绝对时间戳、每条消息带独立的 CRC，V2 把这些冗余全部消除。</p>
-<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-2-gpt.png" alt="图 2-2 Kafka RecordBatch V2 字段布局 GPT 生成版"><figcaption>图 2-2 Kafka RecordBatch V2 字段布局 GPT 生成版</figcaption></figure>
+<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-7-gpt.png" alt="图 2-7 Kafka RecordBatch V2 字段布局 GPT 生成版"><figcaption>图 2-7 Kafka RecordBatch V2 字段布局 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
@@ -1071,12 +1374,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Producer/Consumer arrows -->
   <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>
-  <line x1="55" y1="325" x2="55" y2="350" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="55" y1="325" x2="55" y2="350" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
   <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
-  <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
   <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-2　RecordBatch V2 字段布局</text>
 </svg>
-</div><figcaption>图 2-2 Kafka RecordBatch V2 字段布局</figcaption></figure>
+</div><figcaption>图 2-7 Kafka RecordBatch V2 字段布局</figcaption></figure>
 <p>这套设计的取舍摆在明面上。批量让压缩在相似消息聚集时通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2-6 倍；极端重复场景可能更高），差值编码让每条记录元数据开销降到个位数字节，Batch 级 CRC 省了逐条校验的 CPU，<code>magic</code> 让格式版本自描述、新旧格式可共存。代价也摆在明面上：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
 <h2 id="s31">2.3 通信协议：客户端和服务端怎么对话</h2>
 <p>RESP 是纯文本协议，用 <code>nc</code> 连上 6379 端口直接打字就能交互。在那个几乎所有后端协议都选紧凑二进制的年代，这个"原始"的选择背后是一个判断：瓶颈从来不在带宽。</p>
@@ -1095,10 +1398,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的协议模型换了思路。它是一个<strong>分门别类的请求/响应体系</strong>，而不是"客户端发命令、服务端回结果"的问答题。Produce、Fetch、Metadata、JoinGroup、SyncGroup……几十种请求类型，每种请求有自己独立的 Schema，每种 Schema 有自己的版本号。</p>
 <p>所有请求共用同一个固定头部：<code>api_key</code>（2 字节，标识这是什么类型的请求，如 Produce = 0, Fetch = 1, Metadata = 3……）、<code>api_version</code>（2 字节，标识用哪个版本的 Schema）、<code>correlation_id</code>（4 字节，客户端自定，服务端原样抄到响应里用来匹配请求和响应）、<code>client_id</code>（变长字符串，标识客户端身份）。这个四元组头部是 Kafka 协议最关键的设计。<code>api_key</code> + <code>api_version</code> 让同一类请求可以同时存在多个版本，Broker 根据客户端声明的版本号调整解析方式和返回字段。这意味着：不强制所有客户端升级。3.0 的 Broker 可以和 0.11 的客户端对话，双方用各自能理解的最早版本号做协商。</p>
 <p><strong>批量优先</strong> 是 Kafka 协议区别于 Redis 和 MySQL 最根本的特征。Produce 请求把多条消息打成一个 RecordBatch 一起发给 Broker，Fetch 请求一次拉取指定 <code>(topic, partition, offset)</code> 起始的一段数据（<code>min_bytes</code> + <code>max_bytes</code> 控制拉取量），Broker 用零拷贝把一批消息直接从页缓存推到网卡。单条消息从不独立出现在协议层面。一切以 Batch 为单位。这和 RecordBatch 在存储层的设计是同一个思路：协议层不做单条操作，是 Kafka 把吞吐放在第一位的必然结果。</p>
-<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-3-gpt.png" alt="图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版"><figcaption>图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版</figcaption></figure>
+<figure class="fig"><img src="chapters/02-data-structures-protocols/diagrams/fig-2-8-gpt.png" alt="图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版"><figcaption>图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="fig_2_8_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
@@ -1184,7 +1487,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="420" y="474" font-size="11" fill="#EF4444">❌</text>
   <text x="650" y="474" font-size="11" fill="#EF4444">❌</text>
 </svg>
-</div><figcaption>图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应</figcaption></figure>
+</div><figcaption>图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应</figcaption></figure>
 <h2 id="s35">2.4 横向对比</h2>
 <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚"目标 → 数据结构 → 协议"这条因果链。</p>
 <p><strong>表 2-1 三个软件数据结构与协议的横向对比</strong></p>
@@ -1202,11 +1505,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这三个软件为了各自的核心目标，选择了完全不同的内部数据结构和通信协议。Redis 为极低延迟选了全内存的简洁数据结构和文本协议，MySQL 为通用可靠选了 B+ 树页式结构和紧凑二进制协议，Kafka 的 RecordBatch 则把批量化、压缩和版本演进都做进了格式本身，吞吐因此成了它的默认设定。每一组选择都是"核心目标 → 数据结构 → 协议形态"这条因果链的完整展开。本章讨论的数据结构和协议，为第 4、5、9 章的内存管理、分层架构和数据同步奠定了底层基础。你会发现每一层都在为这些最底层的数据结构服务。数据结构决定了内存怎么管、协议决定了分层怎么切。数据结构决定了该软件访问模式的基本面：Redis 最热是点查所以用哈希，MySQL 最热是范围扫描所以用 B+ 树，Kafka 最热是顺序追加所以用 append-only Batch。</p></section>
 <section class="chapter" id="ch3"><h1 id="s38">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</h1>
 <h2 id="s39">本章导读</h2>
-<p>凌晨三点发版，你敲下 <code>kill -9</code> 想快速重启服务，结果第二天发现丢了十几条刚写入的订单。启动和关闭看似只是"开关"，实际上藏着最危险的状态转换。进程从"可执行文件"到"可对外服务"中间要恢复内存状态、重放未完成的事务、重建连接；进程关闭时则要保证正在处理的请求不丢、内存里的数据落盘、该移交的职责交接清楚。一次粗暴的断电式停机，丢的可能是几秒数据，也可能是整整一批事务。</p>
+<p>凌晨三点发版，你敲下 <code>kill -9</code> 想快速重启服务，结果第二天发现丢了十几条刚写入的数据。启动和关闭看似只是"开关"，实际上藏着最危险的状态转换。进程从"可执行文件"到"可对外服务"中间要恢复内存状态、重放未完成的事务、重建连接；进程关闭时则要保证正在处理的请求不丢、内存里的数据落盘、该移交的职责交接清楚。一次粗暴的断电式停机，丢的可能是几秒数据，也可能是整整一批事务。</p>
 <p>同样是 <code>kill -9</code>，对 Redis 通常只是丢掉最近一小段时间的数据（具体取决于 AOF 的 fsync 策略。<code>everysec</code> 默认是约 1 秒量级的数据窗口，<code>always</code> 每条命令都落盘、窗口接近 0，纯 RDB 则丢自上次快照起的全部），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。差别为何如此之大？因为这三个软件启动和关闭时处理设计完全不同：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群。</p>
 <p><strong>一个进程从可执行文件到"可对外服务"中间必须完成哪些事、为什么不能直接断电、"优雅（graceful）"二字到底优雅在哪里，下面逐一讲清楚。</strong>差别就在它们各自承担的承诺不同。</p>
 <h2 id="s40">3.1 问题的本质</h2>
-<p><strong>启动的本质是状态机重建。</strong> 进程一旦重启，内存里的状态全部归零。启动要做的，是把"上次崩溃或关闭时落到磁盘的那份不完整状态"重建为"一个一致、可对外服务的新状态"。一个数据库启动后如果还能看到崩溃前那一刻已经提交的事务，那是它在启动期重放了日志。一个缓存启动后看到的是几秒前的数据，那是它接受了"快但不全"。所以判断启动有没有"成功"，是看它恢复出来的状态是否可信。</p>
+<p><strong>启动的本质是状态机重建。</strong> 进程一旦重启，内存里的状态全部归零。启动要做的，是把"上次崩溃或关闭时落到磁盘的那份不完整状态"重建为"一个一致、可对外服务的新状态"。一个数据库启动后如果还能看到崩溃前那一刻已经提交的事务，是因为它在启动期重放了日志。一个缓存启动后看到的是几秒前的数据，那是它接受了"快但不全"。所以判断启动有没有"成功"，是看它恢复出来的状态是否可信。</p>
 <p><strong>关闭的本质是状态机快照加上资源释放。</strong> 关闭要回答两个问题：当前内存里哪些状态必须落盘？对外占用（连接、文件锁、集群成员身份）怎么干净地交还？没做完这两件事就退出，下次启动就要替它收拾残局。Redis 的 <code>kill -9</code> 之所以"只是丢几秒数据"，是因为它本来就把内存当主存储，磁盘只是辅助。MySQL 的 <code>kill -9</code> 之所以要崩溃恢复，是因为它承诺了事务语义，必须在启动期把"崩溃那一刻到底哪些事务算数"搞清楚。</p>
 <p>贯穿全章的有三对共同矛盾，它们会在后文各自的实现里反复出现：</p>
 <ol><li><strong>一致性 vs 可用性。</strong> 启动时多恢复一步更安全，但用户等得更久。关闭时多刷一页更安全，但停服时间更长。</li><li><strong>速度 vs 确定性。</strong> 是追求快速就绪（懒加载、跳过校验），还是追求启动后处于"已知的确定状态"（全量校验、预分配）。</li><li><strong>单机视角 vs 分布式视角。</strong> 单机软件的关闭只影响自身。分布式组件的关闭是一个集群事件，要让 Leader 迁移、让副本同步可见。</li></ol>

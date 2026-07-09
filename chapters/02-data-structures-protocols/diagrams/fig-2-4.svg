@@ -1,157 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
-    </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
-    </marker>
-    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
-    </marker>
-    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EA580C"/>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
 
-  <!-- Title -->
-  <text x="450" y="30" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-4 MySQL InnoDB B+ 树结构</text>
-  <text x="450" y="54" text-anchor="middle" font-size="12" fill="#6B7280">三层结构：根节点→内部节点→叶子节点 · 16KB 页对齐 · 叶子层双向链表串联</text>
+  <text x="440" y="30" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-4 ziplist 连锁更新与 listpack 的消除</text>
 
-  <!-- ===== ROOT LEVEL ===== -->
-  <rect x="340" y="75" width="220" height="70" rx="8" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
-  <text x="450" y="98" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">根节点（Root）</text>
-  <text x="450" y="118" text-anchor="middle" font-size="10" fill="#4B5563">只存键 + 子节点指针</text>
-  <text x="450" y="136" text-anchor="middle" font-size="10" fill="#6B7280">例：[30 | 65] → 3 个子节点指针</text>
+  <!-- ============ ziplist（上）============ -->
+  <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录「前一元素的长度」</text>
 
-  <!-- 16KB page label on root -->
-  <rect x="565" y="75" width="70" height="70" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="600" y="105" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">1 页</text>
-  <text x="600" y="120" text-anchor="middle" font-size="9" fill="#92400E">16KB</text>
-  <text x="600" y="135" text-anchor="middle" font-size="9" fill="#92400E">装满键</text>
+  <!-- 元素结构说明标签 -->
+  <text x="60" y="90" font-size="11.5" fill="#6B7280">元素 = ［prevlen 前一元素长度］＋［encoding］＋［data］</text>
 
-  <!-- Arrows from root to internal nodes -->
-  <line x1="390" y1="145" x2="230" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
-  <text x="300" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 &lt; 30</text>
+  <!-- 变更前 -->
+  <text x="60" y="122" font-size="12.5" font-weight="700" fill="#374151">变更前：entry1 长度 = 60 字节（&lt; 254）</text>
+  <!-- entry1 -->
+  <rect x="60"  y="132" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="150" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry1（60 字节）</text>
+  <text x="150" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
+  <!-- entry2 -->
+  <rect x="250" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="325" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry2</text>
+  <text x="325" y="166" text-anchor="middle" font-size="10.5" fill="#065F46">prevlen=1B（记 60）</text>
+  <!-- entry3 -->
+  <rect x="410" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="485" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry3</text>
+  <text x="485" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
 
-  <line x1="450" y1="145" x2="450" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
-  <text x="470" y="175" font-size="9" fill="#2563EB">30 ≤ 键值 &lt; 65</text>
+  <!-- 触发：entry1 变长 -->
+  <text x="60" y="212" font-size="12.5" font-weight="700" fill="#B91C1C">变更后：entry1 增大到 ≥ 254 字节 → 触发连锁</text>
+  <!-- entry1 变大 -->
+  <rect x="60"  y="222" width="180" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="150" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry1（≥254 字节）</text>
+  <text x="150" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">变长了</text>
+  <!-- entry2 prevlen 撑大 1→5 -->
+  <rect x="250" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="325" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry2 撑大</text>
+  <text x="325" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- entry3 跟着撑大 -->
+  <rect x="410" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="485" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry3 跟着撑大</text>
+  <text x="485" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- 继续 -->
+  <text x="580" y="248" font-size="12" fill="#B91C1C">…继续向后</text>
 
-  <line x1="510" y1="145" x2="670" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
-  <text x="600" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 ≥ 65</text>
+  <!-- 连锁箭头 -->
+  <line x1="240" y1="244" x2="250" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <line x1="400" y1="244" x2="410" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <line x1="560" y1="244" x2="574" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
 
-  <!-- ===== INTERNAL LEVEL ===== -->
-  <!-- Internal node 1 -->
-  <rect x="70" y="200" width="320" height="70" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2"/>
-  <text x="230" y="223" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">内部节点（Internal）</text>
-  <text x="230" y="243" text-anchor="middle" font-size="10" fill="#4B5563">只存键 + 子节点指针（不存行数据）</text>
-  <text x="230" y="261" text-anchor="middle" font-size="10" fill="#6B7280">例：[10 | 20] → 子节点指针 × 3</text>
+  <text x="60" y="292" font-size="12" fill="#374151">一个元素变长，可能逐个撑大后面所有元素的 prevlen 字段 → 最坏退化成 <tspan font-weight="700" fill="#B91C1C">O(n²)</tspan></text>
 
-  <!-- Internal node 2 -->
-  <rect x="410" y="200" width="80" height="70" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2"/>
-  <text x="450" y="235" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">[40]</text>
-  <text x="450" y="258" text-anchor="middle" font-size="9" fill="#6B7280">2 个子指针</text>
+  <!-- 分隔线 -->
+  <line x1="60" y1="312" x2="820" y2="312" stroke="#E5E7EB" stroke-width="1.2"/>
 
-  <!-- Internal node 3 -->
-  <rect x="510" y="200" width="320" height="70" rx="8" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2"/>
-  <text x="670" y="223" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">内部节点（Internal）</text>
-  <text x="670" y="243" text-anchor="middle" font-size="10" fill="#4B5563">只存键 + 子节点指针（不存行数据）</text>
-  <text x="670" y="261" text-anchor="middle" font-size="10" fill="#6B7280">例：[80 | 95] → 子节点指针 × 3</text>
+  <!-- ============ listpack（下）============ -->
+  <text x="60" y="342" font-size="14" font-weight="700" fill="#4F46E5">listpack：每个元素只记录「自己的长度」</text>
 
-  <!-- 16KB label on internal -->
-  <rect x="565" y="195" width="70" height="22" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="600" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
+  <rect x="60"  y="356" width="180" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="150" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry1（变长）</text>
+  <text x="150" y="392" text-anchor="middle" font-size="10.5" fill="#6B7280">len＝自己的长度</text>
+  <rect x="250" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="325" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry2 不受影响</text>
+  <text x="325" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
+  <rect x="410" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="485" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry3 不受影响</text>
+  <text x="485" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
 
-  <!-- Arrows from internal to leaf -->
-  <line x1="150" y1="270" x2="130" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-  <line x1="230" y1="270" x2="230" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-  <line x1="310" y1="270" x2="330" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
+  <!-- 断开的连锁：打叉 -->
+  <line x1="243" y1="366" x2="247" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="247" y1="366" x2="243" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="403" y1="366" x2="407" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="407" y1="366" x2="403" y2="390" stroke="#059669" stroke-width="2"/>
 
-  <line x1="430" y1="270" x2="400" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-  <line x1="470" y1="270" x2="550" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-
-  <line x1="590" y1="270" x2="620" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-  <line x1="670" y1="270" x2="700" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-  <line x1="750" y1="270" x2="760" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#arrow-gray)"/>
-
-  <!-- ===== LEAF LEVEL ===== -->
-  <!-- Leaf 1 -->
-  <rect x="60" y="345" width="140" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="130" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
-  <text x="130" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[5] [8]</text>
-  <text x="130" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
-  <text x="130" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
-
-  <!-- Leaf 2 -->
-  <rect x="210" y="345" width="140" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="280" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
-  <text x="280" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[12] [18]</text>
-  <text x="280" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
-  <text x="280" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
-
-  <!-- Leaf 3 -->
-  <rect x="360" y="345" width="140" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="430" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
-  <text x="430" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[35] [38]</text>
-  <text x="430" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
-  <text x="430" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
-
-  <!-- Leaf 4 (highlighted for range scan) -->
-  <rect x="510" y="345" width="140" height="80" rx="8" fill="#D1FAE5" stroke="#059669" stroke-width="2.5"/>
-  <text x="580" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点 ★</text>
-  <text x="580" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[72] [85]</text>
-  <text x="580" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
-  <text x="580" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
-
-  <!-- Leaf 5 -->
-  <rect x="660" y="345" width="140" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="730" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
-  <text x="730" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[90] [98]</text>
-  <text x="730" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
-  <text x="730" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
-
-  <!-- 16KB label on leaf -->
-  <rect x="790" y="340" width="70" height="22" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="825" y="355" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
-
-  <!-- Bidirectional arrows between leaf nodes -->
-  <line x1="200" y1="395" x2="208" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="210" y1="385" x2="202" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <line x1="350" y1="395" x2="358" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="360" y1="385" x2="352" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <line x1="500" y1="395" x2="508" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="510" y1="385" x2="502" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <line x1="650" y1="395" x2="658" y2="395" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="660" y1="385" x2="652" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
-
-  <!-- Range scan annotation -->
-  <rect x="120" y="440" width="650" height="42" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
-  <text x="445" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">叶子层双向链表 → 范围扫描：定位起始叶子后，顺着链表逐个读取，无需反复从根定位</text>
-  <text x="445" y="476" text-anchor="middle" font-size="10" fill="#6B7280">点查 O(log N) · 范围扫描 O(log N + M) · 叶子层天然有序（键序即排序）</text>
-
-  <!-- ===== LEGEND ===== -->
-  <rect x="50" y="500" width="800" height="55" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="70" y="522" font-size="11" font-weight="700" fill="#111827">图例</text>
-
-  <rect x="70" y="532" width="14" height="14" rx="3" fill="#DBEAFE" stroke="#2563EB" stroke-width="1"/>
-  <text x="90" y="544" font-size="10" fill="#4B5563">根/内部节点（只存键+指针）</text>
-
-  <rect x="240" y="532" width="14" height="14" rx="3" fill="#ECFDF5" stroke="#059669" stroke-width="1"/>
-  <text x="260" y="544" font-size="10" fill="#4B5563">叶子节点（存键+完整行数据+链表指针）</text>
-
-  <rect x="440" y="532" width="14" height="14" rx="3" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="460" y="544" font-size="10" fill="#4B5563">每个节点 = 1 个 16KB 磁盘页</text>
-
-  <line x1="620" y1="539" x2="640" y2="539" stroke="#059669" stroke-width="2"/>
-  <text x="646" y="544" font-size="10" fill="#4B5563">双向链表方向</text>
-
-  <!-- ===== KEY INSIGHT BOX ===== -->
-  <rect x="50" y="570" width="800" height="65" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
-  <text x="450" y="592" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">核心取舍</text>
-  <text x="450" y="612" text-anchor="middle" font-size="11" fill="#7F1D1D">内部节点只存键 → 几百个键挤进 16KB → 树极矮（2-3 层）→ 点查 2-3 次 I/O</text>
-  <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
+  <text x="60" y="426" font-size="12" fill="#374151">元素不再记前一个是谁 → 从根上消除连锁，写复杂度回到 <tspan font-weight="700" fill="#065F46">O(n)</tspan>，内存密度不降</text>
 </svg>

@@ -41,7 +41,7 @@
 | T3 | 命令/参数可运行性 | `command-runnable` | 基线版本下命令存在性、默认值、拼写 | ✅ |
 | T4 | 量化数字可核实性 | `number-provenance` | 裸数字有出处/有前提/不过时（规则7：三选一） | ✅ |
 | T5 | 插图语义正确性 | `svg-semantics` | 箭头方向、流程顺序、图中数值与正文一致 | ✅ |
-| T6 | 插图几何正确性 | `svg_audit.py` | 越界/重叠/穿字 | ✅ |
+| T6 | 插图几何正确性 | `svg-checker`（编排 `svg_audit.py` + 渲染 + 13 类陷阱） | 越界/重叠/穿字/箭头衔接/ghost/编号一致 | ✅ |
 | T7 | 源码级实现准确性 | `source-contributor` | 把文档说的当代码做的？版本差异标注？ | ✅ |
 | T8 | 版本保鲜期 | `version-shelf-life` | 版本特定断言是否标注、读者能否区分规律与细节 | ✅ |
 
@@ -76,7 +76,7 @@
 
 ## 2. Agent 完整花名册
 
-共 **20 个 agent + 2 个工具**。人设文件全部在 `.claude/agents/`。
+共 **22 个 agent + 2 个工具**。人设文件全部在 `.claude/agents/`。
 
 ### 文字层（8）
 | 文件名 | 触发场景 |
@@ -90,7 +90,7 @@
 | — | 不可验证绝对化断言（无专用 agent，总调度发起） |
 | — | AI 味黑名单词汇扫描（用去 AI 味自查方法 §6 脚本） |
 
-### 事实层（8）
+### 事实层（9）
 | 文件名 | 触发场景 |
 |--------|---------|
 | `architect-reviewer.md` | 技术事实准确性 + tradeoff 深度 |
@@ -98,9 +98,10 @@
 | `command-runnable.md` | 命令/参数在基线版本的可运行性 |
 | `number-provenance.md` | 量化数字溯源 |
 | `svg-semantics.md` | SVG 图语义正确性 |
+| `svg-checker.md` | SVG 几何/规范检查（编排 svg_audit + 渲染 + 13 类陷阱） |
 | `source-contributor.md` | 开源源码级实现验证 |
 | `version-shelf-life.md` | 版本特定断言的保鲜期 |
-| — | SVG 几何审计（`scripts/svg_audit.py`） |
+| — | SVG 几何审计脚本（`scripts/svg_audit.py`，svg-checker 调用） | |
 
 ### 结构层（6）
 | 文件名 | 触发场景 |
@@ -122,6 +123,11 @@
 | 文件名 | 触发场景 |
 |--------|---------|
 | `compliance.md` | 出版合规（商标/参考文献/AI披露/版权） |
+
+### 制作层（1，非审查·动手作图）
+| 文件名 | 触发场景 |
+|--------|---------|
+| `svg-illustrator.md` | 新增/重画/修一张手绘 SVG 插图（唯一动手改 SVG 的 agent）。产出后交 svg-checker（几何）+ svg-semantics（语义）复核 |
 
 ---
 
