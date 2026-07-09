@@ -150,11 +150,7 @@ def convert(md, svgmap, gptmap, counter, diag_prefix=''):
                     cap_text = mc.group(1); consumed = 2
             cap = '<figcaption>%s</figcaption>' % inline(cap_text, svgmap, diag_prefix) if cap_text else ''
             if url in svgmap:
-                gpt_url = re.sub(r'\.svg$', '-gpt.png', url)
-                if gpt_url in gptmap:
-                    out.append('<figure class="fig">%s%s<div class="gpt-alt"><img src="%s" alt="GPT: %s" loading="lazy"><small>GPT 生成版</small></div></figure>' % (svgmap[url], cap, gptmap[gpt_url], alt))
-                else:
-                    out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))
+                out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))
             else:
                 img_url = diag_prefix + '/' + os.path.basename(url) if diag_prefix else url
                 out.append('<figure class="fig"><img src="%s" alt="%s">%s</figure>' % (img_url, alt, cap))
