@@ -40,7 +40,7 @@ def split_row(line):
 
 SEP = re.compile(r'^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$')
 
-def inline(text, svgmap):
+def inline(text, svgmap, diag_prefix=''):
     codes = []
     def stash(m):
         codes.append(m.group(1)); return '\x00C%d\x00' % (len(codes) - 1)
@@ -51,6 +51,8 @@ def inline(text, svgmap):
         alt, url = m.group(1), m.group(2)
         if url in svgmap:
             return '<span class="inline-svg">' + svgmap[url] + '</span>'
+        if not url.endswith('.svg') and diag_prefix:
+            url = diag_prefix + '/' + os.path.basename(url)
         return '<img src="%s" alt="%s">' % (url, alt)
     text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', img, text)
     # 链接
@@ -62,7 +64,7 @@ def inline(text, svgmap):
     text = re.sub(r'\x00C(\d+)\x00', lambda m: '<code>' + esc(codes[int(m.group(1))]) + '</code>', text)
     return text
 
-def convert(md, svgmap, counter):
+def convert(md, svgmap, gptmap, counter, diag_prefix=''):
     """返回 (html, headings) ；headings=[(level,text,id)]"""
     lines = md.split('\n')
     out, heads = [], []
@@ -99,7 +101,7 @@ def convert(md, svgmap, counter):
             lvl = len(m.group(1)); txt = m.group(2).strip()
             counter[0] += 1; hid = 's%d' % counter[0]
             heads.append((lvl, txt, hid))
-            out.append('<h%d id="%s">%s</h%d>' % (lvl, hid, inline(txt, svgmap), lvl))
+            out.append('<h%d id="%s">%s</h%d>' % (lvl, hid, inline(txt, svgmap, diag_prefix), lvl))
             i += 1; continue
         # hr
         if re.match(r'^(-{3,}|\*{3,}|_{3,})\s*$', line):
@@ -109,11 +111,11 @@ def convert(md, svgmap, counter):
             header = split_row(line); rows = []; i += 2
             while i < n and lines[i].lstrip().startswith('|'):
                 rows.append(split_row(lines[i])); i += 1
-            th = ''.join('<th>%s</th>' % inline(c, svgmap) for c in header)
+            th = ''.join('<th>%s</th>' % inline(c, svgmap, diag_prefix) for c in header)
             trs = []
             for r in rows:
                 while len(r) < len(header): r.append('')
-                trs.append('<tr>%s</tr>' % ''.join('<td>%s</td>' % inline(c, svgmap) for c in r[:len(header)]))
+                trs.append('<tr>%s</tr>' % ''.join('<td>%s</td>' % inline(c, svgmap, diag_prefix) for c in r[:len(header)]))
             out.append('<div class="table-wrap"><table><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>' % (th, ''.join(trs)))
             continue
         # blockquote
@@ -121,7 +123,7 @@ def convert(md, svgmap, counter):
             buf = []
             while i < n and lines[i].lstrip().startswith('>'):
                 buf.append(re.sub(r'^\s*>\s?', '', lines[i])); i += 1
-            out.append('<blockquote>%s</blockquote>' % inline(' '.join(b.strip() for b in buf), svgmap))
+            out.append('<blockquote>%s</blockquote>' % inline(' '.join(b.strip() for b in buf), svgmap, diag_prefix))
             continue
         # list
         lm = re.match(r'^(\s*)([-*+]|\d+\.)\s+(.*)$', line)
@@ -133,7 +135,7 @@ def convert(md, svgmap, counter):
                 if not lm2: break
                 items.append(lm2.group(3)); i += 1
             tag = 'ol' if ordered else 'ul'
-            out.append('<%s>%s</%s>' % (tag, ''.join('<li>%s</li>' % inline(t, svgmap) for t in items), tag))
+            out.append('<%s>%s</%s>' % (tag, ''.join('<li>%s</li>' % inline(t, svgmap, diag_prefix) for t in items), tag))
             continue
         # 图片独占行 → figure
         im = re.match(r'^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$', line)
@@ -146,11 +148,16 @@ def convert(md, svgmap, counter):
                 mc = re.match(r'^\s*\*([^*]+)\*\s*$', lines[i + 1])
                 if mc:
                     cap_text = mc.group(1); consumed = 2
-            cap = '<figcaption>%s</figcaption>' % inline(cap_text, svgmap) if cap_text else ''
+            cap = '<figcaption>%s</figcaption>' % inline(cap_text, svgmap, diag_prefix) if cap_text else ''
             if url in svgmap:
-                out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))
+                gpt_url = re.sub(r'\.svg$', '-gpt.png', url)
+                if gpt_url in gptmap:
+                    out.append('<figure class="fig">%s%s<div class="gpt-alt"><img src="%s" alt="GPT: %s" loading="lazy"><small>GPT 生成版</small></div></figure>' % (svgmap[url], cap, gptmap[gpt_url], alt))
+                else:
+                    out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))
             else:
-                out.append('<figure class="fig"><img src="%s" alt="%s">%s</figure>' % (url, alt, cap))
+                img_url = diag_prefix + '/' + os.path.basename(url) if diag_prefix else url
+                out.append('<figure class="fig"><img src="%s" alt="%s">%s</figure>' % (img_url, alt, cap))
             i += consumed; continue
         # paragraph
         buf = [line]; i += 1
@@ -158,7 +165,7 @@ def convert(md, svgmap, counter):
             l = lines[i]; nxt = lines[i + 1] if i + 1 < n else None
             if is_break(l, nxt): break
             buf.append(l); i += 1
-        out.append('<p>%s</p>' % inline(' '.join(b.strip() for b in buf), svgmap))
+        out.append('<p>%s</p>' % inline(' '.join(b.strip() for b in buf), svgmap, diag_prefix))
     return '\n'.join(out), heads
 
 CHAPTERS = [
@@ -221,6 +228,9 @@ figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
 .svg-wrap,.inline-svg{display:block;width:100%}
 figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.gpt-alt{margin-top:1.2em;padding-top:1em;border-top:1px dashed var(--mute);opacity:.82}
+.gpt-alt img{max-width:600px;width:100%;height:auto;display:block;margin:0 auto;border-radius:6px;border:1px solid #e5e7eb}
+.gpt-alt small{display:block;text-align:center;color:var(--mute);font-size:.82em;margin-top:.4em}
 .toc-toggle{display:none}
 @media(max-width:1200px){figure.fig{margin:2em auto}}
 @media(max-width:860px){
@@ -266,13 +276,16 @@ def main():
         path = os.path.join(ROOT, rel)
         md = open(path, encoding='utf-8').read()
         svgmap = {}
+        gptmap = {}
         if diag and os.path.isdir(os.path.join(ROOT, diag)):
             for fn in sorted(os.listdir(os.path.join(ROOT, diag))):
                 if fn.endswith('.svg'):
                     prefix = fn.replace('.svg', '').replace('-', '_')  # fig-1-1 → fig_1_1
                     svg = load_svg(os.path.join(ROOT, diag, fn), prefix)
                     svgmap['diagrams/' + fn] = '<div class="svg-wrap">' + svg + '</div>'
-        html_body, heads = convert(md, svgmap, counter)
+                elif fn.endswith('-gpt.png'):
+                    gptmap['diagrams/' + fn] = diag + '/' + fn
+        html_body, heads = convert(md, svgmap, gptmap, counter, diag)
         sec_id = 'ch%d' % idx
         # 章标题（第一个 h1）作为 nav 项
         h1 = next((t for (l, t, _id) in heads if l == 1), os.path.basename(rel))
