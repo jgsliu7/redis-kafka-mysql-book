@@ -50,7 +50,7 @@ thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
 figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
 .svg-wrap,.inline-svg{display:block;width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figure.fig svg,.inline-svg svg,.svg-wrap svg,figure.fig img{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 .toc-toggle{display:none}
 .review-index{display:grid;gap:12px;margin:24px 0 0}
@@ -239,6 +239,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
 </svg>
 </div><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件</figcaption></figure>
+<figure class="fig"><img src="../../chapters/01-introduction/diagrams/fig-1-1-gpt.png" alt="图 1-1 后端基础设施的三种核心范式与代表软件 GPT 生成版"><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件 GPT 生成版</figcaption></figure>
 <p><em>图 1-1：后端基础设施的三种核心范式与代表软件。内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</em></p>
 <p>这张图展示：三类范式是并列铺开的三条主线，互不包含。读懂这三条主线上的代表软件，就理解了后端基础设施的基本构件。后面 7 章的主题式深讲，都是在讨论"面对架构难题，这三条主线上的代表分别怎么做的"。</p>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
@@ -447,7 +448,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
 </div><figcaption>图 1-3 三个软件在五个维度上的定位雷达</figcaption></figure>
-<p>图 1-3　三个软件定位雷达：低延迟/高吞吐/强一致/容量/查询灵活五维。三个多边形的形状差异，正好对应"Redis 追求快、MySQL 追求对、Kafka 追求多"。</p>
+<figure class="fig"><img src="../../chapters/01-introduction/diagrams/fig-1-3-gpt.png" alt="图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版"><figcaption>图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版</figcaption></figure>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
 <p>同一个系统，用使用视角和用架构视角去看，看到的是两幅图。我们来研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把研究的视线从配置参数层移到设计决策层。</p>
 <h3 id="s14">1.3.1 两种视角看到的同一个系统</h3>
@@ -477,6 +478,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本书采用<strong>主题式</strong>的组织。每一章围绕一个架构主题（数据结构与协议、生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步），先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这样做的好处有三。第一，避免知识孤岛：主题式组织可以把这三个软件放在同一坐标系里看，形成对比。第二，突出架构共性：同一个问题（比如持久化、比如副本同步）反复出现，你就会发现它们给出的差异性方案和背后的相似规律，而这就是本书要提炼的东西。第三，训练对比分析能力，这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一款的人有价值。</p>
 <p>下面这张图给出全书的章节地图，帮你建立全局感。</p>
+<figure class="fig"><img src="../../chapters/01-introduction/diagrams/fig-1-2-gpt.png" alt="图 1-2 全书章节地图 GPT 生成版"><figcaption>图 1-2 全书章节地图 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -597,11 +599,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部图注 -->
   <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
 </svg>
-</div><figcaption>图 1-2 全书章节地图</figcaption></figure>
-<p><em>图 1-2：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</em></p>
+</div><figcaption>图 1-2：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的"生与死"出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
-<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我们会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.x），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；KRaft 在 Kafka 3.3 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在近几个版本逐步落地，而生产者幂等与事务早在 0.11 就已引入。</p>
+<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.x），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；KRaft 在 Kafka 3.3 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在近几个版本逐步落地，而生产者幂等与事务早在 0.11 就已引入。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许"裸奔"。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>
 <p>术语约定如下。全书术语统一译法，首次出现以"中文（英文）"标注，之后用中文。例如重做日志（redo log）、缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到本书术语表未列的术语，我们会在首次出现时同样标注英文原词。</p>
 <h3 id="s21">1.4.4 推荐阅读路径</h3>
