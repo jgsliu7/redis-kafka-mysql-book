@@ -222,7 +222,7 @@ thead th{background:#eef2ff;color:#3730a3;font-weight:600}
 tbody tr:nth-child(even){background:#fafbfd}
 figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
 .svg-wrap,.inline-svg{display:block;width:100%}
-figure.fig svg,.inline-svg svg,.svg-wrap svg{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figure.fig svg,.inline-svg svg,.svg-wrap svg,figure.fig img{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
 figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 .gpt-alt{margin-top:1.2em;padding-top:1em;border-top:1px dashed var(--mute);opacity:.82}
 .gpt-alt img{max-width:600px;width:100%;height:auto;display:block;margin:0 auto;border-radius:6px;border:1px solid #e5e7eb}
