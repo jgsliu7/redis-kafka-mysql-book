@@ -111,13 +111,16 @@ def load_chapters():
         path = os.path.join(ROOT, rel)
         md = open(path, encoding="utf-8").read()
         svgmap = {}
+        gptmap = {}
         if diag and os.path.isdir(os.path.join(ROOT, diag)):
             for fn in sorted(os.listdir(os.path.join(ROOT, diag))):
                 if fn.endswith(".svg"):
                     prefix = fn.replace(".svg", "").replace("-", "_")
                     svg = load_svg(os.path.join(ROOT, diag, fn), prefix)
                     svgmap["diagrams/" + fn] = '<div class="svg-wrap">' + svg + "</div>"
-        body, heads = convert(md, svgmap, counter)
+                elif fn.endswith('-gpt.png'):
+                    gptmap['diagrams/' + fn] = '../../' + diag + '/' + fn
+        body, heads = convert(md, svgmap, gptmap, counter, ('../../' + diag) if diag else '')
         title = next((t for (lvl, t, _hid) in heads if lvl == 1), os.path.basename(rel))
         items.append({
             "index": idx,
