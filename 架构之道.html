@@ -4114,7 +4114,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="525" y="540" font-size="12" fill="#374151">③ 客户端临时重定向，并带 ASKING 打开 A</text>
   <text x="525" y="560" font-size="12" font-style="italic" fill="#059669">语义：一次性重定向 · 不更新本地表</text>
 </svg>
-</div><figcaption>图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由</figcaption></figure>
+</div><figcaption>图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-2-gpt.png" alt="GPT: 图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>图 7-2　key 经 CRC16 哈希到 0–16383 槽，槽映射到节点；迁移中与迁移完的两种重定向语义不同。</p>
 <p>16384 这个数的选择基于工程折中。Gossip 消息里每个节点要携带自己负责的槽位 bitmap，16384 个槽对应 16384/8 = 2KB 的 bitmap，这个大小在消息压缩与槽粒度之间是个折中：槽太少则单节点承载过重、迁移粒度太粗，槽太多则 bitmap 占用大、Gossip 消息膨胀。16384 既能让集群规模到上百节点仍每节点分到上百槽，又把 bitmap 控制在 2KB 量级，是两边都过得去的取值。</p>
 <p><strong>客户端路由靠 MOVED 和 ASK 两种重定向。</strong> 客户端可以缓存一份槽到节点的映射表，绝大多数请求直接命中。但集群拓扑会变（扩容、缩容、故障转移），所以节点收到不属于自己槽的请求时，会返回一个 MOVED 或 ASK 重定向。MOVED 表示"这个槽已经永久不在你这了，去这个新地址"，客户端收到后更新本地映射表，以后都走新地址；ASK 表示"这个槽正在迁移中，本次请求请去临时地址试一下"，是一次性重定向，客户端不更新映射表，因为迁移完之后这个槽还会回来或换地方。两者的区别在于：MOVED 是状态变更后的最终路由，ASK 是迁移过程中的临时跳板。此外，Redis Cluster 禁用了多数据库的 <code>SELECT</code> 命令（只有 0 号库），并要求多键命令（如 <code>MGET</code>、事务、Lua 脚本）涉及的所有 key 必须落在同一个槽。可以用哈希标签（hash tag）<code>{user:1001}.name</code>、<code>{user:1001}.email</code> 强制让带相同 <code>{...}</code> 的 key 落到同槽。</p>
@@ -4176,7 +4176,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Three concurrent slaves hint -->
   <text x="400" y="380" text-anchor="middle" font-size="11" fill="#9CA3AF">主库 → N 个从库（每个从库独立拉取，互不影响）</text>
 </svg>
-</div><figcaption>图 7-3 MySQL 主从复制基础拓扑</figcaption></figure>
+</div><figcaption>图 7-3 MySQL 主从复制基础拓扑</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-3-gpt.png" alt="GPT: 图 7-3 MySQL 主从复制基础拓扑" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>图 7-3　MySQL 主从复制基础拓扑：主节点写 binlog，从节点 I/O 线程拉取到中继日志，SQL 线程回放，三个角色各司其职。</p>
 <p>MySQL 的集群要求是"不丢数据"。从最古老的异步复制到最新的组复制，这条底线始终没动过。MySQL 的集群演进，就是在这条底线之上，一步步把可用性、自动化、强一致性补全的过程：异步先保证能跑，半同步保证通常不丢，MGR 保证数学上不丢。</p>
 <h3 id="s144">7.3.1 基于 binlog 的复制：单向、异步、行流</h3>
@@ -4266,7 +4266,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="540" y="372" width="180" height="44" rx="6" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
   <text x="630" y="399" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Leader · Broker 3</text>
 </svg>
-</div><figcaption>图 7-4 Kafka 分区与副本拓扑</figcaption></figure>
+</div><figcaption>图 7-4 Kafka 分区与副本拓扑</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-4-gpt.png" alt="GPT: 图 7-4 Kafka 分区与副本拓扑" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>图 7-4　Kafka 分区与副本拓扑：Topic 切为 3 个 Partition，每个 Partition 有 1 个 Leader + 2 个 Follower，Leader 分散在不同 Broker 上，读写负载天然分摊。Partition 1 的 Broker 3 副本因落后超时被踢出 ISR，不再参与 Leader 选举。</p>
 <p>Kafka 原生就是分布式的，因此集群设计上没背负前两款软件那种从单机改造的包袱，但也做了几处明确的取舍。</p>
 <h3 id="s150">7.4.1 Partition：分区即并行单位</h3>
@@ -6358,7 +6358,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底注 -->
   <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示"服务关系"，灰虚线表示"设计递进"；五条规律不是并列清单，而是一条收束链。</text>
 </svg>
-</div><figcaption>图 10-1 五条共性规律的递进关系</figcaption></figure>
+</div><figcaption>图 10-1 五条共性规律的递进关系</figcaption><div class="gpt-alt"><img src="diagrams/fig-10-1-gpt.png" alt="GPT: 图 10-1 五条共性规律的递进关系" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>图 10-1 五条共性规律的递进关系：后四条规律都在服务第一条：让真相之源又快、又稳、又可控。</p>
 <p>箭头标示了递进关系：规律一定下"真相之源"的位置，后四条围绕它展开。规律二让它实现可替换、演进可控，规律三提速，规律四加固可靠性，规律五管住故障恢复。后四条都在把第一条的"真相之源"改造成一个能在生产环境里跑起来的工程对象。</p>
 <blockquote><strong>适用边界</strong>：五条规律建立在同一组前提上：你的系统是<strong>有状态的</strong>（持有不可丢失的数据）、<strong>单写者/少写者</strong>（真相之源通常只有一个写入者）、<strong>OLTP 为主</strong>（在线事务而非离线分析）。如果你面对的是无状态微服务（真相之源不在本服务内，而在外部数据库）、边缘计算/Serverless 函数（数据短暂驻留、生命周期不可控）、纯分析型系统（列存、批量扫描、无 OLTP 事务），这套框架的适用性就会打折扣：规律一"真相之源"仍然成立，但规律三（随机变顺序）和规律四（可靠性的代价）的形态会显著不同。框架的价值在于自知边界，边界之内的判断是可靠的，边界之外的类推需要额外验证。</blockquote>
@@ -6520,7 +6520,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底注 -->
   <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
 </svg>
-</div><figcaption>图 10-2 实践者选型决策树</figcaption></figure>
+</div><figcaption>图 10-2 实践者选型决策树</figcaption><div class="gpt-alt"><img src="diagrams/fig-10-2-gpt.png" alt="GPT: 图 10-2 实践者选型决策树" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>图 10-2 实践者选型决策树：从"我要建一个有状态系统"出发，依次回答四个问题，叶子节点指向"这种约束组合下该借鉴哪家设计"。</p>
 <p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间/时间换法）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。决策树的用法：<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么长成那个样子。比如你做一个秒杀库存系统，决策树会把你带到"持久性优先 + CP 倾向 + 热点读"的叶子，那里指向 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
 <h3 id="s250">10.3.3 三道判断练习</h3>
