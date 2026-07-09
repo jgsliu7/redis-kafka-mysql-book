@@ -352,6 +352,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
 </svg>
 </div><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件</figcaption><div class="gpt-alt"><img src="diagrams/fig-1-1-gpt.png" alt="GPT: 图 1-1 后端基础设施的三种核心范式与代表软件" loading="lazy"><small>GPT 生成版</small></div></figure>
+<figure class="fig"><img src="diagrams/fig-1-1-gpt.png" alt="图 1-1 后端基础设施的三种核心范式与代表软件 GPT 生成版"><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件 GPT 生成版</figcaption></figure>
 <p><em>图 1-1：后端基础设施的三种核心范式与代表软件。内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</em></p>
 <p>这张图展示：三类范式是并列铺开的三条主线，互不包含。读懂这三条主线上的代表软件，就理解了后端基础设施的基本构件。后面 7 章的主题式深讲，都是在讨论"面对架构难题，这三条主线上的代表分别怎么做的"。</p>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
@@ -560,7 +561,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
 </div><figcaption>图 1-3 三个软件在五个维度上的定位雷达</figcaption><div class="gpt-alt"><img src="diagrams/fig-1-3-gpt.png" alt="GPT: 图 1-3 三个软件在五个维度上的定位雷达" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 1-3　三个软件定位雷达：低延迟/高吞吐/强一致/容量/查询灵活五维。三个多边形的形状差异，正好对应"Redis 追求快、MySQL 追求对、Kafka 追求多"。</p>
+<figure class="fig"><img src="diagrams/fig-1-3-gpt.png" alt="图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版"><figcaption>图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版</figcaption></figure>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
 <p>同一个系统，用使用视角和用架构视角去看，看到的是两幅图。我们来研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把研究的视线从配置参数层移到设计决策层。</p>
 <h3 id="s14">1.3.1 两种视角看到的同一个系统</h3>
@@ -590,6 +591,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本书采用<strong>主题式</strong>的组织。每一章围绕一个架构主题（数据结构与协议、生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步），先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这样做的好处有三。第一，避免知识孤岛：主题式组织可以把这三个软件放在同一坐标系里看，形成对比。第二，突出架构共性：同一个问题（比如持久化、比如副本同步）反复出现，你就会发现它们给出的差异性方案和背后的相似规律，而这就是本书要提炼的东西。第三，训练对比分析能力，这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一款的人有价值。</p>
 <p>下面这张图给出全书的章节地图，帮你建立全局感。</p>
+<figure class="fig"><img src="diagrams/fig-1-2-gpt.png" alt="图 1-2 全书章节地图 GPT 生成版"><figcaption>图 1-2 全书章节地图 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -710,8 +712,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部图注 -->
   <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
 </svg>
-</div><figcaption>图 1-2 全书章节地图</figcaption><div class="gpt-alt"><img src="diagrams/fig-1-2-gpt.png" alt="GPT: 图 1-2 全书章节地图" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p><em>图 1-2：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</em></p>
+</div><figcaption>图 1-2：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</figcaption><div class="gpt-alt"><img src="diagrams/fig-1-2-gpt.png" alt="GPT: 图 1-2 全书章节地图" loading="lazy"><small>GPT 生成版</small></div></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的"生与死"出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
 <p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.x），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；KRaft 在 Kafka 3.3 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在近几个版本逐步落地，而生产者幂等与事务早在 0.11 就已引入。</p>
@@ -811,7 +812,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
 </div><figcaption>图 2-1 Redis 五种底层数据结构的适用场景与升级路径</figcaption><div class="gpt-alt"><img src="diagrams/fig-2-1-gpt.png" alt="GPT: 图 2-1 Redis 五种底层数据结构的适用场景与升级路径" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 2-1　Redis 五种底层数据结构：SDS 做字符串，字典做键空间，跳表服务有序集合，ziplist/listpack 和 intset 在小数据下省内存，都为"内存快速存取"这个目标服务。</p>
+<figure class="fig"><img src="diagrams/fig-2-1-gpt.png" alt="图 2-1 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版"><figcaption>图 2-1 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版</figcaption></figure>
 <h3 id="s29">2.2.2 MySQL：为磁盘页和通用查询而生的 B+ 树与行格式</h3>
 <p>MySQL（InnoDB）的数据结构受另一个约束：<strong>数据在磁盘上，一次 I/O 取一页（16KB）</strong>。这个约束是决定性的。内存访问是纳秒级，磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构只有一个目标：<strong>让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用</strong>。</p>
 <p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（几百个键就能挤进一个 16KB 页，树极矮），叶子节点存完整行数据，且叶子之间用双向链表串联。这套设计同时解决三个查询需求：点查（从根走到叶，O(log n)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。第 8 章会展开 InnoDB 页内七段布局和 Page Directory 的细节，本章只抓一个核心。B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只改前后指针，没有页分裂——这正是 MySQL 为通用查询能力付出的代价。<strong>B+ 树就是以 16KB 页为基本 I/O 单位的磁盘友好索引。</strong></p>
@@ -972,6 +973,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
 </svg>
 </div><figcaption>图 2-4 MySQL InnoDB B+ 树结构</figcaption><div class="gpt-alt"><img src="diagrams/fig-2-4-gpt.png" alt="GPT: 图 2-4 MySQL InnoDB B+ 树结构" loading="lazy"><small>GPT 生成版</small></div></figure>
+<figure class="fig"><img src="diagrams/fig-2-4-gpt.png" alt="图 2-4 MySQL InnoDB B+ 树结构 GPT 生成版"><figcaption>图 2-4 MySQL InnoDB B+ 树结构 GPT 生成版</figcaption></figure>
 <p>图 2-4　InnoDB B+ 树三层结构：根节点和内部节点只存键与子节点指针，把几百个键挤进 16KB；叶子节点存完整行数据，双向链表串联支持高效范围扫描。</p>
 <p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么摆。以 8.0 默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。不让大对象拖累整页，也不让跨页撕裂把一次读变成多次 I/O。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
 <p><strong>自适应哈希索引（Adaptive Hash Index）</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。这是"冷数据走磁盘、热数据走内存、极热数据走哈希"的三级加速。数据结构会随访问模式自动调整。</p>
@@ -980,6 +982,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>RecordBatch 就是 Kafka 的基本存储单元。</strong> 生产者会把消息攒够一批（按 <code>batch.size</code> 或 <code>linger.ms</code>）再压成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。</p>
 <p><strong>RecordBatch 的字段布局讲了 Kafka 的所有设计取向。</strong> 从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部包括：<code>baseOffset</code>（这批消息的起始偏移量）、<code>batchLength</code>（整个 Batch 的字节长度，用于快速跳到下一个 Batch）、<code>partitionLeaderEpoch</code>（哪一任 Leader 写了这批）、<code>magic</code>（格式版本号，V2 = 2）、<code>CRC</code>（整批一条校验，而非每条消息各自 CRC）、<code>attributes</code>（压缩类型 + 时间戳类型 + 事务标记）、<code>lastOffsetDelta</code>（最后一条消息距离 baseOffset 的差值）、<code>baseTimestamp</code> 和 <code>maxTimestamp</code>（这批的时间范围）、<code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code>（幂等+事务所需的 Producer 状态）、<code>recordsCount</code>（这批有几条记录）。</p>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0/V1 每条消息存绝对偏移量和绝对时间戳、每条消息带独立的 CRC，V2 把这些冗余全部消除。</p>
+<figure class="fig"><img src="diagrams/fig-2-2-gpt.png" alt="图 2-2 Kafka RecordBatch V2 字段布局 GPT 生成版"><figcaption>图 2-2 Kafka RecordBatch V2 字段布局 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1074,7 +1077,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-2　RecordBatch V2 字段布局</text>
 </svg>
 </div><figcaption>图 2-2 Kafka RecordBatch V2 字段布局</figcaption><div class="gpt-alt"><img src="diagrams/fig-2-2-gpt.png" alt="GPT: 图 2-2 Kafka RecordBatch V2 字段布局" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 2-2　Kafka RecordBatch V2 字段布局：Batch 级头部存 BaseOffset/BatchLength/CRC/Producer 状态，记录级字段只存差值；批量压缩、差分编码、单 CRC 校验，全部为吞吐服务。</p>
 <p>这套设计的取舍摆在明面上。批量让压缩在相似消息聚集时通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2-6 倍；极端重复场景可能更高），差值编码让每条记录元数据开销降到个位数字节，Batch 级 CRC 省了逐条校验的 CPU，<code>magic</code> 让格式版本自描述、新旧格式可共存。代价也摆在明面上：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
 <h2 id="s31">2.3 通信协议：客户端和服务端怎么对话</h2>
 <p>RESP 是纯文本协议，用 <code>nc</code> 连上 6379 端口直接打字就能交互。在那个几乎所有后端协议都选紧凑二进制的年代，这个"原始"的选择背后是一个判断：瓶颈从来不在带宽。</p>
@@ -1093,6 +1095,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的协议模型换了思路。它是一个<strong>分门别类的请求/响应体系</strong>，而不是"客户端发命令、服务端回结果"的问答题。Produce、Fetch、Metadata、JoinGroup、SyncGroup……几十种请求类型，每种请求有自己独立的 Schema，每种 Schema 有自己的版本号。</p>
 <p>所有请求共用同一个固定头部：<code>api_key</code>（2 字节，标识这是什么类型的请求，如 Produce = 0, Fetch = 1, Metadata = 3……）、<code>api_version</code>（2 字节，标识用哪个版本的 Schema）、<code>correlation_id</code>（4 字节，客户端自定，服务端原样抄到响应里用来匹配请求和响应）、<code>client_id</code>（变长字符串，标识客户端身份）。这个四元组头部是 Kafka 协议最关键的设计。<code>api_key</code> + <code>api_version</code> 让同一类请求可以同时存在多个版本，Broker 根据客户端声明的版本号调整解析方式和返回字段。这意味着：不强制所有客户端升级。3.0 的 Broker 可以和 0.11 的客户端对话，双方用各自能理解的最早版本号做协商。</p>
 <p><strong>批量优先</strong> 是 Kafka 协议区别于 Redis 和 MySQL 最根本的特征。Produce 请求把多条消息打成一个 RecordBatch 一起发给 Broker，Fetch 请求一次拉取指定 <code>(topic, partition, offset)</code> 起始的一段数据（<code>min_bytes</code> + <code>max_bytes</code> 控制拉取量），Broker 用零拷贝把一批消息直接从页缓存推到网卡。单条消息从不独立出现在协议层面。一切以 Batch 为单位。这和 RecordBatch 在存储层的设计是同一个思路：协议层不做单条操作，是 Kafka 把吞吐放在第一位的必然结果。</p>
+<figure class="fig"><img src="diagrams/fig-2-3-gpt.png" alt="图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版"><figcaption>图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1182,7 +1185,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="650" y="474" font-size="11" fill="#EF4444">❌</text>
 </svg>
 </div><figcaption>图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应</figcaption><div class="gpt-alt"><img src="diagrams/fig-2-3-gpt.png" alt="GPT: 图 2-3 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 2-3　三个软件通信协议对比模型：Redis 走极简文本（人类可读，单条命令），MySQL 走紧凑二进制（预编译，列式结果集），Kafka 走请求/响应体系（统一头部，版本化，批量优先）。</p>
 <h2 id="s35">2.4 横向对比</h2>
 <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚"目标 → 数据结构 → 协议"这条因果链。</p>
 <p><strong>表 2-1 三个软件数据结构与协议的横向对比</strong></p>
@@ -1263,6 +1265,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="524" font-size="12.5" fill="#374151">③ 单机视角 vs 分布式视角　自己退出，还是先把职责交出去</text>
 </svg>
 </div><figcaption>图 3-1 启动与关闭：状态机的重建与快照</figcaption><div class="gpt-alt"><img src="diagrams/fig-3-1-gpt.png" alt="GPT: 图 3-1 启动与关闭：状态机的重建与快照" loading="lazy"><small>GPT 生成版</small></div></figure>
+<figure class="fig"><img src="diagrams/fig-3-1-gpt.png" alt="图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版"><figcaption>图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版</figcaption></figure>
 <p>图 3-1　启动与关闭作为状态机重建与快照的对称过程，三对矛盾贯穿全章。</p>
 <p>这三个软件的约束差异这里先用一句话带过，具体留到后面的详细讲解。Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。</p>
 <p>后文 MySQL 一节会反复用到两套日志，这里先把名词摆出来：崩溃恢复靠的是 redo（重做日志，记录页级物理修改，崩溃后正向重放）保住持久性，undo（回滚日志，记录操作的逻辑逆，用来回滚未提交事务）保住原子性。两者方向相反、职责不同，3.3 节会展开它们在崩溃恢复里怎么配合。</p>
@@ -1273,6 +1276,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第一段：配置默认值加覆盖。</strong> Redis 先用 <code>initServerConfig</code> 给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数逐层覆盖。这里的设计取舍是"先全量设默认值再逐层覆盖"，好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这个 bug 类别。很多线上事故就栽在某个配置项忘了初始化。</p>
 <p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略、SIGCHLD 回收 RDB/AOF 子进程）。调用 <code>aeCreateEventLoop</code> 创建事件循环。分配数据库数组。打开监听端口。这里有一个关键的取舍。<strong>核心数据结构在启动期就一次性预分配，不做懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）等核心结构一次性分配好，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。这正是 Redis 优先要的东西，核心路径上的内存行为可预测。</p>
 <p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。图 3-2 完整呈现了这段流程。Redis 7.0 引入了多部 AOF（multi-part AOF），AOF 目录里的 base 文件本身就是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令，加载速度比 4.x 以前那种"纯命令重放"快很多。</p>
+<figure class="fig"><img src="diagrams/fig-3-2-gpt.png" alt="图 3-2 Redis 启动四段式时序 GPT 生成版"><figcaption>图 3-2 Redis 启动四段式时序 GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -1349,6 +1353,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第四段：进入事件循环。</strong> <code>aeMain</code> 一启动，Redis 才真正算"可服务"。控制台会打印一条 <code>Ready to accept connections</code> 日志。这是状态机就绪的外显里程碑，运维脚本靠 grep 这一行来判断 Redis 是否就绪。这种"在每个阶段切换处打一条语义明确的日志"的纪律，会在 3.6 节作为一条架构启示展开。</p>
 <h3 id="s43">关闭：三种触发，两条路径</h3>
 <p>关闭有三种触发方式：客户端发 <code>SHUTDOWN</code> 命令、收到 SIGTERM/SIGINT、守护条件触发（比如内存超限被父进程监视退出）。无论哪种触发，进入的处理流程都一样，只是"存不存数据"这一步的选择不同。</p>
+<figure class="fig"><img src="diagrams/fig-3-3-gpt.png" alt="图 3-3 Redis 关闭流程 GPT 生成版"><figcaption>图 3-3 Redis 关闭流程 GPT 生成版</figcaption></figure>
 <p>图 3-3 画出了完整的关闭流程。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1451,7 +1456,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层加权限系统、服务循环。第二段最耗时，也是和 Redis 的本质区别。</p>
 <p><strong>配置加载段</strong>按固定优先级搜索多个 my.cnf 路径（<code>/etc/my.cnf</code> 优先于 <code>~/.my.cnf</code> 等），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是被 <code>/etc/my.cnf</code> 里某个默认值覆盖了。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
-<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，<code>ibdata1</code> 只存储 change buffer 和可选的 undo 日志；5.7 及更早版本数据字典仍在 <code>ibdata1</code> 中）。</li><li><strong>崩溃恢复</strong>。读 checkpoint（标记"重做日志到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描重做日志（redo log），把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用回滚日志（undo log）回滚所有未提交事务。</li></ol>
+<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，<code>ibdata1</code> 只存储 change buffer 和可选的 undo 日志；5.7 及更早版本数据字典仍在 <code>ibdata1</code> 中）。</li></ol>
+<figure class="fig"><img src="diagrams/fig-3-4-gpt.png" alt="图 3-4 InnoDB 崩溃恢复时序 GPT 生成版"><figcaption>图 3-4 InnoDB 崩溃恢复时序 GPT 生成版</figcaption></figure>
+<ol><li><strong>崩溃恢复</strong>。读 checkpoint（标记"重做日志到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描重做日志（redo log），把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用回滚日志（undo log）回滚所有未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理：redo 重放先无差别地把所有页修改补回去（恢复出崩溃瞬间的物理页状态），undo 回滚再撤掉未提交事务留下的痕迹，最终恢复出严格的事务一致性。已提交的全部保留，未提交的全部回滚。正因为 redo 保住持久性、undo 保住原子性，MySQL 才能在崩溃之后把 ACID 的持久性和原子性这两条重新恢复出来。图 3-4 把崩溃恢复画成时序。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1546,6 +1553,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的生命周期是分布式追加写日志的范式。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller 重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 的关闭设计核心是"怎么把自己的离开对集群的冲击降到最小"，刷自己的盘只是基本功。本节先讲启动，再讲关闭，重点剖析受控关闭（Controlled Shutdown）和 KRaft 模式带来的变化。</p>
 <h3 id="s50">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段，是理解 Kafka 启动的关键。</p>
+<figure class="fig"><img src="diagrams/fig-3-5-gpt.png" alt="图 3-5 Kafka 三层网络架构 GPT 生成版"><figcaption>图 3-5 Kafka 三层网络架构 GPT 生成版</figcaption></figure>
 <ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起对新集群进入生产可用（KIP-833），3.5 起 ZooKeeper（ZK）模式被标记弃用，ZK→KRaft 迁移工具在 3.4 以 Early Access 引入、3.5–3.6 为 preview、3.6 起进入生产可用；3.9 是最后一个支持 ZK 模式的 bridge release，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志。节点启动时要先追上这份元数据日志，才能确定当前节点应当负责哪些分区、以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志住在一起、用同一套机制管理。</li><li><strong>日志管理器启动（恢复主战场）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。为什么分区恢复是瓶颈？因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把活分摊开。</li><li><strong>三层网络架构。</strong> 图 3-5 画出了它的布局。</li></ol>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1645,6 +1653,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三层网络的设计意图是把 I/O 密集（收发包）和 CPU 密集（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）负责接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 <code>num.network.threads</code>）负责解析协议帧，把请求塞进共享的请求队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取请求执行真正的业务（读写日志、副本同步），把响应塞回每个 Processor 一个的响应队列，由 Processor 发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。处理慢不会阻塞收发，收发慢也不会饿死处理线程。第 5 章会从分层架构的角度再次回到这个设计。</p>
 <ol><li><strong>副本管理器启动</strong>，开始拉取或等待副本同步。</li><li><strong>控制器启动</strong>（如果该节点是 Controller 候选），接管集群元数据的协调。</li><li><strong>注册到集群</strong>，对外宣告"我在线了"。</li><li><strong>后台线程启动</strong>，进入服务态。</li></ol>
 <p>八个阶段全部走完，Kafka 才对外打印 <code>[KafkaServer id=0] started</code> 这条就绪日志。和 Redis 的 <code>Ready to accept connections</code>、MySQL 的 <code>ready for connections</code> 一样，这条日志是状态机的里程碑标记，运维靠它判断就绪。</p>
+<figure class="fig"><img src="diagrams/fig-3-6-gpt.png" alt="图 3-6 Kafka 受控关闭时序（对照普通关闭） GPT 生成版"><figcaption>图 3-6 Kafka 受控关闭时序（对照普通关闭） GPT 生成版</figcaption></figure>
 <h3 id="s51">关闭：普通关闭 vs 受控关闭</h3>
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用或失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。这条路径发生在受控关闭被禁用（<code>controlled.shutdown.enable=false</code>）或受控关闭失败时。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去重新选举那些原本由它当 Leader 的分区。选举期间分区短暂不可用，客户端会看到抖动。注意，默认配置下 Kafka 走的是受控关闭路径（见下一段），普通关闭只是降级兜底。</p>
@@ -1911,7 +1920,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="500" text-anchor="middle" font-size="12" fill="#374151">数据为典型量级估值；实际值因硬件、负载、队列深度而异，但数量级关系稳定。</text>
   <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」，每一格都是 10 倍差距</text>
 </svg>
-</div><figcaption>图 4-1　存储层次访问延迟数量级（对数坐标）：内存比机械盘快约十万倍；同一块 SSD，顺序读比随机读快 100 倍。</figcaption><div class="gpt-alt"><img src="diagrams/fig-4-1-gpt.png" alt="GPT: 图 4-1 存储层次访问延迟的数量级（对数轴）" loading="lazy"><small>GPT 生成版</small></div></figure>
+</div><figcaption>图 4-1 存储层次访问延迟的数量级（对数轴）</figcaption><div class="gpt-alt"><img src="diagrams/fig-4-1-gpt.png" alt="GPT: 图 4-1 存储层次访问延迟的数量级（对数轴）" loading="lazy"><small>GPT 生成版</small></div></figure>
+<figure class="fig"><img src="diagrams/fig-4-1-gpt.png" alt="图 4-1 存储层次访问延迟的数量级（对数轴） GPT 生成版"><figcaption>图 4-1 存储层次访问延迟的数量级（对数轴） GPT 生成版</figcaption></figure>
 <p>图中两处标注最该记住。第一，内存柱与机械盘柱的长度差。直接说明了为什么要有缓冲池、为什么 Redis 把数据放进内存。第二，SSD 顺序读与随机读两条柱的对比。同一块盘，访问模式从顺序换成随机，延迟就涨了两个数量级。Kafka 采用顺序写、InnoDB 用 WAL 把随机写改造成顺序写。</p>
 <p>这组数字引出三个根本约束。</p>
 <p>第一，内存易失。断电瞬间内存里的内容归零，所有还没写到持久介质上的数据都会消失。任何承诺"持久化"的系统都必须在某个时刻把数据搬到一个断电也不丢的地方。</p>
@@ -2062,6 +2072,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
 </svg>
 </div><figcaption>图 4-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption><div class="gpt-alt"><img src="diagrams/fig-4-2-gpt.png" alt="GPT: 图 4-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制" loading="lazy"><small>GPT 生成版</small></div></figure>
+<figure class="fig"><img src="diagrams/fig-4-2-gpt.png" alt="图 4-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制 GPT 生成版"><figcaption>图 4-2 Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制 GPT 生成版</figcaption></figure>
 <p>图 4-2 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰线程从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
 <h3 id="s67">持久化的两条腿</h3>
 <p>内存淘汰回答的是"满了怎么办"，持久化回答的是"断电了还在不在"。Redis 给了两条腿：RDB 和 AOF。</p>
@@ -2073,6 +2084,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义调整为控制 base 文件是否使用 RDB 格式，base 文件始终为 RDB 格式，行为等效。</p>
 <p><strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>做了几件事。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 4-3 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。7.0 多部 AOF 的字节级布局详见 8.2.4。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，呈现 Redis"内存为主、磁盘为辅"的根本定位。</p>
+<figure class="fig"><img src="diagrams/fig-4-3-gpt.png" alt="图 4-3 Redis 持久化数据流（RDB 快照 / AOF 含混合持久化） GPT 生成版"><figcaption>图 4-3 Redis 持久化数据流（RDB 快照 / AOF 含混合持久化） GPT 生成版</figcaption></figure>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -2180,6 +2192,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul><li><strong>Free List</strong>：空闲页池。需要从磁盘读入新页时，从这里申请一个空闲页。</li><li><strong>LRU List</strong>：活跃页链表，按访问热度排序。这是缓冲池的主体。</li><li><strong>Flush List</strong>：脏页链表。被改过但还没刷盘的页按最早修改时间排队，后台线程依此做 checkpoint 刷盘。</li></ul>
 <p>LRU List 是缓冲池的核心，InnoDB 没有直接用朴素 LRU，而是把它改良成了"新老分区"。整个 LRU List 被一个叫 <code>midpoint</code> 的点分成两段：靠头的 <strong>New Sublist</strong> 占约 5/8，是热区；靠尾的 <strong>Old Sublist</strong> 占约 3/8，是冷区。一个从磁盘新读入的页不进热区头部，而是被插到 <code>midpoint</code>，也就是冷区的头部。它必须在冷区停留超过 <code>innodb_old_blocks_time</code>（默认 1000 毫秒）之后再次被访问，才有资格晋升进热区。</p>
 <p>这个改良专门为了对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们顶掉热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，下次被淘汰时根本进不到热区，真正的热数据不受影响，在全表扫描场景下能把热数据命中率维持在高位，代价只是冷区管理的一点额外开销。</p>
+<figure class="fig"><img src="diagrams/fig-4-4-gpt.png" alt="图 4-4 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush） GPT 生成版"><figcaption>图 4-4 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush） GPT 生成版</figcaption></figure>
 <p>下图把三分链表和 midpoint 的位置画出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -2303,6 +2316,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s72">WAL 与崩溃恢复</h3>
 <p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>重做日志（redo log）</strong>。重做日志是顺序追加写的。崩溃之后，InnoDB 用重做日志重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
 <p>InnoDB 选择用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
+<figure class="fig"><img src="diagrams/fig-4-5-gpt.png" alt="图 4-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘） GPT 生成版"><figcaption>图 4-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘） GPT 生成版</figcaption></figure>
 <p>"持久"的程度由 <code>innodb_flush_log_at_trx_commit</code> 控制，三个档位对应三种可靠性选择。<strong>1（默认）</strong>：每次事务提交时 fsync 日志文件，事务返回 OK 意味着日志已落盘，单节点不丢数据，代价是每次提交等一次 fsync。<strong>2</strong>：每次提交时把日志写到 OS 页缓存，由后台线程每秒统一 fsync 一次，提交不卡 fsync 但 OS 崩溃会丢最近约 1 秒的事务。<strong>0</strong>：提交时不写日志，由后台每秒写一次并 fsync，MySQL 崩溃也丢约 1 秒事务，生产极少使用。这三档和 Redis 的 <code>appendfsync</code>、Kafka 的 <code>acks</code> 是同一道选择题的不同答案——4.6 启示三会回看这条谱系。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -2441,6 +2455,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s78">为什么不做自己的缓冲池</h3>
 <p>Kafka 不在用户态造缓冲池，有三个理由。</p>
 <p>第一，访问模式简单且顺序。Kafka 不需要 InnoDB 那种"新老分区 + 抗扫描污染"的复杂 LRU，因为它的读本身就是顺序的，操作系统预读机制能把"消费者将要读的下几 MB"提前加载进 PageCache，命中率天然就高。</p>
+<figure class="fig"><img src="diagrams/fig-4-6-gpt.png" alt="图 4-6 Kafka 生产-存储-消费的零拷贝数据流 GPT 生成版"><figcaption>图 4-6 Kafka 生产-存储-消费的零拷贝数据流 GPT 生成版</figcaption></figure>
 <p>第二，自己管内存会和 PageCache 形成"双份缓存"。如果 Kafka 在用户态也缓存一份数据，那同一份数据就在内核 PageCache 和用户态各占一份内存，白白浪费一倍。在大吞吐场景下，这点浪费很可观。</p>
 <p>第三，进程重启后 PageCache 仍在。这是把内存交给 OS 才有的好处，Redis 和 MySQL 都没有。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好。升级 Kafka 不等于让读性能掉回冷启动水平。</p>
 <p>下图把 Kafka 生产-存储-消费的零拷贝数据流画出来，对比传统拷贝路径。</p>
@@ -4115,7 +4130,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="525" y="560" font-size="12" font-style="italic" fill="#059669">语义：一次性重定向 · 不更新本地表</text>
 </svg>
 </div><figcaption>图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-2-gpt.png" alt="GPT: 图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 7-2　key 经 CRC16 哈希到 0–16383 槽，槽映射到节点；迁移中与迁移完的两种重定向语义不同。</p>
+<figure class="fig"><img src="diagrams/fig-7-2-gpt.png" alt="图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由 GPT 生成版"><figcaption>图 7-2 Redis Cluster 16384 槽分布与 MOVED/ASK 路由 GPT 生成版</figcaption></figure>
 <p>16384 这个数的选择基于工程折中。Gossip 消息里每个节点要携带自己负责的槽位 bitmap，16384 个槽对应 16384/8 = 2KB 的 bitmap，这个大小在消息压缩与槽粒度之间是个折中：槽太少则单节点承载过重、迁移粒度太粗，槽太多则 bitmap 占用大、Gossip 消息膨胀。16384 既能让集群规模到上百节点仍每节点分到上百槽，又把 bitmap 控制在 2KB 量级，是两边都过得去的取值。</p>
 <p><strong>客户端路由靠 MOVED 和 ASK 两种重定向。</strong> 客户端可以缓存一份槽到节点的映射表，绝大多数请求直接命中。但集群拓扑会变（扩容、缩容、故障转移），所以节点收到不属于自己槽的请求时，会返回一个 MOVED 或 ASK 重定向。MOVED 表示"这个槽已经永久不在你这了，去这个新地址"，客户端收到后更新本地映射表，以后都走新地址；ASK 表示"这个槽正在迁移中，本次请求请去临时地址试一下"，是一次性重定向，客户端不更新映射表，因为迁移完之后这个槽还会回来或换地方。两者的区别在于：MOVED 是状态变更后的最终路由，ASK 是迁移过程中的临时跳板。此外，Redis Cluster 禁用了多数据库的 <code>SELECT</code> 命令（只有 0 号库），并要求多键命令（如 <code>MGET</code>、事务、Lua 脚本）涉及的所有 key 必须落在同一个槽。可以用哈希标签（hash tag）<code>{user:1001}.name</code>、<code>{user:1001}.email</code> 强制让带相同 <code>{...}</code> 的 key 落到同槽。</p>
 <p><strong>元数据完全去中心化，用 Gossip 传播。</strong> Redis Cluster 没有一个集中的协调者节点，所有节点对等，靠 Gossip 协议（PING/PONG/MEET/FAIL 消息）互相交换和传播集群状态：谁加入了、谁负责哪些槽、谁挂了。每个节点最终都会收敛到一致的集群视图，但"最终"意味着过程中可能短暂不一致。Gossip 的好处是无单点、自动发现、能容忍网络抖动；代价是收敛慢，故障感知到全集群达成共识可能要几秒到十几秒，期间部分客户端可能拿到过期视图。</p>
@@ -4177,7 +4192,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="400" y="380" text-anchor="middle" font-size="11" fill="#9CA3AF">主库 → N 个从库（每个从库独立拉取，互不影响）</text>
 </svg>
 </div><figcaption>图 7-3 MySQL 主从复制基础拓扑</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-3-gpt.png" alt="GPT: 图 7-3 MySQL 主从复制基础拓扑" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 7-3　MySQL 主从复制基础拓扑：主节点写 binlog，从节点 I/O 线程拉取到中继日志，SQL 线程回放，三个角色各司其职。</p>
+<figure class="fig"><img src="diagrams/fig-7-3-gpt.png" alt="图 7-3 MySQL 主从复制基础拓扑 GPT 生成版"><figcaption>图 7-3 MySQL 主从复制基础拓扑 GPT 生成版</figcaption></figure>
 <p>MySQL 的集群要求是"不丢数据"。从最古老的异步复制到最新的组复制，这条底线始终没动过。MySQL 的集群演进，就是在这条底线之上，一步步把可用性、自动化、强一致性补全的过程：异步先保证能跑，半同步保证通常不丢，MGR 保证数学上不丢。</p>
 <h3 id="s144">7.3.1 基于 binlog 的复制：单向、异步、行流</h3>
 <p>MySQL 复制的基础是二进制日志（binlog）。主节点把所有写操作记进 binlog，从节点的 I/O 线程连上来拉取 binlog，写到本地的中继日志，再由 SQL 线程回放中继日志重做这些变更。这是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种）的取舍细节归第 9 章，本章只把它当作"变更流的载体"。</p>
@@ -4267,7 +4282,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="630" y="399" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Leader · Broker 3</text>
 </svg>
 </div><figcaption>图 7-4 Kafka 分区与副本拓扑</figcaption><div class="gpt-alt"><img src="diagrams/fig-7-4-gpt.png" alt="GPT: 图 7-4 Kafka 分区与副本拓扑" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 7-4　Kafka 分区与副本拓扑：Topic 切为 3 个 Partition，每个 Partition 有 1 个 Leader + 2 个 Follower，Leader 分散在不同 Broker 上，读写负载天然分摊。Partition 1 的 Broker 3 副本因落后超时被踢出 ISR，不再参与 Leader 选举。</p>
+<figure class="fig"><img src="diagrams/fig-7-4-gpt.png" alt="图 7-4 Kafka 分区与副本拓扑 GPT 生成版"><figcaption>图 7-4 Kafka 分区与副本拓扑 GPT 生成版</figcaption></figure>
 <p>Kafka 原生就是分布式的，因此集群设计上没背负前两款软件那种从单机改造的包袱，但也做了几处明确的取舍。</p>
 <h3 id="s150">7.4.1 Partition：分区即并行单位</h3>
 <p>Kafka 的分区（partition）就是并行单位。一个主题（topic）被切成 N 个分区，每个分区是一份有序的、只能追加（append-only）的日志。生产者发消息时按 key 决定去哪个分区：有 key 时默认用 <code>murmur2(key) % N</code> 做哈希路由，保证同一个 key 永远去同一个分区；没有 key 时，生产者（Kafka 2.4 起经 KIP-480 改为默认）用"粘性分区"（sticky partitioner），把一批消息都发到同一个分区，攒够一批再换分区。这样在保持分区内有序的前提下，把批处理效率做到最高；老的轮询（round-robin）策略会把消息轮流分发到各分区，批更小、延迟更高。</p>
@@ -6359,7 +6374,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示"服务关系"，灰虚线表示"设计递进"；五条规律不是并列清单，而是一条收束链。</text>
 </svg>
 </div><figcaption>图 10-1 五条共性规律的递进关系</figcaption><div class="gpt-alt"><img src="diagrams/fig-10-1-gpt.png" alt="GPT: 图 10-1 五条共性规律的递进关系" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 10-1 五条共性规律的递进关系：后四条规律都在服务第一条：让真相之源又快、又稳、又可控。</p>
+<figure class="fig"><img src="diagrams/fig-10-1-gpt.png" alt="图 10-1 五条共性规律的递进关系 GPT 生成版"><figcaption>图 10-1 五条共性规律的递进关系 GPT 生成版</figcaption></figure>
 <p>箭头标示了递进关系：规律一定下"真相之源"的位置，后四条围绕它展开。规律二让它实现可替换、演进可控，规律三提速，规律四加固可靠性，规律五管住故障恢复。后四条都在把第一条的"真相之源"改造成一个能在生产环境里跑起来的工程对象。</p>
 <blockquote><strong>适用边界</strong>：五条规律建立在同一组前提上：你的系统是<strong>有状态的</strong>（持有不可丢失的数据）、<strong>单写者/少写者</strong>（真相之源通常只有一个写入者）、<strong>OLTP 为主</strong>（在线事务而非离线分析）。如果你面对的是无状态微服务（真相之源不在本服务内，而在外部数据库）、边缘计算/Serverless 函数（数据短暂驻留、生命周期不可控）、纯分析型系统（列存、批量扫描、无 OLTP 事务），这套框架的适用性就会打折扣：规律一"真相之源"仍然成立，但规律三（随机变顺序）和规律四（可靠性的代价）的形态会显著不同。框架的价值在于自知边界，边界之内的判断是可靠的，边界之外的类推需要额外验证。</blockquote>
 <hr>
@@ -6521,7 +6536,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
 </svg>
 </div><figcaption>图 10-2 实践者选型决策树</figcaption><div class="gpt-alt"><img src="diagrams/fig-10-2-gpt.png" alt="GPT: 图 10-2 实践者选型决策树" loading="lazy"><small>GPT 生成版</small></div></figure>
-<p>图 10-2 实践者选型决策树：从"我要建一个有状态系统"出发，依次回答四个问题，叶子节点指向"这种约束组合下该借鉴哪家设计"。</p>
+<figure class="fig"><img src="diagrams/fig-10-2-gpt.png" alt="图 10-2 实践者选型决策树 GPT 生成版"><figcaption>图 10-2 实践者选型决策树 GPT 生成版</figcaption></figure>
 <p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间/时间换法）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。决策树的用法：<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么长成那个样子。比如你做一个秒杀库存系统，决策树会把你带到"持久性优先 + CP 倾向 + 热点读"的叶子，那里指向 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
 <h3 id="s250">10.3.3 三道判断练习</h3>
 <p>三道练习帮你把框架用起来。每题结构固定：场景 → 常见的第一反应 → 用本章框架推导 → 该借鉴它们的哪条机制。</p>
