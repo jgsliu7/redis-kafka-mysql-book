@@ -126,7 +126,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第一类是<strong>快速读写</strong>。缓存热点数据、维护计数器、存放会话、做分布式锁，这些场景的共同诉求是低延迟、高并发，而对持久化的要求往往是"尽力而为"或"可以重建"。这类能力的核心要求是低延迟。</p>
 <p>第二类是<strong>可靠存储</strong>。订单、账户、交易记录，这些数据一旦写下去就不容丢失、不容错乱，还要支持复杂查询和事务。这类能力的核心约束是一致性与持久性。</p>
 <p>第三类是<strong>异步解耦与流转</strong>。系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都需要一个中间介质把生产者和消费者解耦。这类能力的核心约束是吞吐与可扩展。</p>
-<p>这三类能力是互补的，各管一块，不能互相顶替。一个真实的电商订单系统常常会同时用到三者：Redis来保存购物车与库存计数、MySQL保存订单与账户、Kafka把"订单已创建"这个事件广播给履约、推荐、风控等下游。</p>
+<p>这三类能力是互补的，各管一块。一个典型的电商订单系统常常会同时用到三者，比如Redis来保存购物车与库存计数、MySQL保存订单与账户、Kafka把"订单已创建"这个事件广播给履约、推荐、风控等下游。</p>
 <p>我们给三类能力各指定一个代表：内存 → Redis；磁盘数据库 → MySQL；消息与流 → Kafka。下图把这种对应关系固定下来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -449,9 +449,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 1-3 三个软件在五个维度上的定位雷达</figcaption></figure>
 <figure class="fig"><img src="../../chapters/01-introduction/diagrams/fig-1-3-gpt.png" alt="图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版"><figcaption>图 1-3 三个软件在五个维度上的定位雷达 GPT 生成版</figcaption></figure>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
-<p>同一个系统，用使用视角和用架构视角去看，看到的是两幅图。我们来研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把研究的视线从配置参数层移到设计决策层。</p>
+<p>同一个系统，从使用视角和用架构视角去看，关注的是完全不同的内容。我们研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把视线从配置参数移到设计决策。</p>
 <h3 id="s14">1.3.1 两种视角看到的同一个系统</h3>
-<p>同样一句"Redis 是单线程的"，使用者关心的是"我要避免在一个命令里跑 <code>KEYS *</code>，避免在大集合上做重计算，否则会卡住整个实例"。架构师追问的是：<strong>单线程反而更快的原因、多线程 I/O 的嵌入方式、这套设计在什么规模下开始吃亏、以及换成多线程执行需要付出的代价。</strong></p>
+<p>面对同一个问题："Redis 是单线程的"，使用者关心的是"我要避免在一个命令里跑 <code>KEYS *</code>，避免在大集合上做重计算，否则会卡住整个实例"。架构师追问的是：<strong>单线程反而更快的原因、多线程 I/O 的嵌入方式、这套设计在什么规模下开始吃亏、以及换成多线程执行需要付出的代价。</strong></p>
 <p>这两种视角的差别，在于使用者盯的是"怎么配"，架构师盯的是"为什么这么选"。下面这张对照表把同一个系统在两种视角下关注的东西并排列出来。</p>
 <p><strong>表 1-2 使用视角 vs 架构视角对照</strong></p>
 <div class="table-wrap"><table><thead><tr><th>关注维度</th><th>使用视角（怎么做）</th><th>架构视角（为什么这么做）</th></tr></thead><tbody><tr><td>提问方式</td><td>怎么配？怎么调？踩过哪些坑？</td><td>为什么这么选？反过来会怎样？边界在哪？</td></tr><tr><td>Redis 单线程</td><td>避免 <code>KEYS</code>、避免重计算、压到多少 QPS</td><td>单线程为何反而快？多线程 I/O 如何嵌入？瓶颈何时出现？</td></tr><tr><td>MySQL 日志</td><td>开 binlog、设 sync_binlog、配主从</td><td>redo 与 binlog 为何要两阶段提交？日志即数据的边界在哪？</td></tr><tr><td>Kafka 副本</td><td>设 acks=all、min.insync.replicas=2</td><td>ISR 为何要"动态收缩"？主副本切换与一致性如何兼顾？</td></tr><tr><td>知识形态</td><td>配方、参数、最佳实践</td><td>取舍、约束、演化逻辑、可迁移的设计思想</td></tr><tr><td>终极目标</td><td>把现有系统用好、用稳</td><td>理解设计决策，并在自己的系统里做对取舍</td></tr></tbody></table></div>
