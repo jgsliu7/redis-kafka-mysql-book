@@ -378,7 +378,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s10">1.2.2 MySQL：以"不丢、不错"为第一优先级的关系库</h3>
 <p>MySQL的发展历史是一部商业与工程交织的演化史。它 1995 年起源于瑞典 MySQL AB，2008 年被 Sun Microsystems 收购，2010 年随 Sun 被 Oracle 收购后正式归入 Oracle 旗下。这条路径并不平坦：它经历过商业化收购的震荡、催生了 MariaDB 这样的分支分叉，也经历了存储引擎从 MyISAM 到 InnoDB 默认化的更迭。但至今它仍是 Web 应用最常用的关系型数据库之一，原因在于它把一件最难的事做得足够稳，即<strong>保证数据不丢、不错</strong>。</p>
 <p>MySQL 的核心抽象是<strong>关系（表与行）+ SQL + 可插拔存储引擎</strong>。上层是统一的 SQL 接口与基于成本的查询优化器，对应用屏蔽底层差异；下层是 InnoDB 等可替换的引擎，负责真正的存取。这种分层让 MySQL 既能提供标准化的访问方式，又能在存储层做差异化取舍。InnoDB 是默认引擎，本书讨论 MySQL 时以它为主，它把数据组织成<strong>页（page，默认 16KB）</strong>，以 B+ 树聚簇索引为中心来管理整张表。</p>
-<p>支撑 MySQL 设计哲学的是一整套为正确性服务的机制。InnoDB 提供完整的 ACID（原子性、一致性、隔离性、持久性）事务、靠 MVCC 实现的非阻塞读、行级锁；它维护着三套日志：重做日志（redo log）记录物理修改、回滚日志（undo log）支撑回滚与 MVCC、二进制日志（binlog）用于复制与时间点恢复；查询靠基于成本的优化器自动选择执行计划；数据访问先经过缓冲池（Buffer Pool），把热点页留在内存里减少磁盘随机 I/O。这些机制的核心目的是让数据在并发和故障面前都对得上。</p>
+<p>支撑 MySQL 设计哲学的是一整套为正确性服务的机制。InnoDB 提供完整的 ACID（原子性、一致性、隔离性、持久性）事务、靠 MVCC 实现的非阻塞读、行级锁；它维护着三套日志：redo log（重做日志）记录物理修改、回滚日志（undo log）支撑回滚与 MVCC、二进制日志（binlog）用于复制与时间点恢复；查询靠基于成本的优化器自动选择执行计划；数据访问先经过缓冲池（Buffer Pool），把热点页留在内存里减少磁盘随机 I/O。这些机制的核心目的是让数据在并发和故障面前都对得上。</p>
 <p>代价当然存在。为保证持久性，事务提交要做日志落盘（fsync）；为保证一致性，写操作伴随 redo 与 binlog 的两阶段提交开销；为支持 MVCC，旧版本数据要靠 undo 链维护，长事务会拖累性能；调优门槛高，缓冲池、刷新策略、隔离级别都需要根据负载仔细配置。此外，单机扩展有天花板，纵向加内存加 CPU 容易，横向分库分表则代价不菲。它的优先级一直是"对"排在"快"前面：可以慢，但不能错。</p>
 <p>典型场景因此集中在核心业务：交易系统、订单与账户、任何需要强一致与复杂查询的主数据存储。这些场景的共同点是数据价值高、查询模式复杂、容错空间小。</p>
 <p>一句话定位：<strong>MySQL 是事务关系型数据库领域应用最广泛的存储方案。</strong></p>
@@ -579,7 +579,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s16">1.3.3 一个贯穿全书的例子</h3>
 <p>一个后端最经典的问题：保存数据怎么保证不丢？</p>
 <p>架构视角需要把这个问题拆成三个层次的追问。 <strong>第一，先写日志还是先改数据？</strong> 可靠存储系统的常见做法是先写日志（WAL）。原因是日志是顺序写，恢复时按顺序重放，比直接改散落各处的数据页快得多、也安全得多。 <strong>第二，日志落盘的粒度多细？</strong> 是每条命令落盘、每秒落盘，还是交给操作系统决定何时刷盘？粒度越细越安全，但吞吐代价越大。 <strong>第三，日志记的到底是什么？</strong> 这三个软件在这里分歧最大：记"做了什么操作"（逻辑日志），还是记"哪个字节改成什么样"（物理日志）？</p>
-<p>逻辑日志紧凑、跨版本友好，但重放时要重新执行操作，速度慢且要小心幂等；物理日志啰嗦、占空间，但重放就是机械地改页，又快又稳。三者各选了一套方案。 <strong>Redis</strong> 走 AOF 命令日志，即逻辑日志，记的是"做了什么命令"，重放即重新执行命令。 <strong>MySQL</strong> 走 redo 日志加两阶段提交，redo 记的是"页上哪个字节改成什么样"（严格说是物理到页、逻辑到操作的混合日志，详见第 8 章），恢复时机械重放，再配合 binlog 这种逻辑日志做复制。 <strong>Kafka</strong> 最彻底，直接把日志当成数据本体：它没有"日志"和"数据"之分，日志就是数据本身，消费者从日志里读，副本把日志复制过去，连"恢复"这一步都不需要了。</p>
+<p>逻辑日志紧凑、跨版本友好，但重放时要重新执行操作，速度慢且要小心幂等；物理日志啰嗦、占空间，但重放就是机械地改页，又快又稳。三者各选了一套方案。 <strong>Redis</strong> 走 AOF 命令日志，即逻辑日志，记的是"做了什么命令"，重放即重新执行命令。 <strong>MySQL</strong> 走 redo log 加两阶段提交，redo 记的是"页上哪个字节改成什么样"（严格说是物理到页、逻辑到操作的混合日志，详见第 8 章），恢复时机械重放，再配合 binlog 这种逻辑日志做复制。 <strong>Kafka</strong> 最彻底，直接把日志当成数据本体：它没有"日志"和"数据"之分，日志就是数据本身，消费者从日志里读，副本把日志复制过去，连"恢复"这一步都不需要了。</p>
 <p>三种答案，一条共同主线：<strong>顺序写的日志保证故障后可恢复，落盘粒度调节安全与吞吐的平衡。</strong> 这条主线贯穿第 4 章（内存与磁盘的舞蹈）与第 9 章（数据同步），并在每一章里以不同的面貌重新出现。</p>
 <h2 id="s17">1.4 如何读本书</h2>
 <p>这一节说明本书的组织方式、读者画像、版本基线、图表约定和推荐阅读路径。</p>
@@ -716,7 +716,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
 <p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.x），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；KRaft 在 Kafka 3.3 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在近几个版本逐步落地，而生产者幂等与事务早在 0.11 就已引入。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许"裸奔"。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>
-<p>术语约定如下。全书术语统一译法，首次出现以"中文（英文）"标注，之后用中文。例如重做日志（redo log）、缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到本书术语表未列的术语，我们会在首次出现时同样标注英文原词。</p>
+<p>术语约定如下。全书术语统一译法，首次出现时中英对照标注，之后按两档制使用：工程界通行的术语直接用英文，如 redo log、WAL、MVCC；中文已充分沉淀的继续用中文，如缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到本书术语表未列的术语，我们会在首次出现时同样标注英文原词。</p>
 <h3 id="s21">1.4.4 推荐阅读路径</h3>
 <p>本书提供三条阅读路径，按你的目标选择。</p>
 <p><strong>路径 A：系统建立。</strong> 从第 1 章顺序读到第 10 章。适合想建立完整架构认知的读者。每一章都建立在前一章的基础上，读完整本书你会对后端基础设施的设计逻辑有一个连贯的理解。这是最推荐的路径，也是本书写作时假定的阅读顺序。</p>
@@ -1570,7 +1570,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <figure class="fig"><img src="chapters/03-lifecycle/diagrams/fig-3-1-gpt.png" alt="图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版"><figcaption>图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版</figcaption></figure>
 <p>图 3-1　启动与关闭作为状态机重建与快照的对称过程，三对矛盾贯穿全章。</p>
 <p>这三个软件的约束差异这里先用一句话带过，具体留到后面的详细讲解。Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。</p>
-<p>后文 MySQL 一节会反复用到两套日志，这里先把名词提出来：崩溃恢复靠的是 redo（重做日志，记录页级物理修改，崩溃后正向重放）保住持久性，undo（回滚日志，记录操作的逻辑逆，用来回滚未提交事务）保住原子性。两者方向相反、职责不同，3.3 节会展开它们在崩溃恢复里怎么配合。</p>
+<p>后文 MySQL 一节会反复用到两套日志，这里先把名词提出来：崩溃恢复靠的是 redo log（重做日志，记录页级物理修改，崩溃后正向重放）保住持久性，undo log（回滚日志，记录操作的逻辑逆，用来回滚未提交事务）保住原子性。两者方向相反、职责不同，3.3 节会展开它们在崩溃恢复里怎么配合。</p>
 <h2 id="s41">3.2 Redis 的做法</h2>
 <p>理解 Redis 的生命周期，得先理解一个基本事实：<strong>Redis 的全部数据都在内存里。</strong> 一旦进程重启，内存清空，所有键值对全部消失。不像 MySQL 有磁盘上的数据文件可回退，也不像 Kafka 有磁盘上的日志段做持久化。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条加载回内存、重建整个键空间。数据量越大，这个过程越久。一个几十 GB 的实例从加载到就绪可能要几分钟，期间整个实例不可用。所以 Redis 的启动链路每个环节都尽量精简，能省的步骤都省掉，能并行的就并行。反过来，Redis 的关闭也要快。但快的同时要回答一个核心问题：退出前要不要把内存里的最新数据再落一次盘？还是接受丢掉最近几秒的写？这个选择决定了 Redis 在你手里是缓存还是主存。</p>
 <p>Redis 的生命周期以"快"著称，但快的背后是一组很硬的设计取舍。本节把 Redis 从启动到关闭的完整过程拆成四段启动、两条关闭路径来理解，重点看它在每个分叉口选了什么、弃了什么。</p>
@@ -1760,7 +1760,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
 <ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，<code>ibdata1</code> 只存储 change buffer 和可选的 undo 日志；5.7 及更早版本数据字典仍在 <code>ibdata1</code> 中）。</li></ol>
 <figure class="fig"><img src="chapters/03-lifecycle/diagrams/fig-3-4-gpt.png" alt="图 3-4 InnoDB 崩溃恢复时序 GPT 生成版"><figcaption>图 3-4 InnoDB 崩溃恢复时序 GPT 生成版</figcaption></figure>
-<ol><li><strong>崩溃恢复</strong>。读 checkpoint（标记"重做日志到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描重做日志（redo log），把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用回滚日志（undo log）回滚所有未提交事务。</li></ol>
+<ol><li><strong>崩溃恢复</strong>。读 checkpoint（标记"redo log 到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描 redo log，把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用回滚日志（undo log）回滚所有未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理：redo 重放先无差别地把所有页修改补回去（恢复出崩溃瞬间的物理页状态），undo 回滚再撤掉未提交事务留下的痕迹，最终恢复出严格的事务一致性。已提交的全部保留，未提交的全部回滚。正因为 redo 保住持久性、undo 保住原子性，MySQL 才能在崩溃之后把 ACID 的持久性和原子性这两条重新恢复出来。图 3-4 把崩溃恢复画成时序。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1774,13 +1774,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
 
-  <!-- Lifelines: InnoDB 启动流程 | 重做日志(redo) | 缓冲池(Buffer Pool) | 回滚日志(undo) -->
+  <!-- Lifelines: InnoDB 启动流程 | redo log(redo) | 缓冲池(Buffer Pool) | 回滚日志(undo) -->
   <!-- Header boxes -->
   <rect x="40" y="64" width="180" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="130" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">InnoDB 启动恢复流程</text>
 
   <rect x="260" y="64" width="160" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="340" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">重做日志 redo log</text>
+  <text x="340" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">redo log</text>
 
   <rect x="460" y="64" width="160" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="540" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">缓冲池 Buffer Pool</text>
@@ -2596,8 +2596,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Disk -->
   <rect x="320" y="520" width="600" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / 重做日志）</text>
-  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠重做日志重放补齐</text>
+  <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / redo log）</text>
+  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠 redo log 重放补齐</text>
 
   <!-- Flush -> Disk -->
   <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_4_arrowRed)"/>
@@ -2616,9 +2616,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 4-4 InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
 <p>图 4-4 把 Free List、改良版 LRU List（含 New / Old 子链表与 midpoint）、Flush List 并排画出，箭头标出页在链表间的流转路径：新页从 Free List 进入 LRU 的 midpoint，停留超时后晋升 New 区；被修改的页同时进入 Flush List，等待后台线程刷盘。这张图是理解 InnoDB 内存管理的骨架。</p>
 <h3 id="s72">WAL 与崩溃恢复</h3>
-<p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>重做日志（redo log）</strong>。重做日志是顺序追加写的。崩溃之后，InnoDB 用重做日志重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
+<p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>redo log（重做日志）</strong>。redo log 是顺序追加写的。崩溃之后，InnoDB 用 redo log 重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL（Write-Ahead Logging，预写日志）</strong> 的核心：先写日志，后改数据页。</p>
 <p>InnoDB 选择用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
-<figure class="fig"><img src="chapters/04-memory-disk/diagrams/fig-4-5-gpt.png" alt="图 4-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘） GPT 生成版"><figcaption>图 4-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘） GPT 生成版</figcaption></figure>
+<figure class="fig"><img src="chapters/04-memory-disk/diagrams/fig-4-5-gpt.png" alt="图 4-5 MySQL 一次写操作的全链路时序（缓冲池→redo log→双写→刷盘） GPT 生成版"><figcaption>图 4-5 MySQL 一次写操作的全链路时序（缓冲池→redo log→双写→刷盘） GPT 生成版</figcaption></figure>
 <p>"持久"的程度由 <code>innodb_flush_log_at_trx_commit</code> 控制，三个档位对应三种可靠性选择。<strong>1（默认）</strong>：每次事务提交时 fsync 日志文件，事务返回 OK 意味着日志已落盘，单节点不丢数据，代价是每次提交等一次 fsync。<strong>2</strong>：每次提交时把日志写到 OS 页缓存，由后台线程每秒统一 fsync 一次，提交不卡 fsync 但 OS 崩溃会丢最近约 1 秒的事务。<strong>0</strong>：提交时不写日志，由后台每秒写一次并 fsync，MySQL 崩溃也丢约 1 秒事务，生产极少使用。这三档和 Redis 的 <code>appendfsync</code>、Kafka 的 <code>acks</code> 是同一道选择题的不同答案——4.6 启示三会回看这条谱系。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -2636,7 +2636,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Title -->
   
-  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写重做日志）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
+  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写 redo log）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
 
   <!-- Lifelines (actors) -->
   <!-- Client -->
@@ -2658,8 +2658,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Redo Log -->
   <rect x="620" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">重做日志</text>
-  <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">redo log（顺序写）</text>
+  <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">redo log</text>
+  <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">（顺序写）</text>
   <line x1="690" y1="130" x2="690" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
 
   <!-- Disk -->
@@ -2675,7 +2675,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 2. WAL: write redo log FIRST -->
   <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_4_5_arrowRed)"/>
-  <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写重做日志（WAL，顺序写）</text>
+  <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写 redo log（WAL，顺序写）</text>
   <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">「这页要怎么改」先落盘，崩溃后可重放</text>
 
   <!-- 3. modify buffer pool page (in memory) -->
@@ -2691,7 +2691,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 4. COMMIT -->
   <line x1="284" y1="340" x2="100" y2="340" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_4_5_arrow)" stroke-dasharray="5,3"/>
-  <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（重做日志已落盘 → 持久化达成）</text>
+  <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（redo log 已落盘 → 持久化达成）</text>
 
   <!-- Divider -->
   <line x1="40" y1="370" x2="940" y2="370" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="6,4"/>
@@ -2721,7 +2721,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 8. Crash recovery note -->
   <rect x="40" y="612" width="880" height="76" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="634" font-size="13" font-weight="700" fill="#111827">崩溃恢复（重启时）</text>
-  <text x="60" y="656" font-size="12" fill="#374151">重做日志已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
+  <text x="60" y="656" font-size="12" fill="#374151">redo log 已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
   <text x="60" y="676" font-size="11" fill="#6B7280">核心：随机写数据页慢且易损坏 → 用顺序日志保住可靠与速度。</text>
 
   <!-- legend -->
@@ -2736,11 +2736,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="388" y="12" font-size="10" fill="#374151">MySQL 相关</text>
   </g>
 </svg>
-</div><figcaption>图 4-5 MySQL 一次写操作的全链路时序（缓冲池→重做日志→双写→刷盘）</figcaption></figure>
-<p>图 4-5 在时间轴上画出 WAL、双写缓冲、checkpoint 三件事的先后与依赖：事务提交时先把重做日志写到日志文件并落盘（保证持久性）。脏页随后进入 Flush List。后台线程把脏页先写到双写缓冲再写到表空间。最后推进 checkpoint，标记之前的日志可以回收。从这条时序能看到，InnoDB 的写路径有好几道保险。</p>
+</div><figcaption>图 4-5 MySQL 一次写操作的全链路时序（缓冲池→redo log→双写→刷盘）</figcaption></figure>
+<p>图 4-5 在时间轴上画出 WAL、双写缓冲、checkpoint 三件事的先后与依赖：事务提交时先把 redo log 写到日志文件并落盘（保证持久性）。脏页随后进入 Flush List。后台线程把脏页先写到双写缓冲再写到表空间。最后推进 checkpoint，标记之前的日志可以回收。从这条时序能看到，InnoDB 的写路径有好几道保险。</p>
 <h3 id="s73">三个辅助结构：双写、修改缓冲与自适应哈希</h3>
 <p>InnoDB 还有三个辅助结构，每一个都是为某个具体的故障或性能陷阱设计的。</p>
-<p><strong>双写缓冲（Double Write Buffer）</strong>：InnoDB 的页是 16KB，操作系统和磁盘的扇区通常是 4KB 或更小。如果写一个 16KB 页写到一半断电，这个页就损坏了，而且损坏的是数据本身、不是日志。重做日志也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写缓冲从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。这里关心的是双写缓冲从"共享表空间内的一段区域"演进为"独立管理的文件"，具体文件名无关紧要。如果写到一半断电，恢复时可以从双写缓冲拿回完整的页。多写一份顺序数据，换来的是断电时页不会撕裂。这笔代价不大，因为顺序写本身开销很低。</p>
+<p><strong>双写缓冲（Double Write Buffer）</strong>：InnoDB 的页是 16KB，操作系统和磁盘的扇区通常是 4KB 或更小。如果写一个 16KB 页写到一半断电，这个页就损坏了，而且损坏的是数据本身、不是日志。redo log 也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写缓冲从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。这里关心的是双写缓冲从"共享表空间内的一段区域"演进为"独立管理的文件"，具体文件名无关紧要。如果写到一半断电，恢复时可以从双写缓冲拿回完整的页。多写一份顺序数据，换来的是断电时页不会撕裂。这笔代价不大，因为顺序写本身开销很低。</p>
 <p><strong>修改缓冲（Change Buffer）</strong>：InnoDB 的二级索引是 B+ 树，更新一个二级索引项可能要修改一个当前不在缓冲池的页。如果每次都把这个页从磁盘捞上来，就是一次随机 I/O。修改缓冲的做法是：先把这次修改记下来（缓存），等这个页因为别的原因被读入缓冲池时，再把缓存的修改合并（merge）进去。这样就把"为改一个索引项触发一次随机读"延迟成了"等页自然读入时顺便合并"。修改缓冲只对二级索引的非唯一索引生效，因为唯一索引必须立刻检查约束。</p>
 <p><strong>自适应哈希索引（AHI）</strong>：InnoDB 监控热点访问模式，如果发现某些 B+ 树路径被频繁遍历，就自动给这些路径建哈希，把 3 到 4 次页访问压成 1 次。它无需配置、对用户透明，但只在负载稳定、热点集中时才有收益；负载剧烈变化时它反而可能成为开销。这是"在通用引擎里嵌入专用优化"的取舍。</p>
 <h3 id="s74">取舍总账</h3>
@@ -2884,13 +2884,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我参与过一次选型争论：缓存到底该用 Redis 还是 MySQL？有人坚持"MySQL 有内存表和 Query Cache，够用了"。我花了一下午把两者的访问模式拉了一张表：Redis 是"小而热"的 O(1) 内存访问，MySQL 再快的缓存本质也是磁盘页的副本。争论在数据面前有了明确的答案。与其比较哪个"更好"，不如看哪个更匹配你的访问模式。</p>
 <p>把这三个软件的"内存-磁盘"哲学并列，重点是说清楚每个选择背后的访问模式与业务约束。三栏表把六个关键维度摆出来，列序固定 Redis、MySQL、Kafka。</p>
 <p><strong>表 4-3　三个软件"内存-磁盘"哲学横向对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据住哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>重做日志（redo log）+ 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1)~O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按偏移量顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 回放 AOF（大实例数分钟）</td><td>重放重做日志 + 恢复脏页</td><td>进程重启极快（数据在磁盘，无重放），但 PageCache 冷热影响读性能</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 I/O 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据住哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>redo log + 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1)~O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按偏移量顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 回放 AOF（大实例数分钟）</td><td>重放 redo log + 恢复脏页</td><td>进程重启极快（数据在磁盘，无重放），但 PageCache 冷热影响读性能</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 I/O 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
 <p>逐维度解读，要点都在"为什么不同"。</p>
 <p><strong>数据住哪里</strong>。它们在这条轴上的选择决定了容量上限。Redis 选内存，容量上限受物理内存量约束，所以单实例通常会被控制在便于 fork、备份和恢复的范围内。MySQL 选磁盘，容量主要看存储和运维。Kafka 同样把数据放在磁盘上，但它选的是顺序日志，额外要付出放弃随机访问的代价。</p>
-<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的重做日志是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF，见第 8 章），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF，见第 8 章），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
 <p><strong>内存管理主体</strong>。这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 的运维门槛在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。Redis 和 MySQL 都原生支持随机读写，Redis 是 O(1) 到 O(log N) 的内存访问，MySQL 是 B+ 树的几次页访问。Kafka 不支持随机访问，只能按偏移量区间顺序消费。这条决定了适用场景。你需要按主键查一行数据，Kafka 直接出局。</p>
-<p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或回放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放重做日志通常较快（重做日志设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务。唯一受影响的是 PageCache 是否还热。</p>
+<p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或回放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 通常较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务。唯一受影响的是 PageCache 是否还热。</p>
 <p><strong>典型故障模式</strong>。每种范式都有自己最常踩的坑。Redis 是 fork 阻塞与淘汰风暴，MySQL 是缓冲池抖动与磁盘 I/O 打满。Kafka 最典型的是消费者追不上生产者：消费速度低于生产时，消费者读的数据被挤出 PageCache、落到磁盘读，延迟从毫秒级掉到十毫秒以上；监控上表现为消费 lag 和磁盘读 I/O 同时上涨，这是把缓存交给 OS 的隐性代价。</p>
 <p>三个选择的关键是匹配。Redis 对"小而热"、MySQL 对"大而杂"、Kafka 对"大而流"，把你的场景对号入座即可。</p>
 <h2 id="s82">4.6 架构启示</h2>
@@ -2907,7 +2907,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>它们的每个刷盘旋钮，都是同一道选择题的不同档位。Redis 的 <code>appendfsync</code>（always / everysec / no）、MySQL 的 <code>innodb_flush_log_at_trx_commit</code>（1 / 2 / 0）、Kafka 的 <code>acks</code>（all / 1 / 0）与 <code>log.flush.*</code>。把这些旋钮画在同一根轴上，你会发现它们的位置几乎一一对应：最严的那档"每条都落盘"对应最强不丢，最松的那档"交给 OS"对应最高吞吐。</p>
 <p>理解了谱系，调参才有方向。你该问的是"我愿意为多强的持久性牺牲多少吞吐"。很多时候答案是中间档。Redis 的 <code>everysec</code>、MySQL 的 1（或某些场景的 2）、Kafka 的 <code>acks=1</code>（3.0 之前的默认；3.0 起默认已升至 <code>acks=all</code>，这里指主动下调到中间档的场景）。</p>
 <h3 id="s86">启示四：用顺序写替代随机写，是跨范式的共性手段</h3>
-<p>它们的写路径都把随机写转成了顺序写：Redis 的 AOF 把"修改内存数据结构"转成"追加写命令日志"。MySQL 的重做日志把"修改散落各处的数据页"转成"追加写物理变更记录"。Kafka 更干脆，数据本身就是顺序日志，没有"转换"这一步。这是因为在所有持久介质上，顺序写都远快于随机写。</p>
+<p>它们的写路径都把随机写转成了顺序写：Redis 的 AOF 把"修改内存数据结构"转成"追加写命令日志"。MySQL 的 redo log 把"修改散落各处的数据页"转成"追加写物理变更记录"。Kafka 更干脆，数据本身就是顺序日志，没有"转换"这一步。这是因为在所有持久介质上，顺序写都远快于随机写。</p>
 <p>这条规律在系统设计里普适。你要写一个高吞吐的审计日志、一个 WAL、一个事件溯源（event sourcing）系统，都该先想"能不能把写做成顺序追加"。任何把"高频随机写"当核心路径的设计，在数据量上来后都会因磁盘的随机寻道而性能急剧下降。</p>
 <h3 id="s87">给实践者的三个实操要点</h3>
 <p>把上面四条浓缩成可操作的要点：</p>
@@ -3228,7 +3228,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>服务层内这三段切分，靠的是<strong>结构化中间表示（解析树、执行计划）在子层之间传话</strong>。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这与 Redis 的"直接函数调用"完全不同。</p>
 <h3 id="s100">5.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>存储层是 MySQL 分层里最关键的一层，它的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。所有这些组合起来，就规定了引擎要被 MySQL 调用、必须实现哪些方法。</p>
-<p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、多版本并发控制（MVCC，Multi-Version Concurrency Control）、缓冲池、重做日志与回滚日志，是 OLTP（联机事务处理）场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
+<p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、多版本并发控制（MVCC，Multi-Version Concurrency Control）、缓冲池、redo log 与回滚日志，是 OLTP（联机事务处理）场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_4_arrow44" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
@@ -3279,7 +3279,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="140" y="354" font-size="12" fill="#374151">· ACID 事务</text>
   <text x="140" y="376" font-size="12" fill="#374151">· 行锁 + MVCC 多版本并发</text>
   <text x="140" y="398" font-size="12" fill="#374151">· 缓冲池 Buffer Pool</text>
-  <text x="140" y="420" font-size="12" fill="#374151">· 重做日志 redo / 回滚日志 undo</text>
+  <text x="140" y="420" font-size="12" fill="#374151">· redo / undo（日志）</text>
   <text x="140" y="442" font-size="12" fill="#374151">· 表空间 .ibd + B+ 树</text>
   <rect x="160" y="462" width="200" height="32" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
   <text x="260" y="482" text-anchor="middle" font-size="11" fill="#374151">自身又是多层（事务/锁/缓存/日志）</text>
@@ -3307,7 +3307,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是 MySQL 为「可插拔」支付的固有开销。</text>
 </svg>
 </div><figcaption>图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。</figcaption></figure>
-<p>这张图的关键在中间那条粗黄线。Handler API 接口契约。它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。注意，InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池（Buffer Pool）→ 重做日志与回滚日志 → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 <code>.ibd</code> 表空间存数据和索引、<code>ib_logfile</code> 存重做日志、<code>undo_*</code> 存回滚日志，再配合双写缓冲（doublewrite buffer）防止页撕裂。这些细节会在第 8 章存储格式里展开。</p>
+<p>这张图的关键在中间那条粗黄线。Handler API 接口契约。它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。注意，InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池（Buffer Pool）→ redo log 与回滚日志 → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 <code>.ibd</code> 表空间存数据和索引、<code>ib_logfile</code> 存 redo log、<code>undo_*</code> 存回滚日志，再配合双写缓冲（doublewrite buffer）防止页撕裂。这些细节会在第 8 章存储格式里展开。</p>
 <p><strong>接口标准化带来生态，代价是多态开销</strong>。handler 通过虚函数（vtable）多态调用，每次行操作都过一次虚函数表。这意味着一个全表扫描的每一行、一个索引查找的每一次定位，都是一次间接调用，无法被内联优化。这是 MySQL 相对那些"硬编码引擎"的数据库（如 PostgreSQL 的 table access method 虽然也抽象但与执行器结合更紧）的固有开销。MySQL 拿这个代价换来了可插拔。划不划算，取决于你怎么用 MySQL：如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎（比如热数据 InnoDB、冷数据 RocksDB），这笔开销就是生态红利。</p>
 <h3 id="s101">5.3.4 层间通信</h3>
 <p>MySQL 的层间通信有三种形态，分别对应三条边界。连接层到服务层：THD 对象加函数调用，跨线程但同进程。服务层到引擎层：handler 虚函数，多态调用，每次行操作都过 vtable。引擎层到操作系统：文件 API（<code>pread</code> / <code>pwrite</code>）和 Native AIO（Linux 上的 <code>io_submit</code>）。这三段通信机制形态各异，但有一个共同点：<strong>它们都是单机进程内的通信，不跨网络</strong>。MySQL 是单机软件，所有的层间通信都不跨网络。这正好和 Kafka 相反，下一节展开。</p>
@@ -5199,10 +5199,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>图 8-4 InnoDB 16KB 数据页内部七段布局。</p>
 <p>七段布局里最值得看的是 Page Directory。它是页内的稀疏索引：每隔几条记录（默认每 4–8 条）建一个槽，槽里记的是那条"被拥有"的记录在页内偏移量（记录之间用前后指针串成有序链表，槽是链表上的稀疏采样点）。页内查找时，先在槽数组里二分定位到不大于目标的最大槽，再从该槽对应的记录顺着链表顺序扫几条。这一招用很少空间（几十个槽）把页内查找从 O(n) 降到 O(log n) 加几次顺序比较，是在定长页内自建小索引，跟 Kafka 用的稀疏索引同一种思想，尺度小了一个数量级。</p>
 <p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。两个设计要点。一是变长字段长度逆序存放，记录头里先存最后一个变长字段的长度，倒着读，便于解析与崩溃恢复时边读边定位字段边界。二是大字段（VARCHAR、BLOB、TEXT）超过约页大小的一半时溢出到独立溢出页，行内只留一个 20 字节指针（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。这是"页内紧凑"与"大对象不拖累整页"的折中：大对象不该把整页占满、让其他记录无处安放，更不该跨页撕裂导致一次读要拉好几页。Dynamic 让 B+ 树的非叶子节点更紧凑，单页能装下更多键、树更矮，同样是用格式演进解决历史包袱。</p>
-<h3 id="s172">8.3.4 重做日志 + 双写：让"原地改"不惧断电</h3>
-<p>原地改页最大的风险是断电导致的半写（partial write）。一个 16KB 页，操作系统可能只写了前 4KB 或前 8KB 就断电，剩下的没写：页结构损坏，Page Directory 与 User Records 对不上，校验和不过。更糟的是重做日志假设页本身完整：重做日志记录的是"对完整页做的物理修改"，重做的前提是页已处于某个一致状态。半写的页连"完整"这一关都没过，重做日志救不了它。</p>
-<p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页刷盘前，先顺序写到一段连续的双写缓冲，再写到正式位置；恢复时若某页校验和不对，从双写缓冲取回那个页的完整副本，再用重做日志重做到最新。双写缓冲早期放在共享表空间的连续区，8.0.20 起改为独立 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大：同一份脏页要刷两次盘，但因为双写缓冲是连续的顺序写，对性能影响有限。</p>
-<p>重做日志本身是循环日志，按 512 字节块对齐。512 字节匹配传统磁盘扇区的原子写粒度：一次 512 字节的写要么完整要么不发生，不会留下半个扇区的撕裂。先写重做日志（这就是 WAL，预写日志），再改页；崩溃后用重做日志把页重做到一致状态。8.0.30 之前重做日志由固定数量、固定大小的文件循环写；8.0.30 起改为由 <code>innodb_redo_log_capacity</code> 统一管控的动态容量（默认 100MB），但"循环写 + 512B 块对齐"的物理骨架没变。重做日志是物理到页、逻辑到操作的混合日志，记录的是"对哪个页偏移做了什么修改"，既不像纯物理日志那样体积大（每个字节改动都记一条），又不像纯逻辑日志那样难以幂等重做（重做同一个操作可能产生不同结果）。物理逻辑混合日志在"日志体积"与"恢复时能否幂等重做"之间取了折中。</p>
+<h3 id="s172">8.3.4 redo log + 双写：让"原地改"不惧断电</h3>
+<p>原地改页最大的风险是断电导致的半写（partial write）。一个 16KB 页，操作系统可能只写了前 4KB 或前 8KB 就断电，剩下的没写：页结构损坏，Page Directory 与 User Records 对不上，校验和不过。更糟的是 redo log 假设页本身完整：redo log 记录的是"对完整页做的物理修改"，重做的前提是页已处于某个一致状态。半写的页连"完整"这一关都没过，redo log 救不了它。</p>
+<p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页刷盘前，先顺序写到一段连续的双写缓冲，再写到正式位置；恢复时若某页校验和不对，从双写缓冲取回那个页的完整副本，再用 redo 重放到最新。双写缓冲早期放在共享表空间的连续区，8.0.20 起改为独立 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大：同一份脏页要刷两次盘，但因为双写缓冲是连续的顺序写，对性能影响有限。</p>
+<p>redo log 本身是循环日志，按 512 字节块对齐。512 字节匹配传统磁盘扇区的原子写粒度：一次 512 字节的写要么完整要么不发生，不会留下半个扇区的撕裂。先写 redo log（这就是 WAL，预写日志），再改页；崩溃后用 redo log 把页重做到一致状态。8.0.30 之前 redo log 由固定数量、固定大小的文件循环写；8.0.30 起改为由 <code>innodb_redo_log_capacity</code> 统一管控的动态容量（默认 100MB），但"循环写 + 512B 块对齐"的物理骨架没变。redo log 是物理到页、逻辑到操作的混合日志，记录的是"对哪个页偏移做了什么修改"，既不像纯物理日志那样体积大（每个字节改动都记一条），又不像纯逻辑日志那样难以幂等重做（重做同一个操作可能产生不同结果）。物理逻辑混合日志在"日志体积"与"恢复时能否幂等重做"之间取了折中。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -5317,8 +5317,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="584" font-size="11" fill="#374151">双写缓冲 → 页完整性（修半写）；redo log → 改动可重做（保事务）；CRC/校验和 → 损坏可检测。8.0 支持原子写设备时可关掉双写，硬件消灭了那类故障，软件冗余即可撤。</text>
 </svg>
 </div><figcaption>图 8-5 脏页刷盘与崩溃恢复路径</figcaption></figure>
-<p>图 8-5 脏页刷盘流程：双写缓冲 → 正式页，配合重做日志的崩溃恢复路径。</p>
-<p>图中可见完整的双保险机制：正常写路径上重做日志先落盘（WAL），脏页先写双写缓冲再写正式位置；崩溃恢复路径上先扫描重做日志，对每条记录检查目标页 LSN，页未损坏且 LSN 落后则重做，页损坏则从双写缓冲取完整副本再重做。两条路径都指向同一个目标，即页完整性：双写缓冲保证页不撕裂，重做日志保证页内容最新。</p>
+<p>图 8-5 脏页刷盘流程：双写缓冲 → 正式页，配合 redo log 的崩溃恢复路径。</p>
+<p>图中可见完整的双保险机制：正常写路径上 redo log 先落盘（WAL），脏页先写双写缓冲再写正式位置；崩溃恢复路径上先扫描 redo log，对每条记录检查目标页 LSN，页未损坏且 LSN 落后则重做，页损坏则从双写缓冲取完整副本再重做。两条路径都指向同一个目标，即页完整性：双写缓冲保证页不撕裂，redo log 保证页内容最新。</p>
 <p>MySQL 8.0 在硬件能力提升后给了选择：当底层存储支持原子写（如某些 NVM 设备或带原子写功能的 SSD）时，可以关掉双写缓冲，减少写放大。每一层可靠性机制都是为某类故障加的冗余，当那类故障被下层硬件消灭时，软件冗余就可以撤下来（8.6.4 原则四会再展开）。</p>
 <h2 id="s173">8.4 Kafka 的做法</h2>
 <h3 id="s174">8.4.1 定位先行：磁盘就是日志本体</h3>
@@ -5561,12 +5561,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>把三个软件的具体做法摆到同一张表上对比，看每种范式各为谁优化、各自又付了什么代价。</p>
 <h3 id="s181">8.5.1 三栏对比表</h3>
 <p>表 8-2 三个软件在八个维度上的范式对比。</p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据的"家"</td><td>内存</td><td>磁盘</td><td>磁盘（日志本体）</td></tr><tr><td>基本 I/O 单元</td><td>单条命令 / 整个文件</td><td>16KB 定长页</td><td>Record Batch（变长）</td></tr><tr><td>写方式</td><td>全量重写（RDB）/ 追加（AOF）</td><td>原地改页 + WAL</td><td>纯追加，永不改写</td></tr><tr><td>读方式</td><td>加载到内存后随机访问</td><td>B+ 树随机定位</td><td>稀疏索引 + 顺序扫描</td></tr><tr><td>索引形态</td><td>无（内存里现算）</td><td>B+ 树 + 页内 Page Directory</td><td>稀疏偏移量 / 时间戳索引</td></tr><tr><td>崩溃恢复</td><td>RDB 全量 + AOF 增量回放</td><td>重做日志重做 + 双写修页</td><td>日志即真相，重放即可</td></tr><tr><td>演进机制</td><td>RDB 版本号 + 编码升级</td><td>页类型 / 格式位 + 在线 DDL</td><td>Magic 版本号</td></tr><tr><td>校验</td><td>RDB 尾部 CRC64</td><td>页校验和 + 双写</td><td>Batch 级 CRC</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据的"家"</td><td>内存</td><td>磁盘</td><td>磁盘（日志本体）</td></tr><tr><td>基本 I/O 单元</td><td>单条命令 / 整个文件</td><td>16KB 定长页</td><td>Record Batch（变长）</td></tr><tr><td>写方式</td><td>全量重写（RDB）/ 追加（AOF）</td><td>原地改页 + WAL</td><td>纯追加，永不改写</td></tr><tr><td>读方式</td><td>加载到内存后随机访问</td><td>B+ 树随机定位</td><td>稀疏索引 + 顺序扫描</td></tr><tr><td>索引形态</td><td>无（内存里现算）</td><td>B+ 树 + 页内 Page Directory</td><td>稀疏偏移量 / 时间戳索引</td></tr><tr><td>崩溃恢复</td><td>RDB 全量 + AOF 增量回放</td><td>redo 重放 + 双写修页</td><td>日志即真相，重放即可</td></tr><tr><td>演进机制</td><td>RDB 版本号 + 编码升级</td><td>页类型 / 格式位 + 在线 DDL</td><td>Magic 版本号</td></tr><tr><td>校验</td><td>RDB 尾部 CRC64</td><td>页校验和 + 双写</td><td>Batch 级 CRC</td></tr></tbody></table></div>
 <p>每一行都是一次明确的取舍。读方式这一行差异最直观：Redis 加载后才随机访问，MySQL 用 B+ 树随机定位，Kafka 靠稀疏索引加顺序扫描：三种读方式直接对应三种格式骨架。校验这一行则反映出它们对"损坏粒度"的不同假设：Redis 校验整个文件，MySQL 校验单页，Kafka 校验单批。</p>
 <h3 id="s182">8.5.2 解读：三种范式各为谁优化</h3>
 <p>三种格式背后是三种不同的优化目标。</p>
 <p>快照范式（Redis）为"快速整体恢复"优化。RDB 把整内存序列化成一个紧凑二进制，加载时一次性灌入；AOF 把写命令追加成协议文本，可逐条回放也可整体重写。这套格式的代价是不能在线随机查询磁盘：磁盘文件只在启动恢复时被读一次，运行期间不参与读路径。Redis 接受这个代价，因为它的查询永远走内存。</p>
-<p>页式范式（MySQL）为"事务安全的随机读写"优化。16KB 定长页让任意一页能被 O(1) 定位、独立读写、独立淘汰；B+ 树在页之上建立多级索引，支持点查与范围扫；重做日志与双写缓冲保证原地改的页在断电后依然完整且最新。代价是写放大：双写缓冲让脏页刷两次盘，重做日志让每次修改都多记一条日志。另一项代价是定长页的空间浪费，一行 100 字节的记录也要占一个槽，半空的页在所难免。</p>
+<p>页式范式（MySQL）为"事务安全的随机读写"优化。16KB 定长页让任意一页能被 O(1) 定位、独立读写、独立淘汰；B+ 树在页之上建立多级索引，支持点查与范围扫；redo log 与双写缓冲保证原地改的页在断电后依然完整且最新。代价是写放大：双写缓冲让脏页刷两次盘，redo log 让每次修改都多记一条日志。另一项代价是定长页的空间浪费，一行 100 字节的记录也要占一个槽，半空的页在所难免。</p>
 <p>Kafka 的追加日志做法为"高吞吐的顺序写 + 成批压缩"优化。日志段只追加不改写，磁盘顺序写能吃满带宽。Record Batch 把一批消息当成一个存储单元，压缩在 Batch 边界做，同类消息上常见 2-6 倍压缩比（取决于消息内容相似度与压缩级别，极端重复场景可能更高）。稀疏索引则小到能常驻内存，按偏移量随机读只需一次二分加几 KB 顺序扫。代价是不能原地改写：删数据只能靠 retention（保留策略）整段删除，去重只能靠 compaction（压实）重写日志段，单条消息的"修改"在 Kafka 里根本不存在这个操作。</p>
 <h3 id="s183">8.5.3 为什么三个软件选择如此不同</h3>
 <p>它们选择如此不同，各家的核心场景不同，格式自然不同。</p>
@@ -5589,8 +5589,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这条思路可以概括为：<strong>稀疏索引用"少量顺序扫描"换"索引小到能常驻内存"。</strong> 设计索引时，先想清楚索引能不能放进内存，放不进就考虑稀疏化：这种方式在大多数场景下比追求严格 O(log n) 更划算。</p>
 <h3 id="s188">8.6.4 原则四：可靠性要付性能代价，但要知道防的是哪类故障</h3>
 <p>每加一层可靠性机制，都对应一类故障，也对应一份性能代价。</p>
-<p>MySQL 的双写缓冲防止断电导致 16KB 页半写，保证页完整性，代价是同一份脏页刷两次盘（写放大）。重做日志保证已提交事务的修改在页未刷盘时也能重放回来，代价是每次修改多记一条日志。CRC 校验用来检测磁盘静默损坏（bit rot），代价是每次读写多算一次校验和。</p>
-<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。MySQL 8.0 在底层存储支持原子写时允许关掉双写缓冲：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但重做日志不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
+<p>MySQL 的双写缓冲防止断电导致 16KB 页半写，保证页完整性，代价是同一份脏页刷两次盘（写放大）。redo log 保证已提交事务的修改在页未刷盘时也能重放回来，代价是每次修改多记一条日志。CRC 校验用来检测磁盘静默损坏（bit rot），代价是每次读写多算一次校验和。</p>
+<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。MySQL 8.0 在底层存储支持原子写时允许关掉双写缓冲：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但 redo log 不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
 <p>加可靠性机制前，先问"我针对的是哪类故障，这类故障下层有没有更便宜的解法"。盲目堆冗余只会换来无谓的写放大；精准识别故障并让下层承担，写放大就降得下来。</p>
 <h3 id="s189">8.6.5 原则五：格式一旦发布就是长期债务</h3>
 <p>最后一条回到 8.1.2 的第四个张力。存储格式发布即定型，业务会变、字段要加、编码要换、旧 bug 要修，全都要在原格式上做兼容。版本号、保留字段、Magic、编码切换，都是为未来留的口子。</p>
@@ -5697,8 +5697,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>图 8-8 存储格式设计决策树：从访问模式推到格式骨架。</p>
 <p>这张决策树把三问可视化：第一问"会不会原地改"分出定长页与追加两条主干；第二问在"随机定位要快"还是"批量流式进出"之间进一步细分，把定长页引向 MySQL 的页式范式、把追加引向 Kafka 的日志范式或 Redis 的快照范式；第三问"五年后是否可读"横跨所有路径，决定版本号与兼容性投资。三问回答完毕，格式骨架的方向就清晰了。</p>
 <h2 id="s191">8.7 小结</h2>
-<p>三种格式的差异源于访问模式的不同。Redis 拿磁盘当内存的保险副本，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和重做日志是它给断电加的保险；Kafka 永远只追加，靠 Record Batch 压一批、稀疏索引定位，把吞吐拉满。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改付双写与重做日志的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则干脆连"原地改"这个选项都不要了。</p>
-<p>存储格式的选择会长期绑住一个系统：页式再调优也追不上追加日志的写吞吐，追加日志再优化也做不了原地事务。而设计一个格式时，第一个该问的问题是“五年后还能不能加字段、换编码”，省字节决定当下的快慢，可演进性决定这格式三五年后是还能用，还是只能推倒重写。AOF 的 rewrite buffer、重做日志的循环写、Kafka 的 retention 与 compaction，这些机制都能看到"格式决定了什么能被增量同步、什么必须全量重建"这条主线，为第 9 章的数据同步讨论打下基础。</p></section>
+<p>三种格式的差异源于访问模式的不同。Redis 拿磁盘当内存的保险副本，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它给断电加的保险；Kafka 永远只追加，靠 Record Batch 压一批、稀疏索引定位，把吞吐拉满。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改付双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则干脆连"原地改"这个选项都不要了。</p>
+<p>存储格式的选择会长期绑住一个系统：页式再调优也追不上追加日志的写吞吐，追加日志再优化也做不了原地事务。而设计一个格式时，第一个该问的问题是“五年后还能不能加字段、换编码”，省字节决定当下的快慢，可演进性决定这格式三五年后是还能用，还是只能推倒重写。AOF 的 rewrite buffer、redo log 的循环写、Kafka 的 retention 与 compaction，这些机制都能看到"格式决定了什么能被增量同步、什么必须全量重建"这条主线，为第 9 章的数据同步讨论打下基础。</p></section>
 <section class="chapter" id="ch9"><h1 id="s192">第 9 章 数据同步机制 — 集群一致性的实现</h1>
 <h2 id="s193">本章导读</h2>
 <p>当系统扩展到多副本时，开始有了"多份数据"：主节点带几个从节点、多机房多活、甚至只是 Redis 缓存配着 MySQL 数据库。一旦数据不止一份，一个关键问题随之而来：主节点刚写入的那条记录，从节点什么时候能看到。缓存和数据库不一致时该以谁为准，中间网络断了重连之后又怎么把漏掉的部分补上而不重复。处理不好，轻则用户看到旧数据，重则多卖了库存、转多了账。</p>
@@ -6537,20 +6537,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s239">10.1.1 一张表收束九章</h3>
 <p>下表把第 1 到第 9 章的【核心问题 / Redis 决策 / MySQL 决策 / Kafka 决策 / 一句话共性启示】压缩进同一张坐标系。竖看能看出三个软件的定位，横看能看出每一主题的母题。</p>
 <p><strong>表 10-1 九章启示总表</strong></p>
-<div class="table-wrap"><table><thead><tr><th>章</th><th>核心问题</th><th>Redis 的关键决策</th><th>MySQL 的关键决策</th><th>Kafka 的关键决策</th><th>一句话共性启示</th></tr></thead><tbody><tr><td>第 1 章 引言</td><td>选哪三个软件做样本</td><td>内存型代表</td><td>持久化型代表</td><td>流式型代表</td><td>范式互补才有研究价值，差异越大共性越显形</td></tr><tr><td>第 2 章 数据结构与协议</td><td>如何定义数据格式与通信协议</td><td>RESP 文本协议 + SDS/ziplist/listpack 按数据量自适应</td><td>二进制协议 + Dynamic 行格式</td><td>RecordBatch V2 批量编码 + 变长整数/增量时间戳</td><td>编码对齐访问模式；协议即存储格式</td></tr><tr><td>第 3 章 生命周期</td><td>启动关闭如何不丢状态</td><td>RDB/AOF 重放重建内存</td><td>重做日志 + binlog 两阶段提交保提交一致；崩溃恢复重放重做日志、用 undo log 回滚未提交事务</td><td>Controller 选举 + 日志截断到 HW</td><td>启动与关闭是"状态机迁移"</td></tr><tr><td>第 4 章 内存与磁盘</td><td>谁是真相之源</td><td>内存为家、磁盘是保险</td><td>磁盘为家、内存是缓冲池</td><td>磁盘日志为家、PageCache 加速</td><td>持久化与性能的对立是表象，真相是"谁说了算"</td></tr><tr><td>第 5 章 分层架构</td><td>怎么让系统可替换</td><td>robj type/encoding 解耦直连</td><td>THD + Handler 虚函数（可插拔引擎）</td><td>RequestChannel 队列 + 网络协议</td><td>分层是为了让"可替换"成为可能，层间通信决定演进自由度</td></tr><tr><td>第 6 章 安全</td><td>主体能对客体做什么</td><td>从无密码演进到 ACL</td><td>细粒度 grant 表刻进数据字典</td><td>SASL + ACL + 端到端 TLS</td><td>安全是与权限模型同源的能力边界，越早建模演进越省</td></tr><tr><td>第 7 章 集群</td><td>多副本怎么一致</td><td>主从 → Sentinel → Cluster 槽分片 + Gossip</td><td>异步 → 半同步 → MGR（Paxos 类多数派）</td><td>Partition + ISR + KRaft（去 ZooKeeper）</td><td>按一致性需求逐级抬价的阶梯</td></tr><tr><td>第 8 章 存储格式</td><td>字节怎么摆才好访问</td><td>RDB/AOF 为"全量加载 + 增量回放"优化</td><td>16KB 页 + B+树为"点查 + 范围扫描"优化</td><td>Segment + 稀疏索引为"顺序追加 + 偏移量定位"优化</td><td>存储单元要对齐访问单元，格式发布即长期债务</td></tr><tr><td>第 9 章 数据同步</td><td>怎么让两个状态机一致</td><td>PSYNC（部分重同步 + 全量回退）</td><td>binlog + GTID（基于事务的精确位点）</td><td>ISR + leader epoch 截断 + acks/幂等/事务</td><td>复制是用可比的进度坐标（复制偏移量/GTID/偏移量）对齐状态机</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>章</th><th>核心问题</th><th>Redis 的关键决策</th><th>MySQL 的关键决策</th><th>Kafka 的关键决策</th><th>一句话共性启示</th></tr></thead><tbody><tr><td>第 1 章 引言</td><td>选哪三个软件做样本</td><td>内存型代表</td><td>持久化型代表</td><td>流式型代表</td><td>范式互补才有研究价值，差异越大共性越显形</td></tr><tr><td>第 2 章 数据结构与协议</td><td>如何定义数据格式与通信协议</td><td>RESP 文本协议 + SDS/ziplist/listpack 按数据量自适应</td><td>二进制协议 + Dynamic 行格式</td><td>RecordBatch V2 批量编码 + 变长整数/增量时间戳</td><td>编码对齐访问模式；协议即存储格式</td></tr><tr><td>第 3 章 生命周期</td><td>启动关闭如何不丢状态</td><td>RDB/AOF 重放重建内存</td><td>redo log + binlog 两阶段提交保提交一致；崩溃恢复重放 redo log、用 undo log 回滚未提交事务</td><td>Controller 选举 + 日志截断到 HW</td><td>启动与关闭是"状态机迁移"</td></tr><tr><td>第 4 章 内存与磁盘</td><td>谁是真相之源</td><td>内存为家、磁盘是保险</td><td>磁盘为家、内存是缓冲池</td><td>磁盘日志为家、PageCache 加速</td><td>持久化与性能的对立是表象，真相是"谁说了算"</td></tr><tr><td>第 5 章 分层架构</td><td>怎么让系统可替换</td><td>robj type/encoding 解耦直连</td><td>THD + Handler 虚函数（可插拔引擎）</td><td>RequestChannel 队列 + 网络协议</td><td>分层是为了让"可替换"成为可能，层间通信决定演进自由度</td></tr><tr><td>第 6 章 安全</td><td>主体能对客体做什么</td><td>从无密码演进到 ACL</td><td>细粒度 grant 表刻进数据字典</td><td>SASL + ACL + 端到端 TLS</td><td>安全是与权限模型同源的能力边界，越早建模演进越省</td></tr><tr><td>第 7 章 集群</td><td>多副本怎么一致</td><td>主从 → Sentinel → Cluster 槽分片 + Gossip</td><td>异步 → 半同步 → MGR（Paxos 类多数派）</td><td>Partition + ISR + KRaft（去 ZooKeeper）</td><td>按一致性需求逐级抬价的阶梯</td></tr><tr><td>第 8 章 存储格式</td><td>字节怎么摆才好访问</td><td>RDB/AOF 为"全量加载 + 增量回放"优化</td><td>16KB 页 + B+树为"点查 + 范围扫描"优化</td><td>Segment + 稀疏索引为"顺序追加 + 偏移量定位"优化</td><td>存储单元要对齐访问单元，格式发布即长期债务</td></tr><tr><td>第 9 章 数据同步</td><td>怎么让两个状态机一致</td><td>PSYNC（部分重同步 + 全量回退）</td><td>binlog + GTID（基于事务的精确位点）</td><td>ISR + leader epoch 截断 + acks/幂等/事务</td><td>复制是用可比的进度坐标（复制偏移量/GTID/偏移量）对齐状态机</td></tr></tbody></table></div>
 <p>这张表里的共性启示列将在 10.2 节提炼为规律，关键决策列将在 10.3 节转化为取舍维度。九条启示串起来只有一条主线：<strong>约束划定了边界，目标决定了取舍的方向</strong>。各自都面对同样的物理约束（内存有限、磁盘慢、网络会分区、机器会宕），但各自优先保证的目标不同：Redis 优先延迟，MySQL 优先正确性，Kafka 优先吞吐。表 10-1 已经收束了每章的核心启示与关键决策，下面直接进入提炼。</p>
 <hr>
 <h2 id="s240">10.2 共性规律：三个软件用不同语言讲同一套骨架</h2>
 <p>下面把九章启示提炼为五条可复用的架构共性规律。每条规律包含：一句话总结、三个软件印证、以及如何应用到你自己的系统。</p>
 <h3 id="s241">10.2.1 规律一：先定"真相之源"，其余皆为派生</h3>
 <blockquote><strong>系统里只能有一个真相之源（source of truth），其他全是它的派生物。派生物可以丢，真相之源不能丢。</strong></blockquote>
-<p>它们用不同的说法讲同一句话。Redis 把内存当作真相之源，RDB/AOF 只是内存派生的快照，所以 Redis 崩溃可以容忍丢几秒（取决于 <code>appendfsync</code>），但不能容忍内存里的键值对算错。在 MySQL 中，磁盘上的重做日志是真相之源，缓冲池里的脏页只是重做日志的派生物，所以缓冲池脏页丢了无所谓，重做日志不能丢；<code>innodb_flush_log_at_trx_commit=1</code> 保证重做日志每事务落盘不丢，双写缓冲则保证"脏页刷盘时不被撕裂"（撕裂的页重做日志也救不回来）。在 Kafka 中，磁盘上的日志 Segment 是真相之源，PageCache 与消费者偏移量都是派生物，所以日志是"家"，副本只是"抄家"，消费者偏移量甚至可以丢，因为它可以重放日志重新算出来。</p>
+<p>它们用不同的说法讲同一句话。Redis 把内存当作真相之源，RDB/AOF 只是内存派生的快照，所以 Redis 崩溃可以容忍丢几秒（取决于 <code>appendfsync</code>），但不能容忍内存里的键值对算错。在 MySQL 中，磁盘上的 redo log 是真相之源，缓冲池里的脏页只是 redo log 的派生物，所以缓冲池脏页丢了无所谓，redo log 不能丢；<code>innodb_flush_log_at_trx_commit=1</code> 保证 redo log 每事务落盘不丢，双写缓冲则保证"脏页刷盘时不被撕裂"（撕裂的页 redo log 也救不回来）。在 Kafka 中，磁盘上的日志 Segment 是真相之源，PageCache 与消费者偏移量都是派生物，所以日志是"家"，副本只是"抄家"，消费者偏移量甚至可以丢，因为它可以重放日志重新算出来。</p>
 <p>拿到你自己的系统里：设计一个有状态系统，第一件事先回答"谁是真相之源"。这个答案一旦模糊，故障恢复就会失控，因为恢复时你不知道该信谁。一个常见的反例是把缓存和数据库都当真相之源，结果两者不一致时系统行为不可预测。规律一的核心：派生物可以重建，真相之源必须被守护，二者不能颠倒。</p>
 <h3 id="s242">10.2.2 规律二：用"层"把可变性关进笼子</h3>
 <p>层是工程上对付变化的手法，Redis、MySQL、Kafka 各自用层解耦了不同维度的变化：可变的细节用层包起来，稳定的契约留在层与层之间。Redis 的 redisObject 把"语义类型（type）"和"底层编码（encoding）"解耦，同一个 hash 语义底层可以是 listpack 也可以是 hashtable，逻辑层只认 type、存储层管 encoding，于是 Redis 能根据数据大小动态换底层结构而不动上层逻辑，付的代价是一次类型检查的间接寻址。MySQL 的 Handler API 把存储引擎做成可插拔的层，Server 层（解析、优化、执行）稳定、InnoDB/MyISAM 可替换，同一个 SQL 能在引擎间迁移，因为契约落在 Handler 接口上，代价是虚函数调用与跨层上下文（THD）传递。Kafka 把 Log 抽象成接口，UnifiedLog / Partition / Segment 分层，上层 API 不关心 Segment 怎么切，Tiered Storage 能把冷段挪到对象存储而无需改动上层读写路径，同样付了分层带来的间接性。</p>
 <p>当你在两套实现之间犹豫，先抽接口。接口稳定了，实现可以一个一个换、一个一个演进，而不会牵一发动全身。规律二的潜台词是：<strong>稳定的契约向内收敛，多变的实现向外发散</strong>，这是一个比"高内聚低耦合"更可操作的判据：层与层之间只通过稳定的接口交互，不暴露实现细节。</p>
 <h3 id="s243">10.2.3 规律三：把随机变成顺序，把一次变成一批</h3>
-<p>硬件天然对顺序与批量友好，架构设计上的巧思常常就是替硬件把随机改写成顺序、把单条改写成批量，这条规律在它们的性能优化里反复出现。Redis 的管道（pipeline）与 Multi/Exec 把 N 次网络往返合并成 1 次 RTT，AOF 重写把碎片化的历史命令重新合并成一份快照，本质上都是在把一次变成一批。MySQL 的 Change Buffer 把对二级索引的随机写攒成批量，组提交把多个事务的重做日志一次 fsync，预读把随机页请求变成顺序预取，说白了都是在替硬件把随机改写成顺序。Kafka 的 Record Batch 把多条消息打包成一个存储单元，生产者攒批 + 副本 FETCH 也批量拉，零拷贝（sendfile）让一批数据跳过用户态直接从页缓存到网卡，把三件事一起批了。</p>
+<p>硬件天然对顺序与批量友好，架构设计上的巧思常常就是替硬件把随机改写成顺序、把单条改写成批量，这条规律在它们的性能优化里反复出现。Redis 的管道（pipeline）与 Multi/Exec 把 N 次网络往返合并成 1 次 RTT，AOF 重写把碎片化的历史命令重新合并成一份快照，本质上都是在把一次变成一批。MySQL 的 Change Buffer 把对二级索引的随机写攒成批量，组提交把多个事务的 redo log 一次 fsync，预读把随机页请求变成顺序预取，说白了都是在替硬件把随机改写成顺序。Kafka 的 Record Batch 把多条消息打包成一个存储单元，生产者攒批 + 副本 FETCH 也批量拉，零拷贝（sendfile）让一批数据跳过用户态直接从页缓存到网卡，把三件事一起批了。</p>
 <p>为什么这条规律这么普适？因为底层硬件（机械臂、闪存页、网卡包、CPU 缓存行）几乎都对"顺序 + 批量"友好、对"随机 + 单条"不友好。软件架构师能做到的最大性能杠杆，往往是替硬件改写访问模式，靠堆 CPU 收益有限。性能优化先问"这里能不能批、能不能顺序"，再去想换更快的硬件。如果你发现自己在一个循环里反复单条调用，就该想想规律三：把单条攒成批。</p>
 <h3 id="s244">10.2.4 规律四：可靠性要用性能去买，但要知道买的是什么</h3>
 <blockquote><strong>每一次更强的一致性，都是用一次额外的同步等待换来的。代价摆在明面上，选择权在你。</strong></blockquote>
@@ -6853,7 +6853,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s252">10.4.1 架构设计 checklist：动手前先回答的 12 个问题</h3>
 <p>把 10.3 的五个维度拆成 12 个具体问题，按"数据 / 性能 / 可靠性 / 运维"四类组织。表 10-2 把每个问题连同"三个软件如何回答"和"你的系统该回答什么"摆在一起，作为动手前的自检工具。</p>
 <p><strong>表 10-2 架构设计 checklist（12 问）</strong></p>
-<div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>谁是真相之源？</td><td>内存键空间</td><td>重做日志</td><td>日志 Segment</td><td>写下一个名字，并说清派生物有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 偏移量定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、PageCache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>低延迟优先</td><td>稳定延迟优先</td><td>高吞吐下的可接受延迟</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>热点 key 与单线程上限</td><td>事务提交与锁冲突上限</td><td>批量、分区、Broker 数决定上限</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单 partition 易成热点</td><td>标出最热的 key/行/partition 与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认约 1 秒量级窗口（开启 AOF 后）</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（Recovery Time Objective，RTO）？</td><td>RDB 加载或 AOF 重放</td><td>重做日志重做 + 回滚日志回滚</td><td>Leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换剧本</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加 partition 受限、加 Broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 Broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>Broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>谁是真相之源？</td><td>内存键空间</td><td>redo log</td><td>日志 Segment</td><td>写下一个名字，并说清派生物有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 偏移量定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、PageCache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>低延迟优先</td><td>稳定延迟优先</td><td>高吞吐下的可接受延迟</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>热点 key 与单线程上限</td><td>事务提交与锁冲突上限</td><td>批量、分区、Broker 数决定上限</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单 partition 易成热点</td><td>标出最热的 key/行/partition 与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认约 1 秒量级窗口（开启 AOF 后）</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（Recovery Time Objective，RTO）？</td><td>RDB 加载或 AOF 重放</td><td>redo 重放 + 回滚日志回滚</td><td>Leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换剧本</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加 partition 受限、加 Broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 Broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>Broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
 <p>这张表的用法是借它们的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，它们的默认值差异巨大：这是业务问题，得让业务方拍板。12 个问题答完，选型往往就自然确定了：约束已经替决策做了大部分工作。</p>
 <h3 id="s253">10.4.2 认知跃迁的四层台阶</h3>
 <p>读这本书的过程，是一次认知坐标系的变换。这个坐标系分四层。</p>
@@ -6936,11 +6936,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 10-3 认知跃迁的四层台阶</figcaption></figure>
 <p>图 10-3 认知跃迁的四层台阶：L1 使用者到 L4 创新者，四层之间的差距是"看问题的坐标系"在逐层升级；本书第 1–9 章带读者完成 L1→L2，本章推动 L2→L3。</p>
 <p>从下到上四层：L1 是使用者，标志是会配置、会调优、知道"怎么用 Redis/SQL"，问题以"是什么、怎么配"开头；L2 是理解者，标志是懂内部机制、能讲清"为什么这么设计"，问题以"为什么"开头；L3 是设计者，标志是能借鉴思想设计自己的系统，问题以"换我怎么做"开头；L4 是创新者，标志是能定义新的架构范式。本书的 9 章对应 L1→L2 的跃迁：把你从"会用"带到"懂机制"；本章对应 L2→L3 的跃迁：把你从"懂机制"带到"能迁移"。</p>
-<p>L3 是分水岭，因为从这里开始，你回答的问题从"它是什么"换成了"换我怎么做"。L3 的核心能力可以拆成三项，每一项都能在三个软件里找到印证。<strong>抽象能力</strong>：能从 B+树、跳表、稀疏索引里看出同一个"索引"的本质，能从重做日志、AOF、Kafka 日志里看出同一个"预写日志"的本质；更进一步，能从 PSYNC2、GTID、ISR 里看出"用可比位点对齐两个状态机"这个共性。抽象能力让你能从一万个细节里抽出五个模式。<strong>权衡能力</strong>：理解每个选项的机会成本。比如 Redis 用"命令执行单线程"换无锁快，代价是吃不满多核；MySQL 的每次 fsync 换来断电不丢，代价是吞吐被压低；Kafka 的多副本换来高可用，但延迟和复杂度都上去了。权衡能力让你能说清"为什么不选另一个方案"。<strong>工程直觉</strong>：快速识别瓶颈（是 CPU、是 I/O、是网络、还是锁），预判规模放大后的表现（数据量翻十倍哪个组件先崩）。直觉来自反复实验，不能只靠读。</p>
+<p>L3 是分水岭，因为从这里开始，你回答的问题从"它是什么"换成了"换我怎么做"。L3 的核心能力可以拆成三项，每一项都能在三个软件里找到印证。<strong>抽象能力</strong>：能从 B+树、跳表、稀疏索引里看出同一个"索引"的本质，能从 redo log、AOF、Kafka 日志里看出同一个"预写日志"的本质；更进一步，能从 PSYNC2、GTID、ISR 里看出"用可比位点对齐两个状态机"这个共性。抽象能力让你能从一万个细节里抽出五个模式。<strong>权衡能力</strong>：理解每个选项的机会成本。比如 Redis 用"命令执行单线程"换无锁快，代价是吃不满多核；MySQL 的每次 fsync 换来断电不丢，代价是吞吐被压低；Kafka 的多副本换来高可用，但延迟和复杂度都上去了。权衡能力让你能说清"为什么不选另一个方案"。<strong>工程直觉</strong>：快速识别瓶颈（是 CPU、是 I/O、是网络、还是锁），预判规模放大后的表现（数据量翻十倍哪个组件先崩）。直觉来自反复实验，不能只靠读。</p>
 <p>从使用者到设计者的转变，本质是换一套看问题的坐标系——也就是换一套提问方式。</p>
 <h3 id="s254">10.4.3 持续学习与全书收束</h3>
 <p>读完本书只是起点。三条学习路径，供参考。</p>
-<p>读源码。从 Redis 起步，它的代码量小、数据结构清晰，C 语言的直白让你能从命令处理一路追到内存表示，几周就能通读核心路径。再读 InnoDB，重点看页结构、B+树、重做日志/回滚日志、MVCC，这部分代码厚但思路连贯。最后读 Kafka 的 Log 与 ReplicaManager，理解"日志即真相"的工程实现。读源码的姿势是带着问题去：比如"双 1 真的能保证不丢吗，看代码怎么 fsync 的"。</p>
+<p>读源码。从 Redis 起步，它的代码量小、数据结构清晰，C 语言的直白让你能从命令处理一路追到内存表示，几周就能通读核心路径。再读 InnoDB，重点看页结构、B+树、redo log/回滚日志、MVCC，这部分代码厚但思路连贯。最后读 Kafka 的 Log 与 ReplicaManager，理解"日志即真相"的工程实现。读源码的姿势是带着问题去：比如"双 1 真的能保证不丢吗，看代码怎么 fsync 的"。</p>
 <p>改参数看行为，是最快的理解方式。把 Redis 的 <code>appendfsync</code> 从 <code>everysec</code> 改成 <code>always</code>，用 <code>redis-benchmark</code> 看吞吐怎么跌。把 MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 从 1 改成 0，强杀进程看丢多少。把 Kafka 的 <code>acks</code> 从 all 改成 1，断一个 Broker 看消息丢不丢。亲手制造一次"丢数据"，你对参数的代价就有了肌肉记忆。</p>
 <p>跨领域对照。数据库、消息队列、缓存、搜索引擎共享底层原理：它们都在回答同一组问题：真相之源在哪、怎么批、怎么一致、怎么恢复。读完三本不同领域的书，把它们摆在 10.2 的五条规律上一对照，你会发现"换皮不换骨"。这种对照能力，是 L3 设计者最重要的资产。</p>
 <p>三个值得留意的倾向。<strong>先选技术再找场景</strong>：手拿一把锤子到处找钉子，是很容易不知不觉陷进去的惯性。<strong>追求面面俱到</strong>：什么都想要、什么参数都设最严，结果系统在每个维度都平庸。<strong>把一致性当信仰而非价签</strong>：盲目追求"强一致"，却不问业务是否需要，付了不必要的延迟和复杂度。</p>

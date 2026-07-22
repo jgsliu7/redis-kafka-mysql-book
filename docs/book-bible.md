@@ -110,7 +110,7 @@
 
 | 英文 | 首次标注 | 后续用 | 说明 |
 |------|---------|--------|------|
-| redo log | 重做日志（redo log） | **英文** | 工程界日常用语，说"redo log"不做"重做日志" |
+| redo log | redo log（重做日志） | **英文** | 工程界日常用语，说"redo log"不做"重做日志" |
 | undo log | 回滚日志（undo log） | **英文** | 同上 |
 | binlog | binlog（二进制日志） | **英文** | 工程师只说 binlog |
 | WAL | WAL（预写日志，Write-Ahead Log） | **英文** | 缩写优先 |

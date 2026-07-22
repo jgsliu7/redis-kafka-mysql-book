@@ -14,7 +14,7 @@
 
   <!-- Title -->
   <text x="480" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 4-5　MySQL 一次写操作的全链路时序</text>
-  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写重做日志）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
+  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写 redo log）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
 
   <!-- Lifelines (actors) -->
   <!-- Client -->
@@ -36,8 +36,8 @@
 
   <!-- Redo Log -->
   <rect x="620" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">重做日志</text>
-  <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">redo log（顺序写）</text>
+  <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">redo log</text>
+  <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">（顺序写）</text>
   <line x1="690" y1="130" x2="690" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
 
   <!-- Disk -->
@@ -53,7 +53,7 @@
 
   <!-- 2. WAL: write redo log FIRST -->
   <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
-  <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写重做日志（WAL，顺序写）</text>
+  <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写 redo log（WAL，顺序写）</text>
   <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">「这页要怎么改」先落盘，崩溃后可重放</text>
 
   <!-- 3. modify buffer pool page (in memory) -->
@@ -69,7 +69,7 @@
 
   <!-- 4. COMMIT -->
   <line x1="284" y1="340" x2="100" y2="340" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
-  <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（重做日志已落盘 → 持久化达成）</text>
+  <text x="192" y="333" text-anchor="middle" font-size="11" fill="#374151">④ 返回提交成功（redo log 已落盘 → 持久化达成）</text>
 
   <!-- Divider -->
   <line x1="40" y1="370" x2="940" y2="370" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="6,4"/>
@@ -99,7 +99,7 @@
   <!-- 8. Crash recovery note -->
   <rect x="40" y="612" width="880" height="76" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="634" font-size="13" font-weight="700" fill="#111827">崩溃恢复（重启时）</text>
-  <text x="60" y="656" font-size="12" fill="#374151">重做日志已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
+  <text x="60" y="656" font-size="12" fill="#374151">redo log 已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
   <text x="60" y="676" font-size="11" fill="#6B7280">核心：随机写数据页慢且易损坏 → 用顺序日志保住可靠与速度。</text>
 
   <!-- legend -->

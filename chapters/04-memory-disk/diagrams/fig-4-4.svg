@@ -99,8 +99,8 @@
 
   <!-- Disk -->
   <rect x="320" y="520" width="600" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / 重做日志）</text>
-  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠重做日志重放补齐</text>
+  <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / redo log）</text>
+  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠 redo log 重放补齐</text>
 
   <!-- Flush -> Disk -->
   <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>
