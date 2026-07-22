@@ -45,7 +45,7 @@
   <text x="175" y="400" text-anchor="middle" font-size="12" fill="#374151">16384 槽分片 + Gossip</text>
   <text x="175" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：扩展 + 自动容错</text>
 
-  <text x="175" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：归类有争议（异步复制偏 AP，分区时少数派停写偏 CP）</text>
+  <text x="175" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：异步复制偏 AP，分区时少数派停写偏 CP（见 7.2.3）</text>
 
   <!-- ===== MySQL column ===== -->
   <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>

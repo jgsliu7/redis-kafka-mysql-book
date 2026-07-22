@@ -1,165 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="arrow-1-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　三款软件在五个维度上的定位雷达</text>
-  <text x="440" y="52" text-anchor="middle" font-size="12.5" fill="#374151">Redis 朝「低延迟」凸 · MySQL 朝「强一致 / 容量 / 查询」凸 · Kafka 朝「高吞吐」凸</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　全书章节地图</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
 
-  <!-- ============ 雷达网格（中心 300,330，R=200） ============ -->
+  <!-- ============ 起点：第 1 章 引言 ============ -->
+  <rect x="380" y="72" width="200" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.8"/>
+  <text x="480" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 1 章 · 引言</text>
+  <text x="480" y="116" text-anchor="middle" font-size="12" fill="#374151">为什么是这三款软件</text>
 
-  <!-- 3 档同心五边形（score 1 / 3 / 5） -->
-  <polygon points="300.0,290.0 338.0,317.6 323.5,362.4 276.5,362.4 262.0,317.6"
-           fill="none" stroke="#E5E7EB" stroke-width="1"/>
-  <polygon points="300.0,210.0 414.1,292.9 370.5,427.1 229.5,427.1 185.9,292.9"
-           fill="none" stroke="#E5E7EB" stroke-width="1"/>
-  <polygon points="300.0,130.0 490.2,268.2 417.6,491.8 182.4,491.8 109.8,268.2"
-           fill="none" stroke="#D1D5DB" stroke-width="1.3"/>
+  <!-- 引言 → 主体 起点 -->
+  <line x1="480" y1="128" x2="480" y2="158" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="492" y="148" font-size="11.5" fill="#6B7280">全书脉络由此展开</text>
 
-  <!-- 5 条轴线（中心 → 各顶点） -->
-  <g stroke="#D1D5DB" stroke-width="1">
-    <line x1="300" y1="330" x2="300.0" y2="130.0"/>
-    <line x1="300" y1="330" x2="490.2" y2="268.2"/>
-    <line x1="300" y1="330" x2="417.6" y2="491.8"/>
-    <line x1="300" y1="330" x2="182.4" y2="491.8"/>
-    <line x1="300" y1="330" x2="109.8" y2="268.2"/>
-  </g>
+  <!-- ============ 第一组：第 2-4 章（数据结构 / 生命周期 / 内存磁盘） ============ -->
+  <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　地基：数据怎么表示、怎么存活</text>
 
-  <!-- 刻度数字（在顶部轴上标 1/3/5） -->
-  <g font-size="9.5" fill="#9CA3AF" text-anchor="start">
-    <text x="305" y="293">1</text>
-    <text x="305" y="213">3</text>
-    <text x="305" y="143">5</text>
-  </g>
+  <!-- 第 2 章 数据结构与协议 -->
+  <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="56" y="218" font-size="14" font-weight="700" fill="#111827">第 2 章　数据结构与协议</text>
+  <text x="56" y="238" font-size="12" fill="#374151">核心问题：数据在内存里、在线上长什么样？</text>
+  <text x="56" y="258" font-size="11.5" fill="#6B7280">内部结构 · 编码升级 · 通信协议</text>
 
-  <!-- 中心点 -->
-  <circle cx="300" cy="330" r="2.2" fill="#6B7280"/>
+  <!-- 第 3 章 生命周期 -->
+  <rect x="340" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="356" y="218" font-size="14" font-weight="700" fill="#111827">第 3 章　生命周期管理</text>
+  <text x="356" y="238" font-size="12" fill="#374151">核心问题：进程怎么优雅地启动与关闭？</text>
+  <text x="356" y="258" font-size="11.5" fill="#6B7280">信号处理 · 初始化顺序 · 优雅停机</text>
 
-  <!-- 维度标签（轴顶端） -->
-  <g font-size="13" font-weight="700" fill="#111827" text-anchor="middle">
-    <text x="300.0" y="112">低延迟</text>
-    <text x="528" y="265">高吞吐</text>
-    <text x="442" y="514">强一致性</text>
-    <text x="158" y="514">数据容量</text>
-    <text x="72" y="265">查询灵活度</text>
-  </g>
-  <!-- 维度小注 -->
-  <g font-size="10.5" fill="#6B7280" text-anchor="middle">
-    <text x="300.0" y="126">越小越快</text>
-    <text x="528" y="280">每秒处理量</text>
-    <text x="442" y="528">不丢不重</text>
-    <text x="158" y="528">能存多少</text>
-    <text x="72" y="280">SQL/过滤/聚合</text>
-  </g>
+  <!-- 第 4 章 内存与磁盘 -->
+  <rect x="640" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="656" y="218" font-size="14" font-weight="700" fill="#111827">第 4 章　内存与磁盘的舞蹈</text>
+  <text x="656" y="238" font-size="12" fill="#374151">核心问题：数据放哪？怎么不丢？</text>
+  <text x="656" y="258" font-size="11.5" fill="#6B7280">缓冲池 · 页缓存 · WAL · 零拷贝</text>
 
-  <!-- ============ 三款软件多边形 ============ -->
+  <!-- 横向递进箭头（2 → 3 → 4） -->
+  <line x1="320" y1="232" x2="338" y2="232" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="232" x2="638" y2="232" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- Redis 多边形: 5,3,2,1,2 -->
-  <polygon points="300.0,130.0 414.1,292.9 347.0,394.7 276.5,362.4 223.9,305.3"
-           fill="#4F46E5" fill-opacity="0.18" stroke="#4F46E5" stroke-width="2"/>
-  <g fill="#4F46E5">
-    <circle cx="300.0" cy="130.0" r="3.5"/>
-    <circle cx="414.1" cy="292.9" r="3.5"/>
-    <circle cx="347.0" cy="394.7" r="3.5"/>
-    <circle cx="276.5" cy="362.4" r="3.5"/>
-    <circle cx="223.9" cy="305.3" r="3.5"/>
-  </g>
+  <!-- 第一组 → 第二组 -->
+  <line x1="480" y1="270" x2="480" y2="300" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- MySQL 多边形: 2,2,5,5,5 -->
-  <polygon points="300.0,250.0 376.1,305.3 417.6,491.8 182.4,491.8 109.8,268.2"
-           fill="#D97706" fill-opacity="0.18" stroke="#D97706" stroke-width="2"/>
-  <g fill="#D97706">
-    <circle cx="300.0" cy="250.0" r="3.5"/>
-    <circle cx="376.1" cy="305.3" r="3.5"/>
-    <circle cx="417.6" cy="491.8" r="3.5"/>
-    <circle cx="182.4" cy="491.8" r="3.5"/>
-    <circle cx="109.8" cy="268.2" r="3.5"/>
-  </g>
+  <!-- ============ 第二组：第 5-7 章（分层 / 安全 / 集群） ============ -->
+  <text x="40" y="324" font-size="13" font-weight="600" fill="#374151">第二组　骨架与治理：怎么切层、怎么扩容、谁能进</text>
 
-  <!-- Kafka 多边形: 3,5,3,4,1 -->
-  <polygon points="300.0,210.0 490.2,268.2 370.5,427.1 206.0,459.4 262.0,317.6"
-           fill="#059669" fill-opacity="0.18" stroke="#059669" stroke-width="2"/>
-  <g fill="#059669">
-    <circle cx="300.0" cy="210.0" r="3.5"/>
-    <circle cx="490.2" cy="268.2" r="3.5"/>
-    <circle cx="370.5" cy="427.1" r="3.5"/>
-    <circle cx="206.0" cy="459.4" r="3.5"/>
-    <circle cx="262.0" cy="317.6" r="3.5"/>
-  </g>
+  <!-- 第 5 章 分层架构 -->
+  <rect x="40" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="56" y="360" font-size="14" font-weight="700" fill="#111827">第 5 章　分层架构</text>
+  <text x="56" y="380" font-size="12" fill="#374151">核心问题：模块怎么切、层怎么叠？</text>
+  <text x="56" y="400" font-size="11.5" fill="#6B7280">接口 / 引擎 / 存储的层次划分</text>
 
-  <!-- ============ 右侧图例 + 评分表 ============ -->
-  <text x="600" y="120" font-size="14" font-weight="700" fill="#111827">图例与评分（0-5 分）</text>
+  <!-- 第 6 章 安全与权限 -->
+  <rect x="340" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全与权限</text>
+  <text x="356" y="380" font-size="12" fill="#374151">核心问题：谁能访问、能做什么？</text>
+  <text x="356" y="400" font-size="11.5" fill="#6B7280">认证 · ACL · 加密 · 审计</text>
 
-  <!-- Redis 图例 -->
-  <rect x="600" y="138" width="20" height="14" rx="2" fill="#4F46E5" fill-opacity="0.35" stroke="#4F46E5" stroke-width="1.8"/>
-  <text x="628" y="150" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
-  <text x="672" y="150" font-size="11.5" fill="#374151">在乎「快」</text>
+  <!-- 第 7 章 集群与高可用 -->
+  <rect x="640" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群与高可用</text>
+  <text x="656" y="380" font-size="12" fill="#374151">核心问题：单点挂了怎么办？</text>
+  <text x="656" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障切换</text>
 
-  <!-- MySQL 图例 -->
-  <rect x="600" y="162" width="20" height="14" rx="2" fill="#D97706" fill-opacity="0.35" stroke="#D97706" stroke-width="1.8"/>
-  <text x="628" y="174" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
-  <text x="678" y="174" font-size="11.5" fill="#374151">在乎「对」</text>
+  <!-- 横向递进箭头（5 → 6 → 7） -->
+  <line x1="320" y1="374" x2="338" y2="374" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="374" x2="638" y2="374" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- Kafka 图例 -->
-  <rect x="600" y="186" width="20" height="14" rx="2" fill="#059669" fill-opacity="0.35" stroke="#059669" stroke-width="1.8"/>
-  <text x="628" y="198" font-size="13" font-weight="700" fill="#059669">Kafka</text>
-  <text x="672" y="198" font-size="11.5" fill="#374151">在乎「多」</text>
+  <!-- 第二组 → 第三组 -->
+  <line x1="480" y1="412" x2="480" y2="442" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- 评分表 -->
-  <rect x="596" y="218" width="252" height="180" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
-  <!-- 表头 -->
-  <text x="608" y="238" font-size="11.5" font-weight="700" fill="#374151">维度</text>
-  <text x="744" y="238" font-size="11.5" font-weight="700" fill="#4F46E5" text-anchor="middle">Redis</text>
-  <text x="788" y="238" font-size="11.5" font-weight="700" fill="#D97706" text-anchor="middle">MySQL</text>
-  <text x="832" y="238" font-size="11.5" font-weight="700" fill="#059669" text-anchor="middle">Kafka</text>
-  <line x1="604" y1="246" x2="840" y2="246" stroke="#E5E7EB" stroke-width="1"/>
-  <!-- 行 -->
-  <g font-size="11.5" fill="#374151">
-    <text x="608" y="264">低延迟</text>
-    <text x="744" y="264" text-anchor="middle" font-weight="700" fill="#4F46E5">5</text>
-    <text x="788" y="264" text-anchor="middle">2</text>
-    <text x="832" y="264" text-anchor="middle">3</text>
+  <!-- ============ 第三组：第 8-9 章（存储格式 / 数据同步） ============ -->
+  <text x="40" y="466" font-size="13" font-weight="600" fill="#374151">第三组　落盘与搬运：格式与复制</text>
 
-    <text x="608" y="288">高吞吐</text>
-    <text x="744" y="288" text-anchor="middle">3</text>
-    <text x="788" y="288" text-anchor="middle">2</text>
-    <text x="832" y="288" text-anchor="middle" font-weight="700" fill="#059669">5</text>
+  <!-- 第 8 章 存储格式 -->
+  <rect x="40" y="478" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="56" y="502" font-size="14" font-weight="700" fill="#111827">第 8 章　存储格式</text>
+  <text x="56" y="522" font-size="12" fill="#374151">核心问题：数据在磁盘上长什么样？</text>
+  <text x="56" y="542" font-size="11.5" fill="#6B7280">页 · B+ 树 · 日志段 · 压实</text>
 
-    <text x="608" y="312">强一致性</text>
-    <text x="744" y="312" text-anchor="middle">2</text>
-    <text x="788" y="312" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
-    <text x="832" y="312" text-anchor="middle">3</text>
+  <!-- 第 9 章 数据同步 -->
+  <rect x="340" y="478" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="356" y="502" font-size="14" font-weight="700" fill="#111827">第 9 章　数据同步</text>
+  <text x="356" y="522" font-size="12" fill="#374151">核心问题：多副本间数据怎么保持一致？</text>
+  <text x="356" y="542" font-size="11.5" fill="#6B7280">复制 · 二进制日志 · ISR · 一致性级别</text>
 
-    <text x="608" y="336">数据容量</text>
-    <text x="744" y="336" text-anchor="middle">1</text>
-    <text x="788" y="336" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
-    <text x="832" y="336" text-anchor="middle">4</text>
+  <!-- 横向递进箭头（8 → 9） -->
+  <line x1="320" y1="516" x2="338" y2="516" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-    <text x="608" y="360">查询灵活度</text>
-    <text x="744" y="360" text-anchor="middle">2</text>
-    <text x="788" y="360" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
-    <text x="832" y="360" text-anchor="middle">1</text>
+  <!-- 第 9 章 → 第 10 章 -->
+  <line x1="480" y1="554" x2="480" y2="590" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-end)"/>
+  <text x="492" y="576" font-size="11.5" fill="#EF4444">共性升华</text>
 
-    <text x="608" y="388" font-size="10.5" fill="#6B7280" font-style="italic">粗体 = 该维度领先者</text>
-  </g>
+  <!-- ============ 终点：第 10 章 总结 ============ -->
+  <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
+  <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
+  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">八章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
+  <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
-  <!-- ============ 下方解读卡片 ============ -->
-  <rect x="40" y="540" width="256" height="62" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
-  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：偏科「快」</text>
-  <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分独占鳌头，</text>
-  <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
+  <!-- 左侧贯穿主线注释 -->
+  <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
+  <text x="40" y="658" font-size="11.5" fill="#374151">从"生与死"出发，经内存磁盘、分层、</text>
+  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
 
-  <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
-  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：全能「对」</text>
-  <text x="328" y="580" font-size="11" fill="#374151">一致性 / 容量 / 查询三满，</text>
-  <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
+  <!-- 右侧三款软件同题注释 -->
+  <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
+  <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
+  <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
 
-  <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
-  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：偏科「多」</text>
-  <text x="600" y="580" font-size="11" fill="#374151">高吞吐 5 分压满，</text>
-  <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
+  <!-- 底部图注 -->
+  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
 </svg>
