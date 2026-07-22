@@ -235,7 +235,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
 
   <!-- 底部结论 -->
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三款软件读懂，就等于掌握了后端架构的"基本构件"</text>
+  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三个软件读懂，就等于掌握了后端架构的"基本构件"</text>
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
 </svg>
 </div><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件</figcaption></figure>
@@ -246,7 +246,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一。它的独到之处在于提出了"数据结构服务器（data structure server）"这一抽象：它对外暴露结构化类型（字符串、哈希、列表、集合、有序集合、Stream 等），命令直接在结构上做原子操作。这一抽象让它能同时充当缓存、排行榜、消息队列、锁服务等多种角色，用一套原语统一了丰富的使用场景。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
 <p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1, 100 字节消息，作为历史参考；3.x 在同类硬件上吞吐通常更高）。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
-<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 则用顺序写换吞吐，把"多"和"广"做到了极致。</p>
+<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 则用顺序写换吞吐，把"多"和"广"做到了极致。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
 <p>如果只用一句话概括这三个软件各自的强项：Redis 的强项是极简与单点性能，MySQL 在严谨与一致性上最较真，Kafka 则以吞吐和可扩展立身。</p>
 <p>但面对架构难题，它们采用的方案不同，代价也不同。并发怎么控、数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题。后面 8 章的主题式深讲贯穿全书。</p>
@@ -339,7 +339,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="72" y="280">SQL/过滤/聚合</text>
   </g>
 
-  <!-- ============ 三款软件多边形 ============ -->
+  <!-- ============ 三个软件多边形 ============ -->
 
   <!-- Redis 多边形: 5,3,2,1,2 -->
   <polygon points="300.0,130.0 414.1,292.9 347.0,394.7 276.5,362.4 223.9,305.3"
@@ -495,7 +495,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- ============ 起点：第 1 章 引言 ============ -->
   <rect x="380" y="72" width="200" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.8"/>
   <text x="480" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 1 章 · 引言</text>
-  <text x="480" y="116" text-anchor="middle" font-size="12" fill="#374151">为什么是这三款软件</text>
+  <text x="480" y="116" text-anchor="middle" font-size="12" fill="#374151">为什么是这三个软件</text>
 
   <!-- 引言 → 主体 起点 -->
   <line x1="480" y1="128" x2="480" y2="158" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_1_3_arrow)"/>
@@ -582,7 +582,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
   <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
-  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">八章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
+  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">九章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
   <!-- 左侧贯穿主线注释 -->
@@ -590,13 +590,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="40" y="658" font-size="11.5" fill="#374151">从"生与死"出发，经内存磁盘、分层、</text>
   <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
 
-  <!-- 右侧三款软件同题注释 -->
+  <!-- 右侧三个软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
   <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
 
   <!-- 底部图注 -->
-  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
+  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>
 </div><figcaption>图 1-3：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的"生与死"出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>

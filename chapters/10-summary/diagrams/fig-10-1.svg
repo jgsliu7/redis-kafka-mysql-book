@@ -77,9 +77,9 @@
   <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
   <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
 
-  <!-- ============ 底部：三款软件印证带 ============ -->
+  <!-- ============ 底部：三个软件印证带 ============ -->
   <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三款软件印证：同一条规律，三种语言</text>
+  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三个软件印证：同一条规律，三种语言</text>
 
   <!-- Redis 列 -->
   <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>

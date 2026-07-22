@@ -10,8 +10,8 @@
   </defs>
 
   <!-- Title -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-5　三款软件故障转移决策流程对比</text>
-  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三款软件走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
+  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-5　三个软件故障转移决策流程对比</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三个软件走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
 
   <!-- ===== Column headers ===== -->
   <rect x="40"  y="70" width="280" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>

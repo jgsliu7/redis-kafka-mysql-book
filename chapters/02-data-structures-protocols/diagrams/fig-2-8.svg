@@ -6,7 +6,7 @@
     </marker>
   </defs>
 
-  <text x="440" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-8 三款软件通信协议对比</text>
+  <text x="440" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-8 三个软件通信协议对比</text>
 
   <!-- Redis RESP -->
   <rect x="20" y="50" width="270" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>

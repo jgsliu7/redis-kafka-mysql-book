@@ -8,7 +8,7 @@
 
   <!-- 标题 -->
   <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 10-2　实践者选型决策树</text>
-  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三款软件"借形不借器"</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三个软件"借形不借器"</text>
 
   <!-- ============ 根节点 ============ -->
   <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>

@@ -7,7 +7,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-7　三款软件映射到「交互 / 逻辑 / 存储」统一视角</text>
+  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-7　三个软件映射到「交互 / 逻辑 / 存储」统一视角</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">建立本章坐标系：同一组功能，落在不同的层形态里</text>
 
   <!-- 统一视角 三行标签 -->

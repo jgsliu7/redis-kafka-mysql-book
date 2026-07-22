@@ -2,7 +2,7 @@
 ## 2026-07-09 v1：✅ 一次通过
 ### 提示词
 ```
-A clean chapter roadmap diagram for a Chinese programming book titled 全书章节地图. Show a flow from Chapter 1 引言 at top through Chapters 2-9 as interconnected topic nodes arranged in a logical progression: 数据结构与协议, 生命周期管理, 内存与磁盘, 分层架构, 安全与权限, 集群架构, 存储格式, 数据同步, ending at Chapter 10 总结. Each chapter as a rounded box with number and short topic name. Arrows connecting them showing progression. Clean flat design, muted blue colors, Chinese labels, 16:9.
+A clean radar chart comparing Redis MySQL Kafka across five dimensions for a Chinese programming book. A pentagon radar with five axes labeled in Chinese: 低延迟, 高吞吐, 强一致, 数据容量, 查询灵活度. Three colored polygons overlaid: Redis red, MySQL blue, Kafka green. Each polygon has different shape emphasizing different strengths. Clean minimalist style, white background, muted colors, Chinese labels, 16:9.
 ```
 ### 结果
-- 2026-07-09 v1：✅ 通过。章节递进清晰，中文正常。
+- 2026-07-09 v1：✅ 通过。雷达图五维对比清晰，中文正常。

@@ -348,7 +348,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
 
   <!-- 底部结论 -->
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三款软件读懂，就等于掌握了后端架构的"基本构件"</text>
+  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三个软件读懂，就等于掌握了后端架构的"基本构件"</text>
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
 </svg>
 </div><figcaption>图 1-1 后端基础设施的三种核心范式与代表软件</figcaption></figure>
@@ -359,7 +359,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一。它的独到之处在于提出了"数据结构服务器（data structure server）"这一抽象：它对外暴露结构化类型（字符串、哈希、列表、集合、有序集合、Stream 等），命令直接在结构上做原子操作。这一抽象让它能同时充当缓存、排行榜、消息队列、锁服务等多种角色，用一套原语统一了丰富的使用场景。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
 <p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1, 100 字节消息，作为历史参考；3.x 在同类硬件上吞吐通常更高）。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
-<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 则用顺序写换吞吐，把"多"和"广"做到了极致。</p>
+<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 则用顺序写换吞吐，把"多"和"广"做到了极致。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
 <p>如果只用一句话概括这三个软件各自的强项：Redis 的强项是极简与单点性能，MySQL 在严谨与一致性上最较真，Kafka 则以吞吐和可扩展立身。</p>
 <p>但面对架构难题，它们采用的方案不同，代价也不同。并发怎么控、数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题。后面 8 章的主题式深讲贯穿全书。</p>
@@ -452,7 +452,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="72" y="280">SQL/过滤/聚合</text>
   </g>
 
-  <!-- ============ 三款软件多边形 ============ -->
+  <!-- ============ 三个软件多边形 ============ -->
 
   <!-- Redis 多边形: 5,3,2,1,2 -->
   <polygon points="300.0,130.0 414.1,292.9 347.0,394.7 276.5,362.4 223.9,305.3"
@@ -608,7 +608,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- ============ 起点：第 1 章 引言 ============ -->
   <rect x="380" y="72" width="200" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.8"/>
   <text x="480" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 1 章 · 引言</text>
-  <text x="480" y="116" text-anchor="middle" font-size="12" fill="#374151">为什么是这三款软件</text>
+  <text x="480" y="116" text-anchor="middle" font-size="12" fill="#374151">为什么是这三个软件</text>
 
   <!-- 引言 → 主体 起点 -->
   <line x1="480" y1="128" x2="480" y2="158" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_1_3_arrow)"/>
@@ -695,7 +695,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
   <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
-  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">八章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
+  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">九章一镜照 · 共性规律 · 取舍之道 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
   <!-- 左侧贯穿主线注释 -->
@@ -703,13 +703,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="40" y="658" font-size="11.5" fill="#374151">从"生与死"出发，经内存磁盘、分层、</text>
   <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
 
-  <!-- 右侧三款软件同题注释 -->
+  <!-- 右侧三个软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
   <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
 
   <!-- 底部图注 -->
-  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三款软件，对比出共性</text>
+  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>
 </div><figcaption>图 1-3：全书章节地图。8 个主题章加第 10 章总结，按"生与死 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步 → 总结"的逻辑递进。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的"生与死"出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>
@@ -1569,7 +1569,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 3-1 启动与关闭：状态机的重建与快照</figcaption></figure>
 <figure class="fig"><img src="chapters/03-lifecycle/diagrams/fig-3-1-gpt.png" alt="图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版"><figcaption>图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版</figcaption></figure>
 <p>图 3-1　启动与关闭作为状态机重建与快照的对称过程，三对矛盾贯穿全章。</p>
-<p>这三个软件的约束差异这里先用一句话带过，具体留到后面的详细讲解。Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。</p>
+<p>这三个软件的约束差异这里先用一句话带过，具体留到后面的详细讲解。Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志，Write-Ahead Log）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。</p>
 <p>后文 MySQL 一节会反复用到两套日志，这里先把名词提出来：崩溃恢复靠的是 redo log（重做日志，记录页级物理修改，崩溃后正向重放）保住持久性，undo log（回滚日志，记录操作的逻辑逆，用来回滚未提交事务）保住原子性。两者方向相反、职责不同，3.3 节会展开它们在崩溃恢复里怎么配合。</p>
 <h2 id="s41">3.2 Redis 的做法</h2>
 <p>理解 Redis 的生命周期，得先理解一个基本事实：<strong>Redis 的全部数据都在内存里。</strong> 一旦进程重启，内存清空，所有键值对全部消失。不像 MySQL 有磁盘上的数据文件可回退，也不像 Kafka 有磁盘上的日志段做持久化。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条加载回内存、重建整个键空间。数据量越大，这个过程越久。一个几十 GB 的实例从加载到就绪可能要几分钟，期间整个实例不可用。所以 Redis 的启动链路每个环节都尽量精简，能省的步骤都省掉，能并行的就并行。反过来，Redis 的关闭也要快。但快的同时要回答一个核心问题：退出前要不要把内存里的最新数据再落一次盘？还是接受丢掉最近几秒的写？这个选择决定了 Redis 在你手里是缓存还是主存。</p>
@@ -1758,7 +1758,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层加权限系统、服务循环。第二段最耗时，也是和 Redis 的本质区别。</p>
 <p><strong>配置加载段</strong>按固定优先级搜索多个 my.cnf 路径（<code>/etc/my.cnf</code> 优先于 <code>~/.my.cnf</code> 等），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是被 <code>/etc/my.cnf</code> 里某个默认值覆盖了。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
-<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，<code>ibdata1</code> 只存储 change buffer 和可选的 undo 日志；5.7 及更早版本数据字典仍在 <code>ibdata1</code> 中）。</li></ol>
+<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，<code>ibdata1</code> 只存储 change buffer 和可选的 undo log；5.7 及更早版本数据字典仍在 <code>ibdata1</code> 中）。</li></ol>
 <figure class="fig"><img src="chapters/03-lifecycle/diagrams/fig-3-4-gpt.png" alt="图 3-4 InnoDB 崩溃恢复时序 GPT 生成版"><figcaption>图 3-4 InnoDB 崩溃恢复时序 GPT 生成版</figcaption></figure>
 <ol><li><strong>崩溃恢复</strong>。读 checkpoint（标记"redo log 到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描 redo log，把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用 undo log 回滚所有未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理：redo 重放先无差别地把所有页修改补回去（恢复出崩溃瞬间的物理页状态），undo 回滚再撤掉未提交事务留下的痕迹，最终恢复出严格的事务一致性。已提交的全部保留，未提交的全部回滚。正因为 redo 保住持久性、undo 保住原子性，MySQL 才能在崩溃之后把 ACID 的持久性和原子性这两条重新恢复出来。图 3-4 把崩溃恢复画成时序。</p>
@@ -2064,7 +2064,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s53">容器化环境下的生命周期</h3>
 <p>多数生产部署现已跑在 Kubernetes 上。K8s 给优雅关闭加了一道硬约束：SIGTERM → <code>terminationGracePeriodSeconds</code>（默认 30 秒）→ SIGKILL。SIGKILL 即 <code>kill -9</code>，跳过一切清理。各系统必须在 grace period 内完成受控关闭，否则被强行杀死。</p>
 <p><strong>Redis</strong> 的 AOF 重写子进程可能远超 30 秒（取决于实例内存大小：fork 拷贝页表约 10-20 ms/GB（按 4KB 页大小计算，x86_64；小实例几十毫秒，大实例可达数百毫秒），COW 写时复制额外耗时在写入密集场景下可达数秒至数十秒），被 SIGKILL 则新写入数据没落盘。preStop hook 里先触发 <code>BGSAVE</code> 再走正常关闭，或调长 grace period。</p>
-<p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，被 SIGKILL 打断时 redo log 可能不完整。设 <code>innodb_fast_shutdown=0</code> 并给 120 秒以上 grace period，确保完整刷脏和 checkpoint。</p>
+<p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，受控关闭时刷脏页但跳过完整 purge 与 change buffer 合并；一旦被 SIGKILL 强杀，连快速关闭流程都没机会走，只能交给下次启动的崩溃恢复。容器环境建议设 <code>innodb_fast_shutdown=0</code> 并给 120 秒以上 grace period，确保完整刷脏和 checkpoint。</p>
 <p><strong>Kafka</strong> 受控关闭要等 Controller 迁移 Leader，若 Controller 负载高则 <code>controlled.shutdown.max.retries</code> 可能 30 秒内耗尽，退化为普通关闭。调大重试次数和退避间隔（<code>controlled.shutdown.retry.backoff.ms</code>），grace period 设到 60-120 秒。</p>
 <p><strong>实践清单：</strong> preStop hook 主动检查条件而非 sleep；grace period = 刷盘/迁移耗时 + 30 秒余量；关闭期间 readiness probe 返回 false，避免 K8s 反复重启。印证 3.6 节"可观测性是状态机的外显"。</p>
 <h2 id="s54">3.5 横向对比</h2>
@@ -2872,7 +2872,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（攒多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后吞吐会大幅下跌（强 fsync 下常掉到原来的几分之一），通常只在特殊合规要求下使用。这是"吞吐 vs 本地持久性"的旋钮。</p>
 <p>更常用的可靠性旋钮是生产者端的 <code>acks</code>：</p>
 <ul><li><code>acks=0</code>：生产者发出去就不管，不等任何确认。吞吐最高，可能丢消息。</li><li><code>acks=1</code>：只要主节点（leader）把消息写到本地日志就确认。主节点崩溃且未同步到从节点时，这条消息可能丢。</li><li><code>acks=all</code>（也叫 <code>acks=-1</code>）：消息必须被 ISR（同步副本集合，In-Sync Replicas）里的全部副本确认才算成功。配合合理的副本数和 <code>min.insync.replicas</code>，这是最强的"不丢"保证，吞吐也会下降。</li></ul>
-<p>这三档同样是"吞吐 vs 不丢"这条连续谱上的采样点，和 Redis 的 <code>appendfsync</code>、MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 同构。只是被搬到了分布式语境。<code>acks</code> 三档的完整语义、默认值在 3.0 的调整（KIP-679）、以及与 <code>min.insync.replicas</code> 的交互，主场在第 7 章 7.4.3 节。</p>
+<p>这三档同样是"吞吐 vs 不丢"这条连续谱上的采样点，和 Redis 的 <code>appendfsync</code>、MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 同构。只是被搬到了分布式语境。<code>acks</code> 三档的完整语义与 3.0 的默认值调整（KIP-679）见第 7 章 7.4.3 节，与 <code>min.insync.replicas</code> 的精确交互见第 9 章 acks 旋钮一节。</p>
 <p>下表把一个 Kafka 日志段相关的几类文件列出来，看清它们的职责。</p>
 <p><strong>表 4-2　Kafka 日志段（segment）与索引文件布局</strong></p>
 <div class="table-wrap"><table><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>偏移量索引，记录"偏移量 → 物理偏移"的稀疏映射</td><td>每写入 <code>log.index.interval.bytes</code>（默认 4KB）追加一条索引项</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 偏移量"的稀疏映射</td><td>与 <code>.index</code> 同步追加，支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>事务与幂等生产者周期性落盘</td></tr></tbody></table></div>
@@ -3277,9 +3277,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="260" y="322" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">InnoDB（默认）</text>
   <line x1="140" y1="332" x2="380" y2="332" stroke="#FCD34D" stroke-width="1"/>
   <text x="140" y="354" font-size="12" fill="#374151">· ACID 事务</text>
-  <text x="140" y="376" font-size="12" fill="#374151">· 行锁 + MVCC 多版本并发</text>
+  <text x="140" y="376" font-size="12" fill="#374151">· 行锁 + MVCC</text>
   <text x="140" y="398" font-size="12" fill="#374151">· 缓冲池 Buffer Pool</text>
-  <text x="140" y="420" font-size="12" fill="#374151">· redo / undo（日志）</text>
+  <text x="140" y="420" font-size="12" fill="#374151">· redo log / undo log</text>
   <text x="140" y="442" font-size="12" fill="#374151">· 表空间 .ibd + B+ 树</text>
   <rect x="160" y="462" width="200" height="32" rx="4" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
   <text x="260" y="482" text-anchor="middle" font-size="11" fill="#374151">自身又是多层（事务/锁/缓存/日志）</text>
@@ -4224,7 +4224,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第三，故障怎么发现与转移。</strong> 一个节点多久没心跳算"死"？是单点判定（主观下线）还是多数派投票（客观下线）？选新主按什么规则（优先级、日志进度、ID）？分区时少数派该怎么办：继续写（可能脑裂）还是停服（宁可不可用）？这套机制决定了集群在故障时的表现。</p>
 <p><strong>第四，元数据怎么管理。</strong> 哪个节点负责哪些分片？谁是当前的主？副本同步到哪了？这些元数据（metadata）放哪：是集中存到一个协调者（Controller）上，还是去中心化地用 Gossip 让所有节点最终一致？集中式强一致但有单点风险，去中心化无单点但收敛慢。这是集群架构的另一条主轴。</p>
 <p>这四个难题之上，还压着一条更根本的约束：<strong>CAP 定理</strong>。网络分区（Partition）是分布式绕不开的现实，于是一致性（Consistency）与可用性（Availability）必须取舍。P 是给定的，C 和 A 之间只能偏一头。三个软件的默认形态里，Redis 偏 AP（异步可丢、但分区时少数派停写，行为边界见 7.2.3）、MySQL 的默认复制偏 AP、产品定位偏 CP，Kafka 在两端之间可调。这条线索贯穿全章。</p>
-<blockquote><strong>关键数字</strong>  <strong>Redis Cluster：16384 个槽</strong>，Gossip bitmap 仅 2KB。实际节点数上限约 500-1,000（官方建议不超过 1,000；社区生产实践推荐 400-500）；超过后 Gossip 消息膨胀、CPU 开销显著上升，收敛时间变长。  <strong>MySQL MGR：组大小通常 3/5/7/9 个成员</strong>（奇数个避免平票；超过 9 个后 Paxos 共识性能明显下降）。跨 AZ 部署时每笔事务要多约 5–10ms（同城 AZ 典型 RTT 2-5ms；MGR 的 Paxos 共识需多轮往返，实际增加延迟为 RTT 的 2-3 倍；异地 Region 会更高）；多数派容错，3 个成员可容忍 1 个故障。  <strong>Kafka 单分区吞吐：约 10–50MB/s</strong>（视硬件与消息大小；1KB 消息约 1-5 万条/秒，100 字节消息可达 10 万条/秒以上）。KRaft 模式下分区数可达百万级（ZK 时代单集群实践上限约 20 万，受 ZooKeeper 元数据开销所限）。</blockquote>
+<blockquote><strong>关键数字</strong>  <strong>Redis Cluster：16384 个槽</strong>，Gossip bitmap 仅 2KB。实际节点数上限约 500-1,000（官方建议不超过 1,000；社区生产实践推荐 400-500）；超过后 Gossip 消息膨胀、CPU 开销显著上升，收敛时间变长。  <strong>MySQL MGR：组大小通常 3/5/7/9 个成员</strong>（奇数个避免平票；MGR 硬上限 9 个成员，组越大 Paxos 共识开销越高）。跨 AZ 部署时每笔事务要多约 5–10ms（同城 AZ 典型 RTT 2-5ms；MGR 的 Paxos 共识需多轮往返，实际增加延迟为 RTT 的 2-3 倍；异地 Region 会更高）；多数派容错，3 个成员可容忍 1 个故障。  <strong>Kafka 单分区吞吐：约 10–50MB/s</strong>（视硬件与消息大小；1KB 消息约 1-5 万条/秒，100 字节消息可达 10 万条/秒以上）。KRaft 模式下分区数可达百万级（ZK 时代单集群实践上限约 20 万，受 ZooKeeper 元数据开销所限）。</blockquote>
 <p>这三个软件各自走了一条不同的路。图 7-1 把它们的演进主线并列出来，便于先建立一个总体印象。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -4325,7 +4325,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Bottom legend -->
   <line x1="50" y1="495" x2="870" y2="495" stroke="#E5E7EB" stroke-width="1"/>
   <text x="460" y="520" text-anchor="middle" font-size="12" fill="#6B7280">
-    三款软件演进步数相似，终点方案却落到 CAP 的不同象限，这是产品定位决定的设计起点
+    三个软件演进步数相似，终点方案却落到 CAP 的不同象限，这是产品定位决定的设计起点
   </text>
   <text x="460" y="540" text-anchor="middle" font-size="11" fill="#9CA3AF">（红色文字为前一段留下的痛点，箭头方向为演进顺序）</text>
 </svg>
@@ -4441,7 +4441,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>Redis Cluster 在网络分区时优先保证可用</strong>。拥有多数槽的分区继续服务，少数派分区里的槽因为凑不齐多数派主节点无法完成选举，会短暂不可用但不会脑裂写脏数据。要注意这里有一个时间窗口：少数派分区里的主节点并不是立刻知道自己被割出去了，在 <code>cluster-node-timeout</code>（默认 15 秒）之内它还会继续接受写入，超时后才停止——这实际上偏向 CP（一致性优先）行为，但窗口期内写到少数派老主上的数据，可能在故障转移后被丢弃。后记里我亲历的那次库存超卖，钻的正是这个窗口。社区对此归类有争议（antirez 本人主张 CP），但生产实践中异步复制导致的丢写确实存在，所以本书不作绝对的 AP/CP 一刀切归类，而是强调理解其行为边界的实际影响。最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
 <h2 id="s143">7.3 MySQL 的做法</h2>
 <p>理解 MySQL 的集群，得先看清它的基本拓扑。MySQL 集群最核心的组件是<strong>主从复制</strong>：一台主节点（Master，8.0.26 起官方改称 source）负责处理所有写请求，把每一条数据变更记进 binlog（二进制日志）；一台或多台从节点（Slave，8.0.26 起改称 replica）通过订阅主节点的 binlog 来保持数据同步。从节点内部有两个独立线程：I/O 线程负责从主节点拉取 binlog 事件并写入本地的中继日志（relay log），SQL 线程负责从中继日志里逐个回放事件。这种"拉取线程 + 回放线程"的分离设计，让网络拉取和本地回放互不阻塞：网络快了先拉下来囤着，回放慢了就慢慢追。</p>
-<p>从这个基础拓扑出发，MySQL 的集群演进走了三步：异步复制（默认，快但可能丢已提交事务）→ 半同步复制（至少等一个从节点确认收到 binlog，弱一致）→ 组复制 MGR（多数派 Paxos 确认，强一致）。每一步都在为更强的一致性付更多的延迟。注意一个关键细节：半同步复制只等从库 I/O 线程把 binlog 写入 relay log 即确认，不等 SQL 线程回放完毕——如果从库回放慢但 I/O 快，主库在半同步协议中只确认到 I/O 线程写入 relay log——切换后仍可能丢数据。这是半同步"确认但不保证已回放"的边界，也是生产中从"半同步"到"真正不丢"之间最后一道缝隙。下面分别展开。</p>
+<p>从这个基础拓扑出发，MySQL 的集群演进走了三步：异步复制（默认，快但可能丢已提交事务）→ 半同步复制（至少等一个从节点确认收到 binlog，弱一致）→ 组复制 MGR（多数派 Paxos 确认，强一致）。每一步都在为更强的一致性付更多的延迟。注意一个关键细节：半同步复制只等从库 I/O 线程把 binlog 写入 relay log 即确认，不等 SQL 线程回放完毕——所以如果从库回放慢但 I/O 快，切换后已确认的事务仍可能没回放，数据照样丢。这是半同步"确认但不保证已回放"的边界，也是生产中从"半同步"到"真正不丢"之间最后一道缝隙。下面分别展开。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 404" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_7_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -4623,7 +4623,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Title -->
   
-  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三款软件走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">同一个问题「谁来当新主」，三个软件走出三条完全不同的决策路径：去中心化投票 / 共识 View Change / 集中仲裁</text>
 
   <!-- ===== Column headers ===== -->
   <rect x="40"  y="70" width="280" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -5791,7 +5791,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">若每个副本按相同顺序执行相同输入序列，最终状态必然相同 — 这是三款软件同步的共同底层模型</text>
+  <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">若每个副本按相同顺序执行相同输入序列，最终状态必然相同 — 这是三个软件同步的共同底层模型</text>
 
   <!-- 顶部：同一个有序输入序列 -->
   <rect x="120" y="80" width="640" height="62" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -6355,7 +6355,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。Log 抽象一次设计、处处复用：第 5 章讨论的分层思想在这里落到一个具体结论："读路径不分副本还是消费者"。</p>
 <p>拉模式的代价是 Follower 要自己负责追赶节奏，副本数量多时大量 FETCH 请求会压在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，Follower 拉取冷数据时可直接从远程存储读取而不再经过 Leader 出口带宽。这一变化不改变拉模式本身，只改变数据来源（详见第 8 章 8.4.6 节）。</p>
 <h3 id="s217">LEO、HW 与 ISR：同步进度的标尺</h3>
-<p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 7 章 7.4.2 节展开；LEO 与 HW 就在这里定义，下面直接看它们在同步中的角色。</p>
+<p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 7 章 7.4.2 节展开；LEO 与 HW 的语义定义就在这里给出，下面直接看它们在同步中的角色。</p>
 <p>从同步视角看，LEO 是每个副本的本地进度坐标，HW 是 Leader 据此计算出的"已确认边界"：HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交、消费者才读得到。<strong>副本间的同步进度，由 ISR 里最慢的那一个决定</strong>。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 <code>replica.lag.time.max.ms</code> 阈值之外就被踢出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见图 9-7。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -6639,9 +6639,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
   <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
 
-  <!-- ============ 底部：三款软件印证带 ============ -->
+  <!-- ============ 底部：三个软件印证带 ============ -->
   <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三款软件印证：同一条规律，三种语言</text>
+  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三个软件印证：同一条规律，三种语言</text>
 
   <!-- Redis 列 -->
   <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
@@ -6702,7 +6702,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三款软件"借形不借器"</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三个软件"借形不借器"</text>
 
   <!-- ============ 根节点 ============ -->
   <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>

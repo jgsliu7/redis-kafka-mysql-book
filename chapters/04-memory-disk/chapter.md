@@ -229,7 +229,7 @@ Kafka 默认不强制每条消息 `fsync`，刷盘时机交给操作系统。这
 - `acks=1`：只要主节点（leader）把消息写到本地日志就确认。主节点崩溃且未同步到从节点时，这条消息可能丢。
 - `acks=all`（也叫 `acks=-1`）：消息必须被 ISR（同步副本集合，In-Sync Replicas）里的全部副本确认才算成功。配合合理的副本数和 `min.insync.replicas`，这是最强的"不丢"保证，吞吐也会下降。
 
-这三档同样是"吞吐 vs 不丢"这条连续谱上的采样点，和 Redis 的 `appendfsync`、MySQL 的 `innodb_flush_log_at_trx_commit` 同构。只是被搬到了分布式语境。`acks` 三档的完整语义、默认值在 3.0 的调整（KIP-679）、以及与 `min.insync.replicas` 的交互，主场在第 7 章 7.4.3 节。
+这三档同样是"吞吐 vs 不丢"这条连续谱上的采样点，和 Redis 的 `appendfsync`、MySQL 的 `innodb_flush_log_at_trx_commit` 同构。只是被搬到了分布式语境。`acks` 三档的完整语义与 3.0 的默认值调整（KIP-679）见第 7 章 7.4.3 节，与 `min.insync.replicas` 的精确交互见第 9 章 acks 旋钮一节。
 
 下表把一个 Kafka 日志段相关的几类文件列出来，看清它们的职责。
 
