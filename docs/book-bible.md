@@ -111,10 +111,10 @@
 | 英文 | 首次标注 | 后续用 | 说明 |
 |------|---------|--------|------|
 | redo log | redo log（重做日志） | **英文** | 工程界日常用语，说"redo log"不做"重做日志" |
-| undo log | 回滚日志（undo log） | **英文** | 同上 |
+| undo log | undo log（回滚日志） | **英文** | 同上 |
 | binlog | binlog（二进制日志） | **英文** | 工程师只说 binlog |
 | WAL | WAL（预写日志，Write-Ahead Log） | **英文** | 缩写优先 |
-| MVCC | MVCC（多版本并发控制） | **英文** | 缩写优先 |
+| MVCC | MVCC（多版本并发控制，Multi-Version Concurrency Control） | **英文** | 缩写优先 |
 | offset | 偏移量（offset） | **英文** | 非"位移"（displacement），工程师说 offset |
 | compaction | compaction（压实） | **中英** | 均可 |
 | fsync | fsync（落盘） | **中英** | 均可 |
