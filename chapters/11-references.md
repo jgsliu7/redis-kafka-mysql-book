@@ -1,12 +1,12 @@
 # 附录　参考文献与延伸阅读（按章索引）
 
-本书正文引用大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-4 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。
+本书写作参考了大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-4 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。
 
 ## 第 1 章 引言 — 为什么是这三个软件，架构视角的意义
 
 [1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书"同题作答"框架的直接参照，强烈推荐配套阅读。
 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者对"日志即统一抽象"的极简论述，全书核心抽象观的缩影。
-[3] Sanfilippo S (antirez). Redis Design and Trade-offs[EB/OL]. (2020)[2025-12-01]. https://redis.io/docs/latest/. —— Redis 作者本人对"内存即数据"设计哲学的第一手阐述。
+[3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2025-12-01]. http://antirez.com. —— Redis 作者本人对"内存即数据"设计哲学与取舍的第一手阐述。
 
 ## 第 2 章 数据结构与协议 —— 为各自的目标而设计
 
