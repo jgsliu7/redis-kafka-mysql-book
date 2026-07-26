@@ -65,7 +65,6 @@ RDB（快照文件）是 Redis 的全量快照格式。它的设计目标是文�
 
 注意：存储态编码与内存态编码是分离的。内存里 Hash 可能用 listpack 编码，也可能用 hashtable 编码，存盘时不照搬内存布局，改用统一的紧凑二进制序列化；加载后由加载器按当前阈值重新决定编码。这种分离让磁盘格式不绑死内存数据结构的演进：内存编码升级，磁盘格式不需要跟着变。
 
-
 ![图 8-2 RDB 文件布局](diagrams/fig-8-2.svg)
 图 8-2 RDB 文件布局：magic / version / metadata / db-selector / entries / CRC64 footer。
 
@@ -123,8 +122,6 @@ InnoDB 的存储从大到小是四层：表空间、段（segment）、区（ext
 ### 8.3.3 数据页内布局：把一行行记录塞进 16KB
 
 知道了页是 16KB 之后，下一个问题是这 16KB 内部怎么布局。InnoDB 的数据页内部分成七段，从上到下依次是：FIL Header（含页号、前后指针、LSN、页类型）、Page Header（记录页内统计信息）、Infimum 与 Supremum 两条虚拟记录（界定这一页的最小与最大记录）、User Records（真正按主键有序存放的用户记录）、Free Space（剩余空间）、Page Directory（稀疏槽）、FIL Trailer（存 LSN 与校验和），前后各放一个 LSN 是为了让恢复时能验证页是否完整写入。
-
-
 
 ![图 8-4 InnoDB 16KB 数据页内七段布局](diagrams/fig-8-4.svg)
 图 8-4 InnoDB 16KB 数据页内部七段布局。

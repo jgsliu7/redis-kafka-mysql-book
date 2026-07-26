@@ -24,8 +24,6 @@
 
 ![图 3-1 启动与关闭：状态机的重建与快照](diagrams/fig-3-1.svg)
 
-![图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版](diagrams/fig-3-1-gpt.png)
-*图 3-1 启动与关闭：状态机的重建与快照 GPT 生成版*
 图 3-1　启动与关闭作为状态机重建与快照的对称过程，三对矛盾贯穿全章。
 
 Redis 是单线程内存数据库，启动关闭要快，数据量直接决定恢复时长。MySQL 是关系型加 WAL（预写日志，Write-Ahead Log）的系统，启动必须做崩溃恢复，关闭必须保证事务语义。Kafka 是分布式追加写日志（append-only log）的系统，启动要恢复分区日志，关闭要协调集群。
@@ -46,9 +44,6 @@ Redis 的生命周期以"快"著称，但快的背后是一组很硬的设计取
 
 **第三段：数据恢复。AOF 优先于 RDB。** 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。图 3-2 完整呈现了这段流程。Redis 7.0 引入了多部 AOF（multi-part AOF），AOF 目录里的 base 文件本身就是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令，加载速度比 4.x 以前那种"纯命令重放"快很多。
 
-
-![图 3-2 Redis 启动四段式时序 GPT 生成版](diagrams/fig-3-2-gpt.png)
-*图 3-2 Redis 启动四段式时序 GPT 生成版*
 ![图 3-2 Redis 启动四段式时序](diagrams/fig-3-2.svg)
 图 3-2　Redis 启动四段式：配置 → 基础设施 → 数据恢复 → 事件循环，数据恢复段含 AOF/RDB 分支。
 
@@ -60,9 +55,6 @@ AOF 优先是因为它携带的信息严格多于单独的 RDB。即便 7.0 之�
 
 关闭有两种触发方式：客户端发 `SHUTDOWN` 命令、收到 SIGTERM/SIGINT 信号（systemd stop、容器编排的滚动重启最终都落到这条信号路径上）。无论哪种触发，进入的处理流程都一样，只是"存不存数据"这一步的选择不同。
 
-
-![图 3-3 Redis 关闭流程 GPT 生成版](diagrams/fig-3-3-gpt.png)
-*图 3-3 Redis 关闭流程 GPT 生成版*
 图 3-3 画出了完整的关闭流程。
 
 ![图 3-3 Redis 关闭流程](diagrams/fig-3-3.svg)
@@ -97,8 +89,6 @@ MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层�
 1. 初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区。
 2. 加载系统表空间（ibdata 文件），拿到数据字典（MySQL 8.0 起数据字典已迁移到独立的 `mysql.ibd` 文件，`ibdata1` 只存储 change buffer 和可选的 undo log；5.7 及更早版本数据字典仍在 `ibdata1` 中）。
 
-![图 3-4 InnoDB 崩溃恢复时序 GPT 生成版](diagrams/fig-3-4-gpt.png)
-*图 3-4 InnoDB 崩溃恢复时序 GPT 生成版*
 3. **崩溃恢复**。读 checkpoint（标记"redo log 到此已落盘"的位点）对应的 LSN（日志序号），从该位置扫描 redo log，把 redo 里记录的所有页修改原样重放回数据页（这一步不分事务是否提交，先把崩溃那一刻缓冲池里的页状态原样还原），再用 undo log 回滚所有未提交事务。
 
 第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理：redo 重放先无差别地把所有页修改补回去（恢复出崩溃瞬间的物理页状态），undo 回滚再撤掉未提交事务留下的痕迹，最终恢复出严格的事务一致性。已提交的全部保留，未提交的全部回滚。图 3-4 把崩溃恢复画成时序。
@@ -144,9 +134,6 @@ Kafka 的生命周期是分布式追加写日志的范式。**关闭是一个集
 
 Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段，是理解 Kafka 启动的关键。
 
-![图 3-5 Kafka 三层网络架构 GPT 生成版](diagrams/fig-3-5-gpt.png)
-*图 3-5 Kafka 三层网络架构 GPT 生成版*
-
 1. **日志与配置初始化。** 加载 `server.properties`，初始化日志目录。
 2. **元数据管理初始化（KRaft 核心）。** KRaft 模式自 3.3 起对新集群进入生产可用（KIP-833），3.5 起 ZooKeeper（ZK）模式被标记弃用，ZK→KRaft 迁移工具在 3.4 以 Early Access 引入、3.5–3.6 为 preview、3.6 起进入生产可用；3.9 是最后一个支持 ZK 模式的 bridge release，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志。节点启动时要先追上这份元数据日志，才能确定当前节点应当负责哪些分区、以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志住在一起、用同一套机制管理。
 3. **日志管理器启动（恢复主战场）。** 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 `num.recovery.threads.per.data.dir` 并行加速。为什么分区恢复是瓶颈？因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把活分摊开。
@@ -164,9 +151,6 @@ Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日�
 
 八个阶段全部走完，Kafka 才对外打印 `[KafkaServer id=0] started` 这条就绪日志。和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 一样，这条日志是状态机的里程碑标记，运维靠它判断就绪。
 
-
-![图 3-6 Kafka 受控关闭时序（对照普通关闭） GPT 生成版](diagrams/fig-3-6-gpt.png)
-*图 3-6 Kafka 受控关闭时序（对照普通关闭） GPT 生成版*
 ### 关闭：普通关闭 vs 受控关闭
 
 Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。

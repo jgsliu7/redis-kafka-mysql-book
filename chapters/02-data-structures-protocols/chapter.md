@@ -63,8 +63,6 @@ Redis 的数据结构都受同一个约束限制：**全部驻留内存**。内�
 
 ![图 2-5 Redis 五种底层数据结构的适用场景与升级路径](diagrams/fig-2-5.svg)
 
-![图 2-5 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版](diagrams/fig-2-5-gpt.png)
-*图 2-5 Redis 五种底层数据结构的适用场景与升级路径 GPT 生成版*
 ### 2.2.2 MySQL：为磁盘页和通用查询而生的 B+ 树与行格式
 
 MySQL（InnoDB）的数据结构受到一个关键限制：**数据在磁盘上，一次 I/O 取一页（16KB）**。这个限制是决定性的。内存访问是纳秒级，而磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构要尽量解决这个核心问题：**让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用**。
@@ -73,8 +71,6 @@ MySQL（InnoDB）的数据结构受到一个关键限制：**数据在磁盘上�
 
 ![图 2-6 MySQL InnoDB B+ 树结构](diagrams/fig-2-6.svg)
 
-![图 2-6 MySQL InnoDB B+ 树结构 GPT 生成版](diagrams/fig-2-6-gpt.png)
-*图 2-6 MySQL InnoDB B+ 树结构 GPT 生成版*
 图 2-6　InnoDB B+ 树三层结构：根节点和内部节点只存键与子节点指针，把几百个键挤进 16KB；叶子节点存完整行数据，双向链表串联支持高效范围扫描。
 
 **行格式（Row Format）** 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。不让大对象拖累整页，也不让跨页撕裂把一次读变成多次 I/O。这是"页内紧凑"与"大对象不污染整页"的折中。
@@ -102,9 +98,6 @@ Kafka 的数据结构要同时满足三件事：**磁盘顺序追加 + 批量压
 
 头部之后是实际的消息记录。**每条记录不存绝对 offset 和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除。
 
-
-![图 2-7 Kafka RecordBatch V2 字段布局 GPT 生成版](diagrams/fig-2-7-gpt.png)
-*图 2-7 Kafka RecordBatch V2 字段布局 GPT 生成版*
 ![图 2-7 Kafka RecordBatch V2 字段布局](diagrams/fig-2-7.svg)
 这套设计的取舍摆在明面上。批量让压缩在相似消息聚集时通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2-6 倍；极端重复场景可能更高），差值编码让每条记录元数据开销降到个位数字节，Batch 级 CRC 省了逐条校验的 CPU，`magic` 让格式版本自描述、新旧格式可共存。代价也摆在明面上：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。
 
@@ -141,9 +134,6 @@ Kafka 的协议模型换了思路。它是一个**分门别类的请求/响应�
 所有请求共用同一个固定头部：`api_key`（2 字节，标识这是什么类型的请求，如 Produce = 0, Fetch = 1, Metadata = 3……）、`api_version`（2 字节，标识用哪个版本的 Schema）、`correlation_id`（4 字节，客户端自定，服务端原样抄到响应里用来匹配请求和响应）、`client_id`（变长字符串，标识客户端身份）。这个四元组头部是 Kafka 协议最关键的设计。`api_key` + `api_version` 让同一类请求可以同时存在多个版本，Broker 根据客户端声明的版本号调整解析方式和返回字段。这意味着：不强制所有客户端升级。3.0 的 Broker 可以和 0.11 的客户端对话，双方用各自能理解的最早版本号做协商。
 
 **批量优先** 是 Kafka 协议区别于 Redis 和 MySQL 最根本的特征。Produce 请求把多条消息打成一个 RecordBatch 一起发给 Broker，Fetch 请求一次拉取指定 `(topic, partition, offset)` 起始的一段数据（`min_bytes` + `max_bytes` 控制拉取量），Broker 用零拷贝把一批消息直接从页缓存推到网卡。单条消息从不独立出现在协议层面。一切以 Batch 为单位。这和 RecordBatch 在存储层的设计是同一个思路：协议层不做单条操作，是 Kafka 把吞吐放在第一位的必然结果。
-
-![图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版](diagrams/fig-2-8-gpt.png)
-*图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应 GPT 生成版*
 
 ![图 2-8 三个软件通信协议对比：RESP 文本 vs MySQL 二进制 vs Kafka 请求/响应](diagrams/fig-2-8.svg)
 ## 2.4 横向对比
