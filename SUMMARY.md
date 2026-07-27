@@ -9,7 +9,7 @@
 - [第3章　生命周期管理——优雅启动与关闭的艺术](chapters/03-lifecycle/chapter.md)
 
 ## 第二部分　核心机制
-- [第4章　内存与磁盘的舞蹈——速度与持久化的平衡](chapters/04-memory-disk/chapter.md)
+- [第4章　内存与磁盘——速度与持久化的平衡](chapters/04-memory-disk/chapter.md)
 - [第5章　分层架构设计——存储层、逻辑层、交互层](chapters/05-layered-architecture/chapter.md)
 
 ## 第三部分　扩展与保障

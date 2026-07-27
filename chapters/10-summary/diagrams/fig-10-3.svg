@@ -11,7 +11,7 @@
 
   <!-- 标题 -->
   <text x="450" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 10-3　认知跃迁的四层台阶</text>
-  <text x="450" y="53" text-anchor="middle" font-size="13" fill="#6B7280">从使用者到设计者，跨越的不是知识量，而是看问题的坐标系</text>
+  <text x="450" y="53" text-anchor="middle" font-size="13" fill="#6B7280">从使用者到设计者，跨越的不是知识量，而是看问题的方式</text>
 
   <!-- 台阶：从下到上 L1 → L4，宽度递增、高度递增、左对齐基线相同 -->
   <!-- L1 -->
@@ -45,7 +45,7 @@
 
   <!-- 向上跃迁的主箭头（红色，沿各台阶左上角拾级而上，不穿框） -->
   <path d="M 165 410 Q 220 375 270 330 Q 370 290 470 250 Q 575 210 680 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
-  <text x="465" y="200" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">认知跃迁方向（坐标系变换）</text>
+  <text x="465" y="200" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">认知跃迁方向（看问题方式的升级）</text>
 
   <!-- ============ 本书 8 章 / 本章对应标注 ============ -->
   <!-- 本书前 9 章：L1 → L2 -->
@@ -70,8 +70,8 @@
   <!-- 箴言收束 -->
   <rect x="660" y="118" width="200" height="38" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
   <text x="760" y="135" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">箴言</text>
-  <text x="760" y="151" text-anchor="middle" font-size="11" fill="#374151">看问题的坐标系</text>
+  <text x="760" y="151" text-anchor="middle" font-size="11" fill="#374151">看问题的方式</text>
 
   <!-- 底注 -->
-  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四层不是职称阶梯，而是"看问题的坐标系"逐层升级；L3 是分水岭，从回答"是什么"转到回答"为什么/换我怎么做"。</text>
+  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四层不是职称阶梯，而是"看问题的方式"逐层升级；L3 是分水岭，从回答"是什么"转到回答"为什么/换我怎么做"。</text>
 </svg>

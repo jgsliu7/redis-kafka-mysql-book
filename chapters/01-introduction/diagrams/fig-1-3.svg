@@ -10,7 +10,7 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　全书章节地图</text>
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　全书章节结构</text>
   <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->
@@ -39,7 +39,7 @@
 
   <!-- 第 4 章 内存与磁盘 -->
   <rect x="640" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="656" y="218" font-size="14" font-weight="700" fill="#111827">第 4 章　内存与磁盘的舞蹈</text>
+  <text x="656" y="218" font-size="14" font-weight="700" fill="#111827">第 4 章　内存与磁盘</text>
   <text x="656" y="238" font-size="12" fill="#374151">核心问题：数据放哪？怎么不丢？</text>
   <text x="656" y="258" font-size="11.5" fill="#6B7280">缓冲池 · 页缓存 · WAL · 零拷贝</text>
 
@@ -108,7 +108,7 @@
 
   <!-- 左侧贯穿主线注释 -->
   <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
-  <text x="40" y="658" font-size="11.5" fill="#374151">从"生与死"出发，经内存磁盘、分层、</text>
+  <text x="40" y="658" font-size="11.5" fill="#374151">从"启动与关闭"出发，经内存磁盘、分层、</text>
   <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
 
   <!-- 右侧三个软件同题注释 -->

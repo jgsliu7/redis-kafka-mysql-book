@@ -49,8 +49,6 @@ ACL SETUSER alice on >pwd ~keys:* +get +set
 
 凭证存储上，密码以 SHA-256 摘要形式存（通过 `ACL SAVE` 持久化到 `aclfile` 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 `ACL LOAD` 重新加载），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机——靠密码本身的熵来补无盐的短板。
 
-与 Redis 不同，MySQL 从第一天就把认证当作企业级功能来设计。
-
 ### MySQL：可插拔认证插件是核心抽象
 
 MySQL 面向企业市场，从早期就把安全纳入了核心设计：强密码、多层级权限、可审计、可插拔认证。它的安全设计绕不开两点：层级权限表和可插拔认证。
@@ -61,13 +59,11 @@ MySQL 从 8.0.4 起把默认认证插件从老的 `mysql_native_password` 改成
 
 可插拔是更深的设计。认证逻辑与协议解耦，认证变成一个可替换的插件：`auth_socket` 让本机进程免密登录、`authentication_pam` 对接企业 PAM、`authentication_ldap_simple` 对接 LDAP 目录、`sha256_password` 提供无缓存的高安全选项。把身份验证外包给最合适的子系统，这与第 5 章讲过的"可插拔存储引擎"是同一种思路：核心保留扩展点，把变化的部分留给插件。TLS 的协商嵌在握手包里，配合 `REQUIRE SSL`、`REQUIRE X509` 或指定证书主题字段，可以做到账号级强制加密。
 
-如果说前两款都还是单点系统的认证，Kafka 则必须面对分布式多跳的挑战。
-
 ### Kafka：SASL 框架加 JAAS 配置
 
 Kafka 的安全设计面对的是一个单机系统不会有的难题：一次数据流动要跨好几跳。客户端把消息发给 Broker，Broker 把消息复制到其他 Broker 的副本，Broker 还要和控制面（ZooKeeper 或 3.x 的 KRaft）通信。任何一跳明文、任何一跳不认证，都是漏洞。Kafka 的应对是把认证、加密、授权都做成可独立启用的模块，让运维按网络域组合配置。
 
-Kafka 复用 SASL（Simple Authentication and Security Layer，简单认证与安全层）这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要无缝接入企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。
+Kafka 复用 SASL（Simple Authentication and Security Layer，简单认证与安全层）这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要直接对接企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。
 
 生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制，凭证只存服务端（用迭代哈希加盐存储），客户端不需要持有明文密码。相比 PLAIN 机制（客户端要持有明文、网络上虽走 SASL 但 PLAIN 本身无挑战），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。
 
@@ -81,8 +77,6 @@ Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识�
 图 6-2：内部 SASL_SSL、外部 SSL、控制面 KRaft 三条路径并行，按网络域分级信任。
 
 同一个 Broker 对内网应用客户端开 INTERNAL 监听器（SASL_SSL，SCRAM-SHA-512，内网互信证书），对外网客户端开 EXTERNAL 监听器（SSL 或独立 SASL_SSL，公网 CA 签发证书），同时与 KRaft 控制面通过控制面监听器通信。三条路径用不同的协议、证书和信任级别，做到了"内网宽松、外网严格"的分级。这种设计在单机系统里没有对应物，是 Kafka 作为分布式流平台必须付出的架构复杂度。
-
-单机一个密码就够了，分布式多跳必须上标准框架。
 
 ## 6.3 授权
 
@@ -107,8 +101,6 @@ Redis 的授权把权限直接绑到用户，不做角色继承。理由是用�
 
 Redis 的默认策略其实长期没有收紧到"默认安全"。7.x 里 `default` 用户的内置规则仍是 `user default on nopass ~* &* +@all`：启用、无密码、全键、全通道、全命令，即无认证状态，靠的是向后兼容，不能指望它替你兜底。真正起作用的是 `protected-mode`（保护模式，3.2.0 起，默认开启）：当 Redis 绑定全部网卡且没有配置任何密码、`AUTH` 等认证手段时，它只接受本地回环连接，对外网连接直接拒绝。换句话说，protected-mode 拦的是"裸监听被外网命中"，不替代认证本身。要真正加固，还得运维自己动手：显式给 `default` 用户设密码或直接禁用（例如 `ACL SETUSER default off` 禁用用户，或 `ACL SETUSER default resetpass` 清除密码）。
 
-Redis 的授权模型在键值场景里够用，但关系型数据库需要精细得多的控制。
-
 ### MySQL：多层级权限表加 8.0 RBAC
 
 MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分五层：全局、数据库、表、列、存储程序。这套层级对应 `mysql.user`、`mysql.db`、`mysql.tables_priv`、`mysql.columns_priv`、`mysql.procs_priv` 多张权限表。授权检查时，从全局到列逐层收窄，命中即停。
@@ -123,8 +115,6 @@ MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分�
 8.0 才补齐 RBAC 角色系统，支持 `CREATE ROLE`、`GRANT role TO user`、会话级 `SET ROLE`。MySQL 已有的权限矩阵很复杂，用户量级也大，引入角色必须兼顾"不破坏已有 GRANT 语义"，因此它的做法是"角色等于一组权限的命名集合加会话激活"。这是一种务实的兼容优先：新能力叠加在老模型上，老应用零迁移。
 
 权限语义按风险分四类：数据操作（DML，包括 SELECT、INSERT、UPDATE、DELETE）、结构变更（DDL，包括 CREATE、ALTER、DROP，更危险）、管理（SUPER、PROCESS、FILE、RELOAD，高度敏感）、复制（REPLICATION SLAVE、REPLICATION CLIENT，专用于复制拓扑）。这种按风险分桶的命名本身就是安全设计：它让 DBA 一眼能看出哪些权限该谨慎授予。注意：FILE 权限能读写服务器文件系统，配合 SQL 注入可读任意文件，是高敏权限的典型。
-
-Kafka 的授权没有"列/键"概念，主语是服务。
 
 ### Kafka：ACL 绑定 "Principal + Operation + Resource" 三元组
 
@@ -146,9 +136,7 @@ Kafka 的默认策略偏保守：`allow.everyone.if.no.acl.found` 这个参数�
 
 Redis 到 6.0 才原生支持 TLS。6.0 之前的"安全传输"靠 stunnel 代理或 SSH 隧道，也就是把加密功能外包给外部进程。这是一次明确的取舍：Redis 的设计目标是单核十万级 QPS（小包 GET/SET 场景），TLS 的握手开销和每个包的加解密都会直接拉低吞吐，把这种代价推到内核之外，能让绝大多数不需要加密的内网用户不受影响。
 
-补上 TLS 之后，Redis 也没有把它设为强制。它选择"TLS 可选、按端口开启"：你可以关掉明文端口、只开 TLS 端口，也可以两者并存做平滑迁移。配置上建议限定 `tls-protocols TLSv1.2 TLSv1.3`，关闭老旧协议，客户端证书按需启用。典型的性能代价是：握手密集场景下开启 TLS，单线程吞吐相比无加密约降至六到八成（具体数值随硬件、TLS 版本、证书算法波动较大，以实测为准）。是否启用 TLS，由部署者根据吞吐与安全需求自行权衡。
-
-Redis 的 TLS 是 6.0 才补上的课，而 MySQL 从设计第一天就有企业级加密方案。
+补上 TLS 之后，Redis 也没有把它设为强制。它选择"TLS 可选、按端口开启"：你可以关掉明文端口、只开 TLS 端口，也可以两者并存做平滑迁移。配置上建议限定 `tls-protocols TLSv1.2 TLSv1.3`，关闭老旧协议，客户端证书按需启用。典型的性能代价是：握手密集场景下开启 TLS，单线程吞吐相比无加密约降至六到八成（具体数值随硬件、TLS 版本、证书算法波动）。是否启用 TLS，由部署者根据吞吐与安全需求自行权衡。
 
 ### MySQL：传输 TLS 加存储 TDE 两层
 
@@ -157,8 +145,6 @@ MySQL 的加密覆盖传输和存储两层。传输层 TLS 的配置与服务端
 存储加密是 MySQL 区别于另外两款的部分。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS。TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点：密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。
 
 redo log 与 undo log 的加密（`innodb_redo_log_encrypt` / `innodb_undo_log_encrypt`）自 8.0.1 起就支持，binlog 与 relay log 的加密（`binlog_encryption`）自 8.0.14 起支持。表加密了，但日志明文写在磁盘上，攻击者仍能从日志里拼出敏感数据。日志加密补上了这个缺口。
-
-Kafka 的加密必须覆盖多跳全路径。
 
 ### Kafka：TLS 覆盖所有通信路径
 
@@ -212,7 +198,7 @@ Kafka 的原生审计来自 Authorizer 日志：记录每一次授权决策（�
 
 ## 6.7 架构启示
 
-从三个软件的具体实现里，能提炼出五条可复用的安全设计原则。它们是选型和评审时能直接拿出来的判断标准。
+安全不是功能清单，是默认值的学问。这五条原则，选型和评审时能直接拿去对照。
 
 ### 启示一：默认安全策略要与典型部署环境匹配
 

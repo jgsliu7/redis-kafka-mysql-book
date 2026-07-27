@@ -21,7 +21,7 @@
 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Pre-Image Logging[R]. IBM Research Report RJ 1821, 1992. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。
 [10] Apache Kafka. Controlled Shutdown[EB/OL]. [2025-12-01]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。
 
-## 第 4 章 内存与磁盘的舞蹈 — 速度与持久化的平衡
+## 第 4 章 内存与磁盘 — 速度与持久化的平衡
 
 [11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2025-12-01]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解"磁盘为真相、缓存为加速"范式的钥匙。
 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但与之在"顺序写"的精神上呼应。
@@ -78,4 +78,4 @@
 
 ---
 
-> 一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的坐标系。本书替代不了这些资料，能做的是先帮你搭一个共同的坐标系，再去读它们就顺了。
+> 一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的整体视野。本书替代不了这些资料，能做的是先帮你搭一个共同的坐标系，再去读它们就顺了。
