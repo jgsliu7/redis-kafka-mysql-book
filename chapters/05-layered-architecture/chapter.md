@@ -215,7 +215,7 @@ SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调层、跨 Broke
 
 ## 5.5 横向对比
 
-讲完这三个软件，把它们放到一起看，才能看清"为什么不同"。
+三个软件都分层，但 Redis 薄、MySQL 中、Kafka 厚。
 
 先用一张总览图把三段式视角如何映射到它们画出来。
 
@@ -224,7 +224,7 @@ SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调层、跨 Broke
 
 这张图给本章定了对照基准。同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 是粗 4 层，跨层全是函数调用，最薄；MySQL 是中 4 层，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，细分到 5 层，靠队列和网络协议衔接。图里三个色块的颜色是为了在下一张表里一一对应。
 
-接下来用一张三栏对比表把六个核心维度并排，列序固定为 Redis | MySQL | Kafka，维度作为行。层数的口径先说清：Redis 数出四层（RESP 解析、命令分派、robj 抽象、内存存储），MySQL 四层（连接、服务、Handler 接口、引擎），Kafka 五层（SocketServer、KafkaApis、Log、协调层、跨 Broker 协议）。
+接下来用一张三栏对比表把六个核心维度并排，维度作为行。层数的口径先说清：Redis 数出四层（RESP 解析、命令分派、robj 抽象、内存存储），MySQL 四层（连接、服务、Handler 接口、引擎），Kafka 五层（SocketServer、KafkaApis、Log、协调层、跨 Broker 协议）。
 
 **表 5-1　三个软件分层形态横向对比**
 
