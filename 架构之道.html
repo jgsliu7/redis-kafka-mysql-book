@@ -2857,7 +2857,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF，见第 8 章），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
 <p><strong>内存管理主体</strong>。这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 运维的重心在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。这条最好记：需要按主键查一行数据，Kafka 直接出局。</p>
-<p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或重放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务；例外是分区数巨大时（如上万分区）的日志段校验与索引重建要数分钟（见第 3 章）。唯一受影响的是 PageCache 是否还热。</p>
+<p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或重放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务；例外是分区数巨大时（如上万分区）的日志段校验与索引重建要数分钟（见第 3 章）。例外之外，日常受影响的主要是 PageCache 是否还热。</p>
 <p><strong>典型故障模式</strong>。每种范式都有自己最常踩的坑。Redis 是 fork 阻塞与淘汰风暴，MySQL 是缓冲池抖动与磁盘 I/O 打满。Kafka 最典型的是消费者追不上生产者：消费速度低于生产时，消费者读的数据被挤出 PageCache、落到磁盘读，延迟从毫秒级掉到十毫秒以上；监控上表现为消费 lag 和磁盘读 I/O 同时上涨，这是把缓存交给 OS 的隐性代价。</p>
 <p>三个选择的关键是匹配。Redis 对"小而热"、MySQL 对"大而杂"、Kafka 对"大而流"，把你的场景对号入座即可。</p>
 <h2 id="s82">4.6 架构启示</h2>
