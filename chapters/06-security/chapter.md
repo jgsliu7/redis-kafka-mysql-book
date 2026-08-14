@@ -63,7 +63,7 @@ MySQL 从 8.0.4 起把默认认证插件从老的 `mysql_native_password` 改成
 
 Kafka 的安全设计面对的是一个单机系统不会有的难题：一次数据流动要跨好几跳。客户端把消息发给 Broker，Broker 把消息复制到其他 Broker 的副本，Broker 还要和控制面（ZooKeeper 或 3.x 的 KRaft）通信。任何一跳明文、任何一跳不认证，都是漏洞。Kafka 的应对是把认证、加密、授权都做成可独立启用的模块，让运维按网络域组合配置。
 
-Kafka 复用 SASL（Simple Authentication and Security Layer，简单认证与安全层）这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要直接对接企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。
+Kafka 复用 SASL 这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要直接对接企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。
 
 生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制，凭证只存服务端（用迭代哈希加盐存储），客户端不需要持有明文密码。相比 PLAIN 机制（客户端要持有明文、网络上虽走 SASL 但 PLAIN 本身无挑战），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。
 
@@ -120,7 +120,7 @@ MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分�
 
 Kafka 的授权模型是 ACL，每条规则绑定三元组：主体（Principal，通常是服务账号或用户）、操作（Operation）、资源（Resource）。资源类型有 Topic、Group、Cluster、TransactionalId、DelegationToken，每类资源有自己的操作集：Read、Write、Create、Delete、Alter、Describe、ClusterAction、All。
 
-Kafka 原生只有 ACL，没有 RBAC。结论和 Redis 一样不做 RBAC，但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。
+Kafka 原生只有 ACL，没有 RBAC，和 Redis 一样；但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。
 
 前缀授权（prefixed resource pattern）是多租户场景的便利设计。一条规则 `--resource-pattern-type prefixed --topic app-a.` 就能把所有 `app-a.` 开头的主题的读写权限授予 app-a 这个服务，避免逐主题授权。在一个集群承载几十上百个服务的场景下，前缀授权让权限管理退化成"前缀约定加少量例外"，运维成本随之下降。
 
@@ -134,7 +134,7 @@ Kafka 的默认策略要分两种授权器看。`AclAuthorizer`（ZK 时代的�
 
 Redis 到 6.0 才原生支持 TLS。6.0 之前的"安全传输"靠 stunnel 代理或 SSH 隧道，也就是把加密功能外包给外部进程。这是一次明确的取舍：Redis 的设计目标是单核十万级 QPS，TLS 的握手开销和每个包的加解密都会直接拉低吞吐，把这种代价推到内核之外，能让绝大多数不需要加密的内网用户不受影响。
 
-补上 TLS 之后，Redis 也没有把它设为强制。它选择"TLS 可选、按端口开启"：你可以关掉明文端口、只开 TLS 端口，也可以两者并存做平滑迁移。配置上建议限定 `tls-protocols TLSv1.2 TLSv1.3`，关闭老旧协议，客户端证书按需启用。典型的性能代价是：握手密集场景下开启 TLS，单线程吞吐相比无加密约降至六到八成（具体数值随硬件、TLS 版本、证书算法波动）。是否启用 TLS，由部署者根据吞吐与安全需求自行权衡。
+补上 TLS 之后，Redis 也没有把它设为强制。它选择"TLS 可选、按端口开启"：你可以关掉明文端口、只开 TLS 端口，也可以两者并存做平滑迁移。配置上建议限定 `tls-protocols TLSv1.2 TLSv1.3`，关闭老旧协议，客户端证书按需启用。典型的性能代价是：长连接稳态下开启 TLS，单线程吞吐相比无加密约降至六到八成（具体数值随硬件、TLS 版本、证书算法波动），握手密集（短连接）场景的代价更高。是否启用 TLS，由部署者根据吞吐与安全需求自行权衡。
 
 ### MySQL：传输 TLS 加存储 TDE 两层
 
@@ -192,7 +192,7 @@ Kafka 的原生审计来自 Authorizer 日志：记录每一次授权决策（�
 | 性能取向 | 性能优先，安全可选 | 安全与功能并重 | 模块化可组合 |
 | 典型部署假设 | 可信内网 | 企业网络 | 混合或云原生多跳 |
 
-这张表竖着读，能读出三家各自的安全姿态：Redis 一切从简、按需叠加；MySQL 默认安全、分层完整；Kafka 模块化组合、按网络域分级。姿态没有高下，只有与部署形态匹不匹配。
+这张表竖着读，能读出三家各自的安全姿态：Redis 一切从简、按需叠加；MySQL 默认安全、分层完整；Kafka 模块化组合、按网络域分级。姿态没有高下，只看与部署形态匹不匹配。
 
 ## 6.7 架构启示
 
@@ -228,4 +228,4 @@ Redis 默认开放（假设内网）、MySQL 默认收紧（假设企业网络�
 
 认证、授权、加密、审计这四件事，在三个软件身上各有侧重。Redis 从无到有补上 ACL，走的是"安全让位于性能、再按需补回"；MySQL 一上来就把权限做到列级，回应企业级场景对完整性和可审计的硬要求；Kafka 最吃力，SASL、TLS、ACL 三套积木缺一不可，因为多跳分布式里身份要层层传递。它们差异背后是同一条规律：数据长什么样、请求要跨几跳，安全的天花板就在哪。脱离这两者谈"谁更安全"没有意义，正确的问法是"在它的数据模型和部署形态下，这套安全设计是否做到了合理的上限"。
 
-下一章进入集群架构，我们要看的正是安全身份如何在多节点之间传递与校验：Redis Cluster 的节点互信、MySQL 组复制的成员认证、Kafka 多 Broker 的 SASL 与控制面安全，会把本章的"多跳身份"问题放到更大的拓扑里继续展开。
+下一章进入集群架构：分片怎么切、副本怎么一致、故障怎么自动转移、元数据谁说了算，正是本章"请求要跨几跳"那句判断在更大拓扑里的展开。
