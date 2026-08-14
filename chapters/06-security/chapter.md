@@ -47,7 +47,7 @@ ACL SETUSER alice on >pwd ~keys:* +get +set
 
 这条语句创建用户 alice，启用状态、设置密码、允许访问匹配 `keys:*` 的键、授予 `GET` 和 `SET`。每一项都体现同一个取舍：只保留最小可表达单元。Redis 不做 RBAC（基于角色的访问控制），因为内核要轻。Redis 实例上的用户数通常很少，几台应用机器各对应一个用户就够，引入"角色—用户"两层语义会让内核背上不必要的复杂度。把组角色这类复杂语义留给外部的身份管理系统（IAM），是 Redis 一贯的边界划法。
 
-凭证存储上，密码以 SHA-256 摘要形式存（通过 `ACL SAVE` 持久化到 `aclfile` 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 `ACL LOAD` 重新加载），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机：靠密码本身的熵来补无盐的短板。
+凭证存储上，密码以 SHA-256 摘要形式存（通过 `ACL SAVE` 持久化到 `aclfile` 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 `ACL LOAD` 重新加载），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。
 
 ### MySQL：可插拔认证插件是核心抽象
 
@@ -120,11 +120,11 @@ MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分�
 
 Kafka 的授权模型是 ACL，每条规则绑定三元组：主体（Principal，通常是服务账号或用户）、操作（Operation）、资源（Resource）。资源类型有 Topic、Group、Cluster、TransactionalId、DelegationToken，每类资源有自己的操作集：Read、Write、Create、Delete、Alter、Describe、ClusterAction、All。
 
-Kafka 原生只有 ACL，没有 RBAC，和 Redis 一样；但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。
+Kafka 原生只有 ACL，没有 RBAC，和 Redis 一样；但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂，核心保持简单。
 
 前缀授权（prefixed resource pattern）是多租户场景的便利设计。一条规则 `--resource-pattern-type prefixed --topic app-a.` 就能把所有 `app-a.` 开头的主题的读写权限授予 app-a 这个服务，避免逐主题授权。在一个集群承载几十上百个服务的场景下，前缀授权让权限管理退化成"前缀约定加少量例外"，运维成本随之下降。
 
-Kafka 的默认策略要分两种授权器看。`AclAuthorizer`（ZK 时代的经典授权器）下，`allow.everyone.if.no.acl.found` 默认是 **true**：资源上完全没配 ACL 时放行所有人，配了 ACL 之后未命中的请求才被拒绝。KRaft 的 `StandardAuthorizer` 则始终默认拒绝。生产环境要么显式把该参数设为 false、要么直接用 StandardAuthorizer，并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。
+Kafka 的默认策略要分两种授权器看。`AclAuthorizer`（ZK 时代的经典授权器）下，`allow.everyone.if.no.acl.found` 默认是 **true**：资源上完全没配 ACL 时放行所有人，配了 ACL 之后未命中的请求才被拒绝。KRaft 的 `StandardAuthorizer` 则始终默认拒绝。生产环境要么显式把该参数设为 false，要么直接用 StandardAuthorizer，并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。
 
 ## 6.4 加密
 
