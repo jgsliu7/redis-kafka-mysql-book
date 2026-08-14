@@ -9,7 +9,7 @@
 《架构之道：从 Redis、MySQL、Kafka 看软件设计的共性》——中文技术书，通过横向对比 Redis / MySQL / Kafka 提炼可复用的软件架构设计规律。
 
 - **内容**：`chapters/` 下 10 章 + 序言 + 后记 + 参考文献
-- **插图**：52 张手绘 SVG（`chapters/*/diagrams/`）
+- **插图**：57 张手绘 SVG（`chapters/*/diagrams/`）
 - **构建**：`scripts/build_html.py`（单页）、`scripts/build_pages.py`（分章）
 - **规范**：见 §3 参考文档索引
 
@@ -270,7 +270,7 @@ AI 味句式/逻辑类是语义问题。grep 既漏报（换措辞就看不见�
 - **绝对保留**：作者第一人称真实案例、取舍段判断锋芒、结构性锚点比喻（真相之源/骨架/状态机）、优雅(graceful)/同题作答/章节副标题。
 - **术语两档制**：英文优先（redo log/binlog/WAL/MVCC/ISR/GTID/offset/compaction/fsync）首次标注后继续用英文；中文优先（缓冲池/分区/快照/副本/刷盘/日志段）用中文。详见 `docs/book-bible.md` §7 术语对照表。
 - **offset ≠ 位移**："位移"是物理学术语（displacement）。全书"位移"应改为"偏移量（offset）"。
-- **破折号已收敛**：全书"——"已压到个位数。
+- **破折号已收敛**：正文"——"已压到个位数（参考文献条目的著录说明分隔符除外）。
 - **不碰 outline.md**：草稿，build 不读。
 - **改了章节就要重建 HTML**：每次修改 `chapters/` 下任何 md 文件后，必须运行：
   ```bash

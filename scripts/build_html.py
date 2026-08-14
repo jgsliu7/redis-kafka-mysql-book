@@ -143,11 +143,14 @@ def convert(md, svgmap, gptmap, counter, diag_prefix=''):
             alt, url = im.group(1), im.group(2)
             cap_text = alt
             consumed = 1
-            # 若下一行是斜体图注（*图 X-Y …*），合并为唯一图注，避免「figcaption + 斜体图注」重复
+            # 若下一行是图注（*图 X-Y …* 或 图 X-Y　…，仅全角空格体例），合并为唯一图注，避免「figcaption + 图注段落」重复
             if i + 1 < n:
                 mc = re.match(r'^\s*\*([^*]+)\*\s*$', lines[i + 1])
+                mc2 = re.match(r'^\s*图\s*\d+[-－]\d+　', lines[i + 1])
                 if mc:
                     cap_text = mc.group(1); consumed = 2
+                elif mc2:
+                    cap_text = lines[i + 1].strip(); consumed = 2
             cap = '<figcaption>%s</figcaption>' % inline(cap_text, svgmap, diag_prefix) if cap_text else ''
             if url in svgmap:
                 out.append('<figure class="fig">%s%s</figure>' % (svgmap[url], cap))

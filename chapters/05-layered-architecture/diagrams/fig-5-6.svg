@@ -78,7 +78,7 @@
 
   <!-- 返回响应 -->
   <rect x="90" y="408" width="680" height="44" rx="6" fill="#FFFBEB" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW + LEO（位移末尾）</text>
+  <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW + LEO（日志末尾）</text>
   <text x="430" y="445" text-anchor="middle" font-size="11" fill="#6B7280">响应路径同样共享；Follower 用 HW 推进自己的副本位置</text>
 
   <!-- 响应箭头回到两侧 ReplicaManager（沿画布外侧绕行，箭头指回框侧边中点 y=260） -->

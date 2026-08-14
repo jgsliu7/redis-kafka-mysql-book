@@ -21,7 +21,7 @@
 
   <!-- Leader 日志 -->
   <rect x="60" y="100" width="820" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="80" y="120" font-size="13" font-weight="700" fill="#111827">Leader 日志（按位移追加）</text>
+  <text x="80" y="120" font-size="13" font-weight="700" fill="#111827">Leader 日志（按偏移量追加）</text>
   <!-- 5 个消息格 -->
   <rect x="200" y="118" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
   <text x="255" y="132" text-anchor="middle" font-size="11" fill="#374151">m0</text>
