@@ -64,7 +64,9 @@ Redis 最朴素的集群化，是主从复制（replication）。在从节点上
 
 > **共识算法一分钟直觉**（第一次接触 Raft/Paxos 的读者先读这段）：这类算法要解决的问题只有一个——几台机器怎么对"一件事"达成不可反悔的一致决定。套路是三板斧：**任期号（term/epoch）**，每轮决策带一个单调递增的编号，旧任期的决定说了不算；**多数派投票**，提议要拿到过半节点的票才算通过，任意两个多数派必有交集，所以两个不同决定不可能同时通过，这从数学上杜绝了脑裂；**日志复制**，通过的决定按相同顺序落到各节点的日志里，少数派宕机也不丢。Raft 和 Paxos 是这套思路的两个代表，本章后面遇到的 Sentinel 选举、MGR 的 XCom、Kafka 的 KRaft，都是这三板斧的变体。读懂本章只需要上面的直觉，想深究可以读 Raft 的原始论文。
 
-Sentinel（哨兵）就是来做自动故障转移的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，负责在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 `down-after-milliseconds` 没回应，这个 Sentinel 把主节点标记为**主观下线**（SDOWN，subjectively down）：这只是单个 Sentinel 基于本节点视角的判定。然后它通过 `SENTINEL is-master-down-by-addr` 直接询问其他 Sentinel 投票，如果达到配置的 quorum 数量（quorum 是人工设定的判定票数，不必是多数派）都认为主节点挂了，就升级为**客观下线**（ODOWN，objectively down）：这是达到 quorum 数量后集群层面的共识判定。接下来 Sentinels 之间用一种 Raft 风格的选举（Redis 官方文档称之为 "Raft-like"，借鉴了 Raft 的任期号加多数派投票，但没有完整的 Raft 日志复制）选出一个 Leader Sentinel 主持转移，再按优先级、复制偏移量（offset）、runid 三个维度从从节点里挑一个提升为新主，给它发 `REPLICAOF NO ONE`，并通知其他从节点改连新主。
+Sentinel（哨兵）就是来做自动故障转移的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，负责在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 `down-after-milliseconds` 没回应，这个 Sentinel 把主节点标记为**主观下线**（SDOWN，subjectively down）：这只是单个 Sentinel 基于本节点视角的判定。然后它通过 `SENTINEL is-master-down-by-addr` 直接询问其他 Sentinel 投票，如果达到配置的 quorum 数量（quorum 是人工设定的判定票数，不必是多数派）都认为主节点挂了，就升级为**客观下线**（ODOWN，objectively down）：这是达到 quorum 数量后集群层面的共识判定。
+
+接下来 Sentinels 之间用一种 Raft 风格的选举（Redis 官方文档称之为 "Raft-like"，借鉴了 Raft 的任期号加多数派投票，但没有完整的 Raft 日志复制）选出一个 Leader Sentinel 主持转移，再按优先级、复制偏移量（offset）、runid 三个维度从从节点里挑一个提升为新主，给它发 `REPLICAOF NO ONE`，并通知其他从节点改连新主。
 
 Sentinel 自身用了两道投票（quorum 判定客观下线 + 多数派 Raft-like 选举 Leader）来防止单点误判，但**数据层仍然是单主异步复制**。也就是说，监控层的一致性（quorum 判定谁挂了、多数派选举谁主持转移）和数据层的弱一致性（异步复制可丢写）是两件事：前者只管"决策"，不管"数据"。Sentinel 能保证"主节点真的挂了才转移"，但保证不了"转移后一笔都不丢"。主从异步复制的丢写风险原封不动地继承下来。
 
@@ -175,7 +177,7 @@ Kafka 在生产者端有一个参数 `acks`，决定生产者写一条消息时�
 
 Kafka 的元数据管理（哪个 Broker 活着、哪个分区的 Leader 是谁、ISR 是谁、副本怎么分配）经历了两次大的演进。
 
-**早期方案是 ZooKeeper + Controller。** 元数据存在外部的 ZooKeeper 集群里，Kafka 集群里选出一个 Broker 充当 Controller，负责元数据的读写和 partition 的 Leader 选举。这套方案能用，但痛点随规模暴露：第一，元数据和实际状态分离在两套系统里，Broker 状态变更要双向同步，不一致风险大。第二，Controller 是单点（虽然有 failover），Controller 切换期间集群管理暂停。第三，ZooKeeper 本身不适合存大量元数据，分区数到几十万级别时 ZK 的 watch 通知就成了瓶颈。第四，运维要同时维护 Kafka 和 ZooKeeper 两套系统。还有一个隐患：ZK 模式下有个潜在的脑裂风险，Controller 的 Leader 选举在 ZK 里做，partition 的 Leader 选举在 Controller 里做，两层状态可能不一致。
+**早期方案是 ZooKeeper + Controller。** 元数据存在外部的 ZooKeeper 集群里，Kafka 集群里选出一个 Broker 充当 Controller，负责元数据的读写和 partition 的 Leader 选举。这套方案能用，但痛点随规模暴露：第一，元数据和实际状态分离在两套系统里，Broker 状态变更要双向同步，不一致风险大。第二，Controller 是单点（虽然有 failover），Controller 切换期间集群管理暂停。第三，ZooKeeper 本身不适合存大量元数据，分区数到几十万级别时 ZK 的 watch 通知就成了瓶颈（watch 是 ZK 的变更订阅机制：节点数据一变，ZK 要主动推给所有订阅方，订阅者和变更一多，通知量就压不住了）。第四，运维要同时维护 Kafka 和 ZooKeeper 两套系统。还有一个隐患：ZK 模式下有个潜在的脑裂风险，Controller 的 Leader 选举在 ZK 里做，partition 的 Leader 选举在 Controller 里做，两层状态可能不一致。
 
 **KRaft 模式（3.3 起生产可用）是第二次演进。** KRaft 把元数据管理从 ZooKeeper 收回到 Kafka 内部：选一组 Controller 节点，它们之间跑 Raft 共识协议维护一份强一致的元数据日志，不再依赖外部系统（Controller 可与 Broker 同进程部署，也可独立成组）。元数据本身也变成了 Kafka 的一个内部 topic（`__cluster_metadata`），Controller 用 Raft 维护它，所有 Broker 从中同步。这套改造带来几个好处：单系统部署、运维简化；元数据强一致（Raft 保证）；分区数可以从几十万扩到百万级（不受 ZK 限制）；Controller 故障恢复更快（Raft 选举比 ZK session 超时快）。
 

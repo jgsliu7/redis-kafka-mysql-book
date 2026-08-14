@@ -8,7 +8,7 @@
 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者对"日志即统一抽象"的极简论述，全书核心抽象观的缩影。
 [3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人对"内存即数据"设计哲学与取舍的第一手阐述。
 
-## 第 2 章 数据结构与协议 —— 为各自的目标而设计
+## 第 2 章 数据结构与协议 — 为各自的目标而设计
 
 [4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现"协议即存储格式"的统一设计哲学。
 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，展现 Redis"按数据特征自适应"的精髓。
@@ -60,7 +60,7 @@
 [30] MySQL. GTID-Based Replication[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/replication-gtids.html. —— GTID（`source_id:transaction_id`）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。
 [31] Lamport L. Time, Clocks, and the Ordering of Events in a Distributed System[J]. Communications of the ACM, 1978, 21(7): 558-565. —— 逻辑时钟与 happens-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。
 
-## 第 10 章 万法归一 —— 架构设计的共性规律与取舍之道
+## 第 10 章 万法归一 — 架构设计的共性规律与取舍之道
 
 [32] 同 [1]。—— 贯穿全书的姊妹篇，更广视角的数据系统取舍论述，本章五条共性规律的上位参照。
 [33] 同 [23]。—— CAP 定理的形式化证明，本章"一致 vs 可用"这一取舍维度的理论基础。
@@ -78,4 +78,4 @@
 
 ---
 
-> 一点阅读建议：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的整体视野。本书替代不了这些资料，能做的是先帮你搭一个共同的坐标系，再去读它们就顺了。
+> **一点阅读建议**：官方文档适合查证参数与版本细节，KIP 能还原 Kafka 每一步设计的背景，论文适合理解"为什么这么设计"的深层逻辑，而像 DDIA 这样的综合书适合建立跨系统的整体视野。本书替代不了这些资料，能做的是先帮你搭一个共同的坐标系，再去读它们就顺了。

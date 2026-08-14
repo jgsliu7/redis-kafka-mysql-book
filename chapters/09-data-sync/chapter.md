@@ -82,7 +82,7 @@ PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线
 
 **第二是复制积压缓冲区（backlog）。** 主节点维护一个固定大小（默认约 1MB，可调 `repl-backlog-size`）的环形缓冲区，存"最近 N 字节的复制流"。这是一个滑动窗口：新命令进来，老命令被覆盖。
 
-副本断线重连时，把自己的 `replica_offset` 通过 `PSYNC <replid> <offset>` 报给主节点。主节点检查：这个 offset 还在 backlog 窗口内吗？
+副本断线重连时，把自己的 `replica_offset` 通过 `PSYNC <replid> <offset>` 报给主节点（`replid` 是主节点的复制 ID，PSYNC2 之前这个角色由上文提到的 `run_id` 担任）。主节点检查：这个 offset 还在 backlog 窗口内吗？
 
 - 在 → **部分重同步（partial resync）**：只把 offset 到当前之间的差额命令发给副本，几乎瞬间追上。
 - 不在 → 退回全量同步，从头来过。
@@ -90,7 +90,7 @@ PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线
 backlog 窗口与主从 offset 的位置关系，见图 9-4。
 
 ![图 9-4 Redis 复制积压缓冲区与 replication offset](diagrams/fig-9-4.svg)
-图 9-4　backlog 是滑动窗口，主从各持一个字节进度坐标；offset 在窗口内即可增量补差，否则全量。
+图 9-4　backlog 滑动窗口：主从各持一个字节进度坐标，offset 在窗口内即可增量补差，否则全量。
 
 backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。窗口越大，能容忍越长时间的断线（典型场景：副本做一次短暂的 GC 或网络抖动），但主节点要常驻更多内存。这是个按业务调的参数：大流量实例把它调到几十 MB 甚至上百 MB 很常见，目的是让常见的短断线都走部分重同步，避免动辄全量。
 
@@ -138,7 +138,7 @@ MySQL 的传统异步复制是**两段式**的，背后是两个独立的线程�
 主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见图 9-5。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。这是推拉结合：从节点拉、relay log 缓冲、本地推。
 
 ![图 9-5 MySQL 异步 / 半同步复制与 GTID 链路](diagrams/fig-9-5.svg)
-图 9-5　异步复制主写完即返回；半同步增加 ACK 回路；GTID 把位点从文件偏移变成全局事务标识。
+图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。
 
 ### 异步复制：默认的 AP 形态
 
@@ -146,11 +146,15 @@ MySQL 的传统异步复制是**两段式**的，背后是两个独立的线程�
 
 ### 半同步复制：可降级的一致性
 
-半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写到 relay log 即回 ACK，不等本地回放）才返回成功。它有两档提交时点。`AFTER_SYNC`（8.0 默认）是先等副本 ACK 再提交，所有副本看到的事务顺序与主一致。`AFTER_COMMIT` 反过来：先在引擎层提交，再等 ACK。这一档有个危险窗口：提交后、ACK 前，事务对其他会话已经可见；若此刻主崩溃切换，新主上这笔被读过的数据很可能并不存在，这就是幻读。半同步还可降级：等 ACK 超时（`rpl_semi_sync_source_timeout`，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 `rpl_semi_sync_source_wait_for_replica_count` 控制（默认 1）。注意半同步仍不保证零丢失：它只确认"副本收到了"，不确认"副本已提交"，且超时降级后等同异步。第 7 章 7.3.2 节从集群拓扑角度也提到了它作为中间路线的定位。
+半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写到 relay log 即回 ACK，不等本地回放）才返回成功。它有两档提交时点。`AFTER_SYNC`（8.0 默认）是先等副本 ACK 再提交，所有副本看到的事务顺序与主一致。`AFTER_COMMIT` 反过来：先在引擎层提交，再等 ACK。这一档有个危险窗口：提交后、ACK 前，事务对其他会话已经可见；若此刻主崩溃切换，新主上这笔被读过的数据很可能并不存在，这就是幻读。
+
+半同步还可降级：等 ACK 超时（`rpl_semi_sync_source_timeout`，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 `rpl_semi_sync_source_wait_for_replica_count` 控制（默认 1）。
+
+注意半同步仍不保证零丢失：它只确认"副本收到了"，不确认"副本已提交"，且超时降级后等同异步。第 7 章 7.3.2 节从集群拓扑角度也提到了它作为中间路线的定位。
 
 从同步的视角看，半同步的设计要点只有一个：一致性可以临时关掉（超时就降级回异步），但关掉这件事必须可观测。如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。**能降级的一致性机制，降级状态和正常状态同等重要，都得可观测**：Redis 的 `min-replicas` 触发拒绝写入、Kafka 的 ISR 收缩，都是同一个道理。
 
-> 说明：8.0.26 起，半同步相关的 master/slave 命名变量统一重命名为 source/replica（如 `rpl_semi_sync_master_enabled` → `rpl_semi_sync_source_enabled`），旧名变量在过渡期仍可用但已标记弃用。本章统一以新名为准。
+> **说明**：8.0.26 起，半同步相关的 master/slave 命名变量统一重命名为 source/replica（如 `rpl_semi_sync_master_enabled` → `rpl_semi_sync_source_enabled`），旧名变量在过渡期仍可用但已标记弃用。本章统一以新名为准。
 
 ### GTID：位点不再一换主就失效
 
@@ -169,7 +173,7 @@ GTID 带来的简化很直接。副本只要告诉新主"我这里有 GTID 1-100
 这个设计不在副本侧做复杂的冲突检测，而是借用主节点组提交时已经完成的事实判断，把并行性从主节点传递到从节点。配合 `replica_parallel_workers`（8.0.26 前为 `slave_parallel_workers`）、`replica_parallel_type=LOGICAL_CLOCK` 等参数，复制延迟在现代硬件上可以降到很低。并行复制与 MGR 共识的关系见图 9-6。
 
 ![图 9-6 MySQL 多线程并行复制与组复制（MGR）共识](diagrams/fig-9-6.svg)
-图 9-6　从节点按组提交边界并行回放；MGR 把 binlog event 当作共识 log entry，多数派确认才提交。
+图 9-6　并行回放与 MGR：从节点按组提交边界并行回放，MGR 把 binlog event 当作共识 log entry，多数派确认才提交。
 
 ### 组复制（MGR）：把复制升级为共识
 
@@ -212,7 +216,7 @@ Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark
 从同步视角看，LEO 是每个副本的本地进度坐标，HW 是 Leader 据此计算出的"已确认边界"：HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交，消费者才读得到。**副本间的同步进度，由 ISR 里最慢的那一个决定**。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 `replica.lag.time.max.ms` 阈值之外就被踢出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见图 9-7。
 
 ![图 9-7 Kafka Follower FETCH + LEO/HW + leader epoch](diagrams/fig-9-7.svg)
-图 9-7　HW = ISR 中最小 LEO，只有 HW 以下算已提交；leader epoch 用任期号界定权威日志段，截断老 Leader 的脑裂尾部。
+图 9-7　HW 与 leader epoch：HW = ISR 中最小 LEO，只有 HW 以下算已提交；leader epoch 用任期号界定权威日志段，截断老 Leader 的脑裂尾部。
 
 ### leader epoch：解决老 Leader 复活的脑裂
 
