@@ -104,7 +104,7 @@ MySQL 的集群要求是"不丢数据"，从最古老的异步复制到最新的
 
 ### 7.3.1 基于 binlog 的复制：单向、异步、行流
 
-MySQL 复制的基础是 binlog。主节点把所有写操作记进 binlog，从节点的 I/O 线程连上来拉取 binlog，写到本地的中继日志，再由 SQL 线程回放中继日志重做这些变更。这是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种）的取舍细节归第 9 章，本章只把它当作"变更流的载体"。
+MySQL 复制的基础是 binlog。主节点把所有写操作记进 binlog，从节点的 I/O 线程连上来拉取 binlog，写到本地的中继日志，再由 SQL 线程回放中继日志重做这些变更。这是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种，取舍主要在 STATEMENT 与 ROW 之间，细节归第 9 章），本章只把它当作"变更流的载体"。
 
 老式复制靠 file + position 定位复制位点：从节点记录"我同步到了 mysql-bin.000003 的第 1580 字节"。这种方式很脆弱：主节点一换、binlog 一滚动，位点的语义就乱了。MySQL 5.6 引入了全局事务标识（GTID，Global Transaction Identifier），格式是 `source_id:transaction_id`，给每个事务一个全局唯一 ID。从节点只要记"我同步到了哪些 GTID"，主从切换、新从接入都能自动定位，不再依赖脆弱的文件位点。GTID 让 MySQL 复制从"能用"跨到"好用"。
 

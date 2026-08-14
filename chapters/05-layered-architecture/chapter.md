@@ -53,7 +53,7 @@ Redis 与客户端之间用 RESP（REdis Serialization Protocol，Redis 序列�
 
 ### 5.2.2 逻辑层：命令表 + robj 统一抽象
 
-逻辑层是 Redis 承担命令执行的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 `redisCommandTable`，定义在 `server.c` 里（Redis 7.0 重构后，核心管理命令仍集中在 `server.c` 的 `redisCommandTable` 中，大部分数据结构命令已改由各自的源文件（如 `t_string.c`、`t_list.c`）独立注册），每条命令占一行。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。
+逻辑层是 Redis 承担命令执行的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 `redisCommandTable`，6.x 及更早版本定义在 `server.c` 里（Redis 7.0 重构后，命令表改由 `commands/` 目录下的 JSON 描述文件自动生成到 `commands.c`，处理函数仍分布在 `server.c`、`t_string.c`、`t_list.c` 等文件中），每条命令占一行。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。
 
 命令执行的流水线是这样跑的：RESP 解析完得到参数数组 `argv` 和参数个数 `argc` → 用命令名做一次 dict 哈希查到命令表条目 → ACL 权限校验和 arity 校验 → 调用 `cmd->proc(client)` 执行 → 跑慢查询日志和 MONITOR 钩子。下面这张图画的是这条流水线，以及 `client` 结构体怎么把交互层和逻辑层衔接起来。
 
@@ -129,7 +129,7 @@ MySQL 的逻辑层在文档里统称"服务层"（Server 层 / SQL 层），但�
 ![图 5-4 MySQL Handler API 与可插拔存储引擎](diagrams/fig-5-4.svg)
 图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。
 
-这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。注意，InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池（Buffer Pool）→ redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 `.ibd` 表空间存数据和索引、`ib_logfile` 存 redo log、`undo_*` 存 undo log，再配合双写缓冲（doublewrite buffer）防止页撕裂。这些细节会在第 8 章存储格式里展开。
+这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。注意，InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池（Buffer Pool）→ redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 `.ibd` 表空间存数据和索引、独立 redo log 文件存 redo log（8.0.30 前为 `ib_logfile*`，之后为 `#innodb_redo` 目录）、`undo_*` 存 undo log，再配合双写缓冲（doublewrite buffer）防止页撕裂。这些细节会在第 8 章存储格式里展开。
 
 **接口标准化让生态长出来，代价是多态开销**。handler 通过虚函数（vtable）多态调用，每次行操作都过一次虚函数表。这意味着一个全表扫描的每一行、一个索引查找的每一次定位，都是一次间接调用，无法被内联优化。这是 MySQL 相对那些"硬编码引擎"的数据库（如 PostgreSQL 的 table access method 虽然也抽象但与执行器结合更紧）的固有开销。MySQL 拿这个代价换来了可插拔。划不划算，取决于你怎么用 MySQL：如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎（比如热数据 InnoDB、冷数据 RocksDB），这笔开销就是生态红利。
 

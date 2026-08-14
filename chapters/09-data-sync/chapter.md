@@ -98,7 +98,7 @@ backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中�
 
 ### 关键取舍：把同步强度做成可写门槛
 
-Redis 默认偏 AP，但它给了一个弱保证旋钮：`min-replicas-to-write N` + `min-replicas-max-lag T`。这条规则的意思是：主节点接受写入的前提是至少有 N 个副本在线（连接存活），且这些副本在最近 T 秒内向主节点发过 REPLCONF ACK 心跳（主节点上对每个副本记录 `server.unixtime - lastinteraction ≤ T`，即距离上次心跳的秒数）。注意：`master_repl_offset - replica_offset` 是字节进度差，用于 INFO 监控，不是 `min-replicas-max-lag` 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。
+Redis 默认偏 AP，但它给了一个弱保证旋钮：`min-replicas-to-write N` + `min-replicas-max-lag T`。这条规则的意思是：主节点接受写入的前提是至少有 N 个副本在线（连接存活），且这些副本在最近 T 秒内向主节点发过 REPLCONF ACK 心跳（主节点上对每个副本记录 `server.unixtime - repl_ack_time ≤ T`，即距离上次心跳的秒数）。注意：`master_repl_offset - replica_offset` 是字节进度差，用于 INFO 监控，不是 `min-replicas-max-lag` 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。
 
 它只是把"主可以完全单点"约束成"主至少有 N 个跟得上的副本"，否则拒绝写入。这是一个"软门槛"：达不到门槛的写会被拒绝，但已通过的写仍然可能丢失（因为副本是异步追赶）。从中也能看出 Redis 的取舍：不追求理论上的强一致，但在关键路径上设一道可观测、可配置的弱保证，避免数据在没人察觉时丢失。
 
