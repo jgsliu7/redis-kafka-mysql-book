@@ -218,13 +218,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <main class="content">
 <article>
 <section class="chapter" id="ch0"><h1 id="s1">序言</h1>
-<p>我们今天遇到的软件架构方面的问题，绝大多数在软件行业几十年的历史里已经出现过，优秀的前辈们也给出了非常具有想象力的方案。所以我认为，架构师提升架构判断力最务实的方法，就是学习优秀软件的架构设计。</p>
-<p>这部书选择这三个软件：Redis、MySQL、Kafka，它们支撑起了后端基础设施的半边天。我们天天在用，却很少追问它们为什么长成现在这个样子。市面上的资料大多停在"怎么用"：Redis 的数据类型有几种，MySQL 的索引怎么设计，Kafka 的分区选几个。而架构决策者需要的不只是某个软件的用法，还有背后的设计权衡。AI 可以辅助代码生成，但架构取舍涉及周期、成本、团队、现实约束，是 AI 难以完全做好的部分。架构师真正的价值是判断和取舍的能力：它直接决定系统的复杂度、能不能按期上线、好不好运维、够不够健壮。特别是在 AI 时代，做原型和具体编码越来越快，这种决策能力反而变得越来越重要。</p>
-<p>会用这三个软件的人很多；能讲清背后为什么这么设计的就少一些了；能把这几个系统从底层串起来、放到同一个视角下比较的人更少。这本书适合有一定开发基础、喜欢钻研技术的中高级开发者和架构师/CTO 阅读。</p>
+<p>我们今天遇到的软件架构方面的问题，绝大多数在软件行业几十年的历史里已经出现过，前辈们也给出了充满想象力的方案。所以我认为，架构师提升架构判断力最务实的方法，就是学习优秀软件的架构设计。</p>
+<p>这部书选择这三个软件：Redis、MySQL、Kafka，它们支撑起了后端基础设施的半边天。我们天天在用，却很少追问它们为什么被设计成现在这个样子。市面上的资料大多停在"怎么用"：Redis 的数据类型有几种，MySQL 的索引怎么设计，Kafka 的分区选几个。而架构决策者需要的不只是某个软件的用法，还有背后的设计权衡。AI 可以辅助代码生成，但架构取舍涉及周期、成本、团队、现实约束，是 AI 难以完全做好的部分。架构师真正的价值是判断和取舍的能力：它直接决定系统的复杂度、能不能按期上线、好不好运维、够不够健壮。特别是在 AI 时代，做原型和具体编码越来越快，这种决策能力反而变得越来越重要。</p>
+<p>会用这三个软件的人很多；能讲清背后为什么这么设计的就少一些了；能把这几个系统从底层串起来、放到同一个视角下比较的人更少。这本书适合有一定开发基础、喜欢钻研技术的中高级开发者、架构师和 CTO 阅读。</p>
 <p>十年前我就在构思这本书了，虽然拖了很久都没有开始，但这个想法一直在我心头萦绕，我先讲一下主要想传递的核心内容：</p>
 <p>第一层：<strong>这三个软件遇到的问题，你自己设计系统时也会遇到。</strong> 数据结构如何设计、怎么启动才能不丢状态、怎么关闭才能不丢请求、内存和磁盘如何协同、怎么把系统分出清晰的层、怎么做权限与加密、单机扛不住时怎么分片和容错、文件该按什么格式落盘、副本之间怎么对齐。这些问题，Redis、MySQL、Kafka 已经在生产环境里反复打磨了十几年。把这三家的解法吃透，下次遇到同类问题，就至少知道有哪些选项。会用这些软件，是对开发者的要求；知道"这个问题有哪些解法"，是架构认知的第一步。</p>
 <p>第二层：<strong>这三家为什么选这个方案、不选那个方案？选了之后付了什么代价、得到了什么？</strong> 取舍，是架构设计里最难也最值钱的一步。我们需要从这些软件的设计里，感受到"为什么这么取、为什么那么舍"。</p>
-<p>第三层：一个系统牵涉很多技术问题，每个都有多种解法，排列组合下来就是几乎无限的可能性。架构师只知道"有哪些方案"远远不够，难点在于根据"天时地利人和"去判断和选择，把各个环节的方案组合成一个能落地的整体。什么时候上线、跑在什么机器上、团队什么情况、遗留系统怎么处理、公司有什么硬性约束……这些条件下架构如何决策，这是没有万能公式的。技术能力强的工程师当然也能给出单个环节的方案，但系统架构要把各环节整合起来才能落地。什么叫"优秀的设计方案"？Redis 写盘不是最快的，Kafka 随机查询也不是最快的，但这本来就不是它们的核心目标。优秀软件并不是说所有环节/所有问题都用了局部最优方案，常态是非核心的环节都在给核心目标妥协或兜底，该让的让、该保的保、该兜底的兜底。知道方案是"术"，在复杂背景下做对决策和取舍才是"道"。</p>
+<p>第三层：一个系统牵涉很多技术问题，每个都有多种解法，排列组合下来就是几乎无限的可能性。架构师只知道"有哪些方案"远远不够，难点在于根据"天时地利人和"去判断和选择，把各个环节的方案组合成一个能落地的整体。什么时候上线、跑在什么机器上、团队什么情况、遗留系统怎么处理、公司有什么硬性约束……这些条件下架构如何决策，这是没有万能公式的。技术能力强的工程师当然也能给出单个环节的方案，但系统架构要把各环节整合起来才能落地。什么叫"优秀的设计方案"？Redis 写盘不是最快的，Kafka 随机查询也不是最快的，但这本来就不是它们的核心目标。优秀软件并不是说所有环节/所有问题都用了局部最优方案，常态是非核心的环节都在给核心目标让路：该让的让，该兜底的兜底。知道方案是"术"，在复杂背景下做对决策和取舍才是"道"。</p>
 <p>这本书的目的：把这三个软件里的架构经验，变成你学新系统、做架构设计的方法论。</p>
 <p>这本书不讲基础知识，不讲调优技巧，也不贴源码。我会讲更稳定不变的内容，大多数系统都会反复遇到这些设计抉择：速度还是持久、一致还是可用、简单还是灵活、通用还是专用，以及做出这些抉择时必须支付的代价。版本会迭代（本书基于 Redis 7.x、MySQL 8.0.x、Kafka 3.x），但这些抉择的逻辑长期不变。如果你对某些知识点不太理解，建议多用 AI 工具，可以快速帮你补齐这些知识。</p>
 <p>希望你读完本书之后，再面对一个新系统时，能多关注本书提到的关键问题，学着用架构师的角度去分析和思考，这样有助于你更快、更全面地摸清一个新系统。更理想的是，你在设计系统时，能下意识地去考虑不同方案的取舍问题，那么这本书就没白写。</p>
@@ -356,11 +356,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型且有代表性"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一。它的独到之处在于提出了"数据结构服务器（data structure server）"这一抽象：它对外暴露结构化类型（字符串、哈希、列表、集合、有序集合、Stream 等），命令直接在结构上做原子操作。这一抽象让它能同时充当缓存、排行榜、消息队列、锁服务等多种角色，用一套原语覆盖了丰富的使用场景。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
-<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高。单分区吞吐的量级见第 7 章关键数字）。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
+<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见第 7 章关键数字。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
 <p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
 <p>三家的强项各不相同：Redis 强在极简与单点性能，MySQL 把严谨与一致性抓得最紧，Kafka 靠吞吐和可扩展性立身。</p>
-<p>但面对架构难题，它们采用的方案不同，代价也不同。并发怎么控、数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题。后面 8 章逐个深讲这些主题。</p>
+<p>但面对架构难题，它们采用的方案不同，代价也不同。数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题，后面 8 章逐个深讲；并发怎么控，MySQL 的答案是 MVCC，本章 1.2 节会讲它的原理，锁与隔离级别的深水区不在本书范围。</p>
 <p>这三个软件最核心的设计，集中在这几条上：</p>
 <ul><li><strong>Redis</strong>：用"内存 + 单线程命令执行"换极简与低延迟，代价是复杂聚合让位给网络往返。</li><li><strong>MySQL</strong>：用"B+ 树 + WAL + MVCC"换强一致与通用查询，代价是写放大（同一份数据被物理写入多次）、事务开销和调优门槛。</li><li><strong>Kafka</strong>：用"追加写日志 + 顺序 I/O + 分区并行"换高吞吐与线性扩展，代价是延迟偏高、不适合随机查询。</li></ul>
 <p>这三组设计就是本书的主线，后面每章都是它们在不同问题上的展开。</p>
@@ -391,7 +391,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>把这三段概览并排放进一张表，差异在六个维度上就清楚了。</p>
 <p><strong>表 1-1　三个软件设计概览对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而生</td><td>1995，MySQL AB，经 Sun 入 Oracle，关系库常青树</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>稳定事务语义</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
-<p>把这种"追求的东西不同"画成一张雷达图。把低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致与查询灵活两个维度较强，Kafka 在高吞吐维度领先。没有谁能占满五个角：Redis 让出了容量和查询灵活度，MySQL 让出了延迟，Kafka 让出了低延迟和查询灵活度。各自顶满的那个角，正是另外两家的短板。</p>
+<p>把这种"追求的东西不同"画成一张雷达图。把低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致与查询灵活两个维度较强，Kafka 在高吞吐维度领先。没有谁能占满五个角：Redis 让出了容量和查询灵活度，MySQL 让出了低延迟，Kafka 让出了低延迟和查询灵活度。各自顶满的那个角，正是另外两家的短板。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_2_arrow-1-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -707,7 +707,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 1-3　全书章节结构。第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的启动与关闭出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
-<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.x），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
+<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.7 LTS），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许"裸奔"。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>
 <p>术语约定如下。全书术语统一译法，首次出现时中英对照标注，之后按两档制使用：工程界通行的术语直接用英文，如 redo log、undo log、binlog、WAL、MVCC；中文已充分沉淀的继续用中文，如缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到未列出的术语，我们会在首次出现时同样标注英文原词。</p>
 <h3 id="s21">1.4.4 推荐阅读路径</h3>
@@ -1144,13 +1144,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Arrows from root to internal nodes -->
   <line x1="390" y1="145" x2="230" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
-  <text x="300" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 &lt; 30</text>
+  <text x="272" y="160" text-anchor="middle" font-size="9" fill="#2563EB">键值 &lt; 30</text>
 
   <line x1="450" y1="145" x2="450" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
   <text x="470" y="175" font-size="9" fill="#2563EB">30 ≤ 键值 &lt; 65</text>
 
   <line x1="510" y1="145" x2="670" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
-  <text x="600" y="170" text-anchor="middle" font-size="9" fill="#2563EB">键值 ≥ 65</text>
+  <text x="645" y="160" text-anchor="middle" font-size="9" fill="#2563EB">键值 ≥ 65</text>
 
   <!-- ===== INTERNAL LEVEL ===== -->
   <!-- Internal node 1 -->
@@ -1171,8 +1171,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="261" text-anchor="middle" font-size="10" fill="#6B7280">例：[80 | 95] → 子节点指针 × 3</text>
 
   <!-- 16KB label on internal -->
-  <rect x="565" y="195" width="70" height="22" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="600" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
+  <rect x="780" y="300" width="70" height="22" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="815" y="315" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">16KB 页</text>
 
   <!-- Arrows from internal to leaf -->
   <line x1="150" y1="270" x2="130" y2="340" stroke="#60A5FA" stroke-width="1.2" marker-end="url(#fig_2_6_arrow-gray)"/>
@@ -1375,7 +1375,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s32">2.3.1 Redis RESP：能被人眼读懂的极简协议</h3>
 <p>Redis 的协议叫 RESP（REdis Serialization Protocol）。它的设计目标非常明确：实现简单（服务端解析不费 CPU）、人眼可读（协议就是文本，肉眼可辨）、能表达所有 Redis 命令和返回值。</p>
 <p>RESP 用每种数据类型的第一个字节区分类型。<code>+</code> 是简单字符串（如 <code>+OK\r\n</code>），<code>-</code> 是错误（如 <code>-ERR unknown command\r\n</code>），<code>:</code> 是整数（如 <code>:1000\r\n</code>），<code>$</code> 是批量字符串（如 <code>$5\r\nhello\r\n</code>，先告知长度再跟内容，天然二进制安全），<code>*</code> 是数组（如 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code>，先告知元素个数再逐个展开）。五种前缀字符就够用了：既无固定头部，也无版本号；长度只出现在批量字符串里（那是内容长度，不是协议头部）。</p>
-<p>代价跟着简单一起来。RESP 是纯文本协议，体积比二进制大：<code>SET key value</code> 变成 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code> 有三十多个字节。每条命令独立，没有 Batch 概念（Pipeline 只是多条命令一起发，每条仍然独立编码和返回）。版本演进靠手工约定。Redis 6.0 之前没有版本协商，客户端假设服务端支持什么就发什么，不支持就报错。</p>
+<p>但简单也有代价。RESP 是纯文本协议，体积比二进制大：<code>SET key value</code> 变成 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code> 有三十多个字节。每条命令独立，没有 Batch 概念（Pipeline 只是多条命令一起发，每条仍然独立编码和返回）。版本演进靠手工约定。Redis 6.0 之前没有版本协商，客户端假设服务端支持什么就发什么，不支持就报错。</p>
 <p><strong>但 RESP 的"简单"恰好匹配了 Redis 的核心目标。</strong> Redis 命令本身都很短小，协议开销在内存访问的纳秒级延迟面前可以忽略；人眼可读让调试和运维成本趋近于零。连上 <code>redis-cli</code> 敲命令，就是它协议的原生交互方式。用复杂的二进制协议换那点带宽和解析开销，对 Redis 来说是过度设计。</p>
 <p>补充一个版本事实：Redis 6.0 引入了 RESP 3，在保持文本可读性的基础上增加了 Map（<code>%</code>）、Set（<code>~</code>）、Push（<code>&gt;</code>）、Boolean（<code>#</code>）、Null（<code>_</code>）等数据类型，并引入 <code>HELLO</code> 命令让客户端与服务端协商协议版本。RESP 3 保留了 RESP 2 用前缀字符区分类型的做法、<code>\r\n</code> 终止、人眼可读，补上了两个缺口：返回值类型信息的精确化（客户端不再需要从上下文推断"这是整数还是字符串"），以及版本协商机制（弥补了上文提到的"演进靠手工约定"缺陷）。RESP 3 是 opt-in 的：服务端始终兼容 RESP 2 客户端，客户端须用 <code>HELLO</code> 显式协商才能切到 RESP 3，且部分命令的返回类型随之改变（如 <code>HGETALL</code> 从扁平数组变为 Map），切换需要客户端适配。全书的技术描述不依赖任一版本的具体特性。</p>
 <h3 id="s33">2.3.2 MySQL 二进制协议：紧凑编码与预编译</h3>
@@ -2347,14 +2347,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
 </svg>
 </div><figcaption>图 4-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
-<p>图 4-2 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰线程从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
+<p>图 4-2 把近似 LRU 的随机采样池和 LFU 的 Morris 对数计数器并排画出。LRU 一侧，淘汰逻辑从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰骨架，只是比较维度从时间换成了频率。</p>
 <h3 id="s67">持久化的两条腿</h3>
 <p>内存淘汰回答的是"满了怎么办"，持久化回答的是"断电了还在不在"。Redis 给了两条腿：RDB 和 AOF。</p>
 <p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程专心写快照，父子进程通过 COW 隔离，各干各的。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了。生产环境里这种卡顿通常表现为一波客户端超时告警，排查时若发现告警间隔正好等于 <code>save</code> 规则的触发周期，基本就能锁定元凶是 fork。这就是大实例要控制容量的核心原因之一。</p>
 <p><strong>AOF（仅追加文件）</strong> 走另一条路：它不存数据本身，而是把每一条写命令追加到日志末尾。恢复时按顺序回放这些命令重建内存状态。AOF 的核心旋钮是 <code>appendfsync</code>，它决定了日志什么时候真正落到磁盘：</p>
 <ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把 PageCache 写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
 <p>这三档本质上是同一个取舍的三个落点：可靠性 vs 性能。很多生产环境会选择 <code>everysec</code>，因为它把潜在丢失控制在约 1 秒量级，代价是每秒一次的 <code>fsync</code>。需要说明：<code>appendfsync</code> 的默认值确实是 <code>everysec</code>，但 Redis 7.x 出厂默认并不开启 AOF（<code>appendonly no</code>，即 RDB-only）；只有显式打开 AOF 后，<code>appendfsync</code> 才以 <code>everysec</code> 为默认档（详见第 8 章）。</p>
-<p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。重写是按内存当前状态重新生成一份最小的命令集（把那一万条 <code>INCR</code> 压成一条 <code>SET key 10000</code>）。重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套机制保证了重写过程不丢数据。</p>
+<p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。重写是按内存当前状态重新生成一份最小的命令集（把那一万条 <code>INCR</code> 压成一条 <code>SET key 10000</code>）。7.0 之前的单文件 AOF 里，重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套老机制保证了重写过程不丢数据；7.0 起重写期间的新写改为直写新增量文件（见下文 Multi-Part AOF 与 8.2.4）。</p>
 <p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再回放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义是控制 base 文件是否使用 RDB 格式：默认 yes 时 base 为 RDB 格式（等效混合持久化），设为 no 则 base 为 AOF 命令格式。</p>
 <p><strong>7.0 的多部 AOF（Multi-Part AOF）改造</strong>做了几件事。7.0 之前 AOF 是一个单文件（RDB 前导 + 增量命令挤在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>、以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写中途崩溃会破坏现有 AOF"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面图 4-3 里画的"AOF 增量后半"对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。7.0 多部 AOF 的字节级布局详见 8.2.4。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，呈现 Redis"内存为主、磁盘为辅"的根本定位。</p>
@@ -2453,7 +2453,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 4-3　Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
 <p>图 4-3 展示了一条写命令进入 Redis 后如何通往内存与持久化。命令先在内存里执行；RDB 是另一条独立的全量快照路径（fork 触发），而 AOF（含混合持久化）走的是追加日志路径，产物落在 <code>appendonlydir/</code>。也就是说，内存是主，磁盘是从，持久化只是给内存数据留一份后手。</p>
 <h3 id="s68">取舍总账</h3>
-<p>Redis 的取舍可以一句话概括：它用内存和秒级持久化，换来读写延迟低、原生支持多种数据结构。这套取舍在缓存和快速键值场景成立：访问频繁、对延迟敏感、数据可重建或可容忍少量丢失。代价是容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见第 7 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
+<p>Redis 的取舍可以一句话概括：它付出内存成本、接受秒级的持久化窗口，换来读写低延迟和原生的多种数据结构。这套取舍在缓存和快速键值场景成立：访问频繁、对延迟敏感、数据可重建或可容忍少量丢失。代价是容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见第 7 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
 <p>Redis 的"全内存 + 持久化兜底"与 MySQL 的"磁盘为主、内存加速"形成直接对照。</p>
 <h2 id="s69">4.3 MySQL 的做法</h2>
 <p>MySQL 默认的存储引擎是 InnoDB。InnoDB 的核心假设与 Redis 几乎相反：数据最终必须落盘，内存只是减少磁盘 I/O 的缓冲。数据落盘后，容量几乎无限、ACID 可靠；代价是延迟受缓冲池命中率支配。一旦缓存未命中（cache miss），延迟立刻从内存级跌到磁盘级。</p>
@@ -2871,7 +2871,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 和 MySQL 选择自己管理内存，是因为内核的页面缓存策略无法满足它们在淘汰精度上的需求：Redis 要的是 O(1) 的精确淘汰、MySQL 要的是抗扫描污染的新老分区 LRU。Kafka 不要这种精度，所以它直接用上了 OS 缓存的复用面与"重启不冷"的好处。这条原则在中间件设计里反复出现：你在用户态造的每一段缓存，都是在与 OS 缓存抢内存，要确认这份抢占换来的精度值这个价。</p>
 <h3 id="s85">启示三：持久化是"可靠性 vs 性能"的连续谱，不是开关</h3>
 <p>它们的每个刷盘旋钮，都是同一道选择题的不同档位。Redis 的 <code>appendfsync</code>（always / everysec / no）、MySQL 的 <code>innodb_flush_log_at_trx_commit</code>（1 / 2 / 0）、Kafka 的 <code>acks</code>（all / 1 / 0）与 <code>log.flush.*</code>。把这些旋钮画在同一根轴上，你会发现它们的位置几乎一一对应：最严的那档"每条都落盘"对应最强不丢，最松的那档"交给 OS"对应最高吞吐。</p>
-<p>理解了谱系，调参才有方向。你该问的是"我愿意为多强的持久性牺牲多少吞吐"。很多时候答案是中间档。Redis 的 <code>everysec</code>、MySQL 的 2（写 OS 缓存、每秒 fsync 一次）、Kafka 的 <code>acks=1</code>（3.0 之前的默认；3.0 起默认已升至 <code>acks=all</code>，这里指主动下调到中间档的场景）。</p>
+<p>理解了谱系，调参才有方向。你该问的是"我愿意为多强的持久性牺牲多少吞吐"。很多时候答案是中间档。Redis 的 <code>everysec</code>、MySQL 的 2（写 OS 缓存、每秒 fsync 一次）、Kafka 的 <code>acks=1</code>。注意 Kafka 3.0 起默认已是 <code>acks=all</code>，这里说的是主动下调到中间档的场景。</p>
 <h3 id="s86">启示四：用顺序写替代随机写，是跨范式的共性手段</h3>
 <p>它们的写路径都把随机写转成了顺序写：Redis 的 AOF 把"修改内存数据结构"转成"追加写命令日志"。MySQL 的 redo log 把"修改散落各处的数据页"转成"追加写物理变更记录"。Kafka 更干脆，数据本身就是顺序日志，没有"转换"这一步。这是因为在所有持久介质上，顺序写都远快于随机写。</p>
 <p>这条规律在系统设计里普适。你要写一个高吞吐的审计日志、一个 WAL、一个事件溯源（event sourcing）系统，都该先想"能不能把写做成顺序追加"。任何把"高频随机写"当核心路径的设计，在数据量上来后都会因磁盘的随机寻道而性能急剧下降。</p>
@@ -2884,7 +2884,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <section class="chapter" id="ch5"><h1 id="s88">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</h1>
 <h2 id="s89">本章导读</h2>
 <p>有没有接手过一个越改越乱的老项目？改一个小功能，牵连出三个模块的 bug；加一个新特性，要在五六个地方重复改动；想换个底层存储，发现调用方和实现缠成一团，根本抽不出来。这种痛，归根到底都是同一件事：系统没有分好层。"对外收发消息、内部决定逻辑、底层存数据"这三件事混在一起写，系统就必然越长越乱、越改越脆。分层，就是把它们切开，让每一层只管自己那摊事。</p>
-<p>我接手过一个运营后台，需求只是加一个导出按钮。我改了 Controller 三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我动的那几行不小心改了 SQL 拼接的顺序。那次让我明白：代码混在一起写，风险不看你改了多少行：我只动了三行，但影响的边界根本不在这三行里。</p>
+<p>我接手过一个运营后台，需求只是加一个导出按钮。我改了 Controller 三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我动的那几行不小心改了 SQL 拼接的顺序。那次让我明白：代码混在一起写，风险不看你改了多少行。我只动了三行，但影响的边界根本不在这三行里。</p>
 <p>但分层是有代价的。每多一层，就多一次上下文切换、多一份接口要维护。分多深、层之间拿什么传话、谁可以替换，每一项都是实打实的取舍。Redis、MySQL、Kafka 在这些问题上各走一端，正好覆盖了分层设计的取舍：单机最低延迟、标准化生态、分布式水平扩展。</p>
 <p>分层能做多薄，就看一件事：这次抽象带来的延迟，你愿不愿意付。Redis 薄到几乎不分、MySQL 用虚函数换可插拔、Kafka 在存储层之上又多了一层协调。三种极端形态，背后是同一套判断标准。我们用交互层、逻辑层、存储层三段式主轴，把这三个软件放在一起对比。</p>
 <hr>
@@ -3655,7 +3655,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s111">本章导读</h2>
 <p>为什么 Redis 可以裸奔很多年、MySQL 从第一天就把权限做到列级、Kafka 必须在每一跳都重新谈一次身份？三个答案差这么远，根源是各自的数据模型和部署形态。单机内存、企业关系型、分布式多跳，三种形态对安全提了完全不同的要求。</p>
 <p>三个软件放进同一张安全分析表，沿着认证、授权、加密、审计四条线逐个拆解。本章的目标是提供一个可跨场景复用的安全分析框架：安全设计的上限，由数据模型（关系、键值、流）和部署形态（单机、企业、分布式）共同决定。下次给一个新系统做安全评审，先看它的数据住在哪、请求要跨几跳。</p>
-<p>我自己对安全的态度是被一次线上事故扭过来的。早年在测试环境跑 Redis 没设密码，某天发现 <code>KEYS *</code> 返回来一堆不认识的东西：一个爬虫脚本扫到了公网 IP 上的 6379 端口，把我们的实例当成了免费缓存。好在只是测试环境。那次之后我意识到：默认不安全不是设计缺陷，是取舍：设计者把"五分钟跑起来"排在了"先锁门"前面。</p>
+<p>我自己对安全的态度是被一次安全事件扭过来的。早年在测试环境跑 Redis 没设密码，某天发现 <code>KEYS *</code> 返回来一堆不认识的东西：一个爬虫脚本扫到了公网 IP 上的 6379 端口，把我们的实例当成了免费缓存。好在只是测试环境。从那以后我把"默认不安全"看成一种取舍而非缺陷：设计者把"五分钟跑起来"排在了"先锁门"前面。</p>
 <h2 id="s112">6.1 问题的本质</h2>
 <p>在看三个软件的实现之前，先把"数据系统的安全"抽象成一个共性问题。任何一个面向多用户的数据系统，都要在四条线上同时把守。</p>
 <p>第一条是<strong>认证（Authentication）</strong>，回答"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。第二条是<strong>授权（Authorization）</strong>，回答"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。第三条是<strong>加密（Encryption）</strong>，分为传输加密和存储加密：传输加密保证机密性与完整性在路上不被破坏，存储加密保证数据落盘后即使磁盘被盗也无法直接读取。第四条是<strong>审计（Audit）</strong>，回答"事后能否查清谁在什么时候做了什么"，是合规取证和事后复盘的依据。这四条线在一次"客户端发起请求到数据落盘"的链路上各管一段。</p>
@@ -4106,7 +4106,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的授权模型是 ACL，每条规则绑定三元组：主体（Principal，通常是服务账号或用户）、操作（Operation）、资源（Resource）。资源类型有 Topic、Group、Cluster、TransactionalId、DelegationToken，每类资源有自己的操作集：Read、Write、Create、Delete、Alter、Describe、ClusterAction、All。</p>
 <p>Kafka 原生只有 ACL，没有 RBAC，和 Redis 一样；但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。</p>
 <p>前缀授权（prefixed resource pattern）是多租户场景的便利设计。一条规则 <code>--resource-pattern-type prefixed --topic app-a.</code> 就能把所有 <code>app-a.</code> 开头的主题的读写权限授予 app-a 这个服务，避免逐主题授权。在一个集群承载几十上百个服务的场景下，前缀授权让权限管理退化成"前缀约定加少量例外"，运维成本随之下降。</p>
-<p>Kafka 的默认策略要分两种授权器看。<code>AclAuthorizer</code>（ZK 时代的经典授权器）下，<code>allow.everyone.if.no.acl.found</code> 默认是 <strong>true</strong>：资源上完全没配 ACL 时放行所有人，配了 ACL 之后未命中的请求才被拒绝。KRaft 的 <code>StandardAuthorizer</code> 则始终默认拒绝。生产环境要么显式把该参数设为 false、要么直接用 StandardAuthorizer，并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。另有相关的默认值变更：<code>unclean.leader.election.enable</code> 自 0.11 起由 true 改为 false（KIP-106），与 ACL 的默认策略是两回事。</p>
+<p>Kafka 的默认策略要分两种授权器看。<code>AclAuthorizer</code>（ZK 时代的经典授权器）下，<code>allow.everyone.if.no.acl.found</code> 默认是 <strong>true</strong>：资源上完全没配 ACL 时放行所有人，配了 ACL 之后未命中的请求才被拒绝。KRaft 的 <code>StandardAuthorizer</code> 则始终默认拒绝。生产环境要么显式把该参数设为 false、要么直接用 StandardAuthorizer，并配齐 ACL：因为"默认拒绝"一旦生效，遗漏某个资源的 ACL 会让正常请求也被拒，运维必须保证 ACL 覆盖完整。</p>
 <h2 id="s121">6.4 加密</h2>
 <p>加密在传输途中和落盘之后保护数据的安全。三个软件的传输加密都选了 TLS，但补上 TLS 的时机和方式各不相同。</p>
 <h3 id="s122">Redis：TLS 是 6.0 才补上的课</h3>
@@ -4156,7 +4156,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s136">本章导读</h2>
 <p>业务跑顺了，流量却开始翻倍。某天你会发现一台机器扛不住了：CPU 打满、磁盘告急，再宕一次机整个服务就跟着瘫痪。单机的 CPU、内存、磁盘都有物理上限，机器也总会坏。解决这个问题的办法，是把数据和服务分摊到多台机器上，对外表现为一个统一的系统。这就是集群架构要解决的问题。</p>
 <p>但分布式在解决这些问题的同时，也引入了新的复杂度。一旦数据散到多台机器，四个新难题立刻冒出来：数据怎么切才均衡、副本之间怎么保持一致、某台挂了怎么自动发现和转移、集群元数据怎么统一管理。Redis、MySQL、Kafka 在生产环境里把这些问题打磨了十几年，沉淀出三条截然不同的路线。同样面对"单点不够用"：Redis 要快，可丢一点；MySQL 的定位是宁停不丢（默认异步形态仍可丢）；Kafka 不写死，做成可调旋钮，按业务自己选。 三个答案排开，从弱到强。集群的拓扑与容错归本章，复制的字节级细节归第 9 章。</p>
-<p>我做过一个库存服务。当时选了 Redis Cluster，觉得"够快、能自动分片"。结果大促那天出了事：一次网络分区触发了主从切换，被割出去的少数派老主在超时窗口内还在接写，刚扣减的库存在网络恢复后被新主的数据覆盖了。用户下了单，仓库说没货。那次之后我才真正理解，CAP（一致性、可用性与分区容错的取舍定理）不只是教科书上的理论选择题，落到代码里就是实打实的取舍。选了快，就要为快可能丢数据做好预案。</p>
+<p>我做过一个库存服务。当时选了 Redis Cluster，觉得"够快、能自动分片"。结果大促那天出了事：一次网络分区触发了主从切换，被割出去的少数派老主在超时窗口内还在接写，刚扣减的库存在网络恢复后被新主的数据覆盖了。用户下了单，仓库说没货。吃过这个亏，我才真正理解，CAP（一致性、可用性与分区容错的取舍定理）不只是教科书上的理论选择题，落到代码里就是实打实的取舍。选了快，就要为快可能丢数据做好预案。</p>
 <h2 id="s137">7.1 问题的本质</h2>
 <p>不久前有个同事问我："Redis 内存快爆了，加个从节点是不是就行了？"</p>
 <p>这个问题混淆了两件不同的事。加从节点解决的是高可用：主挂了从能顶上，服务不中断。但主从数据是完整副本，主满了从也满，对"内存爆了"毫无帮助。要解决容量问题，得把数据切开放到不同机器上，每台只存一部分，这叫分片（sharding，也叫 partitioning）。</p>
@@ -4284,8 +4284,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>主从复制解决了一个问题：读可以分担到从节点，主节点坏了可以从从节点恢复数据。但它有三个根本性的局限。第一，复制是<strong>异步</strong>的：主节点写完立即返回客户端，不等从节点确认。这是 Redis 的性能取舍：要快就不能等。代价是主节点刚确认的写、从节点还没收到时主节点宕机，这笔写就丢了。第二，<strong>写仍然集中在单主</strong>。主从复制解决了读扩展和高可用，但没有解决写扩展：所有写还是压在一个主节点上，单机内存仍然是容量天花板。第三，<strong>故障转移要人工</strong>。主节点宕了，运维得手动把某个从节点提升为主、再让其他从节点改连新主。对"高可用"这个目标，人工转移不够格。</p>
 <h3 id="s140">7.2.2 Sentinel：把人工故障转移自动化</h3>
 <blockquote><strong>共识算法一分钟直觉</strong>（第一次接触 Raft/Paxos 的读者先读这段）：这类算法要解决的问题只有一个——几台机器怎么对"一件事"达成不可反悔的一致决定。套路是三板斧：<strong>任期号（term/epoch）</strong>，每轮决策带一个单调递增的编号，旧任期的决定说了不算；<strong>多数派投票</strong>，提议要拿到过半节点的票才算通过，任意两个多数派必有交集，所以两个不同决定不可能同时通过，这从数学上杜绝了脑裂；<strong>日志复制</strong>，通过的决定按相同顺序落到各节点的日志里，少数派宕机也不丢。Raft 和 Paxos 是这套思路的两个代表，本章后面遇到的 Sentinel 选举、MGR 的 XCom、Kafka 的 KRaft，都是这三板斧的变体。读懂本章只需要上面的直觉，想深究可以读 Raft 的原始论文。</blockquote>
-<p>Sentinel（哨兵）就是来做自动故障转移的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，负责在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 <code>down-after-milliseconds</code> 没回应，这个 Sentinel 把主节点标记为<strong>主观下线</strong>（SDOWN，subjectively down）：这只是单个 Sentinel 基于本节点视角的判定。然后它通过 <code>SENTINEL is-master-down-by-addr</code> 直接询问其他 Sentinel 投票，如果达到配置的 quorum（多数派）数量都认为主节点挂了，就升级为<strong>客观下线</strong>（ODOWN，objectively down）：这是达到 quorum 数量后集群层面的共识判定。接下来 Sentinels 之间用一种 Raft 风格的选举（Redis 官方文档称之为 "Raft-like"，借鉴了 Raft 的任期号加多数派投票，但没有完整的 Raft 日志复制）选出一个 Leader Sentinel 主持转移，再按优先级、复制偏移量（offset）、runid 三个维度从从节点里挑一个提升为新主，给它发 <code>REPLICAOF NO ONE</code>，并通知其他从节点改连新主。</p>
-<p>Sentinel 自身用了多数派投票（逐台询问投票 + Raft-like 选举）来防止单点误判，但<strong>数据层仍然是单主异步复制</strong>。也就是说，监控层的一致性（多数派投票决定谁挂了、谁来主持转移）和数据层的弱一致性（异步复制可丢写）是两件事：前者只管"决策"，不管"数据"。Sentinel 能保证"主节点真的挂了才转移"，但保证不了"转移后一笔都不丢"。主从异步复制的丢写风险原封不动地继承下来。</p>
+<p>Sentinel（哨兵）就是来做自动故障转移的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，负责在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 <code>down-after-milliseconds</code> 没回应，这个 Sentinel 把主节点标记为<strong>主观下线</strong>（SDOWN，subjectively down）：这只是单个 Sentinel 基于本节点视角的判定。然后它通过 <code>SENTINEL is-master-down-by-addr</code> 直接询问其他 Sentinel 投票，如果达到配置的 quorum 数量（quorum 是人工设定的判定票数，不必是多数派）都认为主节点挂了，就升级为<strong>客观下线</strong>（ODOWN，objectively down）：这是达到 quorum 数量后集群层面的共识判定。接下来 Sentinels 之间用一种 Raft 风格的选举（Redis 官方文档称之为 "Raft-like"，借鉴了 Raft 的任期号加多数派投票，但没有完整的 Raft 日志复制）选出一个 Leader Sentinel 主持转移，再按优先级、复制偏移量（offset）、runid 三个维度从从节点里挑一个提升为新主，给它发 <code>REPLICAOF NO ONE</code>，并通知其他从节点改连新主。</p>
+<p>Sentinel 自身用了两道投票（quorum 判定客观下线 + 多数派 Raft-like 选举 Leader）来防止单点误判，但<strong>数据层仍然是单主异步复制</strong>。也就是说，监控层的一致性（quorum 判定谁挂了、多数派选举谁主持转移）和数据层的弱一致性（异步复制可丢写）是两件事：前者只管"决策"，不管"数据"。Sentinel 能保证"主节点真的挂了才转移"，但保证不了"转移后一笔都不丢"。主从异步复制的丢写风险原封不动地继承下来。</p>
 <p>Sentinel 解决了自动故障转移的问题，但又留下三个新局限：写仍然集中在单主，没法水平扩展。内存仍然受单机限制，应付不了数据量增长。客户端要懂 Sentinel 协议，得知道去问谁要当前主节点地址。这三个局限加在一起，指向同一个诉求：既要能水平扩展，又要能自动容错。这就是 Redis Cluster 要解决的事。</p>
 <h3 id="s141">7.2.3 Redis Cluster：分片加自动容错，去中心化元数据</h3>
 <p>Redis Cluster 是 Redis 的分布式集群方案。它的三个关键词是：分片、自动容错、去中心化。</p>
@@ -4938,7 +4938,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这个等式换来的都是现成的东西：AOF 损坏可以人工编辑修复（纯 AOF 模式下，明确字节边界时可用编辑器删掉坏掉的那条；混合持久化模式下 AOF 文件前段为二进制 RDB 数据，需先用 <code>redis-check-aof --fix</code> 工具修复），可用 redis-cli 直接回放一个 AOF 文件（相当于白得一套恢复工具），格式零额外定义成本（协议早就定义好了，存盘就是按协议写一遍）。这些好处之所以能拿到，是因为 Redis 没有为持久化单独发明一套格式，而是复用了已经存在的协议。</p>
 <p>代价同样明显：体积大、回放慢。一条命令的文本表示远比 RDB 的紧凑二进制臃肿，恢复时要逐条解析、逐条执行，速度比直接灌二进制差一个量级。Redis 用 fsync 策略在"丢多少"与"多慢"之间切档：always 每条命令都落盘（最安全最慢）、everysec 每秒落一次（默认）、no 让操作系统决定（最快但崩溃可能丢更多）。同一种格式下，用 fsync 频率换可靠性档位。</p>
 <p>AOF 还有一个绕不开的难题：随着命令不断追加，文件只会越来越大，里面会堆积大量被覆盖、被删除的过时命令：比如一百万次 INCR 同一个 key，真正有效的只有最后一次。Redis 的解法是重写（rewrite）。重写的关键取舍是：<strong>fork 子进程从当前内存直接生成新 AOF</strong>。这一步绕开了"解析越积越大的日志"这个坑：重写复杂度只跟当前内存数据量有关，跟 AOF 已经积累了多少无关。</p>
-<p>但 fork 那一刻之后，父进程还在处理新写命令，这些命令既不能丢也不能让重写卡住。Redis 的解法是双缓冲：重写期间的新写命令进 aof_rewrite_buffer，重写完成的子进程产出新文件后，父进程把 buffer 里的命令原子追加到新文件尾部，再做 rename 替换。这是"追加日志如何做在线 compaction"的经典手法。</p>
+<p>但 fork 那一刻之后，父进程还在处理新写命令，这些命令既不能丢也不能让重写卡住。7.0 之前，Redis 的解法是双缓冲：重写期间的新写命令进 aof_rewrite_buffer，重写完成的子进程产出新文件后，父进程把 buffer 里的命令原子追加到新文件尾部，再做 rename 替换。这是"追加日志如何做在线 compaction"的经典手法（7.0 起的替代方案见下节）。</p>
 <h3 id="s166">8.2.4 混合持久化：RDB 头加 AOF 尾</h3>
 <p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义是控制 base 文件是否使用 RDB 格式：默认 yes 时 base 为 RDB 格式，效果等同混合持久化常开；设为 no 则 base 为 AOF 命令格式。</p>
 <p>Multi-Part AOF 的真正变化不在"混合"，而在文件结构的重构。7.0 之前，AOF 是单个大文件，重写靠 rename 替换：旧文件删掉、新文件顶上。这个设计的真实痛点在重写期间：新写命令要同时进旧 AOF 和内存重写缓冲区，重写一旦反复失败，旧文件和缓冲区持续膨胀，中断后还残留需人工清理的临时文件。7.0 把它拆成了一个目录，里面由清单文件（manifest）统一管理三类文件：至多一个基础文件（base，RDB 格式）、零或多个增量文件（incr，AOF 命令）、以及重写后被标记为历史（history）待删的旧文件。重写改成了生成新 base + 新 manifest 的原子切换，和 git 的 commit 指针切换是同一种思路：数据不动，指针换。重写中断不会再留下需要人工清理的临时文件，增量文件也可以单独轮转清理。</p>
@@ -5027,8 +5027,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="440" y="525" width="240" height="36" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="2"/>
   <text x="560" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">AOF 增量命令（尾部，少丢）</text>
 </svg>
-</div><figcaption>图 8-3　AOF 重写 + 混合持久化的双缓冲协作时序。</figcaption></figure>
-<p>图中可以看到完整时序：父进程 fork 出子进程，子进程基于当前内存生成 RDB 全量写到新文件；期间父进程照常服务，新命令同时进 AOF 当前文件与 aof_rewrite_buffer；子进程写完后通知父进程，父进程把 buffer 里的增量命令追加到新文件尾部（混合格式的 AOF 段），再 rename 原子替换旧文件。整个过程线上服务不中断。</p>
+</div><figcaption>图 8-3　AOF 重写 + 混合持久化的双缓冲协作时序（7.0 之前的单文件机制；7.0 起为 manifest 原子切换，见 8.2.4）。</figcaption></figure>
+<p>图中画的是 7.0 之前单文件 AOF 的完整时序：父进程 fork 出子进程，子进程基于当前内存生成 RDB 全量写到新文件；期间父进程照常服务，新命令同时进 AOF 当前文件与 aof_rewrite_buffer；子进程写完后通知父进程，父进程把 buffer 里的增量命令追加到新文件尾部（混合格式的 AOF 段），再 rename 原子替换旧文件。整个过程线上服务不中断。7.0 起，缓冲区和 rename 这两步被"新开 incr 文件直写 + manifest 原子切换"取代（见 8.2.4）。</p>
 <p>RDB 与 AOF 是可以拼接的积木：大头走快格式，尾巴走准格式，组合效果在多数生产场景中优于纯 RDB 或纯 AOF。Redis 7.x 出厂默认持久化仍是 RDB-only（<code>appendonly no</code>，靠 <code>save</code> 规则周期性 BGSAVE）；生产环境追求"少丢"才会显式打开 AOF（everysec），混合格式在 7.0 后随 AOF 重写默认产出。这套组合才是社区推荐的生产配置。</p>
 <h2 id="s167">8.3 MySQL 的做法</h2>
 <h3 id="s168">8.3.1 定位先行：磁盘是家，内存是缓存</h3>
@@ -5414,7 +5414,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>单条 Message</td><td>单条 Message</td><td>Record Batch（含多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>每条绝对偏移量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条一条</td><td>每条一条</td><td>Batch 级一条</td></tr><tr><td>压缩</td><td>单条级别，压缩比低</td><td>单条级别，压缩比低</td><td>Batch 级别，压缩比高</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>为"想知道时间得扫全文件"买单</td><td>为"元数据冗余 + 压缩低效"买单</td></tr></tbody></table></div>
 <p>看演进动机这一列，每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。</p>
 <h3 id="s178">8.4.6 Tiered Storage：从本地日志到分层存储</h3>
-<p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一。它修正了 8.4.1 的判断（"磁盘就是日志本体"）改为：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
+<p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
 <p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者或 Follower 读取时，先尝试本地磁盘，未命中则从远程拉取并缓存到本地（fetch-through 语义）。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 三件套在远程和本地是同一套文件结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
 <p>第一，"磁盘就是日志本体"需要修正：真相之源仍是日志 Segment，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式是访问模式的镜像"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -6397,7 +6397,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>leader epoch 的引入是为了补 offset 的不足：offset 只描述"日志长度"，无法表达"某段日志是否被新任期否决"。epoch 给每段日志盖上了"由哪一任 Leader 写下"的戳，让截断决策有据可依。这和 MySQL 用 GTID 标识事务、Redis 用 replid 标识主节点身份，本质是同类思路：<strong>给日志段一个权威的归属标记</strong>。</p>
 <h3 id="s218">acks 旋钮：一致性强度的生产者级档位</h3>
 <p>Kafka 把一致性强度做成了生产者侧的 <code>acks</code> 旋钮（0 / 1 / all 三档），它配合 <code>min.insync.replicas</code>（ISR 最少要有几个副本才允许写入）构成 Kafka 的可靠性语义。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在第 7 章 7.4.3 节展开。</p>
-<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步在超时时降级回异步，弱化一致性以保障可用性，Kafka 在 ISR 不足 <code>min.insync.replicas</code> 时，写入操作会失败。同一个"一致性 vs 可用性"的抉择，这两款软件在生产者侧画在了相反的位置：这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边：宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才换得值。一个常见的强可靠配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>，能容忍单副本故障而不丢数据。</p>
+<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步在超时时降级回异步，弱化一致性以保障可用性，Kafka 在 ISR 不足 <code>min.insync.replicas</code> 时，写入操作会失败。同一个"一致性 vs 可用性"的抉择，这两款软件在生产者侧画在了相反的位置。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才换得值。一个常见的强可靠配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>，能容忍单副本故障而不丢数据。</p>
 <h3 id="s219">unclean leader 选举：CAP 取舍的显式开关</h3>
 <p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。这是一个把 CAP 取舍暴露成显式开关的典型设计：</p>
 <ul><li><strong>允许（true）</strong>：ISR 全挂时，从落后副本中选一个当 Leader，系统恢复可用，但 HW 之后未同步的消息会丢：可用性优先。</li><li><strong>禁止（false，3.x 默认）</strong>：ISR 全挂时宁可不选主，等 ISR 成员恢复：一致性优先，但分区可能短时不可用。（这个默认值自 0.11 起就由 true 改为 false，KIP-106，3.x 沿用并强化了这一取向。）</li></ul>
@@ -6435,8 +6435,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s230">启示三：增量同步必须先解决断点续传</h3>
 <p>全量同步是兜底手段。它们都在"怎么让断线尽量走增量"上投入了大量设计：Redis 的 PSYNC2 + backlog、MySQL 的 GTID 自动定位、Kafka 的 offset + leader epoch 截断，都是为了在断线后精准补差，避免重头来过。</p>
 <p>原因在于全量同步代价巨大。Redis 全量要 fork（阻塞 + 内存风险），MySQL 全量要克隆或长 binlog 回放，Kafka 全量要拷整个分区日志。频繁全量会拖垮主节点、消耗带宽、延长恢复时间。所以设计原则是：<strong>能增量就别全量</strong>，把全量降级为"实在没办法时的最后手段"。这要求你的位点经得起主节点切换、你的缓冲窗口足够覆盖常见断线时长。</p>
-<h3 id="s231">启示四：一致性的代价是延迟的函数</h3>
-<p>正如 9.5 解读三所说，三个软件在同一条延迟-一致性曲线上站在不同位置。MySQL 的半同步超时参数（默认 10 秒）就是这条延迟预算的上限：等副本确认超过 10 秒，主库就不再等待，降级回异步。设计自己的复制系统时，先问业务能承受多少额外确认往返：延迟预算定了，一致性档位自然就定了。</p>
+<h3 id="s231">启示四：先定延迟预算，再定一致性档位</h3>
+<p>正如 9.5 解读三所说，三个软件在同一条延迟-一致性曲线上站在不同位置；第 7 章启示二从集群选型看过同一条谱线，这里把它落到复制设计的动作上。MySQL 的半同步超时参数（默认 10 秒）就是这条延迟预算的上限：等副本确认超过 10 秒，主库就不再等待，降级回异步。设计自己的复制系统时，先问业务能承受多少额外确认往返：延迟预算定了，一致性档位自然就定了。</p>
 <h3 id="s232">启示五：故障恢复是同步的反向问题</h3>
 <p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：同一份日志、同一种位点、同一套截断规则。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入走 clone + GTID 增量；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
 <p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础：只要保证日志可重放、位点可比对、截断有依据，恢复就能复用同步机制本身。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，真到了故障时，出事的往往就是这些地方。</p>
@@ -6452,7 +6452,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <section class="chapter" id="ch10"><h1 id="s235">第 10 章 万法归一 — 架构设计的共性规律与取舍之道</h1>
 <h2 id="s236">本章导读</h2>
 <p>前九章，三个软件在八个主题上交出了截然不同的答卷。Redis 偏延迟，MySQL 偏正确性，Kafka 偏吞吐。但这些差异底下，有没有同一套"骨架"？如果要设计一个新系统，该借鉴 Redis 的极简、MySQL 的严谨、还是 Kafka 的弹性？知道特性不等于会做架构决策。只有把"它们为什么这样选"抽象成规律，规律才能迁移到实际系统中。这一章把前九章的启示串成一条主线。</p>
-<p>我回头看自己的职业生涯，最大的认知转折点不是学会了哪门新技术，而是有一天我突然不再问"这个系统快不快"，开始问"它在什么约束下做了哪些取舍，这些取舍今天还成不成立"。二十出头时我痴迷于压 QPS，后来踩的坑多了才慢慢明白，真正值钱的能力是在一堆约束面前做对选择。这本书就是我自己花了十年才慢慢想清楚的那些规律。</p>
+<p>我回头看自己的职业生涯，最大的认知转折点不是学会了哪门新技术，而是有一天我突然不再问"这个系统快不快"，开始问"它在什么约束下做了哪些取舍，这些取舍今天还成不成立"。二十出头时我痴迷于压 QPS，后来踩的坑多了才慢慢明白，真正值钱的能力是在一堆约束面前做对选择。这本书写的，就是我自己花了十年才慢慢想清楚的那些规律。</p>
 <hr>
 <h2 id="s237">10.1 九章一镜照：前九章核心启示复盘</h2>
 <p>九章九问，每章都在回答同一个母题的不同切面："如何在约束下做出取舍"。把每章的一句话启示，连同它们在该主题上的关键决策，收敛成一张"九章启示总表"，作为后面提炼规律的素材库。</p>
