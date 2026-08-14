@@ -120,7 +120,7 @@ MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分�
 
 Kafka 的授权模型是 ACL，每条规则绑定三元组：主体（Principal，通常是服务账号或用户）、操作（Operation）、资源（Resource）。资源类型有 Topic、Group、Cluster、TransactionalId、DelegationToken，每类资源有自己的操作集：Read、Write、Create、Delete、Alter、Describe、ClusterAction、All。
 
-Kafka 原生只有 ACL，没有 RBAC。原因和 Redis 类似但语境不同，流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。
+Kafka 原生只有 ACL，没有 RBAC。结论和 Redis 一样不做 RBAC，但理由不同：流平台的主语通常是"应用或服务"而不是"人"，服务身份相对稳定，角色层收益不大。企业真要 RBAC 时，通常外接 Apache Ranger 或 Sentry 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划法，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂、核心保持简单。
 
 前缀授权（prefixed resource pattern）是多租户场景的便利设计。一条规则 `--resource-pattern-type prefixed --topic app-a.` 就能把所有 `app-a.` 开头的主题的读写权限授予 app-a 这个服务，避免逐主题授权。在一个集群承载几十上百个服务的场景下，前缀授权让权限管理退化成"前缀约定加少量例外"，运维成本随之下降。
 

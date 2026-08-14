@@ -209,7 +209,7 @@ Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配�
 
 这种"层间通信机制跟着部署形态走"是 Kafka 分层最明显的特征：单机内的层用对象调用，跨机器的层用网络协议，匹不匹配才是判断标准。
 
-五层结构（SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调层、跨 Broker 协议）。这五层指向同一个事实：**分布式系统的层间边界天然是网络，分层要为水平扩展服务**。
+SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调层、跨 Broker 协议这五层，指向同一个事实：**分布式系统的层间边界天然是网络，分层要为水平扩展服务**。
 
 ---
 
