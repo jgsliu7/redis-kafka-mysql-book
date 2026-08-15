@@ -80,5 +80,5 @@
   <text x="538" y="334" font-size="12" fill="#374151">查找 17：顶层快速逼近，下沉到底层后沿链表命中</text>
 
   <rect x="60" y="352" width="760" height="34" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
-  <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是"快速通道"，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
+  <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是抽稀的索引层，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
 </svg>

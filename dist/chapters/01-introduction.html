@@ -107,7 +107,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </li>
 <li><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现</a>
 </li>
-<li><a href="10-summary.html">第 10 章 万法归一 — 架构设计的共性规律与取舍之道</a>
+<li><a href="10-summary.html">第 10 章 总结：架构设计的共性规律与取舍</a>
 </li>
 <li><a href="10-epilogue.html">后记</a>
 </li>
@@ -243,7 +243,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（1.2.1 节展开）。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
-<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见第 7 章关键数字。它"日志即核心"的设计哲学，把整个系统构建在追加写日志之上，影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
+<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见第 7 章关键数字。它把整个系统构建在追加写日志之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
 <p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
 <p>面对架构难题，它们采用的方案不同，代价也不同。数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题，后面 8 章逐个深讲；并发怎么控，MySQL 的答案是 MVCC，本章 1.2 节会讲它的原理，锁与隔离级别的深入细节不在本书范围。</p>
@@ -252,7 +252,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这三组设计就是本书的主线，后面每章都是它们在不同问题上的展开。</p>
 <h2 id="s8">1.2 先认识这三个软件</h2>
 <p>正式对比之前，先把三个软件各过一遍：从哪来、信什么、拿什么换什么。后面的取舍分析都要回到这三段概览上来。</p>
-<h3 id="s9">1.2.1 Redis：内存即数据</h3>
+<h3 id="s9">1.2.1 Redis：数据全部放在内存</h3>
 <p>Redis 的起点很朴素。2009 年，意大利开发者 Salvatore Sanfilippo 在为自己的实时 Web 分析项目找一个能扛住高频访问统计的数据存储时，发现市面上的工具要么不够快、要么能力太单薄，于是干脆自己写了一个。Redis 就是这么一步步为解决一个真实问题做出来的。</p>
 <p>Redis 最有价值的贡献，是提出了<strong>数据结构服务器</strong>这一核心抽象。传统缓存如 Memcached 对外只暴露扁平的字符串键值，复杂操作要靠客户端读出来、改完再塞回去。Redis 则走了相反的路：把字符串、哈希、列表、集合、有序集合、Stream 等结构化类型直接作为一等公民对外暴露，每条命令都是在某个结构上做一次原子操作。比如对有序集合做 <code>ZADD</code> 和 <code>ZRANGEBYSCORE</code>，对列表做 <code>LPUSH</code> 和 <code>BRPOP</code>。这套抽象的好处是：一套原语就能同时覆盖缓存、排行榜、消息队列、计数器、分布式锁这些角色，省去了在每个场景各搭一套轮子的麻烦。</p>
 <p>Redis 把全部数据放在内存中，命令执行在很长一段历史里都是单线程的（自 6.0 起引入了可选的多线程 I/O 来加速网络读写，但命令执行仍是单线程）。持久化靠 RDB 快照与 AOF（Append-Only File，仅追加文件）两种方式互补。网络层采用事件驱动模型。这些选择都围绕同一个目标：<strong>用最少的机制，把延迟压到最低、实现做到最简</strong>。</p>
@@ -306,7 +306,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <line x1="300" y1="330" x2="490.2" y2="268.2"/>
     <line x1="300" y1="330" x2="417.6" y2="491.8"/>
     <line x1="300" y1="330" x2="182.4" y2="491.8"/>
-    <line x1="300" y1="330" x2="109.8" y2="268.2"/>
+    <line x1="300" y1="330" x2="126.2" y2="273.5"/>
   </g>
 
   <!-- 刻度数字（在顶部轴上标 1/3/5） -->
@@ -333,7 +333,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="528" y="280">每秒处理量</text>
     <text x="442" y="528">不丢不重</text>
     <text x="158" y="528">能存多少</text>
-    <text x="72" y="280">SQL/过滤/聚合</text>
+    <text x="72" y="280" font-size="10.5" text-anchor="middle">SQL/过滤/聚合</text>
   </g>
 
   <!-- ============ 三个软件多边形 ============ -->
@@ -450,7 +450,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>面对同一个问题："Redis 是单线程的"，使用者关心的是"我要避免在一个命令里跑 <code>KEYS *</code>，避免在大集合上做重计算，否则会卡住整个实例"。架构师追问的是：<strong>单线程反而更快的原因、多线程 I/O 的嵌入方式、这套设计在什么规模下开始吃亏以及换成多线程执行需要付出的代价。</strong></p>
 <p>这两种视角的差别，在于使用者盯的是"怎么配"，架构师盯的是"为什么这么选"。下面这张对照表把同一个系统在两种视角下关注的东西并排列出来。</p>
 <p><strong>表 1-2　使用视角 vs 架构视角对照</strong></p>
-<div class="table-wrap"><table><thead><tr><th>关注维度</th><th>使用视角（怎么做）</th><th>架构视角（为什么这么做）</th></tr></thead><tbody><tr><td>提问方式</td><td>怎么配？怎么调？踩过哪些坑？</td><td>为什么这么选？反过来会怎样？边界在哪？</td></tr><tr><td>Redis 单线程</td><td>避免 <code>KEYS</code>、避免重计算、压到多少 QPS（每秒查询数）</td><td>单线程为何反而快？多线程 I/O 如何嵌入？瓶颈何时出现？</td></tr><tr><td>MySQL 日志</td><td>开 binlog、设 sync_binlog、配主从</td><td>redo 与 binlog 为何要两阶段提交？日志即数据的边界在哪？</td></tr><tr><td>Kafka 副本</td><td>设 acks=all、min.insync.replicas=2（Kafka 的可靠性参数，详见第 4、7 章）</td><td>ISR 为何要"动态收缩"？主副本切换与一致性如何兼顾？</td></tr><tr><td>知识形态</td><td>配方、参数、最佳实践</td><td>取舍、约束、演化逻辑、可迁移的设计思想</td></tr><tr><td>终极目标</td><td>把现有系统用好、用稳</td><td>理解设计决策，并在自己的系统里做对取舍</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>关注维度</th><th>使用视角（怎么做）</th><th>架构视角（为什么这么做）</th></tr></thead><tbody><tr><td>提问方式</td><td>怎么配？怎么调？踩过哪些坑？</td><td>为什么这么选？反过来会怎样？边界在哪？</td></tr><tr><td>Redis 单线程</td><td>避免 <code>KEYS</code>、避免重计算、压到多少 QPS（每秒查询数）</td><td>单线程为何反而快？多线程 I/O 如何嵌入？瓶颈何时出现？</td></tr><tr><td>MySQL 日志</td><td>开 binlog、设 sync_binlog、配主从</td><td>redo 与 binlog 为何要两阶段提交？日志作为数据正本，边界到哪为止？</td></tr><tr><td>Kafka 副本</td><td>设 acks=all、min.insync.replicas=2（Kafka 的可靠性参数，详见第 4、7 章）</td><td>ISR 为何要"动态收缩"？主副本切换与一致性如何兼顾？</td></tr><tr><td>知识形态</td><td>配方、参数、最佳实践</td><td>取舍、约束、演化逻辑、可迁移的设计思想</td></tr><tr><td>终极目标</td><td>把现有系统用好、用稳</td><td>理解设计决策，并在自己的系统里做对取舍</td></tr></tbody></table></div>
 <p>使用视角问"怎么做"，架构视角问"为什么这么做、反过来会怎样、这套思想能否迁移到我自己设计的系统"。两者互补、不可互相替代。本书要给你的，就是架构视角。</p>
 <h3 id="s15">1.3.2 架构视角的三个方法</h3>
 <p>架构视角落到实处，是三个可以反复使用的方法。</p>
@@ -461,14 +461,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s16">1.3.3 一个贯穿全书的例子</h3>
 <p>一个后端最经典的问题：保存数据怎么保证不丢？</p>
 <p>架构视角需要把这个问题拆成三个层次的追问。 <strong>第一，先写日志还是先改数据？</strong> 可靠存储系统的常见做法是先写日志（WAL）。原因是日志是顺序写，恢复时按顺序重放，比直接改散落各处的数据页快得多、也安全得多。 <strong>第二，日志落盘的粒度多细？</strong> 是每条命令落盘、每秒落盘，还是交给操作系统决定何时刷盘？粒度越细越安全，但吞吐代价越大。 <strong>第三，日志记的到底是什么？</strong> 这三个软件在这里分歧最大：记"做了什么操作"（逻辑日志），还是记"哪个字节改成什么样"（物理日志）？</p>
-<p>逻辑日志紧凑、跨版本友好，但重放时要重新执行操作，速度慢且要小心幂等；物理日志啰嗦、占空间，但重放就是机械地改页，又快又稳。三者各选了一套方案。 <strong>Redis</strong> 走 AOF 命令日志，即逻辑日志，记的是"做了什么命令"，重放即重新执行命令。 <strong>MySQL</strong> 走 redo log 加两阶段提交，redo 记的是"页上哪个字节改成什么样"（严格说是物理到页、逻辑到操作的混合日志，详见第 8 章），恢复时机械重放，再配合 binlog 这种逻辑日志做复制。 <strong>Kafka</strong> 最彻底，直接把日志当成数据本体：它没有"日志"和"数据"之分，日志就是数据本身，消费者从日志里读，副本把日志复制过去，连重放回滚这些步骤都不需要了。</p>
+<p>逻辑日志紧凑、跨版本友好，但重放时要重新执行操作，速度慢且要小心幂等；物理日志啰嗦、占空间，但重放就是机械地改页，又快又稳。三者各选了一套方案。 <strong>Redis</strong> 走 AOF 命令日志，即逻辑日志，记的是"做了什么命令"，重放即重新执行命令。 <strong>MySQL</strong> 走 redo log 加两阶段提交，redo 记的是"页上哪个字节改成什么样"（严格说是物理到页、逻辑到操作的混合日志，详见第 8 章），恢复时机械重放，再配合 binlog 这种逻辑日志做复制。 <strong>Kafka</strong> 最彻底，数据就在日志里：它没有"日志"和"数据"之分，消费者从日志里读，副本把日志复制过去，连重放回滚这些步骤都不需要了。</p>
 <p>三种答案，一条共同主线：<strong>顺序写的日志保证故障后可恢复，落盘粒度调节安全与吞吐的平衡。</strong> 这条主线贯穿第 4 章（内存与磁盘）与第 9 章（数据同步），并在每一章里以不同的面貌重新出现。</p>
 <h2 id="s17">1.4 如何读本书</h2>
 <h3 id="s18">1.4.1 谁应该读，前置要求是什么</h3>
 <p>本书面向三类读者。第一类是 2 年以上经验的后端开发者：你已经用过 Redis、MySQL、Kafka 中的至少一种，能把系统跑起来，但想搞清楚"为什么这样设计"。第二类是负责技术选型的架构师：你需要在多种方案之间做权衡，而权衡的前提是理解每种方案的设计取向与代价。第三类是想建立团队技术体系的技术负责人：你需要一套可以传授、可以复用的架构认知框架。</p>
 <p>前置要求并不高，只需要基本的数据结构与算法常识：哈希表、树、跳表这些名词你听着不陌生；需要一点操作系统常识：进程与线程、内存层次、I/O 模型（阻塞、非阻塞、I/O 多路复用）你能大致说清；你至少实际用过三者之一，知道客户端怎么连、命令或 SQL 怎么写。我<strong>不假设</strong>你具备以下能力：分布式一致性算法（Paxos、Raft）的完整推导、操作系统内核或数据库源码的阅读经验。这些会在用到时补到"够用"的程度，不会成为阅读障碍。</p>
 <h3 id="s19">1.4.2 本书的组织方式：主题式而非软件式</h3>
-<p>本书采用<strong>主题式</strong>的组织：让三家软件对同一道题各交一份答卷，这种"同题作答"结构是全书对比的基本框架。每一章围绕一个架构主题（数据结构与协议、生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步），先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
+<p>本书采用<strong>主题式</strong>的组织：让三家软件对同一批问题各自给出方案，这种结构是全书对比的基本框架。每一章围绕一个架构主题（数据结构与协议、生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步），先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这样做的好处有三。第一，避免各学各的：主题式组织可以把这三个软件放在同一主题下并排比较。第二，突出架构共性：同一个问题（比如持久化、副本同步）反复出现，你就会发现它们给出的差异性方案和背后的相似规律，而这就是本书要提炼的东西。第三，训练对比分析能力，这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一款的人有价值。</p>
 <p>下面这张图给出全书的章节结构，帮你建立全局感。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -483,7 +483,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 对同一问题各自给方案</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->
   <rect x="380" y="72" width="200" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.8"/>
@@ -575,24 +575,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
   <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
-  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">前九章复盘 · 共性规律 · 取舍之道 · 给实践者的建议</text>
+  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">前九章复盘 · 共性规律 · 权衡框架 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
   <!-- 左侧贯穿主线注释 -->
   <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
   <text x="40" y="658" font-size="11.5" fill="#374151">从"启动与关闭"出发，经内存磁盘、分层、</text>
-  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
+  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成共性规律</text>
 
   <!-- 右侧三个软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
-  <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
+  <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 各自给方案 → 横向对比 → 启示</text>
 
   <!-- 底部图注 -->
   <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>
 </div><figcaption>图 1-3　全书章节结构：第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
-<p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的启动与关闭出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍之道。</p>
+<p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的启动与关闭出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
 <p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.7 LTS），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许脱离正文单独出现。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>

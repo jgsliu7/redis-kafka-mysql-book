@@ -11,7 +11,7 @@
 
   <!-- 标题 -->
   <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-4　Redis 复制积压缓冲区与 replication offset</text>
-  <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">backlog 是一个固定大小的环形缓冲；主从各持一份字节进度坐标（offset），重连时比对两坐标的差</text>
+  <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">backlog 是一个固定大小的环形缓冲；主从各持一份字节位点（offset），重连时比对两位点的差</text>
 
   <!-- ============ 主节点侧 backlog 环形缓冲 ============ -->
   <text x="430" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">主节点 Master · 复制积压缓冲区（backlog，默认约 1MB）</text>
@@ -71,7 +71,7 @@
   <text x="430" y="278" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">从节点 Replica · 记录自己已同步到的字节进度</text>
 
   <rect x="180" y="296" width="500" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="430" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">从节点本地的复制进度坐标</text>
+  <text x="430" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">从节点本地的复制位点</text>
   <text x="430" y="338" text-anchor="middle" font-size="13" fill="#EF4444" font-weight="700">replica offset = 330（断线前同步到 cmd B）</text>
 
   <!-- ============ 比对与结论 ============ -->
@@ -87,5 +87,5 @@
   <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
 
   <!-- 底注 -->
-  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节坐标，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
+  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节位点，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
 </svg>

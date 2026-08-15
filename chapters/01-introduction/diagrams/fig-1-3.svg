@@ -11,7 +11,7 @@
 
   <!-- 标题 -->
   <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 1-3　全书章节结构</text>
-  <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 在同一主题下"同题作答"</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 对同一问题各自给方案</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->
   <rect x="380" y="72" width="200" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.8"/>
@@ -103,18 +103,18 @@
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
   <text x="480" y="620" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">第 10 章 · 总结</text>
-  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">前九章复盘 · 共性规律 · 取舍之道 · 给实践者的建议</text>
+  <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">前九章复盘 · 共性规律 · 权衡框架 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
   <!-- 左侧贯穿主线注释 -->
   <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
   <text x="40" y="658" font-size="11.5" fill="#374151">从"启动与关闭"出发，经内存磁盘、分层、</text>
-  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成取舍之道</text>
+  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成共性规律</text>
 
   <!-- 右侧三个软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
-  <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 同题作答 → 横向对比 → 启示</text>
+  <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 各自给方案 → 横向对比 → 启示</text>
 
   <!-- 底部图注 -->
   <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>

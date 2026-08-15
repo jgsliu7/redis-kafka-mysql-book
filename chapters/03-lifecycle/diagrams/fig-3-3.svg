@@ -65,15 +65,16 @@
   <text x="316" y="612" font-size="12" fill="#374151">交还文件锁、内存、进程身份</text>
 
   <!-- Side annotation -->
-  <rect x="40" y="274" width="100" height="280" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="90" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">关键取舍</text>
+  <rect x="40" y="274" width="110" height="280" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="95" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">关键取舍</text>
   <text x="50" y="328" font-size="12" fill="#374151">“存不存数据”</text>
   <text x="50" y="346" font-size="12" fill="#374151">决定权交给用户</text>
   <text x="50" y="384" font-size="12" fill="#374151">包容缓存 / 主存</text>
   <text x="50" y="402" font-size="12" fill="#374151">的双重定位</text>
-  <text x="50" y="440" font-size="12" fill="#374151">“配置即承诺”</text>
-  <text x="50" y="458" font-size="12" fill="#374151">不替你假设</text>
-  <text x="50" y="476" font-size="12" fill="#374151">你是缓存还是主存</text>
+  <text x="50" y="440" font-size="12" fill="#374151">配置由用户显式</text>
+  <text x="50" y="458" font-size="12" fill="#374151">指定并承担后果</text>
+  <text x="50" y="476" font-size="12" fill="#374151">不替你假设</text>
+  <text x="50" y="494" font-size="12" fill="#374151">缓存还是主存</text>
 
   <rect x="740" y="390" width="100" height="232" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="790" y="416" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">履约顺序</text>

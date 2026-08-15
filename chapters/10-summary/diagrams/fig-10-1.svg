@@ -14,12 +14,12 @@
 
   <!-- 标题 -->
   <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 10-1　五条共性规律的递进关系</text>
-  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让真相之源又快、又稳、又可控</text>
+  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让正本又快、又稳、又可控</text>
 
-  <!-- ============ 规律一：真相之源（顶端，核心） ============ -->
+  <!-- ============ 规律一：唯一正本（顶端，核心） ============ -->
   <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定"真相之源"</text>
-  <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个真相之源，其余皆为派生物</text>
+  <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定唯一正本</text>
+  <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个正本，其余皆为派生物</text>
   <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
 
   <!-- "服务"主箭头：从规律一向下分叉到四条 -->
@@ -48,7 +48,7 @@
   <text x="340" y="275" text-anchor="middle" font-size="12.5" fill="#374151">把随机变顺序</text>
   <text x="340" y="291" text-anchor="middle" font-size="12.5" fill="#374151">把一次变一批</text>
   <line x1="268" y1="302" x2="412" y2="302" stroke="#059669" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="340" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更快</text>
+  <text x="340" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本更快</text>
   <text x="340" y="331" text-anchor="middle" font-size="11" fill="#6B7280">提升吞吐</text>
 
   <!-- ============ 规律四：一致性看代价 ============ -->
@@ -57,7 +57,7 @@
   <text x="550" y="275" text-anchor="middle" font-size="12.5" fill="#374151">可靠性要用性能去买</text>
   <text x="550" y="291" text-anchor="middle" font-size="12.5" fill="#374151">但要知道买的是什么</text>
   <line x1="478" y1="302" x2="622" y2="302" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="550" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源更稳</text>
+  <text x="550" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本更稳</text>
   <text x="550" y="331" text-anchor="middle" font-size="11" fill="#6B7280">权衡 RPO 与延迟</text>
 
   <!-- ============ 规律五：状态显式建模 ============ -->
@@ -66,7 +66,7 @@
   <text x="765" y="275" text-anchor="middle" font-size="12.5" fill="#374151">复杂状态显式建模</text>
   <text x="765" y="291" text-anchor="middle" font-size="12.5" fill="#374151">故障恢复可预测</text>
   <line x1="708" y1="302" x2="822" y2="302" stroke="#6B7280" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="765" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让真相之源</text>
+  <text x="765" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本</text>
   <text x="765" y="331" text-anchor="middle" font-size="11" fill="#6B7280">可控可恢复</text>
 
   <!-- 横向递进箭头：二 → 三 → 四 → 五（设计层面的递进） -->
@@ -85,7 +85,7 @@
   <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
   <text x="182" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
   <line x1="76" y1="442" x2="288" y2="442" stroke="#4F46E5" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存即真相，RDB/AOF 派生</text>
+  <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存为正本，RDB/AOF 派生</text>
   <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type/encoding 解耦</text>
   <text x="76" y="502" font-size="11.5" fill="#374151">· 规律三：pipeline / Multi 压往返</text>
   <text x="76" y="522" font-size="11.5" fill="#374151">· 规律四：appendfsync 三档代价</text>
@@ -95,7 +95,7 @@
   <rect x="318" y="412" width="244" height="180" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
   <text x="440" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
   <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为真相，缓冲池派生</text>
+  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为正本，缓冲池派生</text>
   <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
   <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer/group commit</text>
   <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的代价</text>
@@ -105,7 +105,7 @@
   <rect x="576" y="412" width="244" height="180" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1"/>
   <text x="698" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
   <line x1="592" y1="442" x2="804" y2="442" stroke="#059669" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为真相，副本派生</text>
+  <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为正本，副本派生</text>
   <text x="592" y="482" font-size="11.5" fill="#374151">· 规律二：Log 接口分层，冷段可挪</text>
   <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：Record Batch + 零拷贝</text>
   <text x="592" y="522" font-size="11.5" fill="#374151">· 规律四：acks / min.insync 代价</text>

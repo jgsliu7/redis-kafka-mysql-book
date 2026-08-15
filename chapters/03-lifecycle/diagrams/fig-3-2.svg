@@ -62,7 +62,7 @@
 
   <!-- bottom note -->
   <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">信号即协议（Unix 服务经典范式）</text>
+  <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">用信号触发优雅关闭（Unix 服务经典范式）</text>
   <text x="80" y="432" font-size="12.5" fill="#374151">SIGTERM / SIGINT　→　触发优雅关闭（不是立即终止）</text>
   <text x="80" y="452" font-size="12.5" fill="#374151">SIGPIPE　　　　　→　忽略（避免写已关闭连接导致进程被杀）</text>
   <text x="80" y="472" font-size="12.5" fill="#374151">SIGCHLD　　　　　→　回收 RDB / AOF 子进程</text>
