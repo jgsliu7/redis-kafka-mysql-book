@@ -13,7 +13,7 @@
   <!-- Column headers -->
   <text x="80" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">软件</text>
   <text x="280" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">内存（真相/缓存）</text>
-  <text x="560" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">磁盘（保险/家/本体）</text>
+  <text x="560" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">磁盘（备份/主存/本体）</text>
 
   <!-- vertical separator lines -->
   <line x1="160" y1="80" x2="160" y2="420" stroke="#E5E7EB" stroke-width="1"/>
@@ -22,7 +22,7 @@
   <!-- ============ Redis row ============ -->
   <rect x="40" y="130" width="120" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="100" y="158" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis</text>
-  <text x="100" y="180" text-anchor="middle" font-size="12" fill="#374151">内存是家</text>
+  <text x="100" y="180" text-anchor="middle" font-size="12" fill="#374151">内存为主</text>
 
   <!-- memory big -->
   <rect x="190" y="135" width="220" height="60" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
@@ -38,7 +38,7 @@
   <!-- ============ MySQL row ============ -->
   <rect x="40" y="230" width="120" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="100" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL</text>
-  <text x="100" y="280" text-anchor="middle" font-size="12" fill="#374151">磁盘是家</text>
+  <text x="100" y="280" text-anchor="middle" font-size="12" fill="#374151">磁盘为主</text>
 
   <!-- memory small -->
   <rect x="190" y="250" width="220" height="30" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -72,5 +72,5 @@
   <text x="685" y="370" font-size="12" fill="#374151">磁盘就是全部</text>
 
   <!-- footnote -->
-  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据“家”的权重；Redis 内存为主、MySQL 磁盘为主、Kafka 日志即本体</text>
+  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重；Redis 内存为主、MySQL 磁盘为主、Kafka 日志即本体</text>
 </svg>
