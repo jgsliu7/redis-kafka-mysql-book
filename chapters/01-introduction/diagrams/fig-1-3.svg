@@ -51,7 +51,7 @@
   <line x1="480" y1="270" x2="480" y2="300" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
 
   <!-- ============ 第二组：第 5-7 章（分层 / 安全 / 集群） ============ -->
-  <text x="40" y="324" font-size="13" font-weight="600" fill="#374151">第二组　骨架与治理：怎么切层、怎么扩容、谁能进</text>
+  <text x="40" y="324" font-size="13" font-weight="600" fill="#374151">第二组　结构与治理：怎么切层、怎么扩容、谁能进</text>
 
   <!-- 第 5 章 分层架构 -->
   <rect x="40" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>

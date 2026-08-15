@@ -82,7 +82,7 @@
   <text x="734" y="256" font-size="12" fill="#374151">队列作为线程池</text>
   <text x="734" y="274" font-size="12" fill="#374151">之间的解耦点</text>
   <text x="734" y="308" font-size="12" fill="#374151">这是 Kafka 高吞吐</text>
-  <text x="734" y="326" font-size="12" fill="#374151">的骨架</text>
+  <text x="734" y="326" font-size="12" fill="#374151">的基本结构</text>
 
   <!-- Bottom annotation: startup order -->
   <rect x="40" y="420" width="850" height="138" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
