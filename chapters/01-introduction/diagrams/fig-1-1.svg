@@ -52,7 +52,7 @@
   <text x="440" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">MySQL</text>
   <text x="440" y="252" text-anchor="middle" font-size="12.5" fill="#374151">关系库（表/行 + SQL + 引擎）</text>
   <text x="440" y="272" text-anchor="middle" font-size="12" fill="#D97706">追求：强一致 · 不丢不错</text>
-  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：极致写性能</text>
+  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：写入性能</text>
 
   <!-- Kafka -->
   <rect x="600" y="204" width="240" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>

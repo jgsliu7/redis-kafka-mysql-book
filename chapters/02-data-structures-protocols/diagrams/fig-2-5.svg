@@ -33,7 +33,7 @@
   <rect x="40" y="200" width="380" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
   <text x="230" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">ziplist → listpack（紧凑列表）</text>
   <text x="230" y="250" text-anchor="middle" font-size="11" fill="#374151">List/Hash/ZSet 小数据底层编码</text>
-  <text x="230" y="268" text-anchor="middle" font-size="11" fill="#6B7280">连续内存 · 无指针开销 · 极致省内存</text>
+  <text x="230" y="268" text-anchor="middle" font-size="11" fill="#6B7280">连续内存 · 无指针开销 · 内存占用小</text>
   <text x="230" y="286" text-anchor="middle" font-size="11" fill="#6B7280">listpack 每元素自记长度 → 消除连锁更新</text>
 
   <rect x="460" y="200" width="380" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>

@@ -181,7 +181,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">MySQL</text>
   <text x="440" y="252" text-anchor="middle" font-size="12.5" fill="#374151">关系库（表/行 + SQL + 引擎）</text>
   <text x="440" y="272" text-anchor="middle" font-size="12" fill="#D97706">追求：强一致 · 不丢不错</text>
-  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：极致写性能</text>
+  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：写入性能</text>
 
   <!-- Kafka -->
   <rect x="600" y="204" width="240" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
@@ -270,7 +270,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s11">1.2.3 Kafka：以"日志"为核心抽象的流平台</h3>
 <p>Kafka 的出身决定了它的设计取向。2010 年前后，LinkedIn 内部需要把海量的活动日志（用户行为、监控指标、审计流水）从各处采集出来，分发给下游的分析与处理系统。传统的企业级消息队列在那个规模下要么吞吐不够、要么运维太重。于是 LinkedIn 自己写了一套以"日志"为核心的系统，2011 年捐给 Apache，逐步演化为今天功能完备的分布式流平台。</p>
 <p>Kafka 最核心的抽象，是<strong>追加写日志（append-only log）</strong>。一个主题（Topic）被切成多个分区（partition），每个分区本质上就是一条只追加、按偏移量（offset）寻址的有序日志。生产者只往尾部追加，消费者各自维护自己的偏移量向前读。这种"只追加、不修改、按偏移量定位"的模型看着朴素，但消息队列、事件流、数据管道、流处理都能用它实现。因为这些形态要的都是同一件事：有序事件的持续流转。</p>
-<p>把日志抽象推到工业级，Kafka 依赖的是一组为吞吐而生的机制。分区水平扩展，吞吐随节点数线性增长；磁盘 I/O 走顺序写，配合操作系统的页缓存（PageCache）与零拷贝（sendfile）把单机吞吐压到极限。可靠性靠副本（replica）与 ISR（In-Sync Replicas，同步副本集合）保障，只有落在 ISR 中的副本才算"安全"。</p>
+<p>把日志抽象推到工业级，Kafka 依赖的是一组围绕吞吐设计的机制。分区水平扩展，吞吐随节点数线性增长；磁盘 I/O 走顺序写，配合操作系统的页缓存（PageCache）与零拷贝（sendfile）把单机吞吐压到极限。可靠性靠副本（replica）与 ISR（In-Sync Replicas，同步副本集合）保障，只有落在 ISR 中的副本才算"安全"。</p>
 <p>只追加不修改的代价同样明显：随机查询不是它的强项；批量与顺序优先，单条消息的延迟也天然高于内存型系统；消息默认按时间或大小保留，删除与更新要靠压实（compaction）这种间接方式实现。这些约束在 Kafka 中被视为合理代价，它优先保证吞吐与可扩展。</p>
 <p>所以 Kafka 用得最多的是高吞吐的流转场景：日志与事件采集、异步解耦、流处理管道、数据同步（CDC 的下游消费端）。这些场景的特点是数据量大、生产消费要解耦、能容忍一点延迟。</p>
 <p><strong>Kafka 是建立在日志抽象之上的高吞吐分布式流平台。</strong></p>
