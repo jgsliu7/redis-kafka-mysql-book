@@ -96,7 +96,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <li class="nav-sub"><a href="#s37">2.6 小结</a></li>
   </ul>
   </li>
-  <li><a href="#s38" data-target="ch3">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</a>
+  <li><a href="#s38" data-target="ch3">第 3 章 生命周期管理 — 优雅启动与关闭</a>
   <ul>
   <li class="nav-sub"><a href="#s39">本章导读</a></li>
   <li class="nav-sub"><a href="#s40">3.1 问题的本质</a></li>
@@ -202,7 +202,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <ul>
   <li class="nav-sub"><a href="#s260">第 1 章 引言 — 为什么是这三个软件</a></li>
   <li class="nav-sub"><a href="#s261">第 2 章 数据结构与协议 — 为各自的目标而设计</a></li>
-  <li class="nav-sub"><a href="#s262">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</a></li>
+  <li class="nav-sub"><a href="#s262">第 3 章 生命周期管理 — 优雅启动与关闭</a></li>
   <li class="nav-sub"><a href="#s263">第 4 章 内存与磁盘 — 速度与持久化的平衡</a></li>
   <li class="nav-sub"><a href="#s264">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a></li>
   <li class="nav-sub"><a href="#s265">第 6 章 安全机制 — 权限、加密、审计</a></li>
@@ -542,8 +542,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ============ 下方解读卡片 ============ -->
   <rect x="40" y="540" width="256" height="62" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
-  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：偏科「快」</text>
-  <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分独占鳌头，</text>
+  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：得分集中在「快」</text>
+  <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分领先，</text>
   <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
 
   <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
@@ -552,7 +552,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
 
   <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
-  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：偏科「多」</text>
+  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：最高分给了「多」</text>
   <text x="600" y="580" font-size="11" fill="#374151">高吞吐 5 分压满，</text>
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
@@ -1360,14 +1360,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- V0→V1→V2 evolution note -->
   <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
   <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">V0→V1：引入时间戳（8B/条，元数据膨胀）| V1→V2：Batch 级元数据 + 差值编码（消除每条独立的 offset/ts/CRC 冗余）</text>
-  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代精准针对上一代最贵的操作做手术，格式演进就是如此</text>
+  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代格式演进针对上一代最贵的操作</text>
 
   <!-- Producer/Consumer arrows -->
   <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>
   <line x1="55" y1="325" x2="55" y2="350" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
   <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
   <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
-  <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-2　RecordBatch V2 字段布局</text>
+  <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-7　RecordBatch V2 字段布局</text>
 </svg>
 </div><figcaption>图 2-7　RecordBatch V2 字段布局：61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
 <p>这套设计的取舍摆在明面上。相似消息聚成一批，压缩收益通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2–6 倍）；差值编码把每条记录的元数据开销降到个位数字节；CRC（循环冗余校验）整批只算一条，省掉逐条校验的 CPU；<code>magic</code> 字段标明格式版本，新旧格式可以共存。代价同样直接：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
@@ -1473,15 +1473,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="650" y="452" font-size="11" fill="#374151">api_version（每种请求独立）</text>
 
   <text x="60" y="474" font-size="11" fill="#374151">人可读</text>
-  <text x="200" y="474" font-size="11" fill="#065F46">✅</text>
-  <text x="420" y="474" font-size="11" fill="#EF4444">❌</text>
-  <text x="650" y="474" font-size="11" fill="#EF4444">❌</text>
+  <text x="200" y="474" font-size="11" fill="#065F46">✓</text>
+  <text x="420" y="474" font-size="11" fill="#EF4444">✗</text>
+  <text x="650" y="474" font-size="11" fill="#EF4444">✗</text>
 </svg>
 </div><figcaption>图 2-8　三个软件通信协议对比：文本行服务人眼可读与实现简单，二进制服务带宽与解析开销，版本化请求头服务演进兼容。</figcaption></figure>
 <h2 id="s35">2.4 横向对比</h2>
 <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚"目标 → 数据结构 → 协议"这条因果链。</p>
 <p><strong>表 2-2　三个软件数据结构与协议的横向对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心目标</td><td>极低延迟（微秒级）</td><td>通用可靠（ACID + SQL）</td><td>高吞吐（每秒几十万条）</td></tr><tr><td>存储介质定位</td><td>全内存（磁盘仅为恢复）</td><td>磁盘为主（内存是缓存）</td><td>磁盘日志本体（顺序追加）</td></tr><tr><td>核心数据结构</td><td>SDS / 跳表 / 字典 / listpack / intset</td><td>B+ 树 + Dynamic 行格式 + 自适应哈希</td><td>RecordBatch V2（批量+差值编码）</td></tr><tr><td>数据结构优化目标</td><td>O(1)/O(log N) + 低内存占用</td><td>每 16KB 页利用率最大化 + 通用查询</td><td>批量压缩 + 顺序追加 + 格式可演进</td></tr><tr><td>协议类型</td><td>RESP 纯文本</td><td>紧凑二进制</td><td>请求/响应 + 统一头部</td></tr><tr><td>协议核心设计</td><td>5 种前缀字符，人眼可读</td><td>预编译语句 + 二进制结果集</td><td>api_key + api_version + correlation_id</td></tr><tr><td>批量策略</td><td>Pipeline（多条独立命令一次性发）</td><td>预编译语句（解析一次，执行多次）</td><td>RecordBatch（多条消息打成一个包）</td></tr><tr><td>版本演进方式</td><td>HELLO 版本协商（6.0 起，此前靠手工约定）</td><td>能力标志位（握手时交换）</td><td>api_version（每种请求独立版本号）</td></tr><tr><td>人机可读性</td><td>✅ <code>nc</code> 连上直接交互</td><td>❌ 纯二进制，不可读</td><td>❌ 二进制 + 编码，不可读</td></tr><tr><td>最大优势</td><td>解析极简、调试友好</td><td>带宽压降、CPU 省解析</td><td>Batch 吞吐、独立演进不互锁</td></tr><tr><td>最大代价</td><td>体积大、无 Batch</td><td>不可读、实现复杂</td><td>协议复杂性、学习曲线</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心目标</td><td>极低延迟（微秒级）</td><td>通用可靠（ACID + SQL）</td><td>高吞吐（每秒几十万条）</td></tr><tr><td>存储介质定位</td><td>全内存（磁盘仅为恢复）</td><td>磁盘为主（内存是缓存）</td><td>磁盘日志本体（顺序追加）</td></tr><tr><td>核心数据结构</td><td>SDS / 跳表 / 字典 / listpack / intset</td><td>B+ 树 + Dynamic 行格式 + 自适应哈希</td><td>RecordBatch V2（批量+差值编码）</td></tr><tr><td>数据结构优化目标</td><td>O(1)/O(log N) + 低内存占用</td><td>每 16KB 页利用率最大化 + 通用查询</td><td>批量压缩 + 顺序追加 + 格式可演进</td></tr><tr><td>协议类型</td><td>RESP 纯文本</td><td>紧凑二进制</td><td>请求/响应 + 统一头部</td></tr><tr><td>协议核心设计</td><td>5 种前缀字符，人眼可读</td><td>预编译语句 + 二进制结果集</td><td>api_key + api_version + correlation_id</td></tr><tr><td>批量策略</td><td>Pipeline（多条独立命令一次性发）</td><td>预编译语句（解析一次，执行多次）</td><td>RecordBatch（多条消息打成一个包）</td></tr><tr><td>版本演进方式</td><td>HELLO 版本协商（6.0 起，此前靠手工约定）</td><td>能力标志位（握手时交换）</td><td>api_version（每种请求独立版本号）</td></tr><tr><td>人机可读性</td><td>✓ <code>nc</code> 连上直接交互</td><td>✗ 纯二进制，不可读</td><td>✗ 二进制 + 编码，不可读</td></tr><tr><td>最大优势</td><td>解析极简、调试友好</td><td>带宽压降、CPU 省解析</td><td>Batch 吞吐、独立演进不互锁</td></tr><tr><td>最大代价</td><td>体积大、无 Batch</td><td>不可读、实现复杂</td><td>协议复杂性、学习曲线</td></tr></tbody></table></div>
 <p>版本兼容的运营现实，最直观的例子是：一个生产集群里同时跑着十几个不同版本的客户端是常态，协议头部把这层兼容性做进了格式本身，单个客户端的升级不该逼着所有人同步跟进。</p>
 <h2 id="s36">2.5 架构启示</h2>
 <p>数据结构和协议是软件最底层的两个决策，定下来就难反悔。这四条，是三个软件在这个底层共同付出的代价。</p>
@@ -1491,7 +1491,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>启示四：版本字段是为未来演进预留的扩展点。</strong> MySQL 在握手时交换能力标志，Kafka 在每个请求头里带版本号。没有版本协商的协议（如 6.0 之前的 RESP）只能通过后续手工约定来补，而一旦客户端生态已经铺开，Breaking Change 几乎是不可能的。设计一个新协议时，先从第二个版本开始。第一个版本很少有人能把边界想全。留出能力标志或版本字段，是为了将来想做改动时不必推倒重来。</p>
 <h2 id="s37">2.6 小结</h2>
 <p>三个软件的选择各不相同，但都服从同一条因果链：核心目标 → 数据结构 → 协议形态。本章讨论的数据结构和协议，是第 4、5、9 章讲内存管理、分层架构和数据同步的出发点：内存怎么管、分层怎么切，都被最底层的结构选择限定。访问模式的基本面同样在这里定型：Redis 点查最热所以用哈希，MySQL 范围扫描多所以用 B+ 树；Kafka 几乎只有顺序追加，append-only Batch 就够用。</p></section>
-<section class="chapter" id="ch3"><h1 id="s38">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</h1>
+<section class="chapter" id="ch3"><h1 id="s38">第 3 章 生命周期管理 — 优雅启动与关闭</h1>
 <h2 id="s39">本章导读</h2>
 <p>凌晨三点发版，你敲下 <code>kill -9</code> 想快速重启服务，我在真实项目里这么干过，第二天发现丢了数据（那次事故在 3.6 节细讲）。启动和关闭看似只是"开关"，实际上包含最危险的状态转换。进程从"可执行文件"到"可对外服务"中间要恢复内存状态、重放未完成的事务、重建连接；进程关闭时则要保证正在处理的请求不丢、内存里的数据落盘、该移交的职责交接清楚。一次粗暴的断电式停机，丢的可能是几秒数据，也可能是整整一批事务。</p>
 <p>同样是 <code>kill -9</code>，对 Redis 通常只是丢掉最近一小段时间的数据（丢多少取决于持久化配置，详见第 4 章），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。差别的原因是这三个软件在启动和关闭时的处理设计完全不同：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群。</p>
@@ -2181,8 +2181,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 红字结论（柱状图右侧空白处） -->
   <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 死磕「顺序写」的根因</text>
-  <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，等于白捡两个数量级</text>
+  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 坚持「顺序写」的根因</text>
+  <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，直接换来两个数量级</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
   <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->
@@ -5632,7 +5632,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="566" font-size="13" font-weight="700" fill="#EF4444">通用的第三问（适用于所有路径）：我的格式五年后还能被新代码读懂吗？</text>
   <text x="60" y="588" font-size="11" fill="#374151">→ 预留版本号 / Magic / 编码切换位（ziplist→listpack、V1→V2、页类型位）。</text>
   <text x="60" y="608" font-size="11" fill="#374151">→ 存储格式要为“五年后还要读今天的文件”设计，而不是为“今天能写就行”设计。</text>
-  <text x="60" y="628" font-size="11" font-weight="700" fill="#EF4444">箴言：存储格式反映访问模式，结构几乎是被读写约束直接决定的。</text>
+  <text x="60" y="628" font-size="11" font-weight="700" fill="#EF4444">结论：存储格式反映访问模式，结构几乎是被读写约束直接决定的。</text>
 </svg>
 </div><figcaption>图 8-8　存储格式设计决策树：从访问模式推到格式结构。</figcaption></figure>
 <p>这张决策树把三问可视化：第一问"会不会原地改"分出定长页与追加两条主干；第二问在"随机定位要快"还是"批量流式进出"之间进一步细分，把定长页引向 MySQL 的页式范式、把追加引向 Kafka 的日志范式或 Redis 的快照范式；第三问"五年后是否可读"横跨所有路径，决定版本号与兼容性投资。三问回答完毕，格式结构的方向就清晰了。</p>
@@ -5812,9 +5812,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="472" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">三个副本最终状态必然相同</text>
   <text x="440" y="489" text-anchor="middle" font-size="11" fill="#374151">差异只在序列的载体与执行的方式</text>
 
-  <!-- 底注箴言 -->
+  <!-- 底注结论 -->
   <rect x="60" y="514" width="760" height="34" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="440" y="535" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">箴言：同步不是搬运数据，而是重放历史</text>
+  <text x="440" y="535" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">结论：同步是按原顺序重放这串操作</text>
 </svg>
 </div><figcaption>图 9-2　状态机复制模型：相同的有序输入序列 + 相同的执行顺序，必然得到相同的最终状态。</figcaption></figure>
 <blockquote><strong>关键数字</strong>  <strong>Redis PSYNC backlog：默认 1MB</strong>。1 万次写/秒、每条约 100 字节的负载下，约覆盖 <strong>1 秒</strong> 的断线窗口（覆盖时长 = backlog 大小 ÷ 写入字节速率；大实例或高写入场景需调大 <code>repl-backlog-size</code>）；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。  <strong>MySQL 半同步超时：<code>rpl_semi_sync_source_timeout</code> 默认 10 秒</strong>。超时自动降级回异步，一致性保障消失。降级是可观测的，但需配合告警。  <strong>Kafka ISR 剔除阈值：<code>replica.lag.time.max.ms</code> 默认 30 秒</strong>。副本落后超过 30 秒即踢出 ISR，不再参与 Leader 选举，以此保证新主不丢已确认消息。</blockquote>
@@ -6634,7 +6634,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三个软件"借形不借器"</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再借鉴这三个软件的设计思路</text>
 
   <!-- ============ 根节点 ============ -->
   <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
@@ -6768,7 +6768,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">约束已替你做了决定</text>
 
   <!-- 底注 -->
-  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
 </svg>
 </div><figcaption>图 10-2　实践者选型决策树：四个问题依次收窄，每个叶子对应可借鉴的设计。</figcaption></figure>
 <p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间换时间还是时间换空间）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。决策树的用法：<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么被设计成那个样子。比如你做一个秒杀库存系统，按决策树会走到"持久性优先 + CP 倾向 + 热点读"的叶子，对应 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
@@ -6856,9 +6856,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="90" y="150" font-size="11.5" fill="#374151">① 抽象：看见 B+树/跳表/稀疏索引背后的"索引"本质</text>
   <text x="90" y="168" font-size="11.5" fill="#374151">② 权衡：理解每个选项的机会成本　　③ 直觉：快速识别瓶颈、预判规模放大后的表现</text>
 
-  <!-- 箴言收束 -->
+  <!-- 结论收束 -->
   <rect x="660" y="118" width="200" height="38" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
-  <text x="760" y="135" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">箴言</text>
+  <text x="760" y="135" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">结论</text>
   <text x="760" y="151" text-anchor="middle" font-size="11" fill="#374151">看问题的方式</text>
 
   <!-- 底注 -->
@@ -6916,7 +6916,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>[1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书通过让三个软件回答同一批问题来对比设计的直接参照，强烈推荐配套阅读。 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者将日志当作统一抽象的极简论述，全书核心抽象观的缩影。 [3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人对数据全部放内存这一设计取舍的第一手阐述。</p>
 <h2 id="s261">第 2 章 数据结构与协议 — 为各自的目标而设计</h2>
 <p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，展现 Redis"按数据特征自适应"的精髓。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
-<h2 id="s262">第 3 章 生命周期管理 — 优雅启动与关闭的艺术</h2>
+<h2 id="s262">第 3 章 生命周期管理 — 优雅启动与关闭</h2>
 <p>[8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。 [10] Apache Kafka. Controlled Shutdown[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</p>
 <h2 id="s263">第 4 章 内存与磁盘 — 速度与持久化的平衡</h2>
 <p>[11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解磁盘数据是正本、缓存只是加速这一设计的关键。 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但与之在"顺序写"的精神上呼应。 [13] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。</p>

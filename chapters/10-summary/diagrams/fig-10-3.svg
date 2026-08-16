@@ -67,9 +67,9 @@
   <text x="90" y="150" font-size="11.5" fill="#374151">① 抽象：看见 B+树/跳表/稀疏索引背后的"索引"本质</text>
   <text x="90" y="168" font-size="11.5" fill="#374151">② 权衡：理解每个选项的机会成本　　③ 直觉：快速识别瓶颈、预判规模放大后的表现</text>
 
-  <!-- 箴言收束 -->
+  <!-- 结论收束 -->
   <rect x="660" y="118" width="200" height="38" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
-  <text x="760" y="135" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">箴言</text>
+  <text x="760" y="135" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">结论</text>
   <text x="760" y="151" text-anchor="middle" font-size="11" fill="#374151">看问题的方式</text>
 
   <!-- 底注 -->

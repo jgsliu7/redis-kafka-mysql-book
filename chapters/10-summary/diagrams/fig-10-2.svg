@@ -8,7 +8,7 @@
 
   <!-- 标题 -->
   <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 10-2　实践者选型决策树</text>
-  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再向这三个软件"借形不借器"</text>
+  <text x="460" y="53" text-anchor="middle" font-size="13" fill="#6B7280">不必先纠结选 Redis 还是 MySQL，先把约束答清楚，再借鉴这三个软件的设计思路</text>
 
   <!-- ============ 根节点 ============ -->
   <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
@@ -142,5 +142,5 @@
   <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">约束已替你做了决定</text>
 
   <!-- 底注 -->
-  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借形不借器，而非照搬某一家。</text>
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
 </svg>

@@ -83,7 +83,7 @@
   <text x="650" y="452" font-size="11" fill="#374151">api_version（每种请求独立）</text>
 
   <text x="60" y="474" font-size="11" fill="#374151">人可读</text>
-  <text x="200" y="474" font-size="11" fill="#065F46">✅</text>
-  <text x="420" y="474" font-size="11" fill="#EF4444">❌</text>
-  <text x="650" y="474" font-size="11" fill="#EF4444">❌</text>
+  <text x="200" y="474" font-size="11" fill="#065F46">✓</text>
+  <text x="420" y="474" font-size="11" fill="#EF4444">✗</text>
+  <text x="650" y="474" font-size="11" fill="#EF4444">✗</text>
 </svg>
