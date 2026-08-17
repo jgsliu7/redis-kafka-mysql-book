@@ -84,7 +84,7 @@
   <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
   <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
-  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是保险</text>
+  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是恢复副本</text>
   <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
 
   <!-- ============ bottom: 5th question reminder ============ -->

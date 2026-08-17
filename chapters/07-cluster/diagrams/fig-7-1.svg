@@ -11,7 +11,7 @@
 
   <!-- Title -->
   <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　单点到集群的演进路径（三个软件并列）</text>
-  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右是「不断还债」的过程：前一段留下什么痛点，后一段补上</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右：前一段留下什么痛点，后一段补上</text>
 
   <!-- Column headers -->
   <rect x="40"  y="70" width="270" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>

@@ -11,7 +11,7 @@
 ## 第 2 章 数据结构与协议 — 为各自的目标而设计
 
 [4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。
-[5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，展现 Redis"按数据特征自适应"的精髓。
+[5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，体现 Redis"按数据特征自适应"的设计。
 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。
 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。
 

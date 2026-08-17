@@ -2717,7 +2717,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>总结 MySQL 的取舍：它用"复杂的缓冲池 + 多套日志 + 一堆辅助结构"换来"大容量 + ACID 可靠 + 通用 SQL 查询能力"。它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式撑不了这个容量，Kafka 的顺序日志范式给不了随机查询，剩下能选的就是 MySQL 这种"磁盘为主、内存加速"的复杂系统。</p>
 <p>MySQL 把磁盘当主、内存当缓存，Kafka 则干脆把"自己管内存"都省掉。</p>
 <h2 id="s75">4.4 Kafka 的做法</h2>
-<p>Kafka 给自己的定位是分布式事件流平台，核心使命是高吞吐地搬运消息。它的访问模式很纯粹：生产者只追加写，消费者只顺序读，几乎不存在随机点查。从这个访问模式倒推，Kafka 做了一个干脆的决定：不在进程里维护自己的缓冲池，把加速几乎全部交给操作系统的 PageCache。这么做，顺序写正好吃满 OS 预读、高吞吐就来了；内存也交给内核管，进程自己不用再维护缓存。</p>
+<p>Kafka 的定位是分布式事件流平台，核心职责是高吞吐地搬运消息。它的访问模式很纯粹：生产者只追加写，消费者只顺序读，几乎不存在随机点查。从这个访问模式倒推，Kafka 做了一个干脆的决定：不在进程里维护自己的缓冲池，把加速几乎全部交给操作系统的 PageCache。这么做，顺序写正好吃满 OS 预读、高吞吐就来了；内存也交给内核管，进程自己不用再维护缓存。</p>
 <h3 id="s76">核心假设</h3>
 <p>Kafka 假设自己的访问模式是"追加写 + 顺序读"，且数据量天然远超内存。在这种模式下，操作系统内核的预读（readahead）和回写（writeback）机制已经能把磁盘的顺序 I/O 调度得很好，Kafka 再在用户态造一个缓冲池意义不大。</p>
 <p>这个假设下，Kafka 的设计不支持随机访问，换来几乎零成本的内存管理。这也是 Kafka 不能当数据库查的根本原因：它只能按偏移量区间顺序消费，不能像 MySQL 那样按主键随机点查。</p>
@@ -3767,7 +3767,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s113">6.2 认证</h2>
 <p>认证是安全的第一步：在客户端执行任何操作之前，系统必须回答"你是谁"。Redis 内网里一个共享密码就够，MySQL 要按账号、来源、插件把认证做成体系，Kafka 则因为多跳，必须在每一跳都重新认证一次。</p>
 <h3 id="s114">Redis：从全局密码到 ACL 用户</h3>
-<p>Redis 的安全演进路径是"先放弃、再补回"。它把性能和极简内核摆在第一位，直到 6.0 才一次性补上 ACL 和 TLS。这条演进路径本身就是选型时该记的。</p>
+<p>Redis 的安全演进路径是安全让位于性能、之后再按需补回。它把性能和极简内核摆在第一位，直到 6.0 才一次性补上 ACL 和 TLS。这条演进路径本身就是选型时该记的。</p>
 <p>6.0 之前的 Redis 只有一个 <code>requirepass</code> 全局密码，所有客户端共享，无法区分身份。这是"安全让位给极简内核"的取舍：内核不知道调用者是谁，只校验一个共享口令。这种模型在内网可信环境里够用，但一旦 Redis 被错误地暴露到公网，攻击者拿到密码就等于拿到最高权限，历史上未授权 Redis 写 SSH 公钥、写定时任务导致远程代码执行（RCE）的案例非常多见。</p>
 <p>6.0 引入 ACL（Access Control List，访问控制列表）是一次结构性补回。ACL 的核心是"用户"这个一等概念，每个用户有自己的密码集合、命令权限和键模式。一条典型的规则长这样：</p>
 <p>在 redis-cli 中执行：</p>
@@ -4188,7 +4188,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Title -->
   
-  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右是「不断还债」的过程：前一段留下什么痛点，后一段补上</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右：前一段留下什么痛点，后一段补上</text>
 
   <!-- Column headers -->
   <rect x="40"  y="70" width="270" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -4758,7 +4758,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Title -->
   
-  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">内存与磁盘的权重决定了存储格式的基本立场</text>
+  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">内存与磁盘的权重决定了存储格式的基本取向</text>
 
   <!-- Column headers -->
   <text x="80" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">软件</text>
@@ -4781,7 +4781,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- disk small -->
   <rect x="450" y="150" width="220" height="30" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="560" y="170" text-anchor="middle" font-size="12" fill="#374151">RDB / AOF（保险：崩溃后重建内存）</text>
+  <text x="560" y="170" text-anchor="middle" font-size="11.5" fill="#374151">RDB / AOF（恢复副本：崩溃后重建内存）</text>
 
   <text x="685" y="170" font-size="12" fill="#374151">磁盘占比小</text>
 
@@ -5623,7 +5623,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
   <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
-  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是保险</text>
+  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是恢复副本</text>
   <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
 
   <!-- ============ bottom: 5th question reminder ============ -->
@@ -6461,7 +6461,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本章的状态机复制和位点对齐，是第 10 章规律五的核心印证。</p></section>
 <section class="chapter" id="ch10"><h1 id="s235">第 10 章 总结：架构设计的共性规律与取舍</h1>
 <h2 id="s236">本章导读</h2>
-<p>前九章，三个软件在八个主题上给出了截然不同的方案。Redis 偏延迟，MySQL 偏正确性，Kafka 偏吞吐。但这些差异底下是同一套基本结构。设计一个新系统时，该借鉴 Redis 的极简、MySQL 的严谨还是 Kafka 的弹性，要看具体约束。知道特性不等于会做架构决策。只有把"它们为什么这样选"抽象成规律，规律才能迁移到实际系统中。这一章把前九章的启示串成一条主线。</p>
+<p>前九章，三个软件在八个主题上给出了截然不同的方案。Redis 偏延迟，MySQL 偏正确性，Kafka 偏吞吐。但这些差异底下是同一套基本结构。设计一个新系统时，该借鉴 Redis 的极简、MySQL 的严谨还是 Kafka 的可调，要看具体约束。知道特性不等于会做架构决策。只有把"它们为什么这样选"抽象成规律，规律才能迁移到实际系统中。这一章把前九章的启示串成一条主线。</p>
 <p>我回头看自己的职业生涯，最大的认知转折点不是学会了哪门新技术，而是有一天我突然不再问"这个系统快不快"，开始问"它在什么约束下做了哪些取舍，这些取舍今天还成不成立"。二十出头时我痴迷于压 QPS，后来踩的坑多了才慢慢明白，值钱的能力是在一堆约束面前做对选择。这本书写的，就是我自己花了十年才慢慢想清楚的那些规律。</p>
 <hr>
 <h2 id="s237">10.1 前九章核心启示复盘</h2>
@@ -6508,7 +6508,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让正本又快、又稳、又可控</text>
+  <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让正本更快、更稳、可控可恢复</text>
 
   <!-- ============ 规律一：唯一正本（顶端，核心） ============ -->
   <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
@@ -6914,7 +6914,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s260">第 1 章 引言 — 为什么是这三个软件</h2>
 <p>[1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书通过让三个软件回答同一批问题来对比设计的直接参照，强烈推荐配套阅读。 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者将日志当作统一抽象的极简论述，全书核心抽象观的缩影。 [3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人对数据全部放内存这一设计取舍的第一手阐述。</p>
 <h2 id="s261">第 2 章 数据结构与协议 — 为各自的目标而设计</h2>
-<p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，展现 Redis"按数据特征自适应"的精髓。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
+<p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，体现 Redis"按数据特征自适应"的设计。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
 <h2 id="s262">第 3 章 生命周期管理 — 优雅启动与关闭</h2>
 <p>[8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。 [10] Apache Kafka. Controlled Shutdown[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</p>
 <h2 id="s263">第 4 章 内存与磁盘 — 速度与持久化的平衡</h2>
