@@ -355,7 +355,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（1.2.1 节展开）。</p>
-<p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的教科书实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
+<p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的标准实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
 <p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见第 7 章关键数字。它把整个系统构建在追加写日志之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
 <p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
@@ -1103,7 +1103,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Key insight -->
   <rect x="40" y="430" width="800" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
   <text x="440" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心洞察</text>
-  <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，无缝切换是内存效率的核心杠杆</text>
+  <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，自动切换是省内存的关键手段</text>
   <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
 </div><figcaption>图 2-5　五种底层结构按"查询效率 / 内存密度"分两路：intset 有编码升级与类型升级两条路径。</figcaption></figure>
@@ -1354,7 +1354,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="60" y="395" width="760" height="80" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
   <text x="440" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
   <text x="440" y="440" text-anchor="middle" font-size="12" fill="#374151">Batch 头部约 61 字节（固定开销）· 每条记录 timestamp/offset 只存差值（省空间）</text>
-  <text x="440" y="458" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 3–10×）</text>
+  <text x="440" y="458" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 2–6×）</text>
   <text x="440" y="474" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 把批量、压缩、差分编码、幂等支持折进同一个格式</text>
 
   <!-- V0→V1→V2 evolution note -->
@@ -1367,7 +1367,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="55" y1="325" x2="55" y2="350" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
   <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
   <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
-  <text x="430" y="590" text-anchor="middle" font-size="12" fill="#374151">图 2-7　RecordBatch V2 字段布局</text>
 </svg>
 </div><figcaption>图 2-7　RecordBatch V2 字段布局：61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
 <p>这套设计的取舍摆在明面上。相似消息聚成一批，压缩收益通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2–6 倍）；差值编码把每条记录的元数据开销降到个位数字节；CRC（循环冗余校验）整批只算一条，省掉逐条校验的 CPU；<code>magic</code> 字段标明格式版本，新旧格式可以共存。代价同样直接：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远顺序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
@@ -1542,7 +1541,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Shutdown arrow: running -> disk (关闭=快照+释放) -->
   <path d="M525 255 L675 255" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#fig_3_1_arrow)"/>
   <text x="600" y="295" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">关闭：快照 + 资源释放</text>
-  <text x="600" y="318" text-anchor="middle" font-size="12" fill="#374151">守数据 · 清职责 · 退进程</text>
+  <text x="600" y="318" text-anchor="middle" font-size="12" fill="#374151">先把数据落盘 → 交还对外占用 → 最后退出进程</text>
 
   <!-- Crash dashed arrow (return to incomplete state, the loop) -->
   <path d="M440 290 C 440 400, 120 410, 120 285" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#fig_3_1_arrowR)"/>
@@ -2834,7 +2833,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- caveat -->
   <rect x="40" y="664" width="880" height="60" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="686" font-size="13" font-weight="700" fill="#111827">关键前提与边界</text>
-  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心红利。</text>
+  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心好处。</text>
 </svg>
 </div><figcaption>图 4-6　Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
 <p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝。零拷贝只在消费者读"已经缓存在 PageCache 里的数据"时才生效；冷数据还是要走磁盘 I/O，这是它的边界。</p>
@@ -3495,7 +3494,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ===== 底部注释 ===== -->
   <rect x="40" y="492" width="780" height="92" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计红利：Log 抽象让存储层与复制层共享同一份代码</text>
+  <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计收益：Log 抽象让存储层与复制层共享同一份代码</text>
   <text x="60" y="534" font-size="11" fill="#374151">· Follower 复制 = 「一个特殊的消费者」，无需为复制单独写读路径；新增功能只改一处。</text>
   <text x="60" y="554" font-size="11" fill="#374151">· sendfile 零拷贝对两条路径都生效：省掉 2 次内核↔用户态拷贝和 2 次上下文切换。</text>
   <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>
@@ -4122,7 +4121,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>redo log 与 undo log 的加密（<code>innodb_redo_log_encrypt</code> / <code>innodb_undo_log_encrypt</code>）自 8.0.1 起就支持，binlog 与 relay log（中继日志）的加密（<code>binlog_encryption</code>）自 8.0.14 起支持。表加密了，但日志明文写在磁盘上，攻击者仍能从日志里拼出敏感数据。日志加密补上了这个缺口。</p>
 <h3 id="s124">Kafka：TLS 覆盖所有通信路径</h3>
 <p>Kafka 的加密范围比单机系统广得多。客户端到 Broker、Broker 到 Broker（副本同步）、Broker 到控制面（KRaft 元数据）都要 TLS，任何一段明文都是漏洞。这是分布式纵深防御的硬要求，也是 Kafka 加密配置比 Redis、MySQL 复杂的根本原因：你要同时管好几条 TLS 通道。</p>
-<p>性能代价也大。副本同步是大流量长连接，TLS 加解密对吞吐影响明显。要分清这笔开销的来源：长连接稳态下的吞吐损失几乎全部来自记录层的对称加解密（AES-GCM 等 AEAD 套件），和证书用 RSA 还是 ECDSA 无关；证书算法只影响握手阶段的签名运算，而长连接的握手一次摊薄，收益可以忽略。ECDSA 的价值在握手密集的场景（短连接、频繁建连）：握手更快、证书链更小。优化手段因此也对症下药：用硬件指令（AES-NI）压低对称加解密成本、启用 TLS 会话恢复（session resumption，避免重复握手）、在专用硬件上做加密卸载。内部通信和外部通信还可以用不同监听器配不同证书，做到"内网互信证书加外网 CA 签发证书"分层，既省内部开销又保外部严格。</p>
+<p>性能代价也大。副本同步是大流量长连接，TLS 加解密对吞吐影响明显。要分清这笔开销的来源：长连接稳态下的吞吐损失几乎全部来自记录层的对称加解密（AES-GCM 等 AEAD 套件），和证书用 RSA 还是 ECDSA 无关；证书算法只影响握手阶段的签名运算，而长连接的握手一次摊薄，收益可以忽略。ECDSA 的价值在握手密集的场景（短连接、频繁建连）：握手更快、证书链更小。优化手段因此分别针对这些来源：用硬件指令（AES-NI）压低对称加解密成本、启用 TLS 会话恢复（session resumption，避免重复握手）、在专用硬件上做加密卸载。内部通信和外部通信还可以用不同监听器配不同证书，做到"内网互信证书加外网 CA 签发证书"分层，既省内部开销又保外部严格。</p>
 <h3 id="s125">三个软件的安全姿态与生产底线</h3>
 <p>Redis 的安全取向是"内网优先、按需叠加"。它默认假设部署在可信网络，把安全能力做成可选模块。实用底线：开启 ACL 并为每个应用建独立用户、关闭 default 用户、开启 protected-mode、按需开 TLS、用 ACL LOG 加外接采集补审计，补完这套，Redis 才算从"能用"进入"敢上生产"。</p>
 <p>MySQL 走企业级默认安全路线：装好就要求强 root 密码、提供删匿名用户的脚本、可启用 <code>connection_control</code> 插件做连接失败锁定。代价是配置项多、学习曲线陡，但学完之后它能胜任金融、电信这类对合规要求严苛的场景。</p>
@@ -5398,7 +5397,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="450" y1="550" x2="480" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
   <line x1="670" y1="550" x2="700" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
 
-  <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”，文件名本身是索引锚点</text>
+  <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”，文件名本身就是索引</text>
 </svg>
 </div><figcaption>图 8-6　分区 → 日志段 → 三个文件的目录与内部结构。</figcaption></figure>
 <p>图中可以看到一个分区的目录展开成多个日志段，每个日志段三个文件并排。<code>.log</code> 内部是连续的 Record Batch，每个 Batch 由头部和若干条 Record 组成；<code>.index</code> 是定长条目的偏移量索引（每条 8 字节：相对偏移量 4 + 物理位置 4）；<code>.timeindex</code> 是时间戳索引（每条 12 字节：时间戳 8 + 相对偏移量 4）。三个文件用同一个起始偏移量对齐，查找时互相配合。</p>
@@ -6698,7 +6697,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q2 叶子 - 右 -->
   <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
-  <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区先接客</text>
+  <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区时继续提供服务</text>
   <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
   <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
 

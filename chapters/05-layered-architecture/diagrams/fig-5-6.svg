@@ -87,7 +87,7 @@
 
   <!-- ===== 底部注释 ===== -->
   <rect x="40" y="492" width="780" height="92" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计红利：Log 抽象让存储层与复制层共享同一份代码</text>
+  <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计收益：Log 抽象让存储层与复制层共享同一份代码</text>
   <text x="60" y="534" font-size="11" fill="#374151">· Follower 复制 = 「一个特殊的消费者」，无需为复制单独写读路径；新增功能只改一处。</text>
   <text x="60" y="554" font-size="11" fill="#374151">· sendfile 零拷贝对两条路径都生效：省掉 2 次内核↔用户态拷贝和 2 次上下文切换。</text>
   <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>

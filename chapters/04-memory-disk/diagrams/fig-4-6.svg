@@ -102,5 +102,5 @@
   <!-- caveat -->
   <rect x="40" y="664" width="880" height="60" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="686" font-size="13" font-weight="700" fill="#111827">关键前提与边界</text>
-  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心红利。</text>
+  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心好处。</text>
 </svg>
