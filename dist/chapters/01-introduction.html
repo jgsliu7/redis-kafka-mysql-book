@@ -251,7 +251,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <ul><li><strong>Redis</strong>：用"内存 + 单线程命令执行"换极简与低延迟，代价是复杂聚合让位给网络往返。</li><li><strong>MySQL</strong>：用"B+ 树 + WAL + MVCC"换强一致与通用查询，代价是写放大（同一份数据被物理写入多次）、事务开销和调优门槛。</li><li><strong>Kafka</strong>：用"追加写日志 + 顺序 I/O + 分区并行"换高吞吐与线性扩展，代价是延迟偏高、不适合随机查询。</li></ul>
 <p>这三组设计就是本书的主线，后面每章都是它们在不同问题上的展开。</p>
 <h2 id="s8">1.2 先认识这三个软件</h2>
-<p>正式对比之前，先把三个软件各过一遍：从哪来、信什么、拿什么换什么。后面的取舍分析都要回到这三段概览上来。</p>
+<p>正式对比之前，先把三个软件各过一遍：出身、设计取向、关键取舍。后面的取舍分析都要回到这三段概览上来。</p>
 <h3 id="s9">1.2.1 Redis：数据全部放在内存</h3>
 <p>Redis 的起点很朴素。2009 年，意大利开发者 Salvatore Sanfilippo 在为自己的实时 Web 分析项目找一个能扛住高频访问统计的数据存储时，发现市面上的工具要么不够快、要么能力太单薄，于是干脆自己写了一个。Redis 就是这么一步步为解决一个真实问题做出来的。</p>
 <p>Redis 最有价值的贡献，是提出了<strong>数据结构服务器</strong>这一核心抽象。传统缓存如 Memcached 对外只暴露扁平的字符串键值，复杂操作要靠客户端读出来、改完再塞回去。Redis 则走了相反的路：把字符串、哈希、列表、集合、有序集合、Stream 等结构化类型直接作为一等公民对外暴露，每条命令都是在某个结构上做一次原子操作。比如对有序集合做 <code>ZADD</code> 和 <code>ZRANGEBYSCORE</code>，对列表做 <code>LPUSH</code> 和 <code>BRPOP</code>。这套抽象的好处是：一套原语就能同时覆盖缓存、排行榜、消息队列、计数器、分布式锁这些角色，省去了在每个场景各搭一套轮子的麻烦。</p>
@@ -277,7 +277,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s12">1.2.4 小结</h3>
 <p>把这三段概览并排放进一张表，差异在六个维度上就清楚了。</p>
 <p><strong>表 1-1　三个软件设计概览对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而生</td><td>1995，MySQL AB，经 Sun 入 Oracle，长期主流的关系库</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>稳定事务语义</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而写</td><td>1995，MySQL AB，经 Sun 入 Oracle，长期主流的关系库</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>稳定事务语义</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
 <p>把这种"追求的东西不同"画成一张雷达图。把低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致与查询灵活两个维度较强，Kafka 在高吞吐维度领先。没有谁能占满五个角：Redis 让出了容量和查询灵活度，MySQL 让出了低延迟，Kafka 让出了低延迟和查询灵活度。三家的强项恰好互不重叠。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>

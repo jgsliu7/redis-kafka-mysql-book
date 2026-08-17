@@ -148,7 +148,7 @@
 | 性能 | 是否存在热点？ | 单 key 易成热点 | 单行/单页易成热点 | 单分区易成热点 | 标出最热的 key/行/分区与分担方案 |
 | 可靠性 | 可接受最大丢失量（RPO）？ | 默认约 1 秒量级窗口（开启 AOF 后） | 双 1 接近 0 | acks=all 接近 0 | 写一个 RPO 数字，并说清谁能拍板 |
 | 可靠性 | 恢复时间要求（Recovery Time Objective，RTO）？ | RDB 加载或 AOF 重放 | redo 重放 + undo 回滚 | Leader 切换 + 副本同步 | 写一个 RTO 数字，并演练过没 |
-| 可靠性 | 是否跨地域容灾？ | Cluster 跨机房复杂 | MGR 跨机房可行 | MirrorMaker / Cluster Linking | 标出主备地域与切换剧本 |
+| 可靠性 | 是否跨地域容灾？ | Cluster 跨机房复杂 | MGR 跨机房可行 | MirrorMaker / Cluster Linking | 标出主备地域与切换预案 |
 | 运维 | 扩容是否停机？ | Cluster 在线 reshard | 在线加节点 + 自动均衡 | 加分区受限、加 Broker 可在线 | 标出扩容路径与停机窗口 |
 | 运维 | 配置是否动态生效？ | CONFIG SET 部分动态 | 部分参数动态、部分需重启 | 多数 Broker 参数动态 | 标出哪些参数改了要重启 |
 | 运维 | 故障排查路径是否清晰？ | slowlog + latency monitor | slow log + performance_schema | Broker log + 消费者 lag | 写下你出问题第一时间看哪个指标 |

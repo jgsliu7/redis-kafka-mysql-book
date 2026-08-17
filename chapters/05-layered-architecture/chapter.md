@@ -151,7 +151,7 @@ Kafka 的网络层是三者里最"重"的。它受 Netty 的 Reactor 模式启�
 
 **Processor** 是一组线程（数量可配，典型几个到十几个），每个 Processor 管理一批连接的网络读写和协议编解码。它把客户端发来的字节流按 Kafka 协议解析成 `Request` 对象，塞进 RequestChannel；同时把 `Response` 从 RequestChannel 取出来，序列化写回客户端。
 
-**RequestChannel** 是 Processor 与业务线程之间的交接点。一个**有界阻塞队列**。它有界是关键：当业务线程处理不过来、队列填满时，Processor 的入队操作会阻塞，进而阻塞网络 I/O。这是一个天然的背压（backpressure）点，免得内存被堆积的请求压垮。这种"用有界队列当流量调节器"的模式，是高吞吐系统的标配。
+**RequestChannel** 是 Processor 与业务线程之间的交接点。一个**有界阻塞队列**。它有界是关键：当业务线程处理不过来、队列填满时，Processor 的入队操作会阻塞，进而阻塞网络 I/O。这是一个天然的背压（backpressure）点，免得内存被堆积的请求压垮。这种用有界队列阻塞入队来限制请求进入速度的模式，是高吞吐系统的通用做法。
 
 **KafkaRequestHandler** 是一组业务线程（数量可配，等于 `num.io.threads`），每个线程从 RequestChannel 里取请求，调用 `KafkaApis.handle()` 处理。下面这张图把这套四级结构画了出来。
 
