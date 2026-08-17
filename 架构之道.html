@@ -1355,7 +1355,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
   <text x="440" y="440" text-anchor="middle" font-size="12" fill="#374151">Batch 头部约 61 字节（固定开销）· 每条记录 timestamp/offset 只存差值（省空间）</text>
   <text x="440" y="458" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 2–6×）</text>
-  <text x="440" y="474" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 把批量、压缩、差分编码、幂等支持折进同一个格式</text>
+  <text x="440" y="474" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 用同一个格式承载批量、压缩、差分编码与幂等支持</text>
 
   <!-- V0→V1→V2 evolution note -->
   <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
@@ -2338,7 +2338,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="830" y="436" text-anchor="middle" font-size="11" fill="#374151">访问一次 → 计数小</text>
   <text x="830" y="452" text-anchor="middle" font-size="11" fill="#374151">优先被淘汰</text>
 
-  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU「扫描一次冷数据挤掉热数据」的痛点</text>
+  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU「扫描一次冷数据挤掉热数据」的问题</text>
 
   <!-- bottom: essence comparison -->
   <rect x="40" y="540" width="880" height="90" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
@@ -5406,7 +5406,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 消息格式的关键变化是 V2 引入的 RecordBatch。在 V0、V1 时代，最小存储单元是单条消息（Message），每条都自带一份完整元数据：偏移量、时间戳、key 长度、value 长度、CRC、属性。一百万条消息就有一百万份重复元数据，既占空间，又拉低压缩效果：相似数据聚在一起时，压缩算法能找到更多重复模式，但单条消息的元数据把每条记录隔开了。</p>
 <p>V2 把这个单位从单条换成了 Batch（批）。一个 Batch 头部固定 61 字节，存 BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、CRC、Attributes、记录数等整批共享的元数据。Batch 内每条 Record 只存相对量：时间戳差值（相对 Batch 的 BaseTimestamp）、偏移量差值（相对 BaseOffset）、key 与 value 的变长字段。绝大多数差值只要一两个字节就够，单条消息的元数据开销从 V1 的几十字节压到个位数。</p>
 <p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V1 的单条级压缩有结构性提升（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）。</p>
-<p>代价也有：消费者要解整个 Batch 才能读单条。但 Kafka 的消费本来就是成批的：消费者拉一批处理一批，从来不会真去"读一条"。<strong>让存储单元对齐访问单元</strong>，这个代价被工作模式吸收。</p>
+<p>代价也有：消费者要解整个 Batch 才能读单条。但 Kafka 的消费本来就是成批的：消费者拉一批处理一批，从来不会真去"读一条"。<strong>让存储单元对齐访问单元</strong>，这个代价在成批消费的工作模式下并不显现。</p>
 <p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉，见 9.4 节），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让"重启后能续上"成为磁盘层面的保证。</p>
 <h3 id="s176">8.4.4 双索引：偏移量索引 + 时间戳索引</h3>
 <p>Kafka 的随机读靠两套索引：偏移量索引和时间戳索引。两套都是稀疏索引：不是给每条消息都建一条索引项。</p>
