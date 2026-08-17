@@ -177,7 +177,7 @@ Kafka 在生产者端有一个参数 `acks`，决定生产者写一条消息时�
 
 Kafka 的元数据管理（哪个 Broker 活着、哪个分区的 Leader 是谁、ISR 是谁、副本怎么分配）经历了两次大的演进。
 
-**早期方案是 ZooKeeper + Controller。** 元数据存在外部的 ZooKeeper 集群里，Kafka 集群里选出一个 Broker 充当 Controller，负责元数据的读写和 partition 的 Leader 选举。这套方案能用，但痛点随规模暴露：第一，元数据和实际状态分离在两套系统里，Broker 状态变更要双向同步，不一致风险大。第二，Controller 是单点（虽然有 failover），Controller 切换期间集群管理暂停。第三，ZooKeeper 本身不适合存大量元数据，分区数到几十万级别时 ZK 的 watch 通知就成了瓶颈（watch 是 ZK 的变更订阅机制：节点数据一变，ZK 要主动推给所有订阅方，订阅者和变更一多，通知量就压不住了）。第四，运维要同时维护 Kafka 和 ZooKeeper 两套系统。还有一个隐患：ZK 模式下有个潜在的脑裂风险，Controller 的 Leader 选举在 ZK 里做，partition 的 Leader 选举在 Controller 里做，两层状态可能不一致。
+**早期方案是 ZooKeeper + Controller。** 元数据存在外部的 ZooKeeper 集群里，Kafka 集群里选出一个 Broker 充当 Controller，负责元数据的读写和 partition 的 Leader 选举。这套方案能用，但问题随规模暴露：第一，元数据和实际状态分离在两套系统里，Broker 状态变更要双向同步，不一致风险大。第二，Controller 是单点（虽然有 failover），Controller 切换期间集群管理暂停。第三，ZooKeeper 本身不适合存大量元数据，分区数到几十万级别时 ZK 的 watch 通知就成了瓶颈（watch 是 ZK 的变更订阅机制：节点数据一变，ZK 要主动推给所有订阅方，订阅者和变更一多，通知量就压不住了）。第四，运维要同时维护 Kafka 和 ZooKeeper 两套系统。还有一个隐患：ZK 模式下有个潜在的脑裂风险，Controller 的 Leader 选举在 ZK 里做，partition 的 Leader 选举在 Controller 里做，两层状态可能不一致。
 
 **KRaft 模式（3.3 起生产可用）是第二次演进。** KRaft 把元数据管理从 ZooKeeper 收回到 Kafka 内部：选一组 Controller 节点，它们之间跑 Raft 共识协议维护一份强一致的元数据日志，不再依赖外部系统（Controller 可与 Broker 同进程部署，也可独立成组）。元数据本身也变成了 Kafka 的一个内部 topic（`__cluster_metadata`），Controller 用 Raft 维护它，所有 Broker 从中同步。这套改造带来几个好处：单系统部署、运维简化；元数据强一致（Raft 保证）；分区数可以从几十万扩到百万级（不受 ZK 限制）；Controller 故障恢复更快（Raft 选举比 ZK session 超时快）。
 
