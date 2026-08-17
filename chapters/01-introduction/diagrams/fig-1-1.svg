@@ -107,5 +107,5 @@
 
   <!-- 底部结论 -->
   <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
-  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 强在"快" · MySQL 强在"对" · Kafka 强在"多" ）</text>
+  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>

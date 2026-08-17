@@ -95,7 +95,7 @@
 
   <!-- 红字结论（柱状图右侧空白处） -->
   <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 坚持「顺序写」的根因</text>
+  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
   <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，直接换来两个数量级</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->

@@ -218,7 +218,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <main class="content">
 <article>
 <section class="chapter" id="ch0"><h1 id="s1">序言</h1>
-<p>我们今天遇到的软件架构方面的问题，绝大多数在软件行业几十年的历史里已经出现过，前辈们也给出了充满想象力的方案。所以我认为，架构师提升架构判断力最务实的方法，就是学习优秀软件的架构设计。</p>
+<p>我们今天遇到的软件架构方面的问题，绝大多数在软件行业几十年的历史里已经出现过，前辈们也给出了不少巧妙的方案。所以我认为，架构师提升架构判断力最务实的方法，就是学习优秀软件的架构设计。</p>
 <p>这部书选择这三个软件：Redis、MySQL、Kafka，它们承担了后端基础设施的大部分核心职责。我们天天在用，却很少追问它们为什么被设计成现在这个样子。市面上的资料大多停在"怎么用"：Redis 的数据类型有几种，MySQL 的索引怎么设计，Kafka 的分区选几个。而架构决策者需要的不只是某个软件的用法，还有背后的设计权衡。AI 可以辅助代码生成，做原型和具体编码越来越快，但架构取舍涉及周期、成本、团队、现实约束，是它难以做好的部分。架构师真正的价值是判断和取舍的能力：它直接决定系统的复杂度、上线进度、运维难度和健壮性。</p>
 <p>会用这三个软件的人很多，但能讲清背后为什么这么设计、并把这几个系统从底层串起来放到同一个视角下比较的人，要少得多。这本书适合有一定开发基础、喜欢钻研技术的中高级开发者、架构师和 CTO 阅读。</p>
 <p>十年前我就在构思这本书了，虽然拖了很久都没有开始，但我一直没有放下这个想法，我先讲一下想传递的核心内容：</p>
@@ -349,7 +349,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 底部结论 -->
   <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
-  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 强在"快" · MySQL 强在"对" · Kafka 强在"多" ）</text>
+  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>
 </div><figcaption>图 1-1　后端基础设施的三种核心范式与代表软件：内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</figcaption></figure>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
@@ -490,17 +490,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Redis 图例 -->
   <rect x="600" y="138" width="20" height="14" rx="2" fill="#4F46E5" fill-opacity="0.35" stroke="#4F46E5" stroke-width="1.8"/>
   <text x="628" y="150" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
-  <text x="672" y="150" font-size="11.5" fill="#374151">在乎「快」</text>
+  <text x="672" y="150" font-size="11.5" fill="#374151">· 低延迟</text>
 
   <!-- MySQL 图例 -->
   <rect x="600" y="162" width="20" height="14" rx="2" fill="#D97706" fill-opacity="0.35" stroke="#D97706" stroke-width="1.8"/>
   <text x="628" y="174" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
-  <text x="678" y="174" font-size="11.5" fill="#374151">在乎「对」</text>
+  <text x="678" y="174" font-size="11.5" fill="#374151">· 强一致</text>
 
   <!-- Kafka 图例 -->
   <rect x="600" y="186" width="20" height="14" rx="2" fill="#059669" fill-opacity="0.35" stroke="#059669" stroke-width="1.8"/>
   <text x="628" y="198" font-size="13" font-weight="700" fill="#059669">Kafka</text>
-  <text x="672" y="198" font-size="11.5" fill="#374151">在乎「多」</text>
+  <text x="672" y="198" font-size="11.5" fill="#374151">· 高吞吐</text>
 
   <!-- 评分表 -->
   <rect x="596" y="218" width="252" height="180" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
@@ -542,17 +542,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ============ 下方解读卡片 ============ -->
   <rect x="40" y="540" width="256" height="62" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
-  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：得分集中在「快」</text>
+  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：得分集中在低延迟</text>
   <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分领先，</text>
   <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
 
   <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
-  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：强在「对」</text>
+  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：强在一致性</text>
   <text x="328" y="580" font-size="11" fill="#374151">一致性、容量、查询三项都拿高分，</text>
   <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
 
   <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
-  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：最高分给了「多」</text>
+  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：最高分给了高吞吐</text>
   <text x="600" y="580" font-size="11" fill="#374151">高吞吐 5 分压满，</text>
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
@@ -608,7 +608,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="492" y="148" font-size="11.5" fill="#6B7280">全书脉络由此展开</text>
 
   <!-- ============ 第一组：第 2-4 章（数据结构 / 生命周期 / 内存磁盘） ============ -->
-  <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么存活</text>
+  <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么不丢</text>
 
   <!-- 第 2 章 数据结构与协议 -->
   <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
@@ -683,7 +683,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 第 9 章 → 第 10 章 -->
   <line x1="480" y1="554" x2="480" y2="590" stroke="#EF4444" stroke-width="2" marker-end="url(#fig_1_3_arrow-end)"/>
-  <text x="492" y="576" font-size="11.5" fill="#EF4444">共性升华</text>
+  <text x="492" y="576" font-size="11.5" fill="#EF4444">共性提炼</text>
 
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
@@ -1102,7 +1102,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Key insight -->
   <rect x="40" y="430" width="800" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="440" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心洞察</text>
+  <text x="440" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
   <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，自动切换是省内存的关键手段</text>
   <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
@@ -2180,7 +2180,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 红字结论（柱状图右侧空白处） -->
   <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 坚持「顺序写」的根因</text>
+  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
   <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，直接换来两个数量级</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
@@ -2677,7 +2677,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 6. double write to disk -->
   <line x1="876" y1="466" x2="880" y2="500" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_5_arrowRed)"/>
-  <text x="888" y="486" font-size="10" fill="#EF4444">半页损坏免疫</text>
+  <text x="884" y="486" font-size="9.5" fill="#EF4444">半页损坏可恢复</text>
 
   <!-- 7. Checkpoint flush dirty pages -->
   <rect x="420" y="510" width="460" height="50" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
@@ -3389,7 +3389,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部注释 -->
   <rect x="40" y="476" width="800" height="68" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
   <text x="60" y="498" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要扛多分区、多副本的并发 IO。</text>
-  <text x="60" y="518" font-size="11" fill="#374151">交互层是三者里最「重」的（多层线程 + 队列），换来单机榨干多核与水平扩展。延迟比 Redis 高，但吞吐量级不同。</text>
+  <text x="60" y="518" font-size="11" fill="#374151">交互层是三者里最「重」的（多层线程 + 队列），换来单机利用多核与水平扩展。延迟比 Redis 高，但吞吐量级不同。</text>
   <text x="60" y="536" font-size="11" fill="#374151">有界队列是天然的流量调节器：消费慢时背压到网络线程，避免内存被请求堆积拖垮。</text>
 </svg>
 </div><figcaption>图 5-5　Kafka Reactor + RequestChannel 线程模型：网络线程与业务线程通过有界队列解耦，队列满时天然背压上游。</figcaption></figure>
@@ -5492,8 +5492,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ===== Key insight box ===== -->
   <rect x="40" y="310" width="810" height="90" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心洞察</text>
-  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无缝迁移</text>
+  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
+  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无需改动格式即可迁移</text>
   <text x="445" y="380" text-anchor="middle" font-size="12" fill="#374151">Log 抽象封装了"数据在哪"，上层 API 层和复制层完全无感</text>
   <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
 </svg>
@@ -5662,7 +5662,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 标题 -->
   
-  <text x="410" y="56" text-anchor="middle" font-size="13" fill="#374151">一道状态变化，要可靠、有界延迟地传播到其他副本</text>
+  <text x="410" y="56" text-anchor="middle" font-size="13" fill="#374151">一处状态变化，要可靠、有界延迟地传播到其他副本</text>
 
   <!-- 中心节点：一处状态变化 -->
   <rect x="330" y="86" width="160" height="56" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -6469,7 +6469,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s238">10.1.1 一张表收束九章</h3>
 <p>下表把第 1 到第 9 章的【核心问题 / Redis 决策 / MySQL 决策 / Kafka 决策 / 一句话共性启示】压缩进同一张表。竖看能看出三个软件的定位，横看能看出每个主题的核心问题。</p>
 <p><strong>表 10-1　九章启示总表</strong></p>
-<div class="table-wrap"><table><thead><tr><th>章</th><th>核心问题</th><th>Redis 的关键决策</th><th>MySQL 的关键决策</th><th>Kafka 的关键决策</th><th>一句话共性启示</th></tr></thead><tbody><tr><td>第 1 章 引言</td><td>选哪三个软件做样本</td><td>内存型代表</td><td>持久化型代表</td><td>流式型代表</td><td>范式互补才有研究价值，差异越大共性越显形</td></tr><tr><td>第 2 章 数据结构与协议</td><td>如何定义数据格式与通信协议</td><td>RESP 文本协议 + SDS/listpack/intset 按数据量自适应</td><td>二进制协议 + Dynamic 行格式</td><td>RecordBatch V2 批量编码 + 变长整数/增量时间戳</td><td>编码对齐访问模式，协议与存储格式互相配合</td></tr><tr><td>第 3 章 生命周期</td><td>启动关闭如何不丢状态</td><td>RDB/AOF 重放重建内存</td><td>崩溃恢复重放 redo log、用 undo log 回滚未提交事务，保住事务一致性</td><td>Controller 选举 + 日志恢复截断残缺尾部</td><td>启动与关闭是"状态机迁移"</td></tr><tr><td>第 4 章 内存与磁盘</td><td>哪份数据是正本</td><td>内存为主存储、磁盘是恢复副本</td><td>磁盘为主存储、内存是缓冲池</td><td>磁盘日志为主存储、PageCache 加速</td><td>持久化与性能的对立是表象，关键变量是"以哪份数据为准"</td></tr><tr><td>第 5 章 分层架构</td><td>怎么让系统可替换</td><td>robj type/encoding 解耦直连</td><td>THD + Handler 虚函数（可插拔引擎）</td><td>RequestChannel 队列 + 网络协议</td><td>分层是为了让"可替换"成为可能，层间通信决定演进自由度</td></tr><tr><td>第 6 章 安全</td><td>主体能对客体做什么</td><td>从无密码演进到 ACL</td><td>细粒度 grant 表刻进数据字典</td><td>SASL + ACL + 端到端 TLS</td><td>安全是与权限模型同源的能力边界，越早建模演进越省</td></tr><tr><td>第 7 章 集群</td><td>多副本怎么一致</td><td>主从 → Sentinel → Cluster 槽分片 + Gossip</td><td>异步 → 半同步 → MGR（Paxos 类多数派）</td><td>分区 + ISR + KRaft（去 ZooKeeper）</td><td>一致性强度与延迟代价成正比，按需求选档</td></tr><tr><td>第 8 章 存储格式</td><td>字节怎么摆才好访问</td><td>RDB/AOF 为"全量加载 + 增量重放"优化</td><td>16KB 页 + B+ 树为"点查 + 范围扫描"优化</td><td>日志段 + 稀疏索引为"顺序追加 + 偏移量定位"优化</td><td>存储单元要对齐访问单元，格式一旦发布就是一笔长期债务</td></tr><tr><td>第 9 章 数据同步</td><td>怎么让两个状态机一致</td><td>PSYNC（部分重同步 + 全量回退）</td><td>binlog + GTID（基于事务的精确位点）</td><td>ISR + leader epoch 截断 + acks/幂等/事务</td><td>复制是用可比的位点（复制偏移量/GTID/偏移量）对齐状态机</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>章</th><th>核心问题</th><th>Redis 的关键决策</th><th>MySQL 的关键决策</th><th>Kafka 的关键决策</th><th>一句话共性启示</th></tr></thead><tbody><tr><td>第 1 章 引言</td><td>选哪三个软件做样本</td><td>内存型代表</td><td>持久化型代表</td><td>流式型代表</td><td>范式互补才有研究价值，差异越大共性越容易看出来</td></tr><tr><td>第 2 章 数据结构与协议</td><td>如何定义数据格式与通信协议</td><td>RESP 文本协议 + SDS/listpack/intset 按数据量自适应</td><td>二进制协议 + Dynamic 行格式</td><td>RecordBatch V2 批量编码 + 变长整数/增量时间戳</td><td>编码对齐访问模式，协议与存储格式互相配合</td></tr><tr><td>第 3 章 生命周期</td><td>启动关闭如何不丢状态</td><td>RDB/AOF 重放重建内存</td><td>崩溃恢复重放 redo log、用 undo log 回滚未提交事务，保住事务一致性</td><td>Controller 选举 + 日志恢复截断残缺尾部</td><td>启动与关闭是"状态机迁移"</td></tr><tr><td>第 4 章 内存与磁盘</td><td>哪份数据是正本</td><td>内存为主存储、磁盘是恢复副本</td><td>磁盘为主存储、内存是缓冲池</td><td>磁盘日志为主存储、PageCache 加速</td><td>持久化与性能的对立是表象，关键变量是"以哪份数据为准"</td></tr><tr><td>第 5 章 分层架构</td><td>怎么让系统可替换</td><td>robj type/encoding 解耦直连</td><td>THD + Handler 虚函数（可插拔引擎）</td><td>RequestChannel 队列 + 网络协议</td><td>分层是为了让"可替换"成为可能，层间通信决定演进自由度</td></tr><tr><td>第 6 章 安全</td><td>主体能对客体做什么</td><td>从无密码演进到 ACL</td><td>细粒度 grant 表刻进数据字典</td><td>SASL + ACL + 端到端 TLS</td><td>安全是与权限模型同源的能力边界，越早建模演进越省</td></tr><tr><td>第 7 章 集群</td><td>多副本怎么一致</td><td>主从 → Sentinel → Cluster 槽分片 + Gossip</td><td>异步 → 半同步 → MGR（Paxos 类多数派）</td><td>分区 + ISR + KRaft（去 ZooKeeper）</td><td>一致性强度与延迟代价成正比，按需求选档</td></tr><tr><td>第 8 章 存储格式</td><td>字节怎么摆才好访问</td><td>RDB/AOF 为"全量加载 + 增量重放"优化</td><td>16KB 页 + B+ 树为"点查 + 范围扫描"优化</td><td>日志段 + 稀疏索引为"顺序追加 + 偏移量定位"优化</td><td>存储单元要对齐访问单元，格式一旦发布就是一笔长期债务</td></tr><tr><td>第 9 章 数据同步</td><td>怎么让两个状态机一致</td><td>PSYNC（部分重同步 + 全量回退）</td><td>binlog + GTID（基于事务的精确位点）</td><td>ISR + leader epoch 截断 + acks/幂等/事务</td><td>复制是用可比的位点（复制偏移量/GTID/偏移量）对齐状态机</td></tr></tbody></table></div>
 <p>这张表里的共性启示列将在 10.2 节提炼为规律，关键决策列将在 10.3 节转化为取舍维度。九条启示串起来只有一条主线：<strong>约束决定哪些选项可行，目标决定在可行选项里怎么选</strong>。各自面对的是同一组物理约束：内存有限、磁盘慢、网络会分区、机器会宕。</p>
 <hr>
 <h2 id="s239">10.2 共性规律：三个软件背后的同一套基本结构</h2>
@@ -6573,7 +6573,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- ============ 底部：三个软件印证带 ============ -->
   <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三个软件印证：同一条规律，三种语言</text>
+  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三个软件印证：同一条规律，三种实现</text>
 
   <!-- Redis 列 -->
   <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
@@ -6677,7 +6677,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <polygon points="460,300 600,348 460,396 320,348" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="460" y="338" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q2 · 一致性多强？</text>
   <text x="460" y="356" text-anchor="middle" font-size="11.5" fill="#374151">（CP vs AP）</text>
-  <text x="460" y="374" text-anchor="middle" font-size="11.5" fill="#374151">分区时要"对"还是要"活"？</text>
+  <text x="460" y="374" text-anchor="middle" font-size="11.5" fill="#374151">要一致性还是要可用性？</text>
 
   <!-- Q2 左：偏强一致 -->
   <line x1="320" y1="348" x2="200" y2="348" stroke="#4B5563" stroke-width="1.4"/>
@@ -6763,8 +6763,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 中间收束提示 -->
   <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
-  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型自己浮出来</text>
-  <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">约束已替你做了决定</text>
+  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型方向随之清楚</text>
+  <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">起决定作用的是约束条件</text>
 
   <!-- 底注 -->
   <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
@@ -6880,7 +6880,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这一章把前九章的回答收敛成可迁移的规律。从 10.1 的九章启示总表出发，主线收束成一句话：先认清约束，再确定唯一正本，其余都可由它重建。10.2 把这条主线拆成五条共性规律，其中"先确定唯一正本"是基础，其余四条分别提升它的速度、稳定性和可控性。到了 10.3，规律被翻译成五个权衡维度、一棵决策树和三道练习题，目的是让选择从感性变成可推演；10.4 则补上动手前要回答的 12 个问题、从使用者到设计者的四个阶段和一条持续学习路径。三个软件的差异底下藏着同一套基本结构。读完这本书，如果你下次做选型时，能先想"这个系统的约束是什么、取舍在哪里"，这九章的目的就达到了。序言提出的"三层意思"（知道解法、理解取舍、学会决策）至此落地。</p></section>
 <section class="chapter" id="ch11"><h1 id="s255">后记</h1>
 <p>九章走完，这本书讨论了三个软件、八个主题，贯穿它们的是同一种视角。</p>
-<p>如果要在结尾留一句话，我会留一个方法：下次面对设计决策时，先弄清它解决了什么约束、代价由谁来承担。能把这两点弄清楚，选型往往就不言自明。关注 Redis、MySQL、Kafka 各自放弃了什么，比关注它们各自做到了什么更有信息量。</p>
+<p>如果要在结尾留一句话，我会留一个方法：下次面对设计决策时，先弄清它解决了什么约束、代价由谁来承担。能把这两点弄清楚，选型通常就有了答案。关注 Redis、MySQL、Kafka 各自放弃了什么，比关注它们各自做到了什么更有信息量。</p>
 <p>全书反复出现几条线索：先确定唯一正本，其余数据都能从它重建；用层把易变的部分隔开，接口保持比实现稳定；硬件对顺序和批量访问友好，性能优化多半是在把随机改成顺序、把单条攒成批；更强的可靠性要付性能代价，先弄清代价再决定；故障总会发生，状态不显式建模，恢复就不可预测。这些规律不只属于这三个软件。管理状态、权衡性能与可靠性的系统都适用；在分布式里维持一致性，靠的也是这些规律。</p>
 <p>从使用者到设计者，关键在养成一种习惯：遇到任何设计决策，先还原它面对的约束，再判断它的取舍是否值得。这本书如果能帮你养成这个习惯，就够了。</p>
 <hr>

@@ -23,7 +23,7 @@
   <text x="492" y="148" font-size="11.5" fill="#6B7280">全书脉络由此展开</text>
 
   <!-- ============ 第一组：第 2-4 章（数据结构 / 生命周期 / 内存磁盘） ============ -->
-  <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么存活</text>
+  <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么不丢</text>
 
   <!-- 第 2 章 数据结构与协议 -->
   <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
@@ -98,7 +98,7 @@
 
   <!-- 第 9 章 → 第 10 章 -->
   <line x1="480" y1="554" x2="480" y2="590" stroke="#EF4444" stroke-width="2" marker-end="url(#arrow-end)"/>
-  <text x="492" y="576" font-size="11.5" fill="#EF4444">共性升华</text>
+  <text x="492" y="576" font-size="11.5" fill="#EF4444">共性提炼</text>
 
   <!-- ============ 终点：第 10 章 总结 ============ -->
   <rect x="320" y="594" width="320" height="70" rx="6" fill="#F3F4F6" stroke="#111827" stroke-width="2"/>
