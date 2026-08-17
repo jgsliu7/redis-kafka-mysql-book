@@ -348,8 +348,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
 
   <!-- 底部结论 -->
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">把这三个软件读懂，就等于掌握了后端架构的"基本构件"</text>
-  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 管"快" · MySQL 管"对" · Kafka 管"多" ）</text>
+  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
+  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis 强在"快" · MySQL 强在"对" · Kafka 强在"多" ）</text>
 </svg>
 </div><figcaption>图 1-1　后端基础设施的三种核心范式与代表软件：内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</figcaption></figure>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
@@ -357,7 +357,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（1.2.1 节展开）。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的标准实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
 <p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见第 7 章关键数字。它把整个系统构建在追加写日志之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
-<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"顶到底，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
+<p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"放在第一位，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
 <h3 id="s7">1.1.3 从它们身上能学到什么</h3>
 <p>面对架构难题，它们采用的方案不同，代价也不同。数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题，后面 8 章逐个深讲；并发怎么控，MySQL 的答案是 MVCC，本章 1.2 节会讲它的原理，锁与隔离级别的深入细节不在本书范围。</p>
 <p>这三个软件核心的设计，集中在这几条上：</p>
@@ -383,7 +383,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s11">1.2.3 Kafka：以"日志"为核心抽象的流平台</h3>
 <p>Kafka 的出身决定了它的设计取向。2010 年前后，LinkedIn 内部需要把海量的活动日志（用户行为、监控指标、审计流水）从各处采集出来，分发给下游的分析与处理系统。传统的企业级消息队列在那个规模下要么吞吐不够、要么运维太重。于是 LinkedIn 自己写了一套以"日志"为核心的系统，2011 年捐给 Apache，逐步演化为今天功能完备的分布式流平台。</p>
 <p>Kafka 最核心的抽象，是<strong>追加写日志（append-only log）</strong>。一个主题（Topic）被切成多个分区（partition），每个分区本质上就是一条只追加、按偏移量（offset）寻址的有序日志。生产者只往尾部追加，消费者各自维护自己的偏移量向前读。这种"只追加、不修改、按偏移量定位"的模型看着朴素，但消息队列、事件流、数据管道、流处理都能用它实现。因为这些形态要的都是同一件事：有序事件的持续流转。</p>
-<p>把日志抽象推到工业级，Kafka 依赖的是一组围绕吞吐设计的机制。分区水平扩展，吞吐随节点数线性增长；磁盘 I/O 走顺序写，配合操作系统的页缓存（PageCache）与零拷贝（sendfile）把单机吞吐压到极限。可靠性靠副本（replica）与 ISR（In-Sync Replicas，同步副本集合）保障，只有落在 ISR 中的副本才算"安全"。</p>
+<p>把日志抽象推到工业级，Kafka 依赖的是一组围绕吞吐设计的机制。分区水平扩展，吞吐随节点数线性增长；磁盘 I/O 走顺序写，配合操作系统的页缓存（PageCache）与零拷贝（sendfile），换来很高的单机吞吐。可靠性靠副本（replica）与 ISR（In-Sync Replicas，同步副本集合）保障，只有落在 ISR 中的副本才算"安全"。</p>
 <p>只追加不修改的代价同样明显：随机查询不是它的强项；批量与顺序优先，单条消息的延迟也天然高于内存型系统；消息默认按时间或大小保留，删除与更新要靠压实（compaction）这种间接方式实现。这些约束在 Kafka 中被视为合理代价，它优先保证吞吐与可扩展。</p>
 <p>所以 Kafka 用得最多的是高吞吐的流转场景：日志与事件采集、异步解耦、流处理管道、数据同步（CDC 的下游消费端）。这些场景的特点是数据量大、生产消费要解耦、能容忍一点延迟。</p>
 <p><strong>Kafka 是建立在日志抽象之上的高吞吐分布式流平台。</strong></p>
@@ -547,8 +547,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
 
   <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
-  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：全能「对」</text>
-  <text x="328" y="580" font-size="11" fill="#374151">一致性 / 容量 / 查询三满，</text>
+  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：强在「对」</text>
+  <text x="328" y="580" font-size="11" fill="#374151">一致性、容量、查询三项都拿高分，</text>
   <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
 
   <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
@@ -1485,7 +1485,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s36">2.5 架构启示</h2>
 <p>数据结构和协议是软件最底层的两个决策，定下来就难反悔。这四条，是三个软件在这个底层共同付出的代价。</p>
 <p><strong>启示一：数据结构服务于核心目标。</strong> Redis 要快，所以 SDS 取长 O(1)、字典做渐进式 rehash、跳表在缓存局部性上付出了代价，换来实现的简洁。MySQL 走另一条路，为了对齐磁盘页，B+ 树内部节点只存键不存数据（树必须矮），叶子和叶子之间用双向链表串起来，范围扫描不用回头。Kafka 又不一样，它的吞吐需求最大，于是 RecordBatch 把一批消息当成一个不可分割的存储与传输单元，压缩、校验、读写全部以 Batch 为单位，格式还带 magic 版本号让新旧格式可以共存。B+ 树对齐 16KB 页，对应通用可靠的目标；RecordBatch 把批量写进格式，对应吞吐目标。</p>
-<p><strong>启示二：协议是数据结构的外部映射。</strong> Redis 操作简单、返回轻量，适合偶尔单条交互。RESP 用短小的文本行匹配它。MySQL 动辄返回几十列几万行。预编译 + 二进制列式结果集，把"解析一次、复用千万次"做到了极限。Kafka 有几十种请求类型、以 Batch 为单位收发。请求/响应头用 api_key + api_version，让同一集群同时服务不同版本客户端。设计服务端协议时，数据结构的访问模式长什么样：一条一条地小包收发，还是按批往返，决定了协议定长、变长和版本管理策略。</p>
+<p><strong>启示二：协议是数据结构的外部映射。</strong> Redis 操作简单、返回轻量，适合偶尔单条交互。RESP 用短小的文本行匹配它。MySQL 动辄返回几十列几万行。预编译 + 二进制列式结果集，把"解析一次、复用千万次"的优势发挥到最大。Kafka 有几十种请求类型、以 Batch 为单位收发。请求/响应头用 api_key + api_version，让同一集群同时服务不同版本客户端。设计服务端协议时，数据结构的访问模式长什么样：一条一条地小包收发，还是按批往返，决定了协议定长、变长和版本管理策略。</p>
 <p><strong>启示三：简单协议的接入成本最低。</strong> RESP 只有五个前缀字符，熟手一下午就能写出一个能用的 Redis 客户端。这个近乎为零的门槛，让 Redis 的生态覆盖了几乎所有编程语言。评估一个服务端的对外接口时，看文档页数不如看写个客户端要几行代码。</p>
 <p><strong>启示四：版本字段是为未来演进预留的扩展点。</strong> MySQL 在握手时交换能力标志，Kafka 在每个请求头里带版本号。没有版本协商的协议（如 6.0 之前的 RESP）只能通过后续手工约定来补，而一旦客户端生态已经铺开，Breaking Change 几乎是不可能的。设计一个新协议时，先从第二个版本开始。第一个版本很少有人能把边界想全。留出能力标志或版本字段，是为了将来想做改动时不必推倒重来。</p>
 <h2 id="s37">2.6 小结</h2>
@@ -1834,7 +1834,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的生命周期是分布式追加写日志的范式。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 的关闭设计核心是"怎么把自己的离开对集群的冲击降到最小"，刷自己的盘只是最基础的一步。</p>
 <h3 id="s50">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段，是理解 Kafka 启动的关键。</p>
-<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起对新集群进入生产可用（KIP-833），3.5 起 ZooKeeper（ZK）模式被标记弃用，ZK→KRaft 迁移工具在 3.4 以 Early Access 引入、3.5 为 preview、3.6 起进入生产可用；3.9 是最后一个支持 ZK 模式的 bridge release，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志（Raft 是什么，第 7 章有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点应当负责哪些分区，以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZK 模式启动流程的最大分水岭：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志存放在同一处、用同一套机制管理。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构。</strong> 图 3-5 画出了它的布局。</li></ol>
+<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> KRaft 模式自 3.3 起对新集群进入生产可用（KIP-833），3.5 起 ZooKeeper（ZK）模式被标记弃用，ZK→KRaft 迁移工具在 3.4 以 Early Access 引入、3.5 为 preview、3.6 起进入生产可用；3.9 是最后一个支持 ZK 模式的 bridge release，4.0 彻底移除 ZooKeeper。在这个模式下，元数据本身变成了一份用 Raft 复制的日志（Raft 是什么，第 7 章有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点应当负责哪些分区，以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZK 模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志存放在同一处、用同一套机制管理。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment）、恢复活跃段、重建索引。当集群分区数巨大时（比如上万分区），这一段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构。</strong> 图 3-5 画出了它的布局。</li></ol>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -2049,7 +2049,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>从表里能读出四组结论。</p>
 <p><strong>第一，复杂度排序与"数据结构 + 一致性承诺"强相关。</strong> 启动复杂度大致是 MySQL &gt; Kafka &gt; Redis，关闭复杂度的顺序也大致相同。原因是承诺越强（事务语义、复制一致性），恢复时要做的工作越多。Redis 的数据结构最简单（内存键值对 + 单线程），恢复就是重放命令。Kafka 的日志结构次之（追加写 + 偏移量），恢复只需截断。MySQL 的关系模型加事务最复杂，恢复要做 redo 重放加 undo 回滚两套动作。</p>
 <p><strong>第二，关闭的"可配置性"反映了各自的定位。</strong> Redis 给出 SAVE/NOSAVE 两个开关，因为它要同时服务缓存和主存两种用户。MySQL 给出三档参数，让 DBA 按场景在关机和开机之间搬运工作。Kafka 不给单机选项，因为它的关闭本来就是集群事件，单机的"存不存盘"不构成问题（日志在 Leader 迁移后还能从其他副本恢复），真正的问题是"Leader 走了谁来接"。</p>
-<p><strong>第三，单机 vs 分布式是分水岭。</strong> 前两家关闭只是自己的事，Kafka 的关闭要和 Controller 交接 Leader 职责、牵动整个集群。这道分界在第 7 章展开，Leader 选举、ISR 维护等机制将和这里的受控关闭衔接起来。</p>
+<p><strong>第三，单机 vs 分布式是分界线。</strong> 前两家关闭只是自己的事，Kafka 的关闭要和 Controller 交接 Leader 职责、牵动整个集群。这道分界在第 7 章展开，Leader 选举、ISR 维护等机制将和这里的受控关闭衔接起来。</p>
 <p><strong>第四，"快"的代价在不同软件上以不同形式呈现。</strong> Redis 的快来自内存优先加可选不落盘，MySQL 的快来自把清理挪出关键路径。Kafka 则不同，它的快来自日志结构本身：恢复时几乎没多少工作可做。</p>
 <h2 id="s55">3.6 架构启示</h2>
 <p>这五条原则从三个软件的启动与关闭流程里来，分别对应五个具体问题——启动的完成标准、关闭要兑现的承诺、"快"的代价由谁承担、步骤的排列顺序、运维如何判断当前进度。</p>
@@ -2894,7 +2894,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>一个把所有事情揉在一起写的服务是这样的：直接监听 TCP，收到字节后就地解析命令、就地读数据库、就地拼成报文发回去。这种代码在原型阶段跑得很快，但只要复杂度上来一点，它就会从四个方面同时出问题。一是改任何一行都要同时理解协议、SQL 和内存模型，认知负担重；二是换网络库或改存储格式会牵动整个文件，爆炸半径大；三是可测试性差，业务逻辑没法脱离网络做单元测试；最严重的是演进被锁死，升级存储格式时会发现协议处理代码里到处是针对旧格式的硬编码假设。</p>
 <p>分层要解决三件事：<strong>关注点分离（Separation of Concerns）</strong>，让每一层只负责一种关注点。<strong>修改的局部性</strong>，改一层不动另一层。<strong>可替换性</strong>，接口不变、实现可换。这三件事是工程上可验收的指标。你能不能独立测试某一层？换掉某层实现会不会牵动别层？这层有没有引入新的抽象边界？ 系统软件的请求路径大体是同一条：从"外部不可信的输入"出发，穿过一道道边界，最终走到"确定性的存储操作"，再原路返回。每穿过一层，都要做一次抽象与代价的交换。丢掉一些细节（比如丢弃客户端的 TCP 句柄、丢弃 SQL 的语法糖），换来一个更纯净、也更好处理的中间表示。</p>
 <p>这套路径对 Redis、MySQL、Kafka 都成立，但同样的路径，因为每家要满足的约束不同，最后形成了各自的形态。</p>
-<p>Redis 的约束是<strong>单机最低延迟</strong>。它要把每条命令的端到端时间压到亚毫秒，于是层数越少越好，跨层调用最好是直接函数调用，连虚函数都嫌多。对 Redis 来说，薄本身就是目标。</p>
+<p>Redis 的约束是<strong>单机最低延迟</strong>。它要把每条命令的端到端时间压到亚毫秒，于是层数越少越好，跨层调用最好是直接函数调用，连虚函数的开销都要避免。对 Redis 来说，薄本身就是目标。</p>
 <p>MySQL 的约束是<strong>SQL 语义 + 多种存储后端</strong>。SQL 标准要求它必须有一套与具体存储无关的逻辑层；而现实的存储介质又千差万别，事务型、内存型、归档型各有各的访问方式。这两点加在一起，逼着 MySQL 必须提供一套可插拔的接口：上层对 SQL 解耦，下层对引擎解耦。</p>
 <p>Kafka 的约束是<strong>天生分布式</strong>。它的层与层之间本来就隔着网络。Broker 与 Broker 之间、Producer 与 Broker 之间，全是 TCP。这意味着 Kafka 的分层是为了水平扩展：每一层都要能在多台机器上并行跑起来。</p>
 <p>这三个软件尽管源码目录不同，但从功能职责看都可以映射到交互层、逻辑层、存储层三段。这里要做一次概念校准：这三段并不与各自源码目录的字面命名一一对应。Redis 的源码里是 <code>networking.c</code> + <code>server.c</code> + <code>db.c</code>，MySQL 是 <code>sql/</code> + <code>storage/</code>，Kafka 是 <code>network</code> + <code>api</code> + <code>log</code>。我们做的是<strong>语义映射</strong>，把各自不同名字的模块映射到同一种功能职责上，再放在一起比较。这样三个软件就可比了。</p>
@@ -6861,7 +6861,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="760" y="151" text-anchor="middle" font-size="11" fill="#374151">看问题的方式</text>
 
   <!-- 底注 -->
-  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个阶段不是职称阶梯，而是"看问题的方式"逐级升级；设计者阶段是分水岭，从回答"是什么"转到回答"为什么/换我怎么做"。</text>
+  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个阶段不是职称阶梯，而是"看问题的方式"逐级升级；设计者阶段是分界线，从回答"是什么"转到回答"为什么/换我怎么做"。</text>
 </svg>
 </div><figcaption>图 10-3　从使用者到设计者的四个阶段：四个阶段之间的差距是"看问题的方式"在逐级升级；本书第 1–9 章带读者完成从使用者到理解者的转变，本章推动从理解者到设计者的转变。</figcaption></figure>
 <p>从下到上四个阶段：第一阶段是使用者，标志是会配置、会调优、知道"怎么用 Redis/SQL"，问题以"是什么、怎么配"开头；第二阶段是理解者，标志是懂内部机制、能讲清"为什么这么设计"，问题以"为什么"开头；第三阶段是设计者，标志是能借鉴思想设计自己的系统，问题以"换我怎么做"开头；第四阶段是创新者，标志是能定义新的架构范式。本书的九章对应从使用者到理解者的转变：把你从"会用"带到"懂机制"；本章对应从理解者到设计者的转变：把你从"懂机制"带到"能迁移"。</p>
