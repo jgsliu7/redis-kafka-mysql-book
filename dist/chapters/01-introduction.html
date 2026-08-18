@@ -128,7 +128,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第三类是<strong>异步解耦与流转</strong>。系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都需要一个中间介质把生产者和消费者解耦。这类能力的关键在吞吐和可扩展性。</p>
 <p>这三类能力是互补的，各管一块。一个典型的电商订单系统常常会同时用到三者，比如 Redis 来保存购物车与库存计数、MySQL 保存订单与账户、Kafka 把"订单已创建"这个事件广播给履约、推荐、风控等下游。</p>
 <p>我们给三类能力各指定一个代表：内存 → Redis；磁盘数据库 → MySQL；消息与流 → Kafka。下图把这种对应关系固定下来。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 508" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -139,7 +139,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  
 
   <!-- ============ 第 1 行：三类核心能力 ============ -->
   <text x="40" y="74" font-size="13" font-weight="600" fill="#374151">后端基础能力（拆到最底层绕不开三类）</text>
@@ -279,7 +278,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>表 1-1　三个软件设计概览对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而写</td><td>1995，MySQL AB，经 Sun 入 Oracle，长期主流的关系库</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>稳定事务语义</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
 <p>把这种"追求的东西不同"画成一张雷达图。把低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致与查询灵活两个维度较强，Kafka 在高吞吐维度领先。没有谁能占满五个角：Redis 让出了容量和查询灵活度，MySQL 让出了低延迟，Kafka 让出了低延迟和查询灵活度。三家的强项恰好互不重叠。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 30 880 590" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_2_arrow-1-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -287,7 +286,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  
   <text x="440" y="52" text-anchor="middle" font-size="12.5" fill="#374151">Redis 朝「低延迟」凸 · MySQL 朝「强一致 / 容量 / 查询」凸 · Kafka 朝「高吞吐」凸</text>
 
   <!-- ============ 雷达网格（中心 300,330，R=200） ============ -->
@@ -471,7 +469,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本书采用<strong>主题式</strong>的组织：让三家软件对同一批问题各自给出方案，这种结构是全书对比的基本框架。每一章围绕一个架构主题（数据结构与协议、生命周期管理、内存与磁盘、分层架构、安全与权限、集群架构、存储格式、数据同步），先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这样做的好处有三。第一，避免各学各的：主题式组织可以把这三个软件放在同一主题下并排比较。第二，突出架构共性：同一个问题（比如持久化、副本同步）反复出现，你就会发现它们给出的差异性方案和背后的相似规律，而这就是本书要提炼的东西。第三，训练对比分析能力，这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一款的人有价值。</p>
 <p>下面这张图给出全书的章节结构，帮你建立全局感。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 32 960 688" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -482,7 +480,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   <!-- 标题 -->
-  
   <text x="480" y="54" text-anchor="middle" font-size="12.5" fill="#374151">主题式组织：8 章主体 + 1 章总结，每章让 Redis / MySQL / Kafka 对同一问题各自给方案</text>
 
   <!-- ============ 起点：第 1 章 引言 ============ -->
