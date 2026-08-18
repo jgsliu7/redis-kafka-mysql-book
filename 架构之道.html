@@ -4181,9 +4181,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <marker id="fig_7_1_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_7_1_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
-    </marker>
   </defs>
 
   <!-- Title -->
@@ -5543,12 +5540,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <marker id="fig_8_8_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="fig_8_8_arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
-    </marker>
-    <marker id="fig_8_8_arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
-    </marker>
   </defs>
 
   
@@ -5568,11 +5559,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- Q1 branches -->
   <!-- YES (in-place) → page -->
-  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5"/>
   <text x="270" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
 
   <!-- NO (append) -->
-  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5"/>
   <text x="670" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否（追加）</text>
 
   <!-- ============ Q2 left (page family) ============ -->
@@ -5580,9 +5571,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="140" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">Q2：随机定位要快？</text>
   <text x="140" y="362" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
 
-  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.5"/>
+  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.5"/>
+  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
 
   <!-- page result -->
   <line x1="140" y1="390" x2="140" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
@@ -5597,13 +5588,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="800" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">Q3：批量流式进出？</text>
   <text x="800" y="362" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
 
-  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.2"/>
-  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.5"/>
+  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.5"/>
+  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
 
   <!-- Q3 branches -->
   <!-- YES → log -->
-  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5"/>
   <text x="655" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
 
   <!-- NO → snapshot -->
@@ -5617,7 +5608,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="500" y="491" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
   <text x="500" y="505" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
 
-  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_8_arrow)"/>
+  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
 
   <!-- snapshot result (Redis) -->
   <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
@@ -6495,9 +6486,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>五条规律是一个整体：第一条是基础，后四条都在为它服务。图 10-1 把这种递进关系画清楚。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_10_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
-    </marker>
     <marker id="fig_10_1_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
