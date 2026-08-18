@@ -2214,7 +2214,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s66">内存淘汰的真实实现</h3>
 <p>教科书里的 LRU（最近最少使用，Least Recently Used）维护一个双向链表，每次访问把节点移到链表头，淘汰时摘掉链表尾。这个方案准确但代价大：每次访问都要动链表指针，访问量上去之后链表操作的 CPU 开销不可忽视。</p>
 <p>Redis 用了<strong>近似 LRU</strong>：淘汰时从全部键里随机采样 N 个（由 <code>maxmemory-samples</code> 控制，默认 5），从中淘汰最久未用的那一个。采样数越大越接近精确 LRU，CPU 开销也越高。这是一次典型的精度与性能取舍：取 5 个随机样本就足以近似真实 LRU，代价只是常量级的随机采样。</p>
-<p>近似 LRU 有一个老问题：只看时间维度，看不出"频率"。一条被扫描过一次的冷数据，会因为"刚被访问过"而排在热数据前面，把真正的热数据挤走。Redis 4.0 引入了 <strong>LFU（Least Frequently Used，最不经常使用）</strong> 来弥补这个缺陷。LFU 给每个对象维护一个访问频次计数器。为了不在这个计数器上花太多内存，它用的是 Morris 风格的<strong>概率近似计数器</strong>：只用 8 位。普通 8 位计数器最大只能到 255，而这个计数器按概率递增，值越大再往上加 1 的概率越小，计数值随真实访问次数对数增长，所以 8 位能近似记到百万级。LFU 不需要精确计数，只需要区分热和冷，精度换内存，这笔交易划算。LFU 配合衰减机制，让长时间没访问的计数器自然回落：每次访问时，按距上次访问的时长和 <code>lfu-decay-time</code> 参数懒式计算衰减量（非后台定时衰减）。关键参数 <code>lfu-log-factor</code> 控制增长快慢，<code>lfu-decay-time</code>（分钟）控制衰减速率。</p>
+<p>近似 LRU 有一个老问题：只看时间维度，看不出"频率"。一条被扫描过一次的冷数据，会因为"刚被访问过"而排在热数据前面，把真正的热数据挤走。Redis 4.0 引入了 <strong>LFU（Least Frequently Used，最不经常使用）</strong> 来弥补这个缺陷。LFU 给每个对象维护一个访问频次计数器。为了不在这个计数器上花太多内存，它用的是 Morris 风格的<strong>概率近似计数器</strong>：只用 8 位。普通 8 位计数器最大只能到 255，而这个计数器按概率递增，值越大再往上加 1 的概率越小，计数值随真实访问次数对数增长，所以 8 位能近似记到数十万级。LFU 不需要精确计数，只需要区分热和冷，精度换内存，这笔交易划算。LFU 配合衰减机制，让长时间没访问的计数器自然回落：每次访问时，按距上次访问的时长和 <code>lfu-decay-time</code> 参数懒式计算衰减量（非后台定时衰减）。关键参数 <code>lfu-log-factor</code> 控制增长快慢，<code>lfu-decay-time</code>（分钟）控制衰减速率。</p>
 <p>LFU 看频率、LRU 看时间，这是两者的本质差异。举个具体场景：你跑一次全表扫描把一批冷数据读进 Redis，过几秒又来一波真正的热点查询。LRU 下，刚被扫到的冷数据"最新"，会顶掉前面的热数据；LFU 下，冷数据的计数器还是低值，热数据因为高频访问计数器已经爬高，被顶掉的会是冷数据。所以全表扫描后再来热点查询，LFU 能保住热数据不被冷数据顶掉。</p>
 <p>Redis 把淘汰策略做成八种，可以归成三组。<code>noeviction</code> 是内存满了直接报错、不淘汰，适合"数据不能丢"的场景。<code>allkeys-lru</code> / <code>allkeys-lfu</code> / <code>allkeys-random</code> 在全部键里挑淘汰对象。<code>volatile-lru</code> / <code>volatile-lfu</code> / <code>volatile-random</code> / <code>volatile-ttl</code> 只在设置了过期时间（TTL）的键里挑淘汰对象。第三组的存在是为了混合场景：同一份 Redis 既当缓存（带 TTL，可淘汰）又当小型持久存储（不带 TTL，永不淘汰）。理解了这层意图，选策略就有据可依了。</p>
 <p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
@@ -2309,8 +2309,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="785" y="196" text-anchor="middle" font-size="11" fill="#374151">上次访问时间（分钟）</text>
 
   <!-- counter value -->
-  <text x="560" y="232" font-size="12" fill="#374151">计数器值 = log₂(实际访问次数)，以概率递增方式 +1</text>
-  <text x="560" y="252" font-size="12" fill="#374151">8 位可表达 0~255，足以覆盖千万级访问</text>
+  <text x="560" y="232" font-size="12" fill="#374151">计数器值随访问次数增长而放缓（概率递增 +1）</text>
+  <text x="560" y="252" font-size="12" fill="#374151">8 位可表达 0~255，默认参数下约 31 万次访问打满</text>
   <text x="560" y="272" font-size="11" fill="#6B7280">lfu-log-factor（默认 10）控制计数增长斜率</text>
 
   <!-- access increment -->
@@ -2321,9 +2321,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- decay -->
   <rect x="740" y="305" width="180" height="64" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="830" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">周期性衰减</text>
-  <text x="830" y="346" text-anchor="middle" font-size="11" fill="#374151">超过 lfu-decay-time</text>
-  <text x="830" y="362" text-anchor="middle" font-size="11" fill="#374151">（默认 1）分钟则 −1</text>
+  <text x="830" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">访问时懒式衰减</text>
+  <text x="830" y="346" text-anchor="middle" font-size="11" fill="#374151">每空闲 lfu-decay-time</text>
+  <text x="830" y="362" text-anchor="middle" font-size="11" fill="#374151">（默认 1）分钟 −1</text>
 
   <line x1="720" y1="337" x2="736" y2="337" stroke="#4B5563" stroke-width="1.6"/>
 

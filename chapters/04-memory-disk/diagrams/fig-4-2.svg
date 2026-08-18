@@ -90,8 +90,8 @@
   <text x="785" y="196" text-anchor="middle" font-size="11" fill="#374151">上次访问时间（分钟）</text>
 
   <!-- counter value -->
-  <text x="560" y="232" font-size="12" fill="#374151">计数器值 = log₂(实际访问次数)，以概率递增方式 +1</text>
-  <text x="560" y="252" font-size="12" fill="#374151">8 位可表达 0~255，足以覆盖千万级访问</text>
+  <text x="560" y="232" font-size="12" fill="#374151">计数器值随访问次数增长而放缓（概率递增 +1）</text>
+  <text x="560" y="252" font-size="12" fill="#374151">8 位可表达 0~255，默认参数下约 31 万次访问打满</text>
   <text x="560" y="272" font-size="11" fill="#6B7280">lfu-log-factor（默认 10）控制计数增长斜率</text>
 
   <!-- access increment -->
@@ -102,9 +102,9 @@
 
   <!-- decay -->
   <rect x="740" y="305" width="180" height="64" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="830" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">周期性衰减</text>
-  <text x="830" y="346" text-anchor="middle" font-size="11" fill="#374151">超过 lfu-decay-time</text>
-  <text x="830" y="362" text-anchor="middle" font-size="11" fill="#374151">（默认 1）分钟则 −1</text>
+  <text x="830" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">访问时懒式衰减</text>
+  <text x="830" y="346" text-anchor="middle" font-size="11" fill="#374151">每空闲 lfu-decay-time</text>
+  <text x="830" y="362" text-anchor="middle" font-size="11" fill="#374151">（默认 1）分钟 −1</text>
 
   <line x1="720" y1="337" x2="736" y2="337" stroke="#4B5563" stroke-width="1.6"/>
 
