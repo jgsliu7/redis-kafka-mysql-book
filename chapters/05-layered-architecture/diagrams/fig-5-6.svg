@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 860 568" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr47" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -12,7 +12,6 @@
     </marker>
   </defs>
 
-  <text x="430" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径</text>
   <text x="430" y="54" text-anchor="middle" font-size="13" fill="#374151">消费者与 Follower 走同一条 Log 读取 + sendfile 零拷贝路径，存储与复制共享一份代码</text>
 
   <!-- ===== 左侧：消费者场景 ===== -->

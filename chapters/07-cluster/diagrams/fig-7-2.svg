@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 600" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 28 940 572" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -13,7 +13,6 @@
   </defs>
 
   <!-- Title -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-2　Redis Cluster 16384 槽分布与 MOVED/ASK 路由</text>
   <text x="470" y="50" text-anchor="middle" font-size="12" fill="#6B7280">key 经 CRC16 哈希到 0–16383 槽，槽映射到节点；迁移中与迁移完的两种重定向语义不同</text>
 
   <!-- ===== Top: hash formula ===== -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 920 530" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,7 +7,6 @@
   </defs>
 
   <!-- Title -->
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 7-1　单点到集群的演进路径（三个软件并列）</text>
   <text x="460" y="52" text-anchor="middle" font-size="12" fill="#6B7280">每一栏从左到右：前一段留下什么问题，后一段补上</text>
 
   <!-- Column headers -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 34 880 526" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowDown" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,7 +7,6 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-7　三个软件映射到「交互 / 逻辑 / 存储」统一视角</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#374151">同一组功能，落在不同的层形态里</text>
 
   <!-- 统一视角 三行标签 -->

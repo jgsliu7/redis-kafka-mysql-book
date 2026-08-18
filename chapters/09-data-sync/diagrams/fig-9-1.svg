@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 34 820 446" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -10,7 +10,6 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="410" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-1　数据同步的四个子问题</text>
   <text x="410" y="56" text-anchor="middle" font-size="13" fill="#374151">一处状态变化，要可靠、有界延迟地传播到其他副本</text>
 
   <!-- 中心节点：一处状态变化 -->

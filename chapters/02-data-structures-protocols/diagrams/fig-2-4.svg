@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 43 880 427" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
 
-  <text x="440" y="30" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">图 2-4 ziplist 连锁更新与 listpack 的消除</text>
 
   <!-- ============ ziplist（上）============ -->
   <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录「前一元素的长度」</text>

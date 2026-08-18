@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 920 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -9,7 +9,6 @@
     </marker>
   </defs>
 
-  <text x="460" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 8-4　InnoDB 16KB 数据页内部七段布局</text>
   <text x="460" y="54" text-anchor="middle" font-size="13" fill="#374151">自上而下：文件头 → 页头 → 虚拟记录 → 用户记录 → 空闲 → 页目录 → 文件尾</text>
 
   <!-- page outline -->

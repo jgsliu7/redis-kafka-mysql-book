@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 880 528" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr46" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -12,7 +12,6 @@
     </marker>
   </defs>
 
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 5-5　Kafka Reactor + RequestChannel 线程模型</text>
   <text x="440" y="54" text-anchor="middle" font-size="13" fill="#374151">网络线程与业务线程通过有界队列解耦，队列满时天然背压上游</text>
 
   <!-- 客户端们 -->

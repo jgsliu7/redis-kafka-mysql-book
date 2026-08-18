@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 940 630" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -13,7 +13,6 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="470" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 9-6　MySQL 多线程并行复制与组复制（MGR）共识</text>
   <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">左：从库按组提交（LOGICAL_CLOCK）并行回放；右：MGR 把 binlog event 作为共识 log entry，多数派确认才提交</text>
 
   <!-- =========== 左半：多线程并行复制 =========== -->

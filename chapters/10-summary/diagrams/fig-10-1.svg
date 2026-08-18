@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 34 880 606" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
@@ -10,7 +10,6 @@
   </defs>
 
   <!-- 标题 -->
-  <text x="440" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 10-1　五条共性规律的递进关系</text>
   <text x="440" y="56" text-anchor="middle" font-size="13" fill="#6B7280">后四条规律都在服务第一条：让正本更快、更稳、可控可恢复</text>
 
   <!-- ============ 规律一：唯一正本（顶端，核心） ============ -->

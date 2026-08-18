@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 880 430" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -10,7 +10,6 @@
   </defs>
 
   <!-- Title -->
-  <text x="440" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#111827">图 6-1　一次请求链路上的安全四维分工</text>
   <text x="440" y="52" text-anchor="middle" font-size="12" fill="#374151">从客户端发起请求到数据落盘，认证 / 授权 / 加密 / 审计各负责哪一段</text>
 
   <!-- Horizontal pipeline (y=180 baseline) -->
