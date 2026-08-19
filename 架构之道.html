@@ -698,7 +698,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>
 </div><figcaption>图 1-3　全书章节结构：第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
-<p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。从第 3 章的启动与关闭出发，经过内存与磁盘、分层架构、安全、集群、存储格式、数据同步，最终在第 10 章汇成共性规律与取舍。</p>
+<p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。递进的依据就在图里的三条分组带。第 2–4 章讲数据本身——用什么结构表示、怎么在崩溃后不丢。有了这个底子，第 5–7 章才谈系统的组织：层怎么切、容量怎么扩、谁能访问。第 8–9 章处理落盘与搬运：数据在磁盘上存成什么格式、副本之间怎么同步。分组顺序就是依赖顺序——前面的结论是后面讨论的输入。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
 <p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.7 LTS），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许脱离正文单独出现。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>
@@ -1485,7 +1485,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>关闭的本质是状态机快照加上资源释放。</strong> 关闭要回答两个问题：当前内存里哪些状态必须落盘？对外占用（连接、文件锁、集群成员身份）怎么干净地交还？没做完这两件事就退出，下次启动就要补做这些清理工作。Redis 的 <code>kill -9</code> 之所以"只是丢几秒数据"，是因为它本来就把内存当主存储，磁盘只是辅助。MySQL 的 <code>kill -9</code> 之所以要崩溃恢复，是因为它承诺了事务语义，必须在启动期把"崩溃那一刻到底哪些事务算数"搞清楚。</p>
 <p>贯穿全章的有三对共同矛盾，它们会在后文各自的实现里反复出现：</p>
 <ol><li><strong>一致性 vs 可用性。</strong> 启动时多恢复一步更安全，但用户等得更久。关闭时多刷一页更安全，但停服时间更长。</li><li><strong>速度 vs 确定性。</strong> 是追求快速就绪（懒加载、跳过校验），还是追求启动后处于"已知的确定状态"（全量校验、预分配）。</li><li><strong>单机视角 vs 分布式视角。</strong> 单机软件的关闭只影响自身。分布式组件的关闭是一个集群事件，要让 Leader 迁移、让副本同步可见。</li></ol>
-<p>图 3-1 把启动与关闭画成一对"对称"的过程：启动是重建，关闭是快照，中间任何一次崩溃或 <code>kill -9</code> 都会把系统重新拉回"不完整状态"，下次启动得多做恢复工作。三对矛盾标在图的右侧，后文每家软件的实现里都会反复遇到它们。</p>
+<p>图 3-1 把启动与关闭画成一对"对称"的过程：启动是重建，关闭是快照，中间任何一次崩溃或 <code>kill -9</code> 都会把系统重新拉回"不完整状态"，下次启动得多做恢复工作。三对矛盾标在图的底部，后文每家软件的实现里都会反复遇到它们。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 155 880 385" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -2419,7 +2419,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </g>
 </svg>
 </div><figcaption>图 4-3　Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
-<p>图 4-3 展示了一条写命令进入 Redis 后如何通往内存与持久化。命令先在内存里执行；RDB 是另一条独立的全量快照路径（fork 触发），而 AOF（含混合持久化）走的是追加日志路径，产物落在 <code>appendonlydir/</code>。持久化只是给内存数据留一份可恢复的副本。</p>
+<p>两条路径互相独立：RDB 记录某一时刻的全量状态，AOF 记录此后每一条写命令，关掉任何一条，另一条照常工作；混合持久化也没有产生第三条路径，只是把两者在文件层拼接起来。快照期间写命令不被阻塞，靠的是 fork 之后的写时复制（COW）：子进程按 fork 那一刻的内存视图生成快照，父进程继续处理写请求，哪一页被改到才复制哪一页，代价是写密集时内核要复制大量页。这两条路径的产物都只是内存状态的备份，Redis 从不靠磁盘回答读写请求。</p>
 <h3 id="s68">取舍总结</h3>
 <p>Redis 的取舍可以一句话概括：它付出内存成本、接受秒级的持久化窗口，换来读写低延迟和原生的多种数据结构。这套取舍在缓存和快速键值场景成立：访问频繁、对延迟敏感、数据可重建或可容忍少量丢失。代价是容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见第 7 章），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
 <p>Redis 的"全内存 + 持久化兜底"与 MySQL 的"磁盘为主、内存加速"形成直接对照。</p>
@@ -2548,7 +2548,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="666" font-size="12" fill="#374151">2）老区分流 + 停留时间门槛，专门对付「全表扫描污染缓冲池」这一陷阱。</text>
 </svg>
 </div><figcaption>图 4-4　InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
-<p>图 4-4 里，箭头标出页在链表间的流转路径：新页从 Free List 进入 LRU 的 midpoint，停留超时后晋升 New 区；被修改的页同时进入 Flush List，等待后台线程刷盘。这张图是理解 InnoDB 内存管理的关键。</p>
+<p>midpoint 这道门槛挡住的是一次性的批量读，挡不住的是另一件事：真正的热数据总量超过热区容量（约 5/8）时，页照样在热区内互相顶替，这时只能加大缓冲池。停留时间之外还有第二个可调参数 <code>innodb_old_blocks_pct</code>（冷区占比）。前面"核心假设"一节里"跑一次大报表、之后整体延迟上升"的现象，有了这道门槛会缓和，但不会消失：扫描占用的磁盘 I/O 带宽还在。</p>
 <h3 id="s72">WAL 与崩溃恢复</h3>
 <p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>redo log（重做日志）</strong>。redo log 是顺序追加写的。崩溃之后，InnoDB 用 redo log 重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL</strong> 的核心：先写日志，后改数据页。</p>
 <p>InnoDB 选择用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"压到了"顺序写一条日志"。</p>
@@ -2791,7 +2791,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心好处。</text>
 </svg>
 </div><figcaption>图 4-6　Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
-<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝。零拷贝只在消费者读"已经缓存在 PageCache 里的数据"时才生效；冷数据还是要走磁盘 I/O，这是它的边界。</p>
+<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只有 2 次上下文切换。这里的"2 次拷贝"指的是 DMA 层面的拷贝（磁盘到 PageCache、PageCache 到网卡），CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</p>
 <h3 id="s79">可靠性参数</h3>
 <p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（攒多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后吞吐会大幅下跌（强 fsync 下常掉到原来的几分之一），通常只在特殊合规要求下使用。这是"吞吐 vs 本地持久性"的取舍。</p>
 <p>更常用的可靠性参数是生产者端的 <code>acks</code>：</p>
@@ -3819,7 +3819,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；但任何一段明文都是漏洞，故副本同步、控制面、客户端三跳都必须独立 TLS。</text>
 </svg>
 </div><figcaption>图 6-2　内部 SASL_SSL、外部 SSL、控制面 KRaft 三条路径并行，按网络域分级信任。</figcaption></figure>
-<p>同一个 Broker 对内网应用客户端开 INTERNAL 监听器（SASL_SSL，SCRAM-SHA-512，内网互信证书），对外网客户端开 EXTERNAL 监听器（SSL 或独立 SASL_SSL，公网 CA 签发证书），同时与 KRaft 控制面通过控制面监听器通信。</p>
+<p>这套分层的代价是配置矩阵成倍增长：每个监听器都要独立配协议、端口、证书与 <code>advertised.listeners</code>，配置项随监听器数乘 Broker 数增长。生产环境最常见的故障也出在这里——客户端从 bootstrap 地址拿到的 advertised 主机名不属于自己所在的网络域，连接建不起来。应对是把每个域的监听器配置固化成模板、证书按域独立签发与轮转，让"哪个域用哪套配置"成为一份可审计的清单。付这份复杂度换来的是：每段链路的认证与加密可以按它面对的网络域单独定级。</p>
 <h2 id="s117">6.3 授权</h2>
 <p>确认身份之后，下一个问题是授权：一个已认证的身份能做哪些操作。三个软件的数据模型形状不同，授权能做到多细也就不一样。</p>
 <h3 id="s118">Redis：键模式加命令类别的二维控制</h3>
@@ -4727,7 +4727,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s164">8.2.2 RDB：紧凑二进制快照</h3>
 <p>RDB（快照文件）是 Redis 的全量快照格式。它的设计目标是文件小、加载快，因此走的是紧凑二进制路线。</p>
 <p>文件以一段固定魔数 <code>REDIS</code> 开头，紧跟 4 字节 ASCII 版本号。RDB 版本号随 Redis 主版本递增，但标识的是磁盘协议契约，与主版本不一一对应：7.0→v10，7.2→v11，7.4→v12（具体以 <code>src/rdb.h</code> 中的 <code>RDB_VERSION</code> 宏为准）。文件靠前缀自识别，不靠扩展名：任何一段字节流，只要开头是 <code>REDIS</code> 加合法版本号，加载器就认它。长度字段普遍采用变长整数编码（length-encoding），按实际大小自动选最省字节的表示。具体由类型字节的高两位做档位选择：<code>00</code> 走 6 位（0–63）、<code>01</code> 走 14 位（0–16383）、<code>10</code> 走 32 位定长、<code>11</code> 则是特殊编码（int8/int16/int32/LZF 压缩串等，把数值或压缩后的串直接塞进这几个字节）。小长度（0–63）只需 1 个字节就搞定，连额外长度字段都省了。每一处省下来的字节，乘以全量快照的规模，文件体积就能小很多。</p>
-<p>存储态编码与内存态编码是分离的。内存里 Hash 可能用 listpack 编码，也可能用 hashtable 编码，存盘时不照搬内存布局，改用统一的紧凑二进制序列化；加载后由加载器按当前阈值重新决定编码。这种分离让磁盘格式不绑死内存数据结构的演进：内存编码升级，磁盘格式不需要跟着变。</p>
+<p>存储态编码与内存态编码是分离的。内存里 Hash 可能用 listpack 编码，也可能用 hashtable 编码，存盘时不照搬内存布局，改用统一的紧凑二进制序列化；加载后由加载器按当前阈值重新决定编码。这种分离让磁盘格式不绑死内存数据结构的演进：内存编码升级，磁盘格式不需要跟着变。这份格式落到文件层面的布局——整份文件的结构、一条 entry 的字节序列、长度编码的档位——图 8-2 一次画全。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 900 452" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -4836,7 +4836,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s166">8.2.4 混合持久化：RDB 头加 AOF 尾</h3>
 <p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义是控制 base 文件是否使用 RDB 格式：默认 yes 时 base 为 RDB 格式，效果等同混合持久化常开；设为 no 则 base 为 AOF 命令格式。</p>
 <p>Multi-Part AOF 的真正变化不在"混合"，而在文件结构的重构。7.0 之前，AOF 是单个大文件，重写靠 rename 替换：旧文件删掉、新文件顶上。这个设计的真实问题在重写期间：新写命令要同时进旧 AOF 和内存重写缓冲区，重写一旦反复失败，旧文件和缓冲区持续膨胀，中断后还残留需人工清理的临时文件。7.0 把它拆成了一个目录，里面由清单文件（manifest）统一管理三类文件：至多一个基础文件（base，RDB 格式）、零或多个增量文件（incr，AOF 命令），以及重写后被标记为历史（history）待删的旧文件。重写改成了生成新 base + 新 manifest 的原子切换，和 git 的 commit 指针切换是同一种思路：数据不动，指针换。重写中断不会再留下需要人工清理的临时文件，增量文件也可以单独轮转清理。</p>
-<p>文件头是 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（大头走二进制快速灌入）加上 AOF 的"少丢"（尾部增量精确重放自上次 RDB 之后的所有写命令）。一次重启，先用 RDB 快速把内存主体建起来，再重放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
+<p>先回看 7.0 之前：那时混合持久化是单个文件，文件头是 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（大头走二进制快速灌入）加上 AOF 的"少丢"（尾部增量精确重放自上次 RDB 之后的所有写命令）。一次重启，先用 RDB 快速把内存主体建起来，再重放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 920 538" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -4918,8 +4918,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="440" y="525" width="240" height="36" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="2"/>
   <text x="560" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">AOF 增量命令（尾部，少丢）</text>
 </svg>
-</div><figcaption>图 8-3　AOF 重写 + 混合持久化的双缓冲协作时序（7.0 之前的单文件机制；7.0 起为 manifest 原子切换，见 8.2.4）。</figcaption></figure>
-<p>图中画的是 7.0 之前单文件 AOF 的完整时序：父进程 fork 出子进程，子进程基于当前内存生成 RDB 全量写到新文件；期间父进程照常服务，新命令同时进 AOF 当前文件与 aof_rewrite_buffer；子进程写完后通知父进程，父进程把 buffer 里的增量命令追加到新文件尾部（混合格式的 AOF 段），再 rename 原子替换旧文件。整个过程线上服务不中断。7.0 起，缓冲区和 rename 这两步被"新开 incr 文件直写 + manifest 原子切换"取代（见 8.2.4）。</p>
+</div><figcaption>图 8-3　AOF 重写 + 混合持久化的双缓冲协作时序（7.0 之前的单文件机制；7.0 起为 manifest 原子切换，见上文）。</figcaption></figure>
+<p>图中画的是 7.0 之前单文件 AOF 的完整时序：父进程 fork 出子进程，子进程基于当前内存生成 RDB 全量写到新文件；期间父进程照常服务，新命令同时进 AOF 当前文件与 aof_rewrite_buffer；子进程写完后通知父进程，父进程把 buffer 里的增量命令追加到新文件尾部（混合格式的 AOF 段），再 rename 原子替换旧文件。整个过程线上服务不中断。7.0 起，缓冲区和 rename 这两步被"新开 incr 文件直写 + manifest 原子切换"取代。</p>
 <p>RDB 与 AOF 可以搭配使用，效果在多数生产场景中优于纯 RDB 或纯 AOF。Redis 7.x 出厂默认持久化仍是 RDB-only（<code>appendonly no</code>，靠 <code>save</code> 规则周期性 BGSAVE）；生产环境追求"少丢"才会显式打开 AOF（everysec），混合格式在 7.0 后随 AOF 重写默认产出。这套组合才是社区推荐的生产配置。</p>
 <h2 id="s167">8.3 MySQL 的做法</h2>
 <h3 id="s168">8.3.1 定位先行：磁盘为主，内存是缓存</h3>
@@ -5277,7 +5277,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”，文件名本身就是索引</text>
 </svg>
 </div><figcaption>图 8-6　分区 → 日志段 → 三个文件的目录与内部结构。</figcaption></figure>
-<p>图中可以看到一个分区的目录展开成多个日志段，每个日志段三个文件并排。<code>.log</code> 内部是连续的 Record Batch，每个 Batch 由头部和若干条 Record 组成；<code>.index</code> 是定长条目的偏移量索引（每条 8 字节：相对偏移量 4 + 物理位置 4）；<code>.timeindex</code> 是时间戳索引（每条 12 字节：时间戳 8 + 相对偏移量 4）。三个文件用同一个起始偏移量对齐，查找时互相配合。</p>
+<p>一个分区在磁盘目录里展开成一串日志段，三个文件靠同一个起始偏移量对齐：文件名是它，<code>.index</code> 与 <code>.timeindex</code> 条目里的偏移量字段存的也是相对它的差值。用相对量有直接的好处：段的大小由 <code>log.segment.bytes</code> 封顶，条目要存的差值都有上界，4 字节足够表示，两种索引的条目因此都能保持定长，二分查找按固定步长移动即可。条目的具体构成与两套索引的查找步骤，8.4.4 节展开。</p>
 <p>日志段的切分粒度是需要权衡的参数。切得太小，文件数量多，压实时要处理的日志段多，元数据开销大；切得太大，单个文件巨大，按时间回溯的精度下降（一个日志段内时间戳跨度大，时间索引定位后还要扫一大段）。Kafka 的默认是按大小（<code>log.segment.bytes</code> = 1GB）或时间（<code>log.roll.hours</code> = 7 天）任一条件触发切分。这个粒度还跟保留策略（retention）与压实（compaction）直接相关：删除旧数据的最小单位就是一整个日志段，所以日志段大小也决定了清理的粒度。压实是另一种清理路线：按 key 只保留最新值，把日志段重写成"每个 key 只剩最后一条记录"的新段（<code>__consumer_offsets</code> 这类内部主题靠它长期保留每个 key 的最新状态），与按时间/大小的整段删除互补。</p>
 <h3 id="s175">8.4.3 RecordBatch V2：把一批消息当成一个存储单元</h3>
 <p>Kafka 消息格式的关键变化是 V2 引入的 RecordBatch。在 V0、V1 时代，最小存储单元是单条消息（Message），每条都自带一份完整元数据：偏移量、时间戳、key 长度、value 长度、CRC、属性。一百万条消息就有一百万份重复元数据，既占空间，又拉低压缩效果：相似数据聚在一起时，压缩算法能找到更多重复模式，但单条消息的元数据把每条记录隔开了。</p>
@@ -6427,7 +6427,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示支撑关系，灰虚线表示先后递进。</text>
 </svg>
 </div><figcaption>图 10-1　五条共性规律的递进关系：规律一是基础，后四条围绕它展开。</figcaption></figure>
-<p>箭头标示了递进关系：规律一定下正本的位置，后四条围绕它展开。四条分工不同：实现可替换与演进（规律二）、性能（规律三）、可靠性（规律四）、故障恢复（规律五）。后四条都在把第一条的正本改造成一个能在生产环境里跑起来的工程对象。</p>
+<p>图例区分两种箭头：红箭头是支撑关系，规律一定下唯一正本，后四条分别从可替换、速度、可靠性、可恢复四个方向支撑它；灰虚线是先后递进，四条的排列对应一个系统成熟的顺序，先让实现可替换，再提速度，再付性能代价换可靠，最后把状态显式建模。后四条都在把第一条的正本改造成一个能在生产环境里跑起来的工程对象。</p>
 <blockquote><strong>适用边界</strong>：五条规律建立在同一组前提上，你的系统是<strong>有状态的</strong>（持有不可丢失的数据）、<strong>单写者/少写者</strong>（正本通常只有一个写入者）、<strong>OLTP 为主</strong>（在线事务而非离线分析）。如果你面对的是无状态微服务（正本不在本服务内，而在外部数据库）、边缘计算/Serverless 函数（数据短暂驻留、生命周期不可控）、纯分析型系统（列存、批量扫描、无 OLTP 事务），这套框架的适用性就会打折扣：规律一"唯一正本"仍然成立，但规律三（随机变顺序）和规律四（可靠性的代价）的形态会显著不同。框架的价值在于自知边界，边界之内的判断是可靠的，边界之外的类推需要额外验证。</blockquote>
 <hr>
 <h2 id="s246">10.3 从规律到权衡框架</h2>
@@ -6669,7 +6669,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个阶段的差距在提问方式，从"是什么、怎么配"到"为什么"再到"换我怎么做"逐级变化；设计者阶段是分界线。</text>
 </svg>
 </div><figcaption>图 10-3　从使用者到设计者的四个阶段：四级台阶自下而上，两个虚线标注框标出本书各部分覆盖的阶段。</figcaption></figure>
-<p>从下到上四个阶段：第一阶段是使用者，标志是会配置、会调优、知道"怎么用 Redis/SQL"，问题以"是什么、怎么配"开头；第二阶段是理解者，标志是懂内部机制、能讲清"为什么这么设计"，问题以"为什么"开头；第三阶段是设计者，标志是能借鉴思想设计自己的系统，问题以"换我怎么做"开头；第四阶段是创新者，标志是能定义新的架构范式。本书的九章对应从使用者到理解者的转变：把你从"会用"带到"懂机制"；本章对应从理解者到设计者的转变：把你从"懂机制"带到"能迁移"。</p>
+<p>四个阶段的差距不在掌握的名词多少，在能独立产出什么：使用者交出一份能跑的配置；理解者能写出机制解释，能判断一次慢查询慢在哪一层；设计者能给出自己系统的结构与取舍方案；创新者定义新的范式。常见的问题有两种。一种是产出停在使用者一级，却借用理解者的词汇：配置照抄别人的结论，说不出适用约束。另一种是机制没吃透就自建系统：往往只复刻了表面结构，原设计要避开的难点照样撞上。每上一级，检验标准都一样：能不能独立产出这一级的东西。</p>
 <p>设计者阶段的核心能力可以拆成三项，每一项都能在三个软件里找到印证。<strong>抽象能力</strong>：能从 B+ 树、跳表、稀疏索引里看出同一个"索引"的本质，能从 redo log、AOF、Kafka 日志里看出同一个"WAL"的本质；更进一步，能从 PSYNC2、GTID、ISR 里看出"用可比位点对齐两个状态机"这个共性。抽象能力让你把大量细节归纳成少数几条模式。<strong>权衡能力</strong>：理解每个选项的机会成本。比如 Redis 用"命令执行单线程"换无锁快，代价是吃不满多核；MySQL 的每次 fsync 换来断电不丢，代价是吞吐被压低；Kafka 的多副本换来高可用，但延迟和复杂度都上去了。权衡能力让你能说清"为什么不选另一个方案"。<strong>工程直觉</strong>：快速识别瓶颈（是 CPU、是 I/O、是网络、还是锁），预判规模放大后的表现（数据量翻十倍哪个组件先崩）。直觉来自反复实验，不能只靠读。</p>
 <p>从使用者到设计者的转变，本质是换一套看问题的角度，也就是换一套提问方式。</p>
 <h3 id="s253">10.4.3 持续学习与全书收束</h3>
