@@ -9,7 +9,7 @@
   <!-- ============ root ============ -->
   <rect x="320" y="80" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
   <text x="470" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
-  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">先回答三个判断题，再选结构</text>
+  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">逐层回答判断题，再选结构</text>
 
   <!-- ============ Q1 ============ -->
   <polygon points="470,170 620,220 470,270 320,220" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
