@@ -700,7 +700,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 1-3　全书章节结构：第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。递进的依据就在图里的三条分组带。第 2–4 章讲数据本身——用什么结构表示、怎么在崩溃后不丢。有了这个底子，第 5–7 章才谈系统的组织：层怎么切、容量怎么扩、谁能访问。第 8–9 章处理落盘与搬运：数据在磁盘上存成什么格式、副本之间怎么同步。分组顺序就是依赖顺序——前面的结论是后面讨论的输入。</p>
 <h3 id="s20">1.4.3 版本基线与图表约定</h3>
-<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.7 LTS），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（去掉 ZooKeeper），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
+<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。<strong>版本状态提示（2026 年 7 月）</strong>：MySQL 8.0 已结束官方支持（建议新项目使用 8.4 LTS 或 9.7 LTS），Kafka 3.x 已进入生命周期末期（4.0 起 KRaft 为唯一模式、ZooKeeper 彻底移除），Redis 7.x 仍处于维护期。本书讨论的架构规律（B+ 树、WAL、状态机复制、CAP 取舍等）不受版本演进影响；具体参数默认值和命令行为请以最新官方文档为准。几条版本相关的演化包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（新集群自此可不依赖 ZooKeeper 部署），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。每张图、每张表必有正文导语引出、正文段落解读，不允许脱离正文单独出现。本章用到三张图（图 1-1、图 1-2、图 1-3）与两张内联表格（表 1-1、表 1-2）。</p>
 <p>术语约定如下。全书术语统一译法，首次出现时中英对照标注，之后按两档制使用：工程界通行的术语直接用英文，如 redo log、undo log、binlog、WAL、MVCC；中文已充分沉淀的继续用中文，如缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到未列出的术语，我们会在首次出现时同样标注英文原词。</p>
 <h3 id="s21">1.4.4 推荐阅读路径</h3>
@@ -4147,7 +4147,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="335" y="245" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="460" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② 半同步复制</text>
   <text x="460" y="290" text-anchor="middle" font-size="12" fill="#374151">主等 ≥1 个从 ACK 才返回</text>
-  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：不丢（超时降级回异步）</text>
+  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：多数情况不丢（超时降级回异步）</text>
 
   <line x1="460" y1="315" x2="460" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_7_1_arrow-gray)"/>
   <text x="470" y="340" font-size="11" fill="#EF4444">仍无共识 · 脑裂风险</text>
@@ -5379,7 +5379,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>把三个软件的具体做法摆到同一张表上对比，看每种范式各为谁优化、各自又付了什么代价。</p>
 <h3 id="s180">8.5.1 三栏对比表</h3>
 <p><strong>表 8-2　三个软件在八个维度上的范式对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据的主存储位置</td><td>内存</td><td>磁盘</td><td>磁盘（日志本体）</td></tr><tr><td>基本 I/O 单元</td><td>单条命令 / 整个文件</td><td>16KB 定长页</td><td>Record Batch（变长）</td></tr><tr><td>写方式</td><td>全量重写（RDB）/ 追加（AOF）</td><td>原地改页 + WAL</td><td>纯追加，永不改写</td></tr><tr><td>读方式</td><td>加载到内存后随机访问</td><td>B+ 树随机定位</td><td>稀疏索引 + 顺序扫描</td></tr><tr><td>索引形态</td><td>无（内存里现算）</td><td>B+ 树 + 页内 Page Directory</td><td>稀疏偏移量 / 时间戳索引</td></tr><tr><td>崩溃恢复</td><td>RDB 全量 + AOF 增量重放</td><td>redo 重放 + 双写修页</td><td>以日志为正本，重放即可</td></tr><tr><td>演进机制</td><td>RDB 版本号 + 编码升级</td><td>页类型 / 格式位 + 在线 DDL</td><td>Magic 版本号</td></tr><tr><td>校验</td><td>RDB 尾部 CRC64</td><td>页校验和 + 双写</td><td>Batch 级 CRC</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据的主存储位置</td><td>内存</td><td>磁盘</td><td>磁盘（日志本体）</td></tr><tr><td>基本 I/O 单元</td><td>单条命令 / 整个文件</td><td>16KB 定长页</td><td>Record Batch（变长）</td></tr><tr><td>写方式</td><td>全量重写（RDB）/ 追加（AOF）</td><td>原地改页 + WAL</td><td>纯追加，永不改写</td></tr><tr><td>读方式</td><td>加载到内存后随机访问</td><td>B+ 树随机定位</td><td>稀疏索引 + 顺序扫描</td></tr><tr><td>索引形态</td><td>无（内存里现算）</td><td>B+ 树 + 页内 Page Directory</td><td>稀疏偏移量 / 时间戳索引</td></tr><tr><td>崩溃恢复</td><td>RDB 全量 + AOF 增量重放</td><td>redo 重放 + 双写修页</td><td>以日志为正本，截断残缺尾部</td></tr><tr><td>演进机制</td><td>RDB 版本号 + 编码升级</td><td>页类型 / 格式位 + 在线 DDL</td><td>Magic 版本号</td></tr><tr><td>校验</td><td>RDB 尾部 CRC64</td><td>页校验和 + 双写</td><td>Batch 级 CRC</td></tr></tbody></table></div>
 <p>每一行都是一次明确的取舍。读方式这一行差异最直观：Redis 加载后才随机访问，MySQL 用 B+ 树随机定位，Kafka 靠稀疏索引加顺序扫描：三种读方式直接对应三种格式结构。校验这一行则反映出它们对"损坏粒度"的不同假设：Redis 校验整个文件，MySQL 校验单页，Kafka 按批校验。</p>
 <h3 id="s181">8.5.2 解读：三种范式各为谁优化</h3>
 <p>三种格式背后是三种不同的优化目标。第 4 章按数据的主存储放在内存还是磁盘，把三家分成全内存、缓存磁盘、顺序日志三种范式；本节按磁盘文件本身的组织结构来分，快照、页式、追加日志是另一个维度。</p>
