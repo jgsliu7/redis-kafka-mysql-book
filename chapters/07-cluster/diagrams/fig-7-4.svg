@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 24 800 416" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 53 800 387" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
-
-  <text x="400" y="46" text-anchor="middle" font-size="12" fill="#6B7280">Topic 切为 Partition，每个 Partition 有 1 个 Leader + N 个 Follower，Leader 负责所有读写</text>
 
   <!-- Topic -->
   <rect x="250" y="65" width="300" height="36" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>

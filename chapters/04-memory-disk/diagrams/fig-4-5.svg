@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 34 960 726" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 682" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -11,9 +11,6 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
     </marker>
   </defs>
-
-  <!-- Title -->
-  <text x="480" y="56" text-anchor="middle" font-size="13" fill="#374151">WAL（先写 redo log）→ 改缓冲池脏页 → 提交 → 双写缓冲 → Checkpoint 刷盘</text>
 
   <!-- Lifelines (actors) -->
   <!-- Client -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 940 570" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 532" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -11,9 +11,6 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
     </marker>
   </defs>
-
-  <!-- 标题 -->
-  <text x="470" y="52" text-anchor="middle" font-size="13" fill="#374151">两段式：IO 线程拉取 binlog 到 relay log，SQL 线程本地回放；半同步在主提交后等从的 ACK</text>
 
   <!-- ============ 主节点 Source ============ -->
   <rect x="30" y="80" width="240" height="380" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 820 528" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 498" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowL43" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
-
-  <text x="410" y="54" text-anchor="middle" font-size="13" fill="#374151">逻辑层只看 type（语义），存储层只看 encoding（内存表示）</text>
 
   <!-- robj 顶部小框 -->
   <rect x="300" y="74" width="220" height="50" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>

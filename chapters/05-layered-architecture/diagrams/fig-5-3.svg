@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 820 548" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr45" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -8,8 +8,6 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
     </marker>
   </defs>
-
-  <text x="410" y="54" text-anchor="middle" font-size="13" fill="#374151">一个连接的请求带着 THD 穿过连接→服务→引擎，THD 是跨层共享的可变状态</text>
 
   <!-- 四条生命线顶点 -->
   <!-- 客户端 -->
