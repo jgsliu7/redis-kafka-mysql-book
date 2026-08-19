@@ -351,6 +351,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>
 </div><figcaption>图 1-1　后端基础设施的三种核心范式与代表软件：内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</figcaption></figure>
+<p>图里每个软件还标了"追求"与"舍弃"两行，值得先看一眼：每一家舍弃的东西，恰好落在另外两家的强项里。</p>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（1.2.1 节展开）。</p>
@@ -552,6 +553,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
 </div><figcaption>图 1-2　三个软件在五个维度上的定位雷达：低延迟、高吞吐、强一致、数据容量、查询灵活度。</figcaption></figure>
+<p>这张图值得留着来回翻：后面各章的横向对比，解释的都是这三个轮廓的来历。</p>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
 <p>同一个系统，从使用视角和架构视角去看，关注的是完全不同的内容。我们研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把视线从配置参数移到设计决策。</p>
 <h3 id="s14">1.3.1 两种视角看到的同一个系统</h3>
@@ -727,7 +729,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s28">2.2.1 Redis：驻留内存的简洁数据结构</h3>
 <p>Redis 的数据结构都受同一个约束限制：<strong>全部驻留内存</strong>。内存意味着随机访问几乎免费、CPU 开销比 I/O 更敏感、容量被物理上限锁死，所以数据结构要尽量省内存、尽量少 CPU 操作。下面五个结构按这个约束依次出现：SDS、跳表、字典（dict）偏重查询效率，ziplist/listpack 和 intset 偏重内存密度。</p>
 <p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code> 才能知道，SDS 只通过 <code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
-<p><strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。 <strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 字段（<code>alloc</code> 不动，保留已分配空间），把多余空间留作未来的追加缓冲；想真正归还内存需要显式调用 <code>sdsRemoveFreeSpace</code>，SDS 自身从不在缩短路径上自动 <code>realloc</code>。这组策略把频繁操作中的系统调用次数压到最低，让 Redis 在最频繁的操作上做到摊还 O(1)。</p>
+<p><strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。 <strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 字段（<code>alloc</code> 不动，保留已分配空间），把多余空间留作未来的追加缓冲；想真正归还内存需要显式调用 <code>sdsRemoveFreeSpace</code>，SDS 自身从不在缩短路径上自动 <code>realloc</code>。这组策略把频繁操作中的系统调用次数压到最低，让 Redis 在最频繁的操作上做到摊还 O(1)。图 2-1 把两种字符串的内存布局并排画出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 47 880 403" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -800,8 +802,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="60" y="386" width="760" height="42" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
   <text x="440" y="412" text-anchor="middle" font-size="12.5" fill="#92400E">用一个头部换来 O(1) 取长、二进制安全与更少的 realloc，内存里这点头部开销远比反复遍历划算</text>
 </svg>
-</div><figcaption>图 2-1　SDS 内存布局：头部记录 len/alloc/flags，取长度直接读 len 字段（O(1)）；C 字符串靠遍历到 <code>\0</code> 才知长度（O(n)），且无法存二进制数据。</figcaption></figure>
-<p><strong>跳表（skiplist）</strong> 是 Redis 有序集合（ZSET）底层两种结构之一。跳表是多层有序链表，最底层是一条完整的有序双向链表，上面几层是抽稀的索引层，每隔几个节点保留一个指针。查找时从最顶层快速定位到目标附近，再逐层下沉到精确位置。平均 O(log N) 的查找、插入、删除；范围扫描只需在底层链表前进（O(log N + M)），比红黑树的中序遍历更直接；插入时按新节点的随机层数，逐层更新前驱节点的前向指针和跨度（span），不需要旋转或再平衡。选跳表而非红黑树，是因为实现更简单、范围操作更直接。跳表的缓存局部性确实不如红黑树，但在 Redis 的典型数据规模下，这点差异不是主导因素。</p>
+</div><figcaption>图 2-1　SDS 与 C 字符串的内存布局对比：同一个 hello 的两种存法，差别集中在 SDS 的头部。</figcaption></figure>
+<p>对照上下两行，开销的位置不同：C 字符串省了头部，代价摊在每次取长度的遍历里；SDS 多花一个头部，取长度变成读一个字段。Redis 选的是后一种：固定的小开销，换掉按次数累积的遍历。</p>
+<p><strong>跳表（skiplist）</strong> 是 Redis 有序集合（ZSET）底层两种结构之一。跳表是多层有序链表，最底层是一条完整的有序双向链表，上面几层是抽稀的索引层，每隔几个节点保留一个指针。查找时从最顶层快速定位到目标附近，再逐层下沉到精确位置。平均 O(log N) 的查找、插入、删除；范围扫描只需在底层链表前进（O(log N + M)），比红黑树的中序遍历更直接；插入时按新节点的随机层数，逐层更新前驱节点的前向指针和跨度（span），不需要旋转或再平衡。选跳表而非红黑树，是因为实现更简单、范围操作更直接。跳表的缓存局部性确实不如红黑树，但在 Redis 的典型数据规模下，这点差异不是主导因素。多层索引长什么样、查找怎么走，见图 2-2。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 880 312" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -884,10 +887,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="60" y="352" width="760" height="34" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
   <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是抽稀的索引层，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
 </svg>
-</div><figcaption>图 2-2　跳表查找 O(log N)：底层是完整有序链表，上层是抽稀的索引层。查找从顶层快速逼近目标，再逐层下沉到精确位置，跳过大量节点。</figcaption></figure>
+</div><figcaption>图 2-2　跳表的多层索引与查找路径：以查找 17 为例。</figcaption></figure>
+<p>顺着图里的路径从 head 走到 17：每一步要么前进、要么下沉，越往下一次跨过的节点越少，到底层逐个对齐。本章开头排行榜的例子也是这两段：按分数定位起点走这条下沉路径，按名次拉一段沿底层链表前进。</p>
 <p><strong>字典（dict）</strong> 是 Redis 哈希类型的底层结构，也是 Redis 内部键空间本身。它是一个链式哈希表，用 SipHash 做哈希函数（Redis 4.0 起为防 hash 洪泛攻击，从 MurmurHash2 改用带随机种子的 SipHash），冲突用链表解决。</p>
 <p>渐进式 rehash 是 Redis 字典最特别的设计，实现上依赖一个双表结构：每个字典内部同时持有两张哈希表，<code>ht[0]</code> 和 <code>ht[1]</code>。正常情况下只用 <code>ht[0]</code>，<code>ht[1]</code> 是空的。当负载因子（<code>used / size</code>）超过阈值（通常是 1，即扩容条件；或小于 0.1，即缩容条件）时，Redis 不会一次性把所有键从 <code>ht[0]</code> 搬到 <code>ht[1]</code>，因为那会阻塞主线程。它先给 <code>ht[1]</code> 分配一个更大的（或更小的）空间，设一个游标 <code>rehashidx = 0</code>，表示"搬迁进行中"。此后每次对这个字典做增删改查时，Redis 会把 <code>rehashidx</code> 指向的那一个桶里的所有键搬到 <code>ht[1]</code>，然后 <code>rehashidx++</code>。同时，新写入的键直接进 <code>ht[1]</code>，查找和删除则先查 <code>ht[0]</code> 再查 <code>ht[1]</code>。当 <code>rehashidx</code> 走完所有桶，<code>ht[1]</code> 变成新的 <code>ht[0]</code>，旧表释放，<code>rehashidx</code> 重置为 -1，rehash 结束。</p>
-<p>这套机制保证单次字典操作不会因为搬迁而卡顿，每次只搬一个桶，摊还到后续所有操作里。这和其他地方提到的 Redis 设计思想一致：<strong>用摊还替换集中，把省不掉的工作分摊到后续每次操作里</strong>。</p>
+<p>这套机制保证单次字典操作不会因为搬迁而卡顿，每次只搬一个桶，摊还到后续所有操作里。这和其他地方提到的 Redis 设计思想一致：<strong>用摊还替换集中，把省不掉的工作分摊到后续每次操作里</strong>。这套双表搬迁画出来就是图 2-3。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 407" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
@@ -950,8 +954,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="640" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065F46">搬完之后</text>
   <text x="640" y="440" text-anchor="middle" font-size="11.5" fill="#374151">rehashidx 走到底 → ht[1] 变 ht[0]，旧表释放</text>
 </svg>
-</div><figcaption>图 2-3　渐进式 rehash：扩容时不一次性搬迁，而是每次操作顺带把 <code>rehashidx</code> 指向的一个桶从 <code>ht[0]</code> 搬到 <code>ht[1]</code>；期间新写入直接进 <code>ht[1]</code>，查找先查 <code>ht[0]</code> 再查 <code>ht[1]</code>，搬完游标走到底则两表交换。</figcaption></figure>
-<p><strong>压缩列表（ziplist）与紧凑列表（listpack）</strong> 是 Redis 把内存密度推到最高的数据结构。ziplist 是一块连续内存，所有元素紧挨着存，没有指针开销。每个元素存的是"前一个元素长度 + 自己的编码 + 自己的数据"。这带来极高的内存密度，但也带来连锁更新问题：如果一个元素变长，它的"前一个元素长度"字段可能从 1 字节扩成 5 字节，导致后一个元素的同名字段也跟着扩；每连锁一步都要把后方整段字节挪一次（O(n)），最坏 n 个元素逐个连锁，累计 O(n²)。listpack（7.0 起取代了 ziplist 的全部内部用途，旧格式代码保留兼容）把"前一个元素长度"改成了"自己的长度"。每个元素只自记长度，不再管前面是谁，连锁更新从根上消除。内存密度不降，写复杂度从 O(n²) 回到 O(n)。</p>
+</div><figcaption>图 2-3　渐进式 rehash 的双表搬迁过程：搬迁进行到一半的一个时刻。</figcaption></figure>
+<p>注意搬迁不是整桶平移：旧表桶 2 里的 k7、k3、k9 搬过去之后分别落在 <code>ht[1]</code> 不同的桶里，键要按新表的尺寸重新散列。这笔重新散列的开销和搬移一起，摊在每次操作顺带的那一小步里。</p>
+<p><strong>压缩列表（ziplist）与紧凑列表（listpack）</strong> 是 Redis 把内存密度推到最高的数据结构。ziplist 是一块连续内存，所有元素紧挨着存，没有指针开销。每个元素存的是"前一个元素长度 + 自己的编码 + 自己的数据"。这带来极高的内存密度，但也带来连锁更新问题：如果一个元素变长，它的"前一个元素长度"字段可能从 1 字节扩成 5 字节，导致后一个元素的同名字段也跟着扩；每连锁一步都要把后方整段字节挪一次（O(n)），最坏 n 个元素逐个连锁，累计 O(n²)。listpack（7.0 起取代了 ziplist 的全部内部用途，旧格式代码保留兼容）把"前一个元素长度"改成了"自己的长度"。每个元素只自记长度，不再管前面是谁，连锁更新从根上消除。内存密度不降，写复杂度从 O(n²) 回到 O(n)。连锁怎么发生、怎么被消除，并排画在图 2-4 里。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 43 880 427" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_4_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
@@ -1029,10 +1034,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <text x="60" y="426" font-size="12" fill="#374151">元素不再记前一个是谁 → 从根上消除连锁，写复杂度回到 <tspan font-weight="700" fill="#065F46">O(n)</tspan>，内存密度不降</text>
 </svg>
-</div><figcaption>图 2-4　连锁更新：ziplist 每个元素记录"前一元素长度"，一个元素变长使该字段从 1 字节涨到 5 字节，撑大后一元素，可能逐个向后连锁（最坏 O(n²)）；listpack 改为每元素只记"自己的长度"，从根上消除连锁。</figcaption></figure>
+</div><figcaption>图 2-4　ziplist 连锁更新与 listpack 的消除：同一个元素变长，在两种格式里的不同后果。</figcaption></figure>
+<p>触发点在 254 这个长度上：比它短的长度 1 字节就装得下，跨过它，字段要从 1 字节扩成 5 字节。连锁只向后传播，因为每个元素只依赖前一个元素的长度——依赖是单向的，传播也只能单向。</p>
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素：能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。编码只升不降：哪怕后来所有大值都被删了，编码仍然是宽的。这是因为升级是一次性的内存重分配，而降级意味着又一次全量重分配，在 Redis 的场景里"删掉大值"的概率太低，不值得为了降级多付一次开销。</p>
-<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 ziplist → listpack 或 hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。</p>
+<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 ziplist → listpack 或 hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在图 2-5。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1090,10 +1096,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，自动切换是省内存的关键手段</text>
   <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
-</div><figcaption>图 2-5　五种底层结构按"查询效率 / 内存密度"分两路：intset 有编码升级与类型升级两条路径。</figcaption></figure>
+</div><figcaption>图 2-5　Redis 五种底层结构与编码升级路径：五种结构各成卡片，底部三条切换链标出小数据编码的升级去向。</figcaption></figure>
+<p>前面几段把五个结构分开讲，这张图合在一处，忘了哪条升级去向时适合翻回来查。三条链的方向一致：起点都是紧凑编码，终点都是承担查询的结构。</p>
 <h3 id="s29">2.2.2 MySQL：面向磁盘页和通用查询的 B+ 树与行格式</h3>
 <p>MySQL（InnoDB）的数据结构受到一个关键限制：<strong>数据在磁盘上，一次 I/O 取一页（16KB）</strong>。这个限制是决定性的。内存访问是纳秒级，而磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构要尽量解决这个核心问题：<strong>让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用</strong>。</p>
-<p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（几百个键就能挤进一个 16KB 页，树极矮），叶子节点存完整行数据，且叶子之间用双向链表串联。这套设计同时解决三个查询需求：点查（从根走到叶，O(log n)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。第 8 章会展开 InnoDB 页内七段布局和 Page Directory 的细节。B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只做局部的指针更新，没有页分裂；页分裂是磁盘 16KB 页约束下特有的代价，也是 MySQL 为通用查询能力付出的成本。</p>
+<p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（几百个键就能挤进一个 16KB 页，树极矮），叶子节点存完整行数据，且叶子之间用双向链表串联。这套设计同时解决三个查询需求：点查（从根走到叶，O(log n)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。第 8 章会展开 InnoDB 页内七段布局和 Page Directory 的细节。B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只做局部的指针更新，没有页分裂；页分裂是磁盘 16KB 页约束下特有的代价，也是 MySQL 为通用查询能力付出的成本。图 2-6 画了一棵三层的示例树。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 587" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_6_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1246,7 +1253,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="450" y="612" text-anchor="middle" font-size="11" fill="#7F1D1D">内部节点只存键 → 几百个键挤进 16KB → 树极矮（2-3 层）→ 点查 2-3 次 I/O</text>
   <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
 </svg>
-</div><figcaption>图 2-6　InnoDB B+ 树三层结构：根节点和内部节点只存键与子节点指针，把几百个键挤进 16KB；叶子节点存完整行数据，双向链表串联支持高效范围扫描。</figcaption></figure>
+</div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
+<p>把这张图和图 2-2 的跳表放在一起看：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
 <p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
 <p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。</p>
 <h3 id="s30">2.2.3 Kafka 的 RecordBatch：批量、顺序、演进</h3>
@@ -1255,7 +1263,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>从 RecordBatch 的字段布局能看出 Kafka 的大部分设计取向。</strong> 从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
 <div class="table-wrap"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
-<p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除。</p>
+<p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见图 2-7。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 562" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1453,6 +1461,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="650" y="474" font-size="11" fill="#EF4444">✗</text>
 </svg>
 </div><figcaption>图 2-8　三个软件通信协议对比：文本行服务人眼可读与实现简单，二进制服务带宽与解析开销，版本化请求头服务演进兼容。</figcaption></figure>
+<p>图里三家各带了一段实例：RESP 那段是 <code>SET key val</code> 实际发出去的字节，MySQL 那两步是预编译的两次往返，Kafka 那行请求头把 <code>api_key</code>、<code>api_version</code> 摆在最前面，版本协商就发生在这几个字节上。三种协议的差异不用背结论，对着这三段实例就能认出来。</p>
 <h2 id="s35">2.4 横向对比</h2>
 <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚"目标 → 数据结构 → 协议"这条因果链。</p>
 <p><strong>表 2-2　三个软件数据结构与协议的横向对比</strong></p>
@@ -3535,7 +3544,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="534" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
 </svg>
 </div><figcaption>图 5-7　三个软件映射到"交互 / 逻辑 / 存储"统一视角：同样的三段职责，落进各自的层形态。</figcaption></figure>
-<p>这张图给本章定了对照基准。同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 分层最粗也最薄，跨层全是函数调用；MySQL 粒度居中，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，分层最细，靠队列和网络协议衔接。图里三个色块的颜色是为了在下一张表里一一对应。</p>
+<p>这张图给本章定了对照基准。同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 分层最粗也最薄，跨层全是函数调用；MySQL 粒度居中，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，分层最细，靠队列和网络协议衔接。</p>
 <p>接下来用一张三栏对比表把六个核心维度并排，维度作为行。层数的口径先说清：Redis 数出四层（RESP 解析、命令分派、robj 抽象、内存存储），MySQL 四层（连接、服务、Handler 接口、引擎），Kafka 五层（SocketServer、KafkaApis、Log、协调层、跨 Broker 协议）。</p>
 <p><strong>表 5-1　三个软件分层形态横向对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心抽象</td><td><code>robj</code> 键值对象（type/encoding 分离）</td><td>关系表 + 索引（SQL 行模型）</td><td>追加日志（Log / LogSegment）</td></tr><tr><td>主要存储介质</td><td>内存（持久化为辅）</td><td>磁盘（缓冲池做内存缓存）</td><td>磁盘（重度依赖页缓存）</td></tr><tr><td>层数与粒度</td><td>粗 4 层</td><td>中 4 层（服务层内含解析/优化/执行子层）</td><td>细 5 层（含 ReplicaManager/Controller 协调层）</td></tr><tr><td>层间通信机制</td><td>函数调用 + 对象指针（无序列化）</td><td>THD 对象 + handler 虚函数</td><td>RequestChannel 队列 + 跨网络协议</td></tr><tr><td>可插拔性</td><td>无引擎可换（仅内存）</td><td>Handler API 支持多引擎并存</td><td>存储不可换，但有 Connect/Streams 插件生态</td></tr><tr><td>分层的首要目标</td><td>低延迟（层数越少越好）</td><td>兼容性与生态（标准接口）</td><td>水平扩展与高吞吐（网络边界）</td></tr></tbody></table></div>
@@ -4487,11 +4496,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="180" y="267" text-anchor="middle" font-size="12" fill="#374151">半数以上主节点确认 → FAIL</text>
   <text x="180" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（客观下线，广播 FAIL）</text>
 
-  <line x1="180" y1="292" x2="180" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_7_5_arrow-gray)"/>
+  <line x1="180" y1="292" x2="180" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_7_5_arrow-red)"/>
 
   <rect x="55" y="310" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">故障主的从节点发起选举</text>
-  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">申请其他主节点投票（currentEpoch+1）</text>
+  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">凑不齐多数派票？→ 槽暂不可用</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（从节点发起选举拉票，宁可拒写不双主）</text>
 
   <line x1="180" y1="354" x2="180" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_7_5_arrow-gray)"/>
 
@@ -5291,7 +5300,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s178">8.4.6 Tiered Storage：从本地日志到分层存储</h3>
 <p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
 <p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者或 Follower 读取时，先尝试本地磁盘，未命中则从远程拉取并缓存到本地（fetch-through 语义）。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
-<p>第一，"日志数据必须在本地磁盘"的假设需要修正：正本仍是日志段，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式反映访问模式"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。</p>
+<p>第一，"日志数据必须在本地磁盘"的假设需要修正：正本仍是日志段，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式反映访问模式"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。日志段在本地与远程之间的完整生命周期，画在图 8-7 里。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 372" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -5365,6 +5374,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
 </svg>
 </div><figcaption>图 8-7　Kafka Tiered Storage 日志段生命周期：本地热段关闭后异步上传到远程对象存储，消费者和 Follower 读取时先尝试本地、未命中则回源远程。</figcaption></figure>
+<p>顺着图里的 ①②③ 读一遍生命周期：追加写只发生在本地的活跃段，段关闭后才触发异步上传，远程那份是只读的冷段。读取路径分成两条，本地命中和远程回源的延迟差着一个量级，对应前文说的第二点影响。</p>
 <h2 id="s179">8.5 横向对比</h2>
 <p>把三个软件的具体做法摆到同一张表上对比，看每种范式各为谁优化、各自又付了什么代价。</p>
 <h3 id="s180">8.5.1 三栏对比表</h3>
@@ -5558,7 +5568,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="410" y="438" text-anchor="middle" font-size="12" fill="#6B7280">这四个子问题构成本章全篇的分析框架</text>
 </svg>
 </div><figcaption>图 9-1　数据同步的四个子问题：传播什么、怎么传播、到什么程度、断了怎么办。</figcaption></figure>
-<p>这四个子问题的底层，是同一个模型：<strong>状态机复制</strong>，所有副本按相同顺序执行相同输入序列，终态必然相同。DDIA（《Designing Data-Intensive Applications》）第 5 章对此已有展开。它们都在用这个模型，差异只在序列载体和执行方式：Redis 是命令流（副本直接执行），MySQL 的序列是 binlog event（副本回放事件），Kafka 是分区日志消息（副本按偏移量追加）。</p>
+<p>这四个子问题的底层，是同一个模型：<strong>状态机复制</strong>，所有副本按相同顺序执行相同输入序列，终态必然相同。DDIA（《Designing Data-Intensive Applications》）第 5 章对此已有展开。它们都在用这个模型，差异只在序列载体和执行方式：Redis 是命令流（副本直接执行），MySQL 的序列是 binlog event（副本回放事件），Kafka 是分区日志消息（副本按偏移量追加），三列对照见图 9-2。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 448" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -5650,6 +5660,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="489" text-anchor="middle" font-size="11" fill="#374151">差异只在序列的载体与执行的方式</text>
 </svg>
 </div><figcaption>图 9-2　状态机复制模型：顶部同一个输入序列分发到三个副本，对照三列逐步执行后的汇合结果。</figcaption></figure>
+<p>模型成立有一个前提：同一条输入在每个副本上必须产生相同的状态变化，执行必须是确定性的。带随机性或依赖本地时间的命令会让三列到不了同一个 S5——9.2 节会看到 Redis 为此在复制链路上改写了哪些命令。</p>
 <blockquote><strong>关键数字</strong>  <strong>Redis PSYNC backlog：默认 1MB</strong>。1 万次写/秒、每条约 100 字节的负载下，约覆盖 <strong>1 秒</strong> 的断线窗口（覆盖时长 = backlog 大小 ÷ 写入字节速率；大实例或高写入场景需调大 <code>repl-backlog-size</code>）；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。  <strong>MySQL 半同步超时：<code>rpl_semi_sync_source_timeout</code> 默认 10 秒</strong>。超时自动降级回异步，一致性保障消失。降级是可观测的，但需配合告警。  <strong>Kafka ISR 剔除阈值：<code>replica.lag.time.max.ms</code> 默认 30 秒</strong>。副本落后超过 30 秒即踢出 ISR，不再参与 Leader 选举，以此保证新主不丢已确认消息。</blockquote>
 <p>我遇到过一次线上告警，用户反馈下单后查不到订单。排查发现是主从延迟导致的：主节点写入新订单，从节点还没同步到，用户的查询恰好落在了从节点上。那次我意识到"数据已写入"和"用户能看到"之间有一个时间窗口，事务型和缓存型系统对这个窗口的取舍截然不同。后来我们加了一个写后读一致的路由层，但前提是必须先知道这道窗口的存在。</p>
 <h2 id="s195">9.2 Redis 的做法</h2>

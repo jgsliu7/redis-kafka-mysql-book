@@ -238,6 +238,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>
 </div><figcaption>图 1-1　后端基础设施的三种核心范式与代表软件：内存型 / 持久化型 / 流式型三类能力分别由 Redis、MySQL、Kafka 承担。</figcaption></figure>
+<p>图里每个软件还标了"追求"与"舍弃"两行，值得先看一眼：每一家舍弃的东西，恰好落在另外两家的强项里。</p>
 <h3 id="s6">1.1.2 为什么是这三个软件</h3>
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（1.2.1 节展开）。</p>
@@ -439,6 +440,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
 </svg>
 </div><figcaption>图 1-2　三个软件在五个维度上的定位雷达：低延迟、高吞吐、强一致、数据容量、查询灵活度。</figcaption></figure>
+<p>这张图值得留着来回翻：后面各章的横向对比，解释的都是这三个轮廓的来历。</p>
 <h2 id="s13">1.3 架构视角 vs 使用视角</h2>
 <p>同一个系统，从使用视角和架构视角去看，关注的是完全不同的内容。我们研究学习的核心方法是反复追问"为什么这样设计 / 反过来会怎样"，把视线从配置参数移到设计决策。</p>
 <h3 id="s14">1.3.1 两种视角看到的同一个系统</h3>

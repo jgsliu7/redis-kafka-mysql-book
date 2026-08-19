@@ -36,11 +36,11 @@
   <text x="180" y="267" text-anchor="middle" font-size="12" fill="#374151">半数以上主节点确认 → FAIL</text>
   <text x="180" y="283" text-anchor="middle" font-size="11" fill="#6B7280">（客观下线，广播 FAIL）</text>
 
-  <line x1="180" y1="292" x2="180" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <line x1="180" y1="292" x2="180" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
 
   <rect x="55" y="310" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">故障主的从节点发起选举</text>
-  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#6B7280">申请其他主节点投票（currentEpoch+1）</text>
+  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">凑不齐多数派票？→ 槽暂不可用</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（从节点发起选举拉票，宁可拒写不双主）</text>
 
   <line x1="180" y1="354" x2="180" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
