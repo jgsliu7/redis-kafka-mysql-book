@@ -5404,88 +5404,82 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s189">8.6.6 给实践者的三问</h3>
 <p>把五条原则落到实践，面对自己的存储设计先回答三个问题。第一问，数据会被原地改吗？这是最根本的分叉。会原地改，选定长页结构（像 MySQL，页号即偏移，原地改加 WAL）。不会原地改，进下一问。</p>
 <p>第二问，访问是随机定位要快，还是批量流式进出？随机定位要快，走定长页加索引（B+ 树加页内稀疏槽）。批量流式进出且写远多于点查，走追加日志结构（像 Kafka，纯追加加稀疏索引）。既不原地改也不批量流式、只需要崩溃后整体重建，走快照结构（像 Redis 的 RDB 加 AOF）。其中"怕丢一小段还是怕全量重建慢"决定快照与增量日志的组合方式。怕丢，选快照加增量日志（Redis 的混合持久化）；怕恢复慢，就提高快照频率、压缩增量。前两问的答案连成一条选型路线，画出来就是图 8-8 这棵决策树。</p>
-<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 12 940 640" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_8_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
   </defs>
 
-  <!-- ============ root ============ -->
-  <rect x="320" y="80" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
-  <text x="470" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
-  <text x="470" y="124" text-anchor="middle" font-size="11" fill="#374151">逐层回答判断题，再选结构</text>
+  <!-- ============ 起点 ============ -->
+  <rect x="310" y="24" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="460" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
+  <text x="460" y="68" text-anchor="middle" font-size="11" fill="#374151">逐层回答判断题，再选结构</text>
 
-  <!-- ============ Q1 ============ -->
-  <polygon points="470,170 620,220 470,270 320,220" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">数据会被原地改吗？</text>
-  <text x="470" y="228" text-anchor="middle" font-size="10" fill="#374151">（决定定长页 vs 追加日志）</text>
+  <!-- 边1: 起点 → Q1 -->
+  <path d="M 460 80 L 460 110" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
 
-  <line x1="470" y1="136" x2="470" y2="170" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <!-- ============ Q1 第一问: 会不会原地改 ============ -->
+  <polygon points="460,112 610,164 460,216 310,164" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="460" y="154" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">数据会被原地改吗？</text>
+  <text x="460" y="172" text-anchor="middle" font-size="10" fill="#374151">（最根本的分叉）</text>
 
-  <!-- Q1 branches -->
-  <!-- YES (in-place) → page -->
-  <line x1="320" y1="220" x2="220" y2="220" stroke="#4B5563" stroke-width="1.5"/>
-  <text x="270" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
+  <!-- 边2: Q1 是（事务改）→ 直达页式范式，进框顶 x=150 -->
+  <path d="M 310 164 L 150 164 L 150 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="230" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是（事务改）</text>
 
-  <!-- NO (append) -->
-  <line x1="620" y1="220" x2="720" y2="220" stroke="#4B5563" stroke-width="1.5"/>
-  <text x="670" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否（追加）</text>
+  <!-- 边3: Q1 否 → Q2a -->
+  <path d="M 610 164 L 770 164 L 770 248" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="690" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">否</text>
 
-  <!-- ============ Q2 left (page family) ============ -->
-  <polygon points="140,310 250,350 140,390 30,350" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="140" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">随机定位要快？</text>
-  <text x="140" y="362" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
+  <!-- ============ Q2a 第二问之一: 随机定位（页式家族） ============ -->
+  <polygon points="770,250 900,300 770,350 640,300" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="770" y="292" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">随机定位要快？</text>
+  <text x="770" y="310" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
 
-  <line x1="220" y1="220" x2="220" y2="280" stroke="#4B5563" stroke-width="1.5"/>
-  <line x1="220" y1="280" x2="140" y2="280" stroke="#4B5563" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="140" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <!-- 边4: Q2a 是 → 页式范式，第二条入边进框顶 x=220（与边2的 x=150 错开） -->
+  <path d="M 640 300 L 220 300 L 220 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="430" y="292" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
 
-  <!-- page result -->
-  <line x1="140" y1="390" x2="140" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
-  <rect x="30" y="430" width="220" height="80" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-  <text x="140" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">页式范式（MySQL）</text>
-  <text x="140" y="475" text-anchor="middle" font-size="10" fill="#374151">16KB 定长页 · B+ 树</text>
-  <text x="140" y="491" text-anchor="middle" font-size="10" fill="#374151">原地改 + WAL + 双写</text>
-  <text x="140" y="505" text-anchor="middle" font-size="10" fill="#374151">页内 Page Directory 稀疏槽</text>
+  <!-- 边5: Q2a 否 → Q2b -->
+  <path d="M 770 350 L 770 404" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="780" y="380" font-size="11" font-weight="700" fill="#374151">否</text>
 
-  <!-- ============ Q2 right (append family) ============ -->
-  <polygon points="800,310 910,350 800,390 690,350" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="800" y="346" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">批量流式进出？</text>
-  <text x="800" y="362" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
+  <!-- ============ Q2b 第二问之二: 批量流式（日志家族） ============ -->
+  <polygon points="770,406 900,456 770,506 640,456" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="770" y="448" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">批量流式进出？</text>
+  <text x="770" y="466" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
 
-  <line x1="720" y1="220" x2="720" y2="280" stroke="#4B5563" stroke-width="1.5"/>
-  <line x1="720" y1="280" x2="800" y2="280" stroke="#4B5563" stroke-width="1.5"/>
-  <line x1="800" y1="280" x2="800" y2="310" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
+  <!-- 边6: Q2b 是 → 追加日志范式 -->
+  <path d="M 640 456 L 470 456 L 470 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="555" y="448" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
 
-  <!-- Q3 branches -->
-  <!-- YES → log -->
-  <line x1="690" y1="350" x2="620" y2="350" stroke="#4B5563" stroke-width="1.5"/>
-  <text x="655" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">是</text>
+  <!-- 边7: Q2b 否 → 快照范式 -->
+  <path d="M 770 506 L 770 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#fig_8_8_arrow)"/>
+  <text x="780" y="535" font-size="11" font-weight="700" fill="#374151">否</text>
 
-  <!-- NO → snapshot -->
-  <line x1="910" y1="350" x2="900" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
-  <text x="920" y="395" font-size="11" font-weight="700" fill="#374151">否</text>
+  <!-- ============ 终点一排: 页式 / 追加日志 / 快照 ============ -->
+  <rect x="40" y="560" width="220" height="80" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="150" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">页式范式（MySQL）</text>
+  <text x="150" y="605" text-anchor="middle" font-size="10" fill="#374151">16KB 定长页 · B+ 树</text>
+  <text x="150" y="621" text-anchor="middle" font-size="10" fill="#374151">原地改 + WAL + 双写</text>
+  <text x="150" y="635" text-anchor="middle" font-size="10" fill="#374151">页内 Page Directory 稀疏槽</text>
 
-  <!-- log result (Kafka) -->
-  <rect x="380" y="430" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="500" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
-  <text x="500" y="475" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
-  <text x="500" y="491" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
-  <text x="500" y="505" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
+  <rect x="350" y="560" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="470" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
+  <text x="470" y="605" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
+  <text x="470" y="621" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
+  <text x="470" y="635" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
 
-  <line x1="620" y1="350" x2="500" y2="430" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_8_arrow)"/>
-
-  <!-- snapshot result (Redis) -->
-  <rect x="690" y="430" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="800" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
-  <text x="800" y="475" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
-  <text x="800" y="491" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是恢复副本</text>
-  <text x="800" y="505" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
+  <rect x="660" y="560" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="770" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
+  <text x="770" y="605" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
+  <text x="770" y="621" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是恢复副本</text>
+  <text x="770" y="635" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
 
 </svg>
 </div><figcaption>图 8-8　存储格式设计决策树：先判断会不会原地改，再区分随机定位与批量流式，分别落到页式、追加日志、快照三种范式。</figcaption></figure>
-<p>图上第一层菱形是第一问：会原地改走左侧，不会改走右侧。第二层的两个菱形是第二问的两种情形，答案把路线引到三个终点框——页式、追加日志、快照。</p>
+<p>图上第一层菱形是第一问：会原地改走左侧直达页式，不会改走右侧。右侧的两个菱形把第二问拆成两步：先问随机定位要快，再问批量流式进出，答案把路线引到三个终点框——页式、追加日志、快照。两条线进入页式框，一条来自原地改，一条来自不会原地改但要随机定位的数据。</p>
 <p>第三问不画在图上，因为它不决定走哪条路：无论落到哪个终点框，格式都要回答"五年后还能不能读"。预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位），格式才能长期可读。没有预留的，需要现在补上。三问答完，格式结构的方向就清晰了。</p>
 <h2 id="s190">8.7 小结</h2>
 <p>三种格式的差异源于访问模式的不同。Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 永远只追加，靠 Record Batch 压一批、稀疏索引定位，把吞吐推到上限。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改付双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则干脆连"原地改"这个选项都不要了。</p>
