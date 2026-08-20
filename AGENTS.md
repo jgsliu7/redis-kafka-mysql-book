@@ -277,10 +277,10 @@ AI 味句式/逻辑类是语义问题。grep 既漏报（换措辞就看不见�
 - **改了章节就要重建 HTML**：每次修改 `chapters/` 下任何 md 文件后，必须运行：
   ```bash
   python3 scripts/build_html.py    # 单页 → 架构之道.html（git tracked）
-  python3 scripts/build_pages.py   # 分章 → dist/（gitignored）
+  python3 scripts/build_pages.py   # 分章 → dist/（git tracked）
   ```
-  然后 `git add 架构之道.html` 随修改一起提交。
-- **dist/ 不在 git 里**，但 `架构之道.html` 是 tracked。
+  然后 `git add 架构之道.html dist/` 随修改一起提交。
+- **dist/ 全量入库**（2026-08-20 作者拍板）：`架构之道.html` 与 `dist/` 均为 tracked，两个构建缺一不可。此前仅 5 个遗留文件半跟踪，导致分页版悄悄变旧。
 - **本环境无法看图**：视觉验证靠像素渲染 + 源码坐标推理。
 
 ---

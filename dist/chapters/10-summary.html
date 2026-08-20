@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 10 章 总结：架构设计的共性规律与取舍</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1f2328;--mute:#57606a;--line:#d8dee4;--accent:#4f46e5;--bg:#fff;--soft:#f6f8fa}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.8;font-size:16px}
+.layout{display:grid;grid-template-columns:292px 1fr;max-width:1340px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:24px 16px 24px 8px;border-right:1px solid var(--line);font-size:14px}
+.toc-title{font-weight:700;font-size:15px;color:var(--accent);margin:0 0 4px 8px}
+.toc-title a{color:inherit;text-decoration:none}
+.toc-sub{font-size:12px;color:var(--mute);margin:0 0 16px 8px}
+nav.toc ul{list-style:none;padding:0;margin:0}
+nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc li>a:hover{background:var(--soft)}
+nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
+nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
+.content{padding:32px 48px 120px;max-width:1000px}
+.chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
+.page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
+.page-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.page-nav .empty{visibility:hidden}
+h1,h2,h3,h4{line-height:1.35;color:var(--ink);font-weight:700}
+h1{font-size:1.9em;margin:0 0 .6em;padding-bottom:.3em}
+h2{font-size:1.42em;margin:1.8em 0 .6em}
+h3{font-size:1.18em;margin:1.5em 0 .5em}
+h4{font-size:1.04em;margin:1.3em 0 .4em;color:#24292f}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:700;color:#111827}
+em{font-style:normal;color:var(--mute)}
+hr{border:none;border-top:1px solid var(--line);margin:2.4em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:.12em .4em;border-radius:4px;font-size:.9em;color:#24292f}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:8px;overflow-x:auto;line-height:1.55}
+pre code{background:none;color:inherit;padding:0;font-size:.86em}
+blockquote{margin:1.2em 0;padding:.6em 1em .6em 1.1em;border-left:4px solid var(--accent);background:#f7f8ff;color:#343a40;border-radius:0 6px 6px 0}
+blockquote strong{color:var(--accent)}
+ul,ol{margin:0 0 1em;padding-left:1.7em}
+li{margin:.25em 0}
+.table-wrap{overflow-x:auto;margin:1.2em 0}
+table{border-collapse:collapse;width:100%;font-size:.94em}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+thead th{background:#eef2ff;color:#3730a3;font-weight:600}
+tbody tr:nth-child(even){background:#fafbfd}
+figure.fig{margin:2em calc((100% - 1000px)/2);text-align:center}
+.svg-wrap,.inline-svg{display:block;width:100%}
+figure.fig svg,.inline-svg svg,.svg-wrap svg,figure.fig img{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}
+figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
+.toc-toggle{display:none}
+.review-index{display:grid;gap:12px;margin:24px 0 0}
+.review-index a{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;background:#fff}
+.review-index a:hover{border-color:var(--accent);background:#f7f8ff}
+.review-index strong{display:block;color:var(--ink)}
+.review-index span{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+@media(max-width:1200px){figure.fig{margin:2em auto}}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  nav.toc.open{transform:translateX(0)}
+  .content{padding:20px 18px 80px;max-width:100%}
+  .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+  .backdrop.show{display:block}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="bd"></div>
+<button class="toc-toggle">目录</button>
+<div class="layout">
+<nav class="toc" id="toc">
+  <div class="toc-title"><a href="../index.html">架构之道</a></div>
+  <div class="toc-sub">分页审阅版</div>
+  <ul>
+<li><a href="../index.html">首页目录</a></li>
+<li><a href="00-preface.html">序言</a>
+</li>
+<li><a href="01-introduction.html">第 1 章 引言 — 为什么是这三个软件</a>
+</li>
+<li><a href="02-data-structures-protocols.html">第 2 章 数据结构与协议 — 为各自的目标而设计</a>
+</li>
+<li><a href="03-lifecycle.html">第 3 章 生命周期管理 — 优雅启动与关闭</a>
+</li>
+<li><a href="04-memory-disk.html">第 4 章 内存与磁盘 — 速度与持久化的平衡</a>
+</li>
+<li><a href="05-layered-architecture.html">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</a>
+</li>
+<li><a href="06-security.html">第 6 章 安全机制 — 权限、加密、审计</a>
+</li>
+<li><a href="07-cluster.html">第 7 章 集群架构 — 从单点到分布式</a>
+</li>
+<li><a href="08-storage-format.html">第 8 章 磁盘存储格式 — 文件结构的设计哲学</a>
+</li>
+<li><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现</a>
+</li>
+<li class="active"><a href="10-summary.html">第 10 章 总结：架构设计的共性规律与取舍</a>
+<ul>
+<li class="nav-sub"><a href="#s236">本章导读</a></li>
+<li class="nav-sub"><a href="#s237">10.1 前九章核心启示复盘</a></li>
+<li class="nav-sub"><a href="#s239">10.2 共性规律：三个软件背后的同一套基本结构</a></li>
+<li class="nav-sub"><a href="#s246">10.3 从规律到权衡框架</a></li>
+<li class="nav-sub"><a href="#s250">10.4 给实践者的建议：从使用者到设计者</a></li>
+<li class="nav-sub"><a href="#s254">10.5 小结</a></li>
+</ul>
+</li>
+<li><a href="10-epilogue.html">后记</a>
+</li>
+<li><a href="11-references.html">附录　参考文献与延伸阅读（按章索引）</a>
+</li>
+</ul>
+</nav>
+<main class="content">
+<article class="chapter"><h1 id="s235">第 10 章 总结：架构设计的共性规律与取舍</h1>
+<h2 id="s236">本章导读</h2>
+<p>前九章，三个软件在八个主题上给出了截然不同的方案。Redis 偏延迟，MySQL 偏正确性，Kafka 偏吞吐。但这些差异底下是同一套基本结构。设计一个新系统时，该借鉴 Redis 的极简、MySQL 的严谨还是 Kafka 的可调，要看具体约束。知道特性不等于会做架构决策。只有把"它们为什么这样选"抽象成规律，规律才能迁移到实际系统中。这一章把前九章的启示串成一条主线。</p>
+<p>我回头看自己的职业生涯，最大的认知转折点不是学会了哪门新技术，而是有一天我突然不再问"这个系统快不快"，开始问"它在什么约束下做了哪些取舍，这些取舍今天还成不成立"。二十出头时我痴迷于压 QPS，后来踩的坑多了才慢慢明白，值钱的能力是在一堆约束面前做对选择。这本书写的，就是我自己花了十年才慢慢想清楚的那些规律。</p>
+<hr>
+<h2 id="s237">10.1 前九章核心启示复盘</h2>
+<p>九章九问，每章都在回答同一个核心问题的不同方面："如何在约束下做出取舍"。把每章的一句话启示，连同它们在该主题上的关键决策，收敛成一张"九章启示总表"，作为后面提炼规律的素材库。</p>
+<h3 id="s238">10.1.1 一张表收束九章</h3>
+<p>下表把第 1 到第 9 章的【核心问题 / Redis 决策 / MySQL 决策 / Kafka 决策 / 一句话共性启示】压缩进同一张表。竖看能看出三个软件的定位，横看能看出每个主题的核心问题。</p>
+<p><strong>表 10-1　九章启示总表</strong></p>
+<div class="table-wrap"><table><thead><tr><th>章</th><th>核心问题</th><th>Redis 的关键决策</th><th>MySQL 的关键决策</th><th>Kafka 的关键决策</th><th>一句话共性启示</th></tr></thead><tbody><tr><td>第 1 章 引言</td><td>选哪三个软件做样本</td><td>内存型代表</td><td>持久化型代表</td><td>流式型代表</td><td>范式互补才有研究价值，差异越大共性越容易看出来</td></tr><tr><td>第 2 章 数据结构与协议</td><td>如何定义数据格式与通信协议</td><td>RESP 文本协议 + SDS/listpack/intset 按数据量自适应</td><td>二进制协议 + Dynamic 行格式</td><td>RecordBatch V2 批量编码 + 变长整数/增量时间戳</td><td>编码对齐访问模式，协议与存储格式互相配合</td></tr><tr><td>第 3 章 生命周期</td><td>启动关闭如何不丢状态</td><td>RDB/AOF 重放重建内存</td><td>崩溃恢复重放 redo log、用 undo log 回滚未提交事务，保住事务一致性</td><td>Controller 选举 + 日志恢复截断残缺尾部</td><td>启动与关闭是"状态机迁移"</td></tr><tr><td>第 4 章 内存与磁盘</td><td>哪份数据是正本</td><td>内存为主存储、磁盘是恢复副本</td><td>磁盘为主存储、内存是缓冲池</td><td>磁盘日志为主存储、PageCache 加速</td><td>持久化与性能的对立是表象，关键变量是"以哪份数据为准"</td></tr><tr><td>第 5 章 分层架构</td><td>怎么让系统可替换</td><td>robj type/encoding 解耦直连</td><td>THD + Handler 虚函数（可插拔引擎）</td><td>RequestChannel 队列 + 网络协议</td><td>分层是为了让"可替换"成为可能，层间通信决定演进自由度</td></tr><tr><td>第 6 章 安全</td><td>主体能对客体做什么</td><td>从无密码演进到 ACL</td><td>细粒度 grant 表写进数据字典</td><td>SASL + ACL + 端到端 TLS</td><td>安全是与权限模型同源的能力边界，越早建模演进越省</td></tr><tr><td>第 7 章 集群</td><td>多副本怎么一致</td><td>主从 → Sentinel → Cluster 槽分片 + Gossip</td><td>异步 → 半同步 → MGR（Paxos 类多数派）</td><td>分区 + ISR + KRaft（去 ZooKeeper）</td><td>一致性强度与延迟代价成正比，按需求选档</td></tr><tr><td>第 8 章 存储格式</td><td>字节怎么排列才好访问</td><td>RDB/AOF 为"全量加载 + 增量重放"优化</td><td>16KB 页 + B+ 树为"点查 + 范围扫描"优化</td><td>日志段 + 稀疏索引为"顺序追加 + 偏移量定位"优化</td><td>存储单元要对齐访问单元，格式一旦发布就是一笔长期债务</td></tr><tr><td>第 9 章 数据同步</td><td>怎么让两个状态机一致</td><td>PSYNC（部分重同步 + 全量回退）</td><td>binlog + GTID（基于事务的精确位点）</td><td>ISR + leader epoch 截断 + acks/幂等/事务</td><td>复制是用可比的位点（复制偏移量/GTID/偏移量）对齐状态机</td></tr></tbody></table></div>
+<p>这张表里的共性启示列将在 10.2 节提炼为规律，关键决策列将在 10.3 节转化为取舍维度。九条启示串起来只有一条主线：<strong>约束决定哪些选项可行，目标决定在可行选项里怎么选</strong>。各自面对的是同一组物理约束：内存有限、磁盘慢、网络会分区、机器会宕。</p>
+<hr>
+<h2 id="s239">10.2 共性规律：三个软件背后的同一套基本结构</h2>
+<p>下面把九章启示提炼为五条可复用的架构共性规律。这些规律并非本书首次发现，价值在于用三个软件的实证把它们变成可操作的工具。</p>
+<h3 id="s240">10.2.1 规律一：先确定唯一正本</h3>
+<blockquote><strong>一个有状态的系统只能有一份数据是正本（source of truth），其他数据都是它的副本或派生结果。副本丢了可以重建，正本丢了就找不回来。</strong></blockquote>
+<p>它们用不同的说法讲同一句话。在 Redis 中，内存是正本，RDB/AOF 只是派生的快照，所以 Redis 崩溃可以容忍丢几秒（取决于 <code>appendfsync</code>），但不能容忍内存里的键值对算错。在 MySQL 中，磁盘上的数据页和 redo log 共同构成正本，缓冲池里的脏页只是它们的内存派生数据，所以缓冲池脏页丢了无所谓，已落盘的 redo log 不能丢；<code>innodb_flush_log_at_trx_commit=1</code> 保证 redo log 每事务落盘不丢，双写缓冲则保证"脏页刷盘时不被撕裂"（撕裂的页 redo log 也救不回来）。在 Kafka 中，磁盘上的日志段是正本，PageCache 与消费者偏移量都是派生数据，副本只是拷贝，消费者偏移量甚至可以丢，因为它可以重放日志重新算出来。</p>
+<p>把这条规律拿到你自己的系统里：设计一个有状态系统，第一件事先回答"哪份数据是正本"。这个答案一旦模糊，故障恢复就会失控，因为恢复时你不知道该信谁。一个常见的反例是把缓存和数据库都当正本，结果两者不一致时系统行为不可预测。</p>
+<h3 id="s241">10.2.2 规律二：用"层"隔离可变性</h3>
+<p>层是工程上对付变化的手法，Redis、MySQL、Kafka 各自用层解耦了不同维度的变化：可变的细节用层包起来，稳定的契约留在层与层之间。Redis 的 redisObject 把"语义类型（type）"和"底层编码（encoding）"解耦，同一个 hash 语义底层可以是 listpack 也可以是 hashtable，逻辑层只认 type、存储层管 encoding，于是 Redis 能根据数据大小动态换底层结构而不动上层逻辑，付的代价是一次类型检查的间接寻址。MySQL 的 Handler API 把存储引擎做成可插拔的层，Server 层（解析、优化、执行）稳定、InnoDB/MyISAM 可替换，同一个 SQL 能在引擎间迁移，因为契约落在 Handler 接口上，代价是虚函数调用与跨层上下文（THD）传递。Kafka 把 Log 抽象成接口，UnifiedLog / Partition / Segment 分层，上层 API 不关心 Segment 怎么切，Tiered Storage 能把冷段挪到对象存储而无需改动上层读写路径，同样付了分层带来的间接性。</p>
+<p>当你在两套实现之间犹豫，先抽接口。接口稳定了，实现可以一个一个换、一个一个演进，而不会牵一发动全身。规律二的潜台词是：<strong>稳定的契约留在层间，多变的实现隔离在层内</strong>，这是一个比"高内聚低耦合"更可操作的判据。</p>
+<h3 id="s242">10.2.3 规律三：把访问改写成顺序和批量</h3>
+<p>硬件天然对顺序与批量友好，架构设计上的巧思常常就是把随机访问改写成顺序、把单条操作合并成批量，这条规律在它们的性能优化里反复出现。Redis 的管道（pipeline）与 MULTI/EXEC 把 N 次网络往返合并成 1 次 RTT，AOF 重写把碎片化的历史命令重新合并成一份快照，本质上都是在把单条操作合并成批量。MySQL 的修改缓冲把对二级索引的随机写合并成批量，组提交把多个事务的 redo log 一次 fsync，预读把随机页请求变成顺序预取，说白了都是在把随机访问改写成顺序。Kafka 的 Record Batch 把多条消息打包成一个存储单元，生产者攒批 + 副本 FETCH 也批量拉，零拷贝（sendfile）让一批数据跳过用户态直接从页缓存到网卡，这三件事都是在做批量。</p>
+<p>这条规律这么普适，是因为底层硬件（机械臂、闪存页、网卡包、CPU 缓存行）几乎都对"顺序 + 批量"友好、对"随机 + 单条"不友好。对软件架构师来说，收益最大的一项性能优化手段，往往是改写访问模式以适应硬件，靠堆 CPU 收益有限。性能优化先问"这里能不能批、能不能顺序"，再去想换更快的硬件。如果你发现自己在一个循环里反复单条调用，就该想想规律三：把单条合并成批。</p>
+<h3 id="s243">10.2.4 规律四：更强的可靠性要付性能代价，先弄清代价再决定</h3>
+<blockquote><strong>每一次更强的一致性，都是用一次额外的同步等待换来的。代价是明确的，是否接受由设计者决定。</strong></blockquote>
+<p>一致性的代价都不是免费的，它们用参数把这个代价明确标出。Redis 的 <code>appendfsync</code> 有三档：<code>always</code>（每条命令都落盘，最慢但最不丢）、<code>everysec</code>（每秒落盘一次，开启 AOF 后的默认值）、<code>no</code>（交给操作系统决定，最快但可能丢较多），对应"丢多少 vs 慢多少"。MySQL 的 <code>innodb_flush_log_at_trx_commit</code>（控制 redo log 提交时是否 fsync）与 <code>sync_binlog</code>（控制 binlog 提交时是否 fsync）组成双 1 / 双 0 档位（两个都设 1 为"双 1"，最耐断电；都设 0 为"双 0"，最快但断电可丢），是"持久性 vs 吞吐"的取舍。半同步与异步复制的切换，是"延迟 vs 恢复点目标（Recovery Point Objective，RPO）"的取舍。Kafka 的 <code>acks=0/1/all</code> 配合 <code>min.insync.replicas</code>，是"吞吐 vs 不丢"的代价。幂等与事务，靠额外的 Broker 状态机和协议往返，达到了"恰好一次"这个更高的一致性档位。</p>
+<p>所谓"强一致"都是某个参数从 0 调到 1 的结果。应用时，把这个参数的代价暴露给真正在意它的人（业务方、SRE），让"愿意付多少延迟"和"能容忍多少丢失"成为一次明确的取舍，而不是默认把所有参数调到最严。规律四的另一面：被默认设成最严却没人真正需要的参数，是在浪费吞吐。</p>
+<h3 id="s244">10.2.5 规律五：复杂状态必须显式建模，故障恢复要可预测</h3>
+<p>一个有状态的系统，运行时都在维护一堆隐式或显式的状态。它们的做法是把这些状态显式建模，并为每个状态预先写定恢复路径。Redis 启动就是按 RDB/AOF 把状态重放回去。MySQL 把活跃事务、锁等待、LSN 当运行时状态，用 ARIES 式恢复（3.3 节展开的重放 redo 与回滚 undo）当崩溃恢复流程，用 GTID 给复制状态一个全局可比的位点，让从节点知道自己该重做哪些事务、跳过哪些事务。Kafka 把 HW/LEO、ISR、Controller 任期（epoch）当运行时状态，用"按 leader epoch 截断分叉尾部 + Controller 重新分配 leader"当恢复路径，于是 Broker 重启后能精确地界定"哪段日志算数、哪段要丢"。</p>
+<p>应用到自己的系统：先问"我最坏会处于哪些状态"，再为每个状态写"如何进、如何出"。能写出来才算可控；写不出来的状态，故障时很可能演变成事故。规律五是规律一的延伸：正本之所以能守住，靠的就是把它的状态显式建模出来、把恢复路径提前写定。</p>
+<h3 id="s245">10.2.6 规律小结</h3>
+<p>五条规律是一个整体：第一条是基础，后四条都在为它服务。图 10-1 把这种递进关系画清楚。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 72 880 568" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_10_1_arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_10_1_arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- ============ 规律一：唯一正本（顶端，核心） ============ -->
+  <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定唯一正本</text>
+  <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个正本，其余皆为派生物</text>
+  <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
+
+  <!-- "服务"主箭头：从规律一向下分叉到四条 -->
+  <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_10_1_arrowRed)"/>
+  <text x="455" y="178" font-size="11.5" fill="#EF4444" font-weight="600">后四条皆为之服务</text>
+
+  <!-- 横向汇流线 -->
+  <line x1="130" y1="200" x2="780" y2="200" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="130" y1="200" x2="130" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="340" y1="200" x2="340" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="550" y1="200" x2="550" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+  <line x1="780" y1="200" x2="780" y2="232" stroke="#EF4444" stroke-width="1.4"/>
+
+  <!-- ============ 规律二：层包裹可变 ============ -->
+  <rect x="40" y="232" width="180" height="104" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="130" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律二</text>
+  <text x="130" y="275" text-anchor="middle" font-size="12.5" fill="#374151">用"层"把可变性</text>
+  <text x="130" y="291" text-anchor="middle" font-size="12.5" fill="#374151">隔离在层内</text>
+  <line x1="58" y1="302" x2="202" y2="302" stroke="#4F46E5" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="130" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让实现可替换</text>
+  <text x="130" y="331" text-anchor="middle" font-size="11" fill="#6B7280">演进自由度</text>
+
+  <!-- ============ 规律三：顺序批量 ============ -->
+  <rect x="250" y="232" width="180" height="104" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="340" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律三</text>
+  <text x="340" y="275" text-anchor="middle" font-size="12.5" fill="#374151">把随机变顺序</text>
+  <text x="340" y="291" text-anchor="middle" font-size="12.5" fill="#374151">把一次变一批</text>
+  <line x1="268" y1="302" x2="412" y2="302" stroke="#059669" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="340" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本更快</text>
+  <text x="340" y="331" text-anchor="middle" font-size="11" fill="#6B7280">提升吞吐</text>
+
+  <!-- ============ 规律四：一致性看代价 ============ -->
+  <rect x="460" y="232" width="180" height="104" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="550" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律四</text>
+  <text x="550" y="275" text-anchor="middle" font-size="12.5" fill="#374151">可靠性要用性能换</text>
+  <text x="550" y="291" text-anchor="middle" font-size="12.5" fill="#374151">但要知道换来的是什么</text>
+  <line x1="478" y1="302" x2="622" y2="302" stroke="#D97706" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="550" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本更稳</text>
+  <text x="550" y="331" text-anchor="middle" font-size="11" fill="#6B7280">权衡 RPO 与延迟</text>
+
+  <!-- ============ 规律五：状态显式建模 ============ -->
+  <rect x="690" y="232" width="150" height="104" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="765" y="256" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">规律五</text>
+  <text x="765" y="275" text-anchor="middle" font-size="12.5" fill="#374151">复杂状态显式建模</text>
+  <text x="765" y="291" text-anchor="middle" font-size="12.5" fill="#374151">故障恢复可预测</text>
+  <line x1="708" y1="302" x2="822" y2="302" stroke="#6B7280" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="765" y="318" text-anchor="middle" font-size="11" fill="#6B7280">→ 让正本</text>
+  <text x="765" y="331" text-anchor="middle" font-size="11" fill="#6B7280">可控可恢复</text>
+
+  <!-- 横向递进箭头：二 → 三 → 四 → 五（设计层面的递进） -->
+  <line x1="222" y1="284" x2="248" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_10_1_arrowDash)"/>
+  <line x1="432" y1="284" x2="458" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_10_1_arrowDash)"/>
+  <line x1="642" y1="284" x2="688" y2="284" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_10_1_arrowDash)"/>
+  <text x="235" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+  <text x="445" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+  <text x="665" y="277" text-anchor="middle" font-size="10" fill="#9CA3AF">递进</text>
+
+  <!-- ============ 底部：三个软件印证带 ============ -->
+  <rect x="40" y="372" width="800" height="232" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="60" y="396" font-size="13" font-weight="700" fill="#111827">三个软件印证：同一条规律，三种实现</text>
+
+  <!-- Redis 列 -->
+  <rect x="60" y="412" width="244" height="180" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
+  <text x="182" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis</text>
+  <line x1="76" y1="442" x2="288" y2="442" stroke="#4F46E5" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="76" y="462" font-size="11.5" fill="#374151">· 规律一：内存为正本，RDB/AOF 派生</text>
+  <text x="76" y="482" font-size="11.5" fill="#374151">· 规律二：robj 的 type/encoding 解耦</text>
+  <text x="76" y="502" font-size="11.5" fill="#374151">· 规律三：pipeline / Multi 压往返</text>
+  <text x="76" y="522" font-size="11.5" fill="#374151">· 规律四：appendfsync 三档代价</text>
+  <text x="76" y="542" font-size="11.5" fill="#374151">· 规律五：键空间 + RDB/AOF 恢复路径</text>
+
+  <!-- MySQL 列 -->
+  <rect x="318" y="412" width="244" height="180" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
+  <text x="440" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
+  <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为正本，缓冲池派生</text>
+  <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
+  <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer/group commit</text>
+  <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的代价</text>
+  <text x="334" y="542" font-size="11.5" fill="#374151">· 规律五：ARIES 三阶段 + GTID</text>
+
+  <!-- Kafka 列 -->
+  <rect x="576" y="412" width="244" height="180" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1"/>
+  <text x="698" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka</text>
+  <line x1="592" y1="442" x2="804" y2="442" stroke="#059669" stroke-width="0.7" stroke-dasharray="3,2"/>
+  <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为正本，副本派生</text>
+  <text x="592" y="482" font-size="11.5" fill="#374151">· 规律二：Log 接口分层，冷段可挪</text>
+  <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：Record Batch + 零拷贝</text>
+  <text x="592" y="522" font-size="11.5" fill="#374151">· 规律四：acks / min.insync 代价</text>
+  <text x="592" y="542" font-size="11.5" fill="#374151">· 规律五：HW/LEO + Controller 重选</text>
+
+  <!-- 底注 -->
+  <text x="440" y="624" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：红箭头表示支撑关系，灰虚线表示先后递进。</text>
+</svg>
+</div><figcaption>图 10-1　五条共性规律的递进关系：规律一是基础，后四条围绕它展开。</figcaption></figure>
+<p>图例区分两种箭头：红箭头是支撑关系，规律一定下唯一正本，后四条分别从可替换、速度、可靠性、可恢复四个方向支撑它；灰虚线是先后递进，四条的排列对应一个系统成熟的顺序，先让实现可替换，再提速度，再付性能代价换可靠，最后把状态显式建模。后四条都在把第一条的正本改造成一个能在生产环境里跑起来的工程对象。</p>
+<blockquote><strong>适用边界</strong>：五条规律建立在同一组前提上，你的系统是<strong>有状态的</strong>（持有不可丢失的数据）、<strong>单写者/少写者</strong>（正本通常只有一个写入者）、<strong>OLTP 为主</strong>（在线事务而非离线分析）。如果你面对的是无状态微服务（正本不在本服务内，而在外部数据库）、边缘计算/Serverless 函数（数据短暂驻留、生命周期不可控）、纯分析型系统（列存、批量扫描、无 OLTP 事务），这套框架的适用性就会打折扣：规律一"唯一正本"仍然成立，但规律三（随机变顺序）和规律四（可靠性的代价）的形态会显著不同。框架的价值在于自知边界，边界之内的判断是可靠的，边界之外的类推需要额外验证。</blockquote>
+<hr>
+<h2 id="s246">10.3 从规律到权衡框架</h2>
+<p>上一节讲规律是什么，这一节把规律变成可操作的取舍框架：五个反复出现的权衡维度，加上一棵选型决策树和三道判断练习题。</p>
+<h3 id="s247">10.3.1 五个反复出现的权衡维度</h3>
+<p>每个维度依次回答四个问题：张力是什么；三个软件各自偏向哪一端；代价是什么；什么场景该倒向哪一端。</p>
+<p><strong>维度一：速度 vs 持久性</strong>。数据写下去多久才算数，是这一维度要回答的问题。Redis 默认偏向速度，开启 AOF 后默认 <code>appendfsync=everysec</code>，把风险控制在约 1 秒量级的数据窗口内（出厂默认 RDB-only 时，丢失窗口取决于快照周期），因此写入开销更低。MySQL 默认偏向持久性（<code>innodb_flush_log_at_trx_commit=1</code> 与 <code>sync_binlog=1</code> 均为默认值，合称"双 1"配置），让每条已提交事务都 fsync，从而做到"断电不丢"，代价是每事务一次磁盘同步。Kafka 偏向持久性，<code>acks=all</code> + 多副本让一条消息被 ISR 全部确认才算写入成功，付的是副本同步的 RTT。缓存、计数器、限流可偏速度端；账本、订单、支付必须偏持久性端。核心问题是"这个场景丢得起吗"。</p>
+<p><strong>维度二：一致性 vs 可用性（CAP 的工程体现）</strong>。网络分区一来，你要么写对要么继续服务，没有两全。Redis Cluster 默认偏 AP（归类见 7.2.3），分区时持有多数主节点的分区继续服务、少数派分区的槽短暂不可用，故障切换时可能丢失少量已确认的写（异步复制的固有代价）；MySQL MGR 偏 CP，少数派分区直接拒绝写，宁可停服也不写错；Kafka 可调，用 ISR 选主 + <code>min.insync.replicas</code> 控制一致性强度，业务能在 CP 倾向和可用性之间自己调。AP 优先高可用，代价是故障切换时可能丢少量写；CP 优先强一致，代价是分区时部分请求失败。金融核心偏 CP（宁可拒绝服务也不能错账），社交 feed 偏 AP（少量数据可修，但不能不活）。</p>
+<p><strong>维度三：空间 vs 时间</strong>。要么拿空间买查询时间，要么拿计算时间省存储空间。Redis 用内存换 O(1) 访问，把数据全部驻留内存，把"空间换时间"做到了头；MySQL 用 B+ 树索引 + 缓冲池换查询时间，索引和数据页都是为查询提速的额外空间开销；Kafka 用稀疏索引省空间（索引只记里程碑），用顺序扫描花时间补上定位，是"时间换空间"的典型。空间换时间要付内存/存储成本，时间换空间要付 CPU 与延迟成本。热点读、低延迟访问要往空间换时间上靠；冷数据归档、高吞吐追加反过来，往时间换空间上靠。</p>
+<p><strong>维度四：简单 vs 灵活</strong>。把决策写死换来性能，留开关换来灵活性，两边没法兼得。Redis 把"命令执行单线程"写死（即便 6.0 起可开启多线程 I/O 卸载网络读写，数据访问仍单线程），因此内核无锁快、可重入逻辑简单，代价是单个实例吃不满多核 CPU；MySQL 的 Handler 接口留了灵活性，支撑可插拔存储引擎，但付虚函数开销和跨层上下文传递；Kafka 把副本、偏移量、事务做成显式原语，灵活但概念多、学习曲线陡。简单难演进，灵活易误用：这是一对长期存在的张力。规模可控、需求稳定的，要简单；需求多变、要长期演进的，宁可复杂也要灵活。</p>
+<p><strong>维度五：通用 vs 专用</strong>。做一个什么都能做的系统，还是聚焦一类需求做到最强。MySQL 偏通用，事务、SQL、多种存储引擎、多种复制模式都支持，所以它能在很多场景都用上，但每个维度都很难做到最强；Redis 与 Kafka 偏专用：Redis 专攻内存快速存取与计算，Kafka 专攻高吞吐日志，专用系统在自己擅长的那件事上性能很强，但覆盖不了边界需求。业务域宽、需求杂，倾向通用；性能决定成败、需求聚焦，倾向专用。</p>
+<p>五个维度不是孤立的，它们会互相牵扯。比如维度一（速度 vs 持久性）和维度二（CP vs AP）常常联动：你越偏持久性，越倾向于 CP。这种联动是真实的工程现实，不必强求每个维度都独立打分。</p>
+<h3 id="s248">10.3.2 一个选型决策树</h3>
+<p>五个维度摆开之后，下图把取舍框架做成一棵可以一步步走的决策树。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 920 698" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_10_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <!-- ============ 根节点 ============ -->
+  <rect x="320" y="74" width="280" height="56" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <text x="460" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">我要建一个有状态的系统</text>
+  <text x="460" y="118" text-anchor="middle" font-size="12" fill="#374151">从根出发，依次回答四个问题</text>
+
+  <!-- 主干连线 -->
+  <line x1="460" y1="130" x2="460" y2="156" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_10_2_arrow)"/>
+
+  <!-- ============ 问题一：能丢吗 ============ -->
+  <polygon points="460,158 612,212 460,266 308,212" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="200" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q1 · 数据能丢吗？</text>
+  <text x="460" y="220" text-anchor="middle" font-size="11.5" fill="#374151">（速度 vs 持久性）</text>
+  <text x="460" y="240" text-anchor="middle" font-size="11.5" fill="#374151">RPO 容忍度是多少？</text>
+
+  <!-- Q1 左分支：不能丢 -->
+  <line x1="308" y1="212" x2="180" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="180" y1="212" x2="180" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="240" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">不能丢</text>
+
+  <!-- Q1 右分支：可丢/可秒丢 -->
+  <line x1="612" y1="212" x2="740" y2="212" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="740" y1="212" x2="740" y2="288" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="680" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">可丢/可秒丢</text>
+
+  <!-- Q1 叶子 - 左 -->
+  <rect x="70" y="290" width="220" height="62" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="180" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏持久性档位</text>
+  <text x="180" y="330" text-anchor="middle" font-size="11" fill="#374151">正本不能丢</text>
+  <text x="180" y="339" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 双1 / Kafka acks=all</text>
+
+  <!-- Q1 叶子 - 右 -->
+  <rect x="630" y="290" width="220" height="62" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="740" y="312" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">偏速度档位</text>
+  <text x="740" y="330" text-anchor="middle" font-size="11" fill="#374151">可容忍秒级丢</text>
+  <text x="740" y="339" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis everysec / 缓存场景</text>
+
+  <!-- ============ 问题二：一致性多强（中间主干） ============ -->
+  <line x1="460" y1="266" x2="460" y2="298" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_10_2_arrow)"/>
+
+  <polygon points="460,300 600,348 460,396 320,348" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="338" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q2 · 一致性多强？</text>
+  <text x="460" y="356" text-anchor="middle" font-size="11.5" fill="#374151">（CP vs AP）</text>
+  <text x="460" y="374" text-anchor="middle" font-size="11.5" fill="#374151">要一致性还是要可用性？</text>
+
+  <!-- Q2 左：偏强一致 -->
+  <line x1="320" y1="348" x2="200" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="348" x2="200" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="215" y="378" font-size="11.5" font-weight="600" fill="#111827">偏 CP</text>
+
+  <!-- Q2 右：偏高可用 -->
+  <line x1="600" y1="348" x2="720" y2="348" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="348" x2="720" y2="412" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="705" y="378" text-anchor="end" font-size="11.5" font-weight="600" fill="#111827">偏 AP</text>
+
+  <!-- Q2 叶子 - 左 -->
+  <rect x="90" y="414" width="220" height="58" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="200" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">少数派拒绝写</text>
+  <text x="200" y="453" text-anchor="middle" font-size="11" fill="#374151">金融核心 / 账本</text>
+  <text x="200" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL MGR / Kafka ISR 不足拒写</text>
+
+  <!-- Q2 叶子 - 右 -->
+  <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区时继续提供服务</text>
+  <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
+  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
+
+  <!-- ============ 问题三：读写模式 ============ -->
+  <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_10_2_arrow)"/>
+
+  <polygon points="460,428 600,472 460,516 320,472" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="462" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q3 · 读写模式？</text>
+  <text x="460" y="480" text-anchor="middle" font-size="11.5" fill="#374151">（空间 vs 时间）</text>
+  <text x="460" y="498" text-anchor="middle" font-size="11.5" fill="#374151">热点读 / 随机点查 / 顺序流？</text>
+
+  <!-- Q3 左：空间换时间 -->
+  <line x1="320" y1="472" x2="200" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="472" x2="200" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="215" y="502" font-size="11.5" font-weight="600" fill="#111827">空间换时间</text>
+
+  <!-- Q3 右：时间换空间 -->
+  <line x1="600" y1="472" x2="720" y2="472" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="472" x2="720" y2="534" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="705" y="502" text-anchor="end" font-size="11.5" font-weight="600" fill="#111827">时间换空间</text>
+
+  <!-- Q3 叶子 - 左 -->
+  <rect x="90" y="536" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">内存换 O(1) 访问</text>
+  <text x="200" y="575" text-anchor="middle" font-size="11" fill="#374151">热点读 / 随机点查</text>
+  <text x="200" y="584" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis / MySQL B+树索引</text>
+
+  <!-- Q3 叶子 - 右 -->
+  <rect x="610" y="536" width="220" height="58" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="720" y="558" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">顺序扫描兜底定位</text>
+  <text x="720" y="575" text-anchor="middle" font-size="11" fill="#374151">高吞吐追加 / 冷数据归档</text>
+  <text x="720" y="584" text-anchor="middle" font-size="11" fill="#6B7280">→ Kafka 稀疏索引 + 顺序扫描</text>
+
+  <!-- ============ 问题四：是否长期演进 ============ -->
+  <line x1="460" y1="516" x2="460" y2="546" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_10_2_arrow)"/>
+
+  <polygon points="460,548 612,588 460,628 308,588" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="460" y="578" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">Q4 · 长期演进？</text>
+  <text x="460" y="596" text-anchor="middle" font-size="11.5" fill="#374151">（简单 vs 灵活）</text>
+  <text x="460" y="614" text-anchor="middle" font-size="11.5" fill="#374151">需求多变，还是规模可控？</text>
+
+  <!-- Q4 左：偏简单 -->
+  <line x1="308" y1="588" x2="200" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="200" y1="588" x2="200" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="215" y="618" font-size="11.5" font-weight="600" fill="#111827">偏简单</text>
+
+  <!-- Q4 右：偏灵活 -->
+  <line x1="612" y1="588" x2="720" y2="588" stroke="#4B5563" stroke-width="1.4"/>
+  <line x1="720" y1="588" x2="720" y2="648" stroke="#4B5563" stroke-width="1.4" marker-end="url(#fig_10_2_arrow)"/>
+  <text x="705" y="618" text-anchor="end" font-size="11.5" font-weight="600" fill="#111827">偏灵活</text>
+
+  <!-- Q4 叶子 - 左 -->
+  <rect x="90" y="650" width="220" height="54" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="200" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">决策写死换性能</text>
+  <text x="200" y="688" text-anchor="middle" font-size="11" fill="#374151">规模可控、需求稳定</text>
+  <text x="200" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis 单线程无锁模型</text>
+
+  <!-- Q4 叶子 - 右 -->
+  <rect x="610" y="650" width="220" height="54" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="720" y="671" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">留开关换灵活性</text>
+  <text x="720" y="688" text-anchor="middle" font-size="11" fill="#374151">需求多变、长期演进</text>
+  <text x="720" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 可插拔引擎</text>
+
+  <!-- 中间收束提示 -->
+  <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
+  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型方向随之清楚</text>
+  <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">起决定作用的是约束条件</text>
+
+  <!-- 底注 -->
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
+</svg>
+</div><figcaption>图 10-2　实践者选型决策树：四个问题依次收窄，每个叶子对应可借鉴的设计。</figcaption></figure>
+<p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间换时间还是时间换空间）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。决策树的用法：<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么被设计成那个样子。比如你做一个秒杀库存系统，按决策树会走到"持久性优先 + CP 倾向 + 热点读"的叶子，对应 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
+<h3 id="s249">10.3.3 三道判断练习</h3>
+<p>三道练习帮你把框架用起来。每道题从一个场景出发，先摆出常见的思路，再用本章框架推导，最后说清该借鉴它们的哪条机制。</p>
+<p><strong>练习一："做一个网约车系统，司机位置上报和派单该放 Redis 还是 MySQL？"</strong> 常见的思路是"都是核心系统，统一放 MySQL"。但这两个子问题的访问模式完全不同。司机位置每几秒上报一次，读写都高频，丢一次等下一次上报就补回来，这是"快"的问题，适合放 Redis（GEO 地理位置结构直接支持附近司机查询）。而派单成单属于交易数据：同一单派给两个司机就是事故，状态迁移必须可审计，这是"对"的问题。用规律一（唯一正本）的判据：订单状态机必须以 MySQL 为唯一正本（强一致、双 1、事务保护状态迁移），Redis 只做位置索引与派单候选的快速过滤，算错了可以按 MySQL 重建。借鉴的是"唯一正本"和"让快的一层承担大部分访问，减轻慢层的负载"。</p>
+<p><strong>练习二："日志采集系统，要不要上 Kafka 的事务？"</strong> 常见的思路是"事务更安全所以上"。但日志场景的特征是可容忍少量重复或乱序（消费端去重即可），而 Kafka 事务的额外开销（Broker 维持事务状态机、生产者两阶段提交、消费者隔离读）换不回对等的业务价值。用规律四（看一致性代价）的判据：开 <code>enable.idempotence=true</code>（它内部会强制 <code>acks=all</code> + 重试，挡住"重复写入"和"生产者重试导致的乱序"），再上跨分区事务就是过度设计。</p>
+<p><strong>练习三："一个新业务，要不要一上来就分库分表？"</strong> 第一反应往往是"早做早省事"。但分片牺牲了单机事务、JOIN、外键约束，换来了水平扩展。过早分片等于为一个还不需要的容量去付昂贵的灵活性代价。用维度四（简单 vs 灵活）和维度五（通用 vs 专用）的判据：先用单机 MySQL + 读写分离顶住，到瓶颈真的出现时再切，切的时候按第 7 章集群架构的演进路径逐级升级。早分片省的是今天的运维，付的是未来每次跨片事务的复杂度。</p>
+<p>三道练习的共同点：它们都在逼你把约束摊开，让选择从"感觉"变成可推演的。框架的价值在于让你看清自己到底在取舍什么。</p>
+<hr>
+<h2 id="s250">10.4 给实践者的建议：从使用者到设计者</h2>
+<p>规律和框架偏原则，要用起来还需要一份具体的清单和一条认知路径。</p>
+<h3 id="s251">10.4.1 架构设计 checklist：动手前先回答的 12 个问题</h3>
+<p>把 10.3 的五个维度拆成 12 个具体问题，按"数据 / 性能 / 可靠性 / 运维"四类组织。表 10-2 把每个问题连同"三个软件如何回答"和"你的系统该回答什么"摆在一起，作为动手前的自检工具。</p>
+<p><strong>表 10-2　架构设计 checklist（12 问）</strong></p>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>哪份数据是正本？</td><td>内存键空间</td><td>数据页 + redo log</td><td>日志段</td><td>写下一个名字，并说清派生数据有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 偏移量定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、PageCache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>低延迟优先</td><td>稳定延迟优先</td><td>高吞吐下的可接受延迟</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>热点 key 与单线程上限</td><td>事务提交与锁冲突上限</td><td>批量、分区、Broker 数决定上限</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单分区易成热点</td><td>标出最热的 key/行/分区与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认约 1 秒量级窗口（开启 AOF 后）</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（Recovery Time Objective，RTO）？</td><td>RDB 加载或 AOF 重放</td><td>redo 重放 + undo 回滚</td><td>Leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换预案</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加分区受限、加 Broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 Broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>Broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
+<p>这张表的用法是借它们的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，它们的默认值差异巨大：这是业务问题，得让业务方拍板。12 个问题答完，选型往往就自然确定了：约束弄清楚，决策就完成了一大半。</p>
+<h3 id="s252">10.4.2 从使用者到设计者的四个阶段</h3>
+<p>读这本书的过程，是换一套看问题的方式。这套方式分四个阶段。</p>
+<figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 100 900 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="fig_10_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+    <marker id="fig_10_3_arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <!-- 台阶：从下到上 使用者 → 创新者，宽度递增、高度递增、左对齐基线相同 -->
+  <!-- 使用者 -->
+  <rect x="80" y="410" width="170" height="80" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="165" y="438" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">使用者</text>
+  <text x="165" y="458" text-anchor="middle" font-size="11.5" fill="#374151">会配置、会调优</text>
+  <text x="165" y="476" text-anchor="middle" font-size="11" fill="#6B7280">"怎么用 Redis / SQL"</text>
+
+  <!-- 理解者 -->
+  <rect x="270" y="330" width="180" height="80" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="360" y="358" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">理解者</text>
+  <text x="360" y="378" text-anchor="middle" font-size="11.5" fill="#374151">懂内部机制</text>
+  <text x="360" y="396" text-anchor="middle" font-size="11" fill="#6B7280">"为什么这么设计"</text>
+
+  <!-- 设计者 -->
+  <rect x="470" y="250" width="190" height="80" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="565" y="278" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">设计者</text>
+  <text x="565" y="298" text-anchor="middle" font-size="11.5" fill="#374151">能借鉴思想造系统</text>
+  <text x="565" y="316" text-anchor="middle" font-size="11" fill="#6B7280">抽象 + 权衡 + 直觉</text>
+
+  <!-- 创新者 -->
+  <rect x="680" y="170" width="180" height="80" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="770" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">创新者</text>
+  <text x="770" y="218" text-anchor="middle" font-size="11.5" fill="#374151">创造新架构模式</text>
+  <text x="770" y="236" text-anchor="middle" font-size="11" fill="#6B7280">定义新的范式</text>
+
+  <!-- 台阶水平连接（顶面），表达"拾级而上" -->
+  <line x1="250" y1="410" x2="270" y2="410" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="450" y1="330" x2="470" y2="330" stroke="#4B5563" stroke-width="1.2"/>
+  <line x1="660" y1="250" x2="680" y2="250" stroke="#4B5563" stroke-width="1.2"/>
+
+  <!-- 向上进阶的主箭头（红色，沿各台阶左上角拾级而上，不穿框） -->
+  <path d="M 165 410 Q 220 375 270 330 Q 370 290 470 250 Q 575 210 680 170" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#fig_10_3_arrow)"/>
+  <text x="465" y="200" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">进阶方向（看问题方式的升级）</text>
+
+  <!-- ============ 本书 8 章 / 本章对应标注 ============ -->
+  <!-- 本书前 9 章：使用者 → 理解者 -->
+  <rect x="245" y="498" width="230" height="36" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="360" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4F46E5">本书第 1–9 章</text>
+  <text x="360" y="529" text-anchor="middle" font-size="11" fill="#374151">带读者完成从使用者到理解者的转变</text>
+  <!-- 连线从标注框上指到 使用者/理解者 交界（理解者台阶底边 y=410） -->
+  <line x1="360" y1="498" x2="360" y2="412" stroke="#4F46E5" stroke-width="1.2" marker-end="url(#fig_10_3_arrowGray)"/>
+
+  <!-- 本章：理解者 → 设计者 -->
+  <rect x="540" y="498" width="190" height="36" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="635" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#D97706">第 10 章（本章）</text>
+  <text x="635" y="529" text-anchor="middle" font-size="11" fill="#374151">推动从理解者到设计者的转变</text>
+  <line x1="610" y1="498" x2="580" y2="335" stroke="#D97706" stroke-width="1.2" marker-end="url(#fig_10_3_arrowGray)"/>
+
+  <!-- ============ 设计者核心能力 ============ -->
+  <rect x="80" y="112" width="560" height="62" rx="6" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="90" y="132" font-size="12" font-weight="700" fill="#111827">设计者的三项核心能力：</text>
+  <text x="90" y="150" font-size="11.5" fill="#374151">① 抽象：看见 B+树/跳表/稀疏索引背后的"索引"本质</text>
+  <text x="90" y="168" font-size="11.5" fill="#374151">② 权衡：理解每个选项的机会成本　　③ 直觉：快速识别瓶颈、预判规模放大后的表现</text>
+
+  <!-- 底注 -->
+  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个阶段的差距在提问方式，从"是什么、怎么配"到"为什么"再到"换我怎么做"逐级变化；设计者阶段是分界线。</text>
+</svg>
+</div><figcaption>图 10-3　从使用者到设计者的四个阶段：四级台阶自下而上，两个虚线标注框标出本书各部分覆盖的阶段。</figcaption></figure>
+<p>四个阶段的差距不在掌握的名词多少，在能独立产出什么：使用者交出一份能跑的配置；理解者能写出机制解释，能判断一次慢查询慢在哪一层；设计者能给出自己系统的结构与取舍方案；创新者定义新的范式。常见的问题有两种。一种是产出停在使用者一级，却借用理解者的词汇：配置照抄别人的结论，说不出适用约束。另一种是机制没吃透就自建系统：往往只复刻了表面结构，原设计要避开的难点照样撞上。每上一级，检验标准都一样：能不能独立产出这一级的东西。</p>
+<p>设计者阶段的核心能力可以拆成三项，每一项都能在三个软件里找到印证。<strong>抽象能力</strong>：能从 B+ 树、跳表、稀疏索引里看出同一个"索引"的本质，能从 redo log、AOF、Kafka 日志里看出同一个"WAL"的本质；更进一步，能从 PSYNC2、GTID、ISR 里看出"用可比位点对齐两个状态机"这个共性。抽象能力让你把大量细节归纳成少数几条模式。<strong>权衡能力</strong>：理解每个选项的机会成本。比如 Redis 用"命令执行单线程"换无锁快，代价是吃不满多核；MySQL 的每次 fsync 换来断电不丢，代价是吞吐被压低；Kafka 的多副本换来高可用，但延迟和复杂度都上去了。权衡能力让你能说清"为什么不选另一个方案"。<strong>工程直觉</strong>：快速识别瓶颈（是 CPU、是 I/O、是网络、还是锁），预判规模放大后的表现（数据量翻十倍哪个组件先崩）。直觉来自反复实验，不能只靠读。</p>
+<p>从使用者到设计者的转变，本质是换一套看问题的角度，也就是换一套提问方式。</p>
+<h3 id="s253">10.4.3 持续学习与全书收束</h3>
+<p>读完本书只是起点。三条学习路径，供参考。</p>
+<p>读源码。从 Redis 起步，它的代码量小、数据结构清晰，C 语言的直白让你能从命令处理一路追到内存表示，几周就能通读核心路径。再读 InnoDB，重点看页结构、B+ 树、redo log/undo log、MVCC，这部分代码厚但思路连贯。最后读 Kafka 的 Log 与 ReplicaManager，理解"以日志为正本"的工程实现。读源码的方法是带着问题去：比如"双 1 真的能保证不丢吗，看代码怎么 fsync 的"。</p>
+<p>改参数看行为，是最快的理解方式。把 Redis 的 <code>appendfsync</code> 从 <code>everysec</code> 改成 <code>always</code>，用 <code>redis-benchmark</code> 看吞吐怎么跌。把 MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 从 1 改成 0，强杀进程看丢多少。最后把 Kafka 的 <code>acks</code> 从 all 改成 1，断一个 Broker 看消息丢不丢。亲手制造一次"丢数据"，你对参数的代价就有了直观感受。</p>
+<p>跨领域对照。数据库、消息队列、缓存、搜索引擎共享底层原理，都在回答同一组问题：正本在哪、怎么批量、怎么一致、怎么恢复。读完三本不同领域的书，把它们放到 10.2 的五条规律下一一对照，你会发现它们表面不同、底层一致。这种对照能力，是设计者阶段重要的资产。</p>
+<p>三个值得留意的倾向。<strong>先选技术再找场景</strong>：先定了技术再去凑适用场景，是很容易不知不觉陷进去的惯性。<strong>追求面面俱到</strong>：什么都想要、什么参数都设最严，结果系统在每个维度都平庸。<strong>把一致性当信仰而不看代价</strong>：盲目追求"强一致"，却不问业务是否需要，付了不必要的延迟和复杂度。</p>
+<p>回到第 1 章的组织方式：三个软件对同一批问题给出了三份不同方案，但做决策的步骤是同一套：先认约束，再确定唯一正本，然后用分层、批量、一致性档位、显式状态把正本做成能用的系统。理解共性之后，剩下的判断是：哪个方案适合自己的约束。</p>
+<p>架构设计的本质，是在摸清约束之后选出最简洁的方案。简洁意味着组件、参数、每一层抽象，背后都对应一个被摊开过的约束；去掉了会违反约束的，才是必须保留的。</p>
+<hr>
+<h2 id="s254">10.5 小结</h2>
+<p>这一章把前九章的回答收敛成可迁移的规律。从 10.1 的九章启示总表出发，主线收束成一句话：先认清约束，再确定唯一正本，其余都可由它重建。10.2 把这条主线拆成五条共性规律，其中"先确定唯一正本"是基础，其余四条分别提升它的速度、稳定性和可控性。到了 10.3，规律被翻译成五个权衡维度、一棵决策树和三道练习题，目的是让选择从感性变成可推演；10.4 则补上动手前要回答的 12 个问题、从使用者到设计者的四个阶段和一条持续学习路径。三个软件的差异底下藏着同一套基本结构。读完这本书，如果你下次做选型时，能先想"这个系统的约束是什么、取舍在哪里"，这九章的目的就达到了。序言提出的"三层意思"（知道解法、理解取舍、学会决策）至此落地。</p><nav class="page-nav"><a href="09-data-sync.html">← 第 9 章 数据同步机制 — 集群一致性的实现</a><a href="10-epilogue.html">后记 →</a></nav></article>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.getElementById('toc'),bd=document.getElementById('bd');
+  if(btn){btn.addEventListener('click',function(){nav.classList.toggle('open');if(bd)bd.classList.toggle('show',nav.classList.contains('open'))});}
+  if(bd){bd.addEventListener('click',function(){nav.classList.remove('open');bd.classList.remove('show');});}
+  // 当前章节高亮
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section.chapter'));
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-target]'));
+  if('IntersectionObserver' in window && links.length){
+    var map={};links.forEach(function(a){map[a.getAttribute('data-target')]=a;});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.parentElement.classList.remove('active');});
+          var a=map[e.target.id]; if(a)a.parentElement.classList.add('active');
+        }
+      });
+    },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>
