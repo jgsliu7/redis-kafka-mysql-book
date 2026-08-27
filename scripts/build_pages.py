@@ -167,7 +167,7 @@ def page_shell(title, nav, main, depth="chapter"):
 <button class="toc-toggle">目录</button>
 <div class="layout">
 <nav class="toc" id="toc">
-  <div class="toc-title"><a href="%sindex.html">架构之道</a></div>
+  <div class="toc-title"><a href="%sindex.html">架构观察笔记</a></div>
   <div class="toc-sub">分页审阅版</div>
   %s
 </nav>
@@ -188,13 +188,13 @@ def build_index(items):
             % (item["file"], html_escape(item["title"]), html_escape(item["rel"]))
         )
     main = """
-<h1>架构之道：分页审阅版</h1>
+<h1>架构观察笔记：分页审阅版</h1>
 <p class="chapter-meta">源稿来自 Markdown；本目录用于逐章审阅和单独优化。每章页面已内联 SVG 图示，可直接浏览图片。</p>
 <div class="review-index">
 %s
 </div>
 """ % "\n".join(cards)
-    return page_shell("架构之道：分页审阅版", nav_html(items, depth="root"), main, depth="root")
+    return page_shell("架构观察笔记：分页审阅版", nav_html(items, depth="root"), main, depth="root")
 
 
 def prev_next(items, idx):

@@ -1,4 +1,4 @@
-# 《架构之道：从 Redis、MySQL、Kafka 看软件设计的共性》
+# 《架构观察笔记：从 Redis、MySQL、Kafka 说起》
 
 ## 关于本书
 

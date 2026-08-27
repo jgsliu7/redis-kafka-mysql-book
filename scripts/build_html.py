@@ -305,7 +305,7 @@ def main():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>架构之道：从 Redis、MySQL、Kafka 看软件设计的共性</title>
+<title>架构观察笔记：从 Redis、MySQL、Kafka 说起</title>
 <style>%s</style>
 </head>
 <body>
@@ -313,7 +313,7 @@ def main():
 <button class="toc-toggle">目录</button>
 <div class="layout">
 <nav class="toc" id="toc">
-  <div class="toc-title">架构之道</div>
+  <div class="toc-title">架构观察笔记</div>
   <div class="toc-sub">从 Redis、MySQL、Kafka 看软件设计的共性</div>
   %s
 </nav>
