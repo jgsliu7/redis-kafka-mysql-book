@@ -416,7 +416,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>查询缓存（Query Cache）</strong> 是分层失败的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。设计意图是好的，但它在 8.0 被彻底移除。失败的原因正是分层的错位：缓存做在服务层，而数据失效的源头在引擎层。任何一张表的任何一次写，都要去检查所有引用了这张表的缓存项并使之失效；加之整个缓存由一把全局互斥锁保护，高并发下锁竞争本身就是瓶颈；在高写入负载下，缓存维护的开销远超它带来的收益。缓存本应做在引擎层内部（InnoDB 的缓冲池就是），而不是跨在服务层。这个案例 5.6 节会作为"该移除的层要移除"的例证再用一次。</p>
 <p>服务层内这三段切分，靠的是<strong>结构化中间表示（解析树、执行计划）在子层之间传递</strong>。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这和 Redis 的"直接函数调用"是两种路子。</p>
 <h3 id="s104">5.3.3 存储层：Handler API 与可插拔引擎</h3>
-<p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。所有这些组合起来，就规定了引擎要被 MySQL 调用、必须实现哪些方法。</p>
+<p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>，后两者由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行）。所有这些组合起来，就规定了引擎要被 MySQL 调用、必须实现哪些方法。</p>
 <p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 840 492" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -614,7 +614,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s108">5.4.2 逻辑层（API 层）：请求类型分派</h3>
 <p>Kafka 的"逻辑层"在源码里叫 <code>KafkaApis</code>，它做的事比 MySQL 的服务层要薄得多。它不做解析（解析在 Processor 完成），也不做优化（Kafka 没有"查询优化"这回事），就只做<strong>协议适配加请求分派</strong>。</p>
 <p>Kafka 把所有请求类型枚举成 ApiKeys：PRODUCE、FETCH、LIST_OFFSETS、METADATA、LEADER_AND_ISR 等。每一种有自己的版本号，Broker 要兼容新旧版本。<code>KafkaApis.handle()</code> 拿到一个 <code>RequestChannel.Request</code>，按 ApiKeys 走 switch 分派到对应的 <code>handleXxx</code> 方法。</p>
-<p>这一层还负责横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。配额机制限制单个 client 每秒能产生的字节或请求数，防止单一客户端压垮集群。版本协商在协议层完成，Broker 选一个客户端支持的最高版本回应。</p>
+<p>这一层还负责横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。配额机制限制单个 client 每秒能产生的字节或请求数，防止单一客户端压垮集群。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
 <p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢、动一次影响面大，副本管理算法可能半年调一次，绑在一起改一处就得动两处。</p>
 <h3 id="s109">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
 <p>存储层是 Kafka 最具特色的一层。它的核心抽象是 <strong><code>Log</code></strong>，一个非常具体的对象，指一组顺序追加的日志段（LogSegment），不是泛指的"日志"。每个分区对应一个 Log，每个 Log 由多个 LogSegment 组成，每个 LogSegment 在磁盘上是三个文件：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>）。这套字节布局会在第 8 章详讲，这里只看它作为"存储层抽象"的形态。</p>
@@ -716,7 +716,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径，存储层与复制层共享一份代码。</figcaption></figure>
 <p>这张图点出了 Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们走同一条 <code>KafkaApis.handleFetchRequest</code> → <code>ReplicaManager.fetchMessages</code> → Log 读取 → sendfile 路径，<strong>只是请求里的标志位不同</strong>（普通消费者 vs 副本同步）。也就是说，<strong>Follower 复制就是"一个特殊的消费者"</strong>。</p>
 <p><strong>存储层和复制层共享同一份代码</strong>。Kafka 不需要为副本同步单独写一套读路径、单独维护一套状态机。复用消费读路径意味着任何对读路径的优化（零拷贝、索引、缓存）都同时惠及复制。任何 bug 修复只改一处。对比一下：很多系统的"主从复制"是独立模块，复制代码和读写代码各写一份，长年累月就会漂移、出 bug。这也是为什么第 9 章讲数据同步时能讲得简洁。</p>
-<p>这一小节的取舍很直接：<strong>Kafka 把存储做得极薄（就是追加写日志），复杂度交给上层（索引、复制、压实）</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 引入后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见第 8 章 8.4.6 节）。</p>
+<p>这一小节的取舍很直接：<strong>Kafka 把存储做得极薄（就是追加写日志），复杂度交给上层（索引、复制、压实）</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 正式 GA（3.6 起以早期版本引入）后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见第 8 章 8.4.6 节）。</p>
 <h3 id="s110">5.4.4 协调层：在 Log 之上的额外一层</h3>
 <p>Kafka 还有一个 Redis 和 MySQL 都没有的层：<strong>协调层</strong>。它包括 ReplicaManager（副本管理）、Partition（分区对象）、Controller（集群控制器），以及 KRaft（取代 ZooKeeper 的元数据管理），细节留给第 7 章。</p>
 <p>需要这一层，是因为 Kafka 是分布式系统。分区的 Leader 在哪台 Broker 上、ISR 里有谁、Controller 怎么协调全集群，这些不属于交互层、不属于 API 层、也不属于存储层。它要解决的是一个独立的问题：<strong>保证多个 Broker 上的副本数据一致</strong>。</p>

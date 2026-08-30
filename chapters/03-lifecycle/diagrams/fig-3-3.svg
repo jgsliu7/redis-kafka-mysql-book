@@ -22,7 +22,7 @@
   <!-- Step 1: 子进程判定 (decision diamond -> rect) -->
   <rect x="300" y="166" width="280" height="76" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
-  <text x="316" y="214" font-size="12" fill="#374151">是 → 等待其完成，或杀掉子进程</text>
+  <text x="316" y="214" font-size="12" fill="#374151">是 → 直接杀掉，不等它完成</text>
   <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
 
   <!-- Step 2: SAVE / NOSAVE branch -->

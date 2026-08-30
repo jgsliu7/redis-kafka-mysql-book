@@ -17,7 +17,7 @@
 
   <rect x="250" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="310" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">batchLength</text>
-  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 总字节长</text>
+  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 不含首 12B 总长</text>
 
   <rect x="380" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="440" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">leaderEpoch</text>

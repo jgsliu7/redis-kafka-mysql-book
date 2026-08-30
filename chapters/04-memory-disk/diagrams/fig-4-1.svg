@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 88 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-  <defs>
-    <marker id="arrow-red-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
-    </marker>
-  </defs>
 
   <!-- ============ 绘图区参数 ============
        X 轴起点 x0 = 240，终点 x1 = 820（宽 580）
@@ -45,7 +40,7 @@
        柱高 36，间距 18；首柱 y=112
        1: L1/L2   ~1 ns      -> x 终点 240
        2: 主内存   ~100 ns    -> log10(100)=2 -> 240 + 2/7*580 = 405.7
-       3: SSD顺序 ~1000 ns   -> log10(1000)=3 -> 240 + 3/7*580 = 488.6  [红色高亮]
+       3: SSD顺序 ~1e5 ns（单次延迟与随机同量级）-> log10(1e5)=5 -> 240 + 5/7*580 = 654.3  [红色高亮]
        4: SSD随机 ~100000 ns -> log10(1e5)=5  -> 240 + 5/7*580 = 654.3  [红色高亮]
        5: 机械盘   ~1e7 ns    -> log10(1e7)=7  -> 820
   -->
@@ -65,9 +60,9 @@
 
   <!-- 柱 3: SSD 顺序读（红色高亮） -->
   <text x="230" y="235" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 顺序读</text>
-  <text x="230" y="250" text-anchor="end" font-size="11" fill="#6B7280">顺序 · ~1 μs</text>
-  <rect x="240" y="224" width="248.6" height="32" fill="#EF4444" opacity="0.85"/>
-  <text x="498" y="244" font-size="11.5" font-weight="600" fill="#EF4444">1 μs (1,000 ns)</text>
+  <text x="230" y="250" text-anchor="end" font-size="11" fill="#6B7280">顺序 · ~100 μs</text>
+  <rect x="240" y="224" width="414.3" height="32" fill="#EF4444" opacity="0.85"/>
+  <text x="664" y="244" font-size="11.5" font-weight="600" fill="#EF4444">≈100 μs（与随机同量级）</text>
 
   <!-- 柱 4: SSD 随机读（红色高亮） -->
   <text x="230" y="285" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 随机读</text>
@@ -82,17 +77,17 @@
   <text x="812" y="339" font-size="11.5" font-weight="600" fill="#111827" text-anchor="end">10 ms</text>
   <text x="812" y="352" font-size="9.5" fill="#111827" text-anchor="end">(10,000,000 ns)</text>
 
-  <!-- ============ 红色高亮：顺序 vs 随机 100× 标注 ============ -->
-  <!-- 横线走 bar3/bar4 间隙(y=265)，标注框让开竖线(x=666)，避免穿字/穿框 -->
-  <line x1="500" y1="265" x2="660" y2="265" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
-  <line x1="660" y1="265" x2="660" y2="290" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arrow-red-3-6)" marker-start="url(#arrow-red-3-6)"/>
-  <rect x="666" y="258" width="150" height="20" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
-  <text x="741" y="272" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序比随机快 100×</text>
+  <!-- ============ 红色高亮：SSD 顺序 vs 随机（延迟同量级）标注 ============ -->
+  <!-- 两条 SSD 柱等长（同量级），标注框放在两柱端注之间的空档，让开竖线(x=654.3/737.1) -->
+  <rect x="666" y="248" width="196" height="32" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
+  <text x="764" y="263" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序 vs 随机：延迟同量级</text>
+  <text x="764" y="277" text-anchor="middle" font-size="10" fill="#374151">差距在吞吐（带宽 vs IOPS）</text>
 
   <!-- 红字结论（柱状图右侧空白处） -->
-  <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
-  <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，直接换来两个数量级</text>
+  <rect x="540" y="358" width="290" height="64" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
+  <text x="685" y="376" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
+  <text x="685" y="394" text-anchor="middle" font-size="10.5" fill="#374151">机械盘：省寻道，延迟差两个数量级</text>
+  <text x="685" y="411" text-anchor="middle" font-size="10.5" fill="#374151">SSD：差距转向吞吐与写放大</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
   <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->

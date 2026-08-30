@@ -189,7 +189,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 的生命周期以"快"著称，但快的背后是一组很硬的设计取舍。</p>
 <h3 id="s46">启动四阶段</h3>
 <p><strong>第一段：配置默认值加覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数逐层覆盖。这里的设计取舍是"先全量设默认值再逐层覆盖"，好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这个 bug 类别。很多线上事故就出在某个配置项忘了初始化。</p>
-<p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略、SIGCHLD 回收 RDB/AOF 子进程）。创建事件循环，分配数据库数组，打开监听端口。这里有一个关键的取舍。<strong>核心基线结构在启动期就一次性预分配，不做懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）等基线结构一次性分配好，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
+<p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收）。创建事件循环，分配数据库数组，打开监听端口。这里有一个关键的取舍。<strong>核心基线结构在启动期就一次性预分配，不做懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）等基线结构一次性分配好，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
 <p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。图 3-2 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF），AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令，加载速度比 4.x 以前那种"纯命令重放"快很多。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 522" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -289,7 +289,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Step 1: 子进程判定 (decision diamond -> rect) -->
   <rect x="300" y="166" width="280" height="76" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
-  <text x="316" y="214" font-size="12" fill="#374151">是 → 等待其完成，或杀掉子进程</text>
+  <text x="316" y="214" font-size="12" fill="#374151">是 → 直接杀掉，不等它完成</text>
   <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
 
   <!-- Step 2: SAVE / NOSAVE branch -->
@@ -353,7 +353,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="752" y="610" font-size="12" fill="#EF4444">连接先于身份</text>
 </svg>
 </div><figcaption>图 3-3　Redis 关闭流程：先处理 RDB/AOF 重写子进程，再按 SAVE/NOSAVE 决定存盘与否。</figcaption></figure>
-<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，要么等它完成，要么杀掉子进程。这是为了不留下半成品文件。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上，虽然不影响正确性（rename 不会发生），但会留下垃圾。等子进程完成更干净，代价是关闭耗时增加。</p>
+<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，直接杀掉，不等它完成——优雅关闭把关闭耗时排在抢救半成品快照前面。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上；这不会破坏正确性（rename 不会发生，正本不受影响），留下的垃圾随后会被清理。</p>
 <p><strong>第二步：刷盘与否由用户决定。</strong> <code>SHUTDOWN SAVE</code> 会触发一次阻塞式 <code>SAVE</code> 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；<code>SHUTDOWN NOSAVE</code> 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。NOSAVE 跳过的只是 RDB 写盘；如果 AOF 已开启，第三步仍然会把 AOF 缓冲区刷出。这个设计兼顾了 Redis 两种用法。它不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定——一套代码就此同时服务两类用户。这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</p>
 <p><strong>第三步刷 AOF 缓冲</strong>，把内存里尚未落盘的追加命令 flush（刷盘）出去（如果开了 AOF）。<strong>第四步关闭所有客户端连接</strong>，通知对端、释放连接资源。<strong>第五步释放资源并 exit</strong>，交还文件锁、内存、进程身份。</p>
 <h3 id="s48">用信号触发优雅关闭</h3>
@@ -452,7 +452,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>解读这张表的关键在一句话：同一份数据清理工作，要么在"关闭时"做，要么在"下次启动时"做。档位 0 把工作前置到关闭期，换下次启动快。档位 2 把工作全部推迟到启动期，换关闭快。档位 1 在中间取折中。<strong>每种"快"的做法，都是把一部分工作推迟到别的时刻完成</strong>。</p>
 <p>默认设为 1 而不是 0，工程上的理由很实际：档位 0 要求的完整 purge 和修改缓冲合并（修改缓冲把对二级索引页的修改先攒在内存、等页读入时再补写回去，第 4 章详述）在繁忙库上可能耗时几十分钟甚至更久，而这些工作对正确性没有任何贡献，启动后由后台线程在日常运行中逐步完成即可。用"关闭时间不可控"去换"零正确性收益的清理工作"显然不划算，所以默认档把这些工作推迟到运行期，让关闭耗时有个可预期的上界。只有升级、大版本切换这类希望下次启动干干净净的场景，才值得提前用档位 0 关一次。</p>
 <h3 id="s52">关闭慢的常见根因</h3>
-<p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：大量脏页待刷（缓冲池大、写入密集，刷盘是随机 I/O，吞吐有上限）、长事务在跑（关闭时这些事务会被回滚，回滚使用 undo log 通过逻辑逆操作逐条撤销。注意 undo log 和 redo log 是两套独立的日志系统，回滚不是 redo 物理重放的"逆过程"，而是 undo 做逻辑回撤；回滚通常比正向写入更慢，事务越长越慢）、从节点 binlog（二进制日志）同步等待（关闭要等从节点把 binlog 拉完）、全文检索（FTS）索引优化在跑。这些根因都指向同一个事实：<strong>关闭是事务、复制、后台任务的交汇点</strong>。理解了这一点，再去读 <code>SHOW PROCESSLIST</code> 在关闭期的输出就能精准定位卡点。</p>
+<p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：大量脏页待刷（缓冲池大、写入密集，刷盘是随机 I/O，吞吐有上限）、长事务在跑（关闭时这些事务会被回滚，回滚使用 undo log 通过逻辑逆操作逐条撤销。注意 undo log 和 redo log 是两套独立的日志系统，回滚不是 redo 物理重放的"逆过程"，而是 undo 做逻辑回撤；回滚通常比正向写入更慢，事务越长越慢）、从库复制线程退出等待（从库关闭要等 SQL 线程回放完当前事件组再停；主库关闭则直接断开 dump 线程，并不等从库把 binlog 拉完）、全文检索（FTS）索引优化在跑。这些根因都指向同一个事实：<strong>关闭是事务、复制、后台任务的交汇点</strong>。理解了这一点，再去读 <code>SHOW PROCESSLIST</code> 在关闭期的输出就能精准定位卡点。</p>
 <h2 id="s53">3.4 Kafka 的做法</h2>
 <p>Kafka 的生命周期是分布式追加写日志的范式。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 的关闭设计核心是"怎么把自己的离开对集群的冲击降到最小"，刷自己的盘只是最基础的一步。</p>
 <h3 id="s54">启动链路：八阶段</h3>
@@ -557,7 +557,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s55">关闭：普通关闭 vs 受控关闭</h3>
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用（<code>controlled.shutdown.enable=false</code>）或失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去重新选举那些原本由它当 Leader 的分区。选举期间分区短暂不可用，客户端会看到抖动。默认配置下 Kafka 走的是受控关闭路径（见下一段），普通关闭只是降级兜底。</p>
-<p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 副本迁移到 ISR（同步副本集合）里还活着的其他副本</strong>。它会向这些副本发 LeaderAndIsr 请求，让它们接任 Leader。等所有 Leader 都迁移完，Controller 回复"你可以走了"，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p>
+<p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 副本迁移到 ISR（同步副本集合）里还活着的其他副本</strong>。它把新的 Leader 任免传达给这些副本——ZK 模式下向副本发 LeaderAndIsr 请求，KRaft 模式下写进元数据日志由各 Broker 应用——让它们接任 Leader。等所有 Leader 都迁移完，Controller 回复"你可以走了"，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 940 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -659,7 +659,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>在分布式系统里，优雅关闭是给集群留出交接职责的时间。</strong> 受控关闭就是这条原则的具体协议：它不强求 Broker 走得快，只要求它在退出之前先把 Leader 的职责迁移到其他副本。</p>
 <h3 id="s57">容器化环境下的生命周期</h3>
 <p>容器的约束不分软件，这一小节把三家合在一起看。多数生产部署现已跑在 Kubernetes（K8s）上。K8s 给优雅关闭加了一道硬约束：SIGTERM → <code>terminationGracePeriodSeconds</code>（默认 30 秒）→ SIGKILL。SIGKILL 即 <code>kill -9</code>，跳过一切清理。各系统必须在 grace period 内完成受控关闭，否则被强行杀死。</p>
-<p><strong>Redis</strong> 的 AOF 重写子进程可能远超 30 秒（取决于实例内存大小：fork 拷贝页表耗时随实例内存上升，小实例几十毫秒、大实例可达数百毫秒；COW 写时复制额外耗时在写入密集场景下可达数秒至数十秒），被 SIGKILL 则新写入数据没落盘。preStop hook 里先触发 <code>BGSAVE</code> 再走正常关闭，或调长 grace period。</p>
+<p><strong>Redis</strong> 的优雅关闭不等 AOF/RDB 重写子进程，第一步就把它们杀掉，关闭本身不为重写耗时；真正的耗时来自重写类操作本身——fork 拷贝页表随实例内存上升（小实例几十毫秒、大实例数百毫秒），写入密集下 COW 额外耗时可达数秒至数十秒，超过 30 秒 grace period 就会被 SIGKILL，新写入数据没落盘。preStop hook 里先触发 <code>BGSAVE</code> 再走正常关闭，或调长 grace period。</p>
 <p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，受控关闭时刷脏页但跳过完整 purge 与 change buffer 合并；一旦被 SIGKILL 强杀，连快速关闭流程都没机会走，只能交给下次启动的崩溃恢复。容器环境保留默认 <code>innodb_fast_shutdown=1</code>（它已包含脏页刷盘），grace period 给 120 秒以上；只有升级、大版本切换等需要干净下线的场景才设 0，且须按 3.3 节提示预留档位 0 几分钟到几十分钟甚至更久的耗时。</p>
 <p><strong>Kafka</strong> 受控关闭要等 Controller 迁移 Leader，若 Controller 负载高则 <code>controlled.shutdown.max.retries</code> 可能 30 秒内耗尽，退化为普通关闭。调大重试次数和退避间隔（<code>controlled.shutdown.retry.backoff.ms</code>），grace period 设到 60–120 秒。</p>
 <p><strong>实践清单：</strong> preStop hook 主动检查条件而非 sleep；grace period = 刷盘/迁移耗时 + 30 秒余量；关闭期间 readiness probe 返回 false，避免 K8s 反复重启。</p>

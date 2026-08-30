@@ -131,7 +131,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s27">2.2 内部数据结构：为核心目标而设计</h2>
 <h3 id="s28">2.2.1 Redis：驻留内存的简洁数据结构</h3>
 <p>Redis 的数据结构都受同一个约束限制：<strong>全部驻留内存</strong>。内存意味着随机访问几乎免费、CPU 开销比 I/O 更敏感、容量被物理上限锁死，所以数据结构要尽量省内存、尽量少 CPU 操作。下面五个结构按这个约束依次出现：SDS、跳表、字典（dict）偏重查询效率，ziplist/listpack 和 intset 偏重内存密度。</p>
-<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code> 才能知道，SDS 只通过 <code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
+<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存；其中 sdshdr5 最省，整个头只有 1 字节，长度直接嵌在 flags 的高 5 位里）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code> 才能知道，SDS 只通过 <code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
 <p><strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。 <strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 字段（<code>alloc</code> 不动，保留已分配空间），把多余空间留作未来的追加缓冲；想真正归还内存需要显式调用 <code>sdsRemoveFreeSpace</code>，SDS 自身从不在缩短路径上自动 <code>realloc</code>。这组策略把频繁操作中的系统调用次数压到最低，让 Redis 在最频繁的操作上做到摊还 O(1)。图 2-1 把两种字符串的内存布局并排画出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 47 880 403" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -441,7 +441,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>触发点在 254 这个长度上：比它短的长度 1 字节就装得下，跨过它，字段要从 1 字节扩成 5 字节。连锁只向后传播，因为每个元素只依赖前一个元素的长度——依赖是单向的，传播也只能单向。</p>
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素：能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。编码只升不降：哪怕后来所有大值都被删了，编码仍然是宽的。这是因为升级是一次性的内存重分配，而降级意味着又一次全量重分配，在 Redis 的场景里"删掉大值"的概率太低，不值得为了降级多付一次开销。</p>
-<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 ziplist → listpack 或 hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在图 2-5。</p>
+<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 listpack → hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在图 2-5。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -658,14 +658,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
 <p>把这张图和图 2-2 的跳表放在一起看：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
-<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
+<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。行太长放不下时才动用溢出页，而且按整行判定：一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，从最长的变长列（VARCHAR/BLOB/TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针；很短的 TEXT/BLOB（约 40 字节以内）则始终留在行内。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
 <p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。</p>
 <h3 id="s30">2.2.3 Kafka 的 RecordBatch：批量、顺序、演进</h3>
 <p>Kafka 的数据结构要同时满足三件事：<strong>磁盘顺序追加 + 批量压缩 + 格式可演进</strong>。满足这三件事的结构就是 RecordBatch，一个专为"把多条消息打成一个包"设计的结构，既不是树也不是哈希。</p>
 <p><strong>RecordBatch 就是 Kafka 的基本存储单元。</strong> 生产者会把消息积累成一批（按 <code>batch.size</code> 或 <code>linger.ms</code>）再压成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。</p>
 <p>从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
-<div class="table-wrap"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见图 2-7。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 562" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -685,7 +685,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="250" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="310" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">batchLength</text>
-  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 总字节长</text>
+  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 不含首 12B 总长</text>
 
   <rect x="380" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="440" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">leaderEpoch</text>
@@ -762,7 +762,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三个软件的协议走了三条路：Redis 用人眼可读的纯文本，MySQL 用紧凑二进制，Kafka 用带版本号的请求/响应。先从最"原始"的 RESP 看起——在那个几乎所有后端协议都选紧凑二进制的年代，这个选择背后是一个判断：瓶颈从来不在带宽。</p>
 <h3 id="s32">2.3.1 Redis RESP：能被人眼读懂的极简协议</h3>
 <p>Redis 的协议叫 RESP（REdis Serialization Protocol）。它的设计目标非常明确：实现简单（服务端解析不费 CPU）、人眼可读（协议就是文本，肉眼可辨，用 <code>nc</code> 连上 6379 端口直接打字就能交互）、能表达所有 Redis 命令和返回值。</p>
-<p>RESP 用每种数据类型的第一个字节区分类型。<code>+</code> 是简单字符串（如 <code>+OK\r\n</code>），<code>-</code> 是错误（如 <code>-ERR unknown command\r\n</code>），<code>:</code> 是整数（如 <code>:1000\r\n</code>），<code>$</code> 是批量字符串（如 <code>$5\r\nhello\r\n</code>，先告知长度再跟内容，天然二进制安全），<code>*</code> 是数组（如 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code>，先告知元素个数再逐个展开）。五种前缀字符就够用了：既无固定头部，也无版本号；长度只出现在批量字符串里（那是内容长度，不是协议头部）。</p>
+<p>RESP 用每种数据类型的第一个字节区分类型。<code>+</code> 是简单字符串（如 <code>+OK\r\n</code>），<code>-</code> 是错误（如 <code>-ERR unknown command\r\n</code>），<code>:</code> 是整数（如 <code>:1000\r\n</code>），<code>$</code> 是批量字符串（如 <code>$5\r\nhello\r\n</code>，先告知长度再跟内容，天然二进制安全），<code>*</code> 是数组（如 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code>，先告知元素个数再逐个展开）。五种前缀字符就够用了：既无固定头部，也无版本号；长度信息只出现在两处——数组首行的元素个数和批量字符串的内容长度，都是内容自述，不是固定协议头。</p>
 <p>但简单也有代价。RESP 是纯文本协议，体积比二进制大：<code>SET key value</code> 变成 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code> 有三十多个字节。每条命令独立，没有 Batch 概念（Pipeline 只是多条命令一起发，每条仍然独立编码和返回）。版本演进靠手工约定。Redis 6.0 之前没有版本协商，客户端假设服务端支持什么就发什么，不支持就报错。</p>
 <p><strong>但 RESP 的"简单"恰好匹配了 Redis 的核心目标。</strong> Redis 命令本身都很短小，协议开销在内存访问的纳秒级延迟面前可以忽略；人眼可读让调试和运维成本趋近于零。用 <code>redis-cli</code> 连上实例敲命令，就是它协议的原生交互方式。用复杂的二进制协议换那点带宽和解析开销，对 Redis 来说是过度设计。</p>
 <p>补充一个版本事实：Redis 6.0 引入了 RESP 3，在保持文本可读性的基础上增加了 Map（<code>%</code>）、Set（<code>~</code>）、Push（<code>&gt;</code>）、Boolean（<code>#</code>）、Null（<code>_</code>）等数据类型，并引入 <code>HELLO</code> 命令让客户端与服务端协商协议版本。RESP 3 保留了 RESP 2 用前缀字符区分类型的做法、<code>\r\n</code> 终止、人眼可读，补上了两个缺口：返回值类型信息的精确化（客户端不再需要从上下文推断"这是整数还是字符串"），以及版本协商机制（弥补了上文提到的"演进靠手工约定"缺陷）。RESP 3 是 opt-in 的：服务端始终兼容 RESP 2 客户端，客户端须用 <code>HELLO</code> 显式协商才能切到 RESP 3，且部分命令的返回类型随之改变（如 <code>HGETALL</code> 从扁平数组变为 Map），切换需要客户端适配。全书的技术描述不依赖任一版本的具体特性。</p>

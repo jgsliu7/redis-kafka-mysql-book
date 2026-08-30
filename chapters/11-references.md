@@ -12,14 +12,14 @@
 
 [4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。
 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，体现 Redis"按数据特征自适应"的设计。
-[6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。
+[6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98+-+Exactly+Once+Delivery+and+Transactional+Messaging. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。
 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。
 
 ## 第 3 章 生命周期管理 — 优雅启动与关闭
 
 [8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。
 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。
-[10] Apache Kafka. Controlled Shutdown[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。
+[10] Apache Kafka. Controlled Shutdown（Kafka Documentation）[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。
 
 ## 第 4 章 内存与磁盘 — 速度与持久化的平衡
 
@@ -30,7 +30,7 @@
 
 [13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。
 [14] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，体现分层灵活性的代价。
-[15] Apache Kafka. Network Threading Design[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。
+[15] Apache Kafka. Kafka Documentation: Design / Implementation[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Design 与 Implementation 部分对 Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。
 
 ## 第 6 章 安全机制 — 权限、加密、审计
 
@@ -42,20 +42,20 @@
 
 [19] Redis. Redis Cluster Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/. —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。
 [20] MySQL. MySQL Group Replication (MGR) 与 XCom[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/group-replication.html. —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。
-[21] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。
+[21] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833%3A+Mark+KRaft+as+Production+Ready. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。
 [22] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59. —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。
 
 ## 第 8 章 磁盘存储格式 — 文件结构的设计哲学
 
 [23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。
 [24] MySQL. InnoDB Page Structure[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。
-[25] Redis. RDB File Format 与 RESP Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/persistence/. —— 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计，快照范式文件结构的典型范例。
-[26] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志按热度卸载到远程对象存储的架构设计，8.4.6 Tiered Storage 一节的关键参考。
+[25] Redis. Redis Persistence（RDB 文件编码）[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— RDB 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计（官方未发布字节级 RDB 格式规范，此页为最接近的官方来源），快照范式文件结构的典型范例。
+[26] Apache Kafka. KIP-405: Kafka Tiered Storage[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405%3A+Kafka+Tiered+Storage. —— Kafka 将本地日志按热度卸载到远程对象存储的架构设计，8.4.6 Tiered Storage 一节的关键参考。
 
 ## 第 9 章 数据同步机制 — 集群一致性的实现
 
-[27] Apache Kafka. KIP-101: Replication Protocol Revamp[EB/OL]. (2015)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。
-[28] Apache Kafka. KIP-320: Leader Epochs[EB/OL]. (2018)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-320. —— Leader Epoch 在截断协议中的细化应用，避免副本恢复时按 HW 误截断造成数据丢失与不一致。
+[27] Apache Kafka. KIP-101: Alter Replication Protocol to use Leader Epoch rather than High Watermark for Truncation[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。
+[28] Apache Kafka. KIP-320: Allow fetchers to detect and handle log truncation[EB/OL]. (2018)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-320%3A+Allow+fetchers+to+detect+and+handle+log+truncation. —— Leader Epoch 在截断协议中的细化应用，避免副本恢复时按 HW 误截断造成数据丢失与不一致。
 [29] Redis. Replication 与 PSYNC2[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/replication/. —— replid/replid2 双标识符、复制偏移量与环形积压缓冲区实现部分重同步的官方描述，PSYNC2 使故障转移后仍可增量同步。
 [30] MySQL. GTID-Based Replication[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/replication-gtids.html. —— GTID（`source_id:transaction_id`）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。
 [31] Lamport L. Time, Clocks, and the Ordering of Events in a Distributed System[J]. Communications of the ACM, 1978, 21(7): 558-565. —— 逻辑时钟与 happens-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。

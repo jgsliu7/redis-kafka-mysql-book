@@ -209,7 +209,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
 <p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存承担内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
-<blockquote><strong>关键数字</strong>  <strong>InnoDB 16KB 页：页头、目录等结构性开销约占 1%–2%（一两百到几百字节），其余为记录区与空闲区</strong>。每页容纳约 2–200 行（依行宽而定）；页号即文件偏移，O(1) 随机定位是页式结构的效率根基。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条约 14 字节、V1 约 22 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制/已压缩数据近下限），带宽与存储成本结构性下降。  <strong>Redis RDB 压缩比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。紧凑二进制编码（变长整数 + LZF）使磁盘文件远小于内存实际占用，恢复时快速加载。</blockquote>
+<blockquote><strong>关键数字</strong>  <strong>InnoDB 16KB 页：页头、目录等结构性开销约占 1%–2%（一两百到几百字节），其余为记录区与空闲区</strong>。每页容纳约 2–200 行（依行宽而定）；页号即文件偏移，O(1) 随机定位是页式结构的效率根基。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 压缩比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。紧凑二进制编码（变长整数 + LZF）使磁盘文件远小于内存实际占用，恢复时快速加载。</blockquote>
 <blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台合并（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》第 3 章是很好的起点。</blockquote>
 <h2 id="s177">8.2 Redis 的做法</h2>
 <h3 id="s178">8.2.1 定位先行：磁盘服务于内存</h3>
@@ -515,8 +515,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="571" text-anchor="middle" font-size="11" fill="#374151">缓冲池命中率（越小越少污染）</text>
 </svg>
 </div><figcaption>图 8-4　InnoDB 16KB 数据页内部七段布局。</figcaption></figure>
-<p>七段布局里最值得看的是 Page Directory。它是页内的稀疏索引：每隔几条记录（默认每 4–8 条）建一个槽，槽里记的是那条"被拥有"的记录在页内的偏移量（记录之间用前后指针串成有序链表，槽是链表上的稀疏采样点）。页内查找时，先在槽数组里二分定位到不大于目标的最大槽，再从该槽对应的记录顺着链表顺序扫几条。这一招用很少空间（几十个槽）把页内查找从 O(n) 降到 O(log n) 再加几次顺序比较，是在定长页内自建小索引，跟 Kafka 用的稀疏索引同一种思想，尺度小了一个数量级。</p>
-<p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。有两个设计要点。一是变长字段长度逆序存放，记录头里先存最后一个变长字段的长度，倒着读，便于解析与崩溃恢复时边读边定位字段边界。二是大字段（VARCHAR、BLOB、TEXT）超过约页大小的一半时溢出到独立溢出页，行内只留一个 20 字节指针（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。这是"页内紧凑"与"大对象不拖累整页"的折中：大对象不该把整页占满、让其他记录无处安放，更不该跨页撕裂导致一次读要拉好几页。Dynamic 让 B+ 树的非叶子节点更紧凑，单页能装下更多键、树更矮，同样是用格式演进解决历史包袱。</p>
+<p>七段布局里最值得看的是 Page Directory。它是页内的稀疏索引：每隔几条记录（默认每 4–8 条）建一个槽，槽里记的是那条"被拥有"的记录在页内的偏移量（记录之间用单向指针 next_record 串成有序链表，槽是链表上的稀疏采样点）。页内查找时，先在槽数组里二分定位到不大于目标的最大槽，再从该槽对应的记录顺着链表顺序扫几条。这一招用很少空间（几十个槽）把页内查找从 O(n) 降到 O(log n) 再加几次顺序比较，是在定长页内自建小索引，跟 Kafka 用的稀疏索引同一种思想，尺度小了一个数量级。</p>
+<p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。有两个设计要点。一是变长字段长度逆序存放，记录头里先存最后一个变长字段的长度，倒着读，便于解析与崩溃恢复时边读边定位字段边界。二是溢出按整行判定，不以单个字段超页大小一半为准：一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，才从最长的变长列（VARCHAR、BLOB、TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针，挪完还不够再挪次长的；不超过约 40 字节的短 TEXT/BLOB 始终留在行内（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。这是"页内紧凑"与"大对象不拖累整页"的折中：大对象不该把整页占满、让其他记录无处安放，更不该跨页撕裂导致一次读要拉好几页。Dynamic 让 B+ 树的非叶子节点更紧凑，单页能装下更多键、树更矮，同样是用格式演进解决历史包袱。</p>
 <h3 id="s186">8.3.4 redo log + 双写：保证"原地改"在断电后可恢复</h3>
 <p>原地改页最大的风险是断电导致的半写（partial write）。一个 16KB 页，操作系统可能只写了前 4KB 或前 8KB 就断电，剩下的没写：页结构损坏，Page Directory 与 User Records 对不上，校验和不过。更糟的是 redo log 假设页本身完整：redo log 记录的是"对完整页做的物理修改"，重做的前提是页已处于某个一致状态。半写的页连"完整"这一关都没过，redo log 救不了它。</p>
 <p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页刷盘前，先顺序写到一段连续的双写缓冲，再写到正式位置；恢复时若某页校验和不对，从双写缓冲取回那个页的完整副本，再用 redo 重放到最新。双写缓冲早期放在共享表空间的连续区，后来改为独立 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大：同一份脏页要刷两次盘，但因为双写缓冲是连续的顺序写，对性能影响有限。</p>
@@ -633,7 +633,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-5　脏页刷盘流程：双写缓冲 → 正式页，配合 redo log 的崩溃恢复路径。</figcaption></figure>
 <p>图中可见完整的双重保护机制：正常写路径上 redo log 先落盘（WAL），脏页先写双写缓冲再写正式位置；崩溃恢复路径上先扫描 redo log，对每条记录检查目标页 LSN，页未损坏且 LSN 落后则重做，页损坏则从双写缓冲取完整副本再重做。两条路径都指向同一个目标，即页完整性：双写缓冲保证页不撕裂，redo log 保证页内容最新。</p>
-<p>MySQL 8.0 在硬件能力提升后给了选择：当底层存储支持原子写（如某些 NVM 设备或带原子写功能的 SSD）时，可以关掉双写缓冲，减少写放大。每一层可靠性机制都是为某类故障加的冗余，当那类故障被下层硬件消灭时，软件冗余就可以撤下来（8.6.4 启示四会再展开）。</p>
+<p>当底层存储支持原子写（如某些 NVM 设备或带原子写功能的 SSD）时，可以关掉双写缓冲（<code>innodb_doublewrite=OFF</code>，这个开关早于 8.0 就存在），减少写放大。每一层可靠性机制都是为某类故障加的冗余，当那类故障被下层硬件消灭时，软件冗余就可以撤下来（8.6.4 启示四会再展开）。</p>
 <h2 id="s187">8.4 Kafka 的做法</h2>
 <h3 id="s188">8.4.1 定位先行：磁盘就是日志本体</h3>
 <p>Kafka 的定位又反过来了。对 Kafka 来说，消息只有一份正本，就存储在磁盘的日志段里。它不像 MySQL 那样自己管缓冲池，页缓存交给操作系统，Kafka 只把字节往日志文件里追加，读时直接从页缓存或磁盘顺序读。这种数据本体就在磁盘日志里的定位把格式设计的约束收得很紧，因此格式要满足三条硬要求：纯追加写（日志段只在尾部追加，旧字节不再改写）、按偏移量（offset）随机读（靠索引而非扫描，定位要快）、成批压缩（带宽稀缺，一批相近消息压在一起能省下数倍的存储与传输成本）。于是 Kafka 的基本结构就是"日志段 + 稀疏索引 + RecordBatch"这三个组成部分。</p>
@@ -773,7 +773,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s190">8.4.3 RecordBatch V2：把一批消息当成一个存储单元</h3>
 <p>Kafka 消息格式的关键变化是 V2 引入的 RecordBatch（字段布局见 2.2.3 节表 2-1，这里看它为什么这样演进）。在 V0、V1 时代，最小存储单元是单条消息（Message），每条都自带一份完整元数据：偏移量、时间戳、key 长度、value 长度、CRC、属性。一百万条消息就有一百万份重复元数据，既占空间，又拉低压缩效果：相似数据聚在一起时，压缩算法能找到更多重复模式，但单条消息的元数据把每条记录隔开了。</p>
 <p>V2 把这个单位从单条换成了 Batch（批）。一个 Batch 头部固定 61 字节，存 BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、CRC、Attributes、记录数等整批共享的元数据。Batch 内每条 Record 只存相对量：时间戳差值（相对 Batch 的 BaseTimestamp）、偏移量差值（相对 BaseOffset）、key 与 value 的变长字段。绝大多数差值只要一两个字节就够，单条消息的元数据开销从 V1 的几十字节压到个位数。</p>
-<p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V1 的单条级压缩有结构性提升（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）。</p>
+<p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V0/V1 的整包 wrapper 压缩（外层把一批消息压成一个消息体，内层每条仍各带一份元数据）有结构性提升（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）。</p>
 <p>代价也有：消费者要解整个 Batch 才能读单条。但 Kafka 的消费本来就是成批的：消费者拉一批处理一批，从来不会真去"读一条"。<strong>让存储单元对齐访问单元</strong>，这个代价在成批消费的工作模式下并不显现。</p>
 <p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉，见 9.4 节），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让"重启后能续上"成为磁盘层面的保证。</p>
 <h3 id="s191">8.4.4 双索引：偏移量索引 + 时间戳索引</h3>
@@ -786,11 +786,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>演进机制靠 Magic 字段做版本号。Magic 是消息格式里的一个字节，标识这条消息是哪个版本。老 Broker 收到不认识的 Magic 直接拒绝；消费者按 Magic 选不同的解析路径。这种"格式自带版本号"的做法，是支持混合版本部署与平滑升级的标配：跟 RDB 的 version、InnoDB 的页类型字段是同一类机制。</p>
 <p>下面用一张表对比三代格式的字段与演进动机。</p>
 <p><strong>表 8-1　Kafka 消息格式 V0 / V1 / V2 的字段对比与演进动机</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>单条 Message</td><td>单条 Message</td><td>RecordBatch（含多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>每条绝对偏移量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条一条</td><td>每条一条</td><td>Batch 级一条</td></tr><tr><td>压缩</td><td>单条级别，压缩比低</td><td>单条级别，压缩比低</td><td>Batch 级别，压缩比高</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>解决"想知道时间得扫全文件"的问题</td><td>解决"元数据冗余 + 压缩低效"的问题</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>单条 Message</td><td>单条 Message</td><td>RecordBatch（含多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>每条绝对偏移量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条一条</td><td>每条一条</td><td>Batch 级一条</td></tr><tr><td>压缩</td><td>整包 wrapper 压缩（内条仍各带元数据），压缩比低</td><td>整包 wrapper 压缩（内条仍各带元数据），压缩比低</td><td>Batch 级别，压缩比高</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>解决"想知道时间得扫全文件"的问题</td><td>解决"元数据冗余 + 压缩低效"的问题</td></tr></tbody></table></div>
 <p>看演进动机这一列，每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。</p>
 <h3 id="s193">8.4.6 Tiered Storage：从本地日志到分层存储</h3>
 <p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
-<p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者读取时，先尝试本地磁盘，未命中则从远程拉取并缓存到本地（fetch-through 语义）；副本同步不走这条路径——Follower 的 FETCH 一律由 Leader 的本地日志服务，哪怕该段在 Leader 本地已删、只余远程副本。因此本地保留窗口（local retention）必须盖住最慢 ISR 副本的落后量，否则落后副本永远追不上、会被移出 ISR。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
+<p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者读取时，先尝试本地磁盘，未命中则从远程存储流式读取，不把远程段重新物化成本地日志段；副本同步不走这条路径——Follower 的 FETCH 一律由 Leader 的本地日志服务，哪怕该段在 Leader 本地已删、只余远程副本。因此本地保留窗口（local retention）必须盖住最慢 ISR 副本的落后量，否则落后副本永远追不上、会被移出 ISR。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
 <p>这一变化带来三方面影响。第一，"日志数据必须在本地磁盘"的假设需要修正：正本仍是日志段，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式反映访问模式"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。日志段在本地与远程之间的完整生命周期，画在图 8-7 里。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 372" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -897,7 +897,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s202">8.6.4 启示四：可靠性要付性能代价，但要知道防的是哪类故障</h3>
 <p>每加一层可靠性机制，都对应一类故障，也对应一份性能代价。</p>
 <p>MySQL 的双写缓冲防止断电导致 16KB 页半写，保证页完整性，代价是同一份脏页刷两次盘（写放大）。redo log 保证已提交事务的修改在页未刷盘时也能重放回来，代价是每次修改多记一条日志。CRC 校验用来检测磁盘静默损坏（bit rot），代价是每次读写多算一次校验和。</p>
-<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。MySQL 8.0 在底层存储支持原子写时允许关掉双写缓冲：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但 redo log 不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
+<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。当底层存储支持原子写时，MySQL 允许关掉双写缓冲（<code>innodb_doublewrite=OFF</code>）：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但 redo log 不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
 <p>加可靠性机制前，先问"我针对的是哪类故障，这类故障下层有没有更便宜的解法"。盲目堆冗余只会换来无谓的写放大；精准识别故障并让下层承担，这笔开销就降得下来。</p>
 <h3 id="s203">8.6.5 启示五：格式一旦发布就是长期债务</h3>
 <p>最后一条回到 8.1.2 的第四个矛盾。存储格式发布即定型，业务会变、字段要加、编码要换、旧 bug 要修，全都要在原格式上做兼容。版本号、保留字段、Magic、编码切换，都是为未来预留的扩展空间（第 2 章启示四在协议层讲过同一件事：第一个版本没人能把边界想全，先留版本字段）。</p>

@@ -56,8 +56,8 @@
   <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
   <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
   <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
-  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入 backlog</text>
-  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发积压命令</text>
+  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入连接专属复制缓冲</text>
+  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发缓冲的命令</text>
   <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
 
   <!-- 右分支连线 -->

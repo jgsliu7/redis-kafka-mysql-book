@@ -84,7 +84,7 @@
 
   <rect x="620" y="355" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="745" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ KRaft 元数据</text>
-  <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 单进程强一致</text>
+  <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 控制器组多数派强一致</text>
   <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：百万分区 + 快速恢复</text>
 
   <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：可调（acks=all 默认偏 CP，可下调）</text>

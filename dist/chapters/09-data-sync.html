@@ -293,14 +293,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s211">传播单元：命令本身</h3>
 <p>Redis 选择把命令本身作为传播单元。主节点执行完一条写命令后，把这条命令（用 Redis 序列化协议 RESP 重写后）原样发送给所有副本；副本收到后本地执行一次，状态就对齐了。</p>
 <p>这个选择呼应了第 8 章"AOF 持久化文件复用协议格式"的设计：AOF 持久化记录的就是同一种命令流。于是 Redis 把持久化和复制<strong>复用同一种载体</strong>：一份命令流既写给磁盘（AOF）也写给网络（副本），二者天然一致。能用一种日志说清的事，就不引入第二种。</p>
-<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它处理不了<strong>语义歧义</strong>：比如非确定性命令（<code>SPOP</code>、<code>RANDOMKEY</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 的处理是在复制链路上对这些命令做特殊改写：把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，把分歧在源头消除。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：只把脚本执行产生的写命令效果传给副本，确定性由此保证。早期版本默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
+<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它处理不了<strong>语义歧义</strong>：比如非确定性命令（<code>SPOP</code>、<code>EXPIRE</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 的处理是在复制链路上对这些命令做特殊改写：把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，把分歧在源头消除。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：只把脚本执行产生的写命令效果传给副本，确定性由此保证。早期版本默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
 <h3 id="s212">单向异步：把一致性换成低延迟</h3>
 <p>Redis 复制是<strong>单向异步</strong>的。主节点写完后立即给客户端返回 OK，<strong>不等任何副本确认</strong>；副本通过一条长连接异步地接收命令流并追赶。副本只能有一个主（一个数据集的权威来源），形成树状的复制拓扑。</p>
 <p>这是默认偏 AP（高可用优先）的取向；分区时少数派停写则偏 CP（归类讨论见 7.2.3 节）。主节点的延迟几乎不受副本数量和副本健康度影响，而低延迟正是 Redis 作为缓存/在线存储最看重的特性。代价同样明确：主节点故障时，已经返回给客户端但还没来得及传到副本的写，会永久丢失。Redis 用"可能丢失少量写"换来主节点不受副本拖累：副本再慢再断，主的写入路径都不等它。</p>
-<h3 id="s213">全量同步：fork 出 RDB，传完补积压</h3>
+<h3 id="s213">全量同步：fork 出 RDB，传完补增量</h3>
 <p>副本第一次连上来，或者增量同步无法进行时，就要做全量同步。流程是：</p>
-<ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（<code>?</code> 与 <code>-1</code> 分别表示"未知 run_id"与"无偏移量"，这是 Redis 副本首次连接时发的内部协议命令，不是能在 redis-cli 里直接敲的命令），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存到复制积压缓冲区（replication backlog）</strong>。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把积压缓冲区里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
-<p>这里的关键在第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。backlog 就用来补上"过去那一刻"到"当前"之间的这段空缺。</p>
+<ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（<code>?</code> 与 <code>-1</code> 分别表示"未知 run_id"与"无偏移量"，这是 Redis 副本首次连接时发的内部协议命令，不是能在 redis-cli 里直接敲的命令），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存进这条复制连接专属的输出缓冲区</strong>（不是 replication backlog——那是常驻的环形缓冲，职责是服务断线重连后的部分重同步）。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把副本专属缓冲里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
+<p>这里的关键在第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。这个副本专属缓冲就用来补上"过去那一刻"到"当前"之间的这段空缺。</p>
 <p>另一类代价在两处：<code>BGSAVE</code> 的 fork 在大实例上会有一瞬间的内存翻倍风险（写时复制）和短暂的停顿；RDB 文件在网络上的传输要消耗主节点的出口带宽。全量同步越频繁，这两项代价越痛，所以 Redis 才会重点设计增量同步，把全量降级为"最后手段"。Redis 全量同步与部分重同步的完整分支见图 9-3。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 66 880 554" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -359,8 +359,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
   <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
   <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
-  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入 backlog</text>
-  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发积压命令</text>
+  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入连接专属复制缓冲</text>
+  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发缓冲的命令</text>
   <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
 
   <!-- 右分支连线 -->
@@ -583,7 +583,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部说明 -->
   <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步：主提交后等从 ACK（落 relay log）才返回；半同步超时自动降级回异步</text>
+  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（落 relay log）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
 </svg>
 </div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
 <h3 id="s221">异步复制：默认的 AP 形态</h3>
@@ -599,8 +599,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>GTID（Global Transaction Identifier，全局事务标识）把位点升级成 <code>source_id:transaction_id</code> 的形式：<code>source_id</code> 是发起事务的源节点的 UUID，<code>transaction_id</code> 是该节点上单调递增的事务序号。每个事务在 binlog 里都有一个全局唯一的 GTID。</p>
 <p>GTID 带来的简化很直接。副本只要告诉新主"我这里有 GTID 1-100"，新主就自动从 101 开始追，不用人工对文件、不用查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此变得直观。位点因此成了一个能拿来推理的工具，不再只是内部细节。</p>
 <h3 id="s224">多线程并行复制：缓解单线程回放瓶颈</h3>
-<p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件，主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
-<p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
+<p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件（8.0.27 起 MTS 默认开启 4 个 worker，更早版本默认单线程），主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
+<p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘；主节点把每个事务的锁区间以 last_committed / sequence_number 标记写进 binlog，副本按这些标记划定可并行窗口）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
 <p>配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。但这个并行的上限是主库的组提交宽度：主库并发低、每次落盘攒不下几个事务时，从库能并行的也只有那几个——串行瓶颈没有消失，只是从从库挪到了主库的提交队列。低写入并发的库，MTS 的提升有限。并行复制与 MGR 共识的关系见图 9-6。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 597" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -731,7 +731,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这正是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务：只要多数派存活，已确认的事务就一定在。</p>
 <p>代价是延迟：每一次提交都要承担一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待）。从弱到强有几档：<code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）。读写是否要等本节点追平，按场景选。</p>
 <h3 id="s226">分布式恢复：新成员怎么追上</h3>
-<p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有缺口太大（缺失事务超过 <code>group_replication_clone_threshold</code>，默认 86,400 笔）或所需 binlog 已不可得时，才改用 8.0.17+ 提供的 clone 插件：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + backlog 补差"一样。</p>
+<p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件（参数 <code>group_replication_clone_threshold</code> 看似按缺失事务数触发，默认值实为 int64 上限，默认配置下从不因缺口大小而 clone）：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + 期间增量补发"一样。</p>
 <h3 id="s227">取舍总结</h3>
 <p>MySQL 在数据同步上的取舍是三档：从异步（可丢、最快）到半同步（多数情况下不丢、超时降级）到组复制（多数派强一致、最慢），业务方按场景选档。Redis 则只提供一个默认档，另给一个弱保证参数和一个按写生效的 <code>WAIT</code> 命令（均见 9.2 节）。</p>
 <h2 id="s228">9.4 Kafka 的做法</h2>
@@ -741,7 +741,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这一点和第 5 章 Kafka 存储层的 Log 抽象直接呼应：日志天然提供了全序关系，所以"状态机复制里的有序输入序列"在 Kafka 这里是现成的：日志本身就是序列。</p>
 <h3 id="s230">纯拉模式：和消费者走同一条路径</h3>
 <p>Kafka 复制用的是<strong>纯拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis 的"主推"、MySQL 的"I/O 线程拉 + relay log 缓冲"都不同。</p>
-<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。第 5 章的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
+<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应——只有一处读上界的差别：普通消费者被截在高水位 HW 以下，Follower 可以一直读到 LEO（区分标志是请求里的 replica_id 取值：Follower 填自己的 broker id，消费者填 -1）。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。第 5 章的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
 <p>拉模式的代价是 Follower 要自己负责追赶节奏，副本数量多时大量 FETCH 请求会压在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载帮到的是消费者读取，不是副本拉取：消费者读冷段时回源远程存储，而 Follower 的 FETCH 仍由 Leader 本地日志服务，哪怕该段在 Leader 本地已删——所以本地保留窗口必须盖住最慢 ISR 副本的落后量（详见第 8 章 8.4.6 节）。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
 <p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 7 章 7.4.2 节展开；LEO 与 HW 的语义定义就在这里给出，下面直接看它们在同步中的角色。</p>
@@ -898,7 +898,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s246">启示四：先定延迟预算，再定一致性档位</h3>
 <p>正如 9.5 解读三所说，三个软件在同一条延迟-一致性曲线上站在不同位置；第 7 章启示二从集群选型看过同一条谱线，这里把它落到复制设计的动作上。MySQL 的半同步超时参数（默认 10 秒）就是这条延迟预算的上限：等副本确认超过 10 秒，主节点就不再等待，降级回异步。设计自己的复制系统时，先问业务能承受多少额外确认往返：延迟预算定了，一致性档位自然就定了。</p>
 <h3 id="s247">启示五：故障恢复是同步的反向问题</h3>
-<p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：日志、位点和截断规则都相同。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，缺口过大才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
+<p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：日志、位点和截断规则都相同。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，补差所需 binlog 已不可得才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
 <p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础：只要保证日志可重放、位点可比对、截断有依据，恢复就能复用同步机制本身。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，真到了故障时，出事的往往就是这些地方。</p>
 <h3 id="s248">反模式提醒</h3>
 <p>三个常见的反模式，都是从正面启示的反面衍生出来的：</p>

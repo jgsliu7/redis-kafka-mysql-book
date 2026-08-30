@@ -729,7 +729,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s27">2.2 内部数据结构：为核心目标而设计</h2>
 <h3 id="s28">2.2.1 Redis：驻留内存的简洁数据结构</h3>
 <p>Redis 的数据结构都受同一个约束限制：<strong>全部驻留内存</strong>。内存意味着随机访问几乎免费、CPU 开销比 I/O 更敏感、容量被物理上限锁死，所以数据结构要尽量省内存、尽量少 CPU 操作。下面五个结构按这个约束依次出现：SDS、跳表、字典（dict）偏重查询效率，ziplist/listpack 和 intset 偏重内存密度。</p>
-<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code> 才能知道，SDS 只通过 <code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
+<p><strong>SDS（简单动态字符串）</strong> 是 Redis 最基础的字符串实现。不用 C 语言的 <code>char*</code>，而是自己实现了一套叫 SDS 的结构。它的头部（header）记录了：<code>len</code>（当前字符串长度）、<code>alloc</code>（已分配的总字节数，不包括头部和结尾 <code>\0</code>）、<code>flags</code>（标记 SDS 类型，Redis 按长度分 sdshdr5/8/16/32/64 共五种，短字符串用小头省内存；其中 sdshdr5 最省，整个头只有 1 字节，长度直接嵌在 flags 的高 5 位里）。实际存数据的 <code>buf</code> 紧跟在头部后面。C 语言的字符串取长度要遍历到 <code>\0</code> 才能知道，SDS 只通过 <code>len</code> 字段就知道，任意二进制数据都能存，不需要依赖终止符。</p>
 <p><strong>预分配</strong>：扩容时，如果新长度小于 1MB，SDS 直接翻倍分配；超过 1MB 则每次只多申请 1MB。这样连续追加时不会每次都触发 <code>realloc</code>。 <strong>惰性释放</strong>：缩短字符串时不立即归还内存，只改 <code>len</code> 字段（<code>alloc</code> 不动，保留已分配空间），把多余空间留作未来的追加缓冲；想真正归还内存需要显式调用 <code>sdsRemoveFreeSpace</code>，SDS 自身从不在缩短路径上自动 <code>realloc</code>。这组策略把频繁操作中的系统调用次数压到最低，让 Redis 在最频繁的操作上做到摊还 O(1)。图 2-1 把两种字符串的内存布局并排画出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 47 880 403" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1039,7 +1039,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>触发点在 254 这个长度上：比它短的长度 1 字节就装得下，跨过它，字段要从 1 字节扩成 5 字节。连锁只向后传播，因为每个元素只依赖前一个元素的长度——依赖是单向的，传播也只能单向。</p>
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素：能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。编码只升不降：哪怕后来所有大值都被删了，编码仍然是宽的。这是因为升级是一次性的内存重分配，而降级意味着又一次全量重分配，在 Redis 的场景里"删掉大值"的概率太低，不值得为了降级多付一次开销。</p>
-<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 ziplist → listpack 或 hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在图 2-5。</p>
+<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 listpack → hashtable 的升级逻辑是一样的。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在图 2-5。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1256,14 +1256,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
 <p>把这张图和图 2-2 的跳表放在一起看：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
-<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。大字段（VARCHAR/BLOB/TEXT）超过约页大小一半时溢出到独立溢出页，行内只留一个 20 字节指针。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
+<p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。行太长放不下时才动用溢出页，而且按整行判定：一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，从最长的变长列（VARCHAR/BLOB/TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针；很短的 TEXT/BLOB（约 40 字节以内）则始终留在行内。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
 <p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。</p>
 <h3 id="s30">2.2.3 Kafka 的 RecordBatch：批量、顺序、演进</h3>
 <p>Kafka 的数据结构要同时满足三件事：<strong>磁盘顺序追加 + 批量压缩 + 格式可演进</strong>。满足这三件事的结构就是 RecordBatch，一个专为"把多条消息打成一个包"设计的结构，既不是树也不是哈希。</p>
 <p><strong>RecordBatch 就是 Kafka 的基本存储单元。</strong> 生产者会把消息积累成一批（按 <code>batch.size</code> 或 <code>linger.ms</code>）再压成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。</p>
 <p>从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
-<div class="table-wrap"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对 offset 和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见图 2-7。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 562" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1283,7 +1283,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="250" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="310" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">batchLength</text>
-  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 总字节长</text>
+  <text x="310" y="153" text-anchor="middle" font-size="10" fill="#6B7280">4B · 不含首 12B 总长</text>
 
   <rect x="380" y="110" width="120" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="440" y="133" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">leaderEpoch</text>
@@ -1360,7 +1360,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三个软件的协议走了三条路：Redis 用人眼可读的纯文本，MySQL 用紧凑二进制，Kafka 用带版本号的请求/响应。先从最"原始"的 RESP 看起——在那个几乎所有后端协议都选紧凑二进制的年代，这个选择背后是一个判断：瓶颈从来不在带宽。</p>
 <h3 id="s32">2.3.1 Redis RESP：能被人眼读懂的极简协议</h3>
 <p>Redis 的协议叫 RESP（REdis Serialization Protocol）。它的设计目标非常明确：实现简单（服务端解析不费 CPU）、人眼可读（协议就是文本，肉眼可辨，用 <code>nc</code> 连上 6379 端口直接打字就能交互）、能表达所有 Redis 命令和返回值。</p>
-<p>RESP 用每种数据类型的第一个字节区分类型。<code>+</code> 是简单字符串（如 <code>+OK\r\n</code>），<code>-</code> 是错误（如 <code>-ERR unknown command\r\n</code>），<code>:</code> 是整数（如 <code>:1000\r\n</code>），<code>$</code> 是批量字符串（如 <code>$5\r\nhello\r\n</code>，先告知长度再跟内容，天然二进制安全），<code>*</code> 是数组（如 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code>，先告知元素个数再逐个展开）。五种前缀字符就够用了：既无固定头部，也无版本号；长度只出现在批量字符串里（那是内容长度，不是协议头部）。</p>
+<p>RESP 用每种数据类型的第一个字节区分类型。<code>+</code> 是简单字符串（如 <code>+OK\r\n</code>），<code>-</code> 是错误（如 <code>-ERR unknown command\r\n</code>），<code>:</code> 是整数（如 <code>:1000\r\n</code>），<code>$</code> 是批量字符串（如 <code>$5\r\nhello\r\n</code>，先告知长度再跟内容，天然二进制安全），<code>*</code> 是数组（如 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code>，先告知元素个数再逐个展开）。五种前缀字符就够用了：既无固定头部，也无版本号；长度信息只出现在两处——数组首行的元素个数和批量字符串的内容长度，都是内容自述，不是固定协议头。</p>
 <p>但简单也有代价。RESP 是纯文本协议，体积比二进制大：<code>SET key value</code> 变成 <code>*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n</code> 有三十多个字节。每条命令独立，没有 Batch 概念（Pipeline 只是多条命令一起发，每条仍然独立编码和返回）。版本演进靠手工约定。Redis 6.0 之前没有版本协商，客户端假设服务端支持什么就发什么，不支持就报错。</p>
 <p><strong>但 RESP 的"简单"恰好匹配了 Redis 的核心目标。</strong> Redis 命令本身都很短小，协议开销在内存访问的纳秒级延迟面前可以忽略；人眼可读让调试和运维成本趋近于零。用 <code>redis-cli</code> 连上实例敲命令，就是它协议的原生交互方式。用复杂的二进制协议换那点带宽和解析开销，对 Redis 来说是过度设计。</p>
 <p>补充一个版本事实：Redis 6.0 引入了 RESP 3，在保持文本可读性的基础上增加了 Map（<code>%</code>）、Set（<code>~</code>）、Push（<code>&gt;</code>）、Boolean（<code>#</code>）、Null（<code>_</code>）等数据类型，并引入 <code>HELLO</code> 命令让客户端与服务端协商协议版本。RESP 3 保留了 RESP 2 用前缀字符区分类型的做法、<code>\r\n</code> 终止、人眼可读，补上了两个缺口：返回值类型信息的精确化（客户端不再需要从上下文推断"这是整数还是字符串"），以及版本协商机制（弥补了上文提到的"演进靠手工约定"缺陷）。RESP 3 是 opt-in 的：服务端始终兼容 RESP 2 客户端，客户端须用 <code>HELLO</code> 显式协商才能切到 RESP 3，且部分命令的返回类型随之改变（如 <code>HGETALL</code> 从扁平数组变为 Map），切换需要客户端适配。全书的技术描述不依赖任一版本的具体特性。</p>
@@ -1552,7 +1552,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 的生命周期以"快"著称，但快的背后是一组很硬的设计取舍。</p>
 <h3 id="s46">启动四阶段</h3>
 <p><strong>第一段：配置默认值加覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数逐层覆盖。这里的设计取舍是"先全量设默认值再逐层覆盖"，好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这个 bug 类别。很多线上事故就出在某个配置项忘了初始化。</p>
-<p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略、SIGCHLD 回收 RDB/AOF 子进程）。创建事件循环，分配数据库数组，打开监听端口。这里有一个关键的取舍。<strong>核心基线结构在启动期就一次性预分配，不做懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）等基线结构一次性分配好，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
+<p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器（SIGTERM/SIGINT 触发优雅关闭、SIGPIPE 忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收）。创建事件循环，分配数据库数组，打开监听端口。这里有一个关键的取舍。<strong>核心基线结构在启动期就一次性预分配，不做懒加载</strong>。Redis 会在启动期就把数据库数组、共享对象（shared objects，例如预创建 0–9999 共 10000 个共享整数对象以复用常见小整数）等基线结构一次性分配好，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
 <p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。图 3-2 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF），AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令，加载速度比 4.x 以前那种"纯命令重放"快很多。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 522" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1652,7 +1652,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- Step 1: 子进程判定 (decision diamond -> rect) -->
   <rect x="300" y="166" width="280" height="76" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
-  <text x="316" y="214" font-size="12" fill="#374151">是 → 等待其完成，或杀掉子进程</text>
+  <text x="316" y="214" font-size="12" fill="#374151">是 → 直接杀掉，不等它完成</text>
   <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
 
   <!-- Step 2: SAVE / NOSAVE branch -->
@@ -1716,7 +1716,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="752" y="610" font-size="12" fill="#EF4444">连接先于身份</text>
 </svg>
 </div><figcaption>图 3-3　Redis 关闭流程：先处理 RDB/AOF 重写子进程，再按 SAVE/NOSAVE 决定存盘与否。</figcaption></figure>
-<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，要么等它完成，要么杀掉子进程。这是为了不留下半成品文件。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上，虽然不影响正确性（rename 不会发生），但会留下垃圾。等子进程完成更干净，代价是关闭耗时增加。</p>
+<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，直接杀掉，不等它完成——优雅关闭把关闭耗时排在抢救半成品快照前面。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上；这不会破坏正确性（rename 不会发生，正本不受影响），留下的垃圾随后会被清理。</p>
 <p><strong>第二步：刷盘与否由用户决定。</strong> <code>SHUTDOWN SAVE</code> 会触发一次阻塞式 <code>SAVE</code> 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；<code>SHUTDOWN NOSAVE</code> 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。NOSAVE 跳过的只是 RDB 写盘；如果 AOF 已开启，第三步仍然会把 AOF 缓冲区刷出。这个设计兼顾了 Redis 两种用法。它不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定——一套代码就此同时服务两类用户。这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</p>
 <p><strong>第三步刷 AOF 缓冲</strong>，把内存里尚未落盘的追加命令 flush（刷盘）出去（如果开了 AOF）。<strong>第四步关闭所有客户端连接</strong>，通知对端、释放连接资源。<strong>第五步释放资源并 exit</strong>，交还文件锁、内存、进程身份。</p>
 <h3 id="s48">用信号触发优雅关闭</h3>
@@ -1815,7 +1815,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>解读这张表的关键在一句话：同一份数据清理工作，要么在"关闭时"做，要么在"下次启动时"做。档位 0 把工作前置到关闭期，换下次启动快。档位 2 把工作全部推迟到启动期，换关闭快。档位 1 在中间取折中。<strong>每种"快"的做法，都是把一部分工作推迟到别的时刻完成</strong>。</p>
 <p>默认设为 1 而不是 0，工程上的理由很实际：档位 0 要求的完整 purge 和修改缓冲合并（修改缓冲把对二级索引页的修改先攒在内存、等页读入时再补写回去，第 4 章详述）在繁忙库上可能耗时几十分钟甚至更久，而这些工作对正确性没有任何贡献，启动后由后台线程在日常运行中逐步完成即可。用"关闭时间不可控"去换"零正确性收益的清理工作"显然不划算，所以默认档把这些工作推迟到运行期，让关闭耗时有个可预期的上界。只有升级、大版本切换这类希望下次启动干干净净的场景，才值得提前用档位 0 关一次。</p>
 <h3 id="s52">关闭慢的常见根因</h3>
-<p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：大量脏页待刷（缓冲池大、写入密集，刷盘是随机 I/O，吞吐有上限）、长事务在跑（关闭时这些事务会被回滚，回滚使用 undo log 通过逻辑逆操作逐条撤销。注意 undo log 和 redo log 是两套独立的日志系统，回滚不是 redo 物理重放的"逆过程"，而是 undo 做逻辑回撤；回滚通常比正向写入更慢，事务越长越慢）、从节点 binlog（二进制日志）同步等待（关闭要等从节点把 binlog 拉完）、全文检索（FTS）索引优化在跑。这些根因都指向同一个事实：<strong>关闭是事务、复制、后台任务的交汇点</strong>。理解了这一点，再去读 <code>SHOW PROCESSLIST</code> 在关闭期的输出就能精准定位卡点。</p>
+<p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：大量脏页待刷（缓冲池大、写入密集，刷盘是随机 I/O，吞吐有上限）、长事务在跑（关闭时这些事务会被回滚，回滚使用 undo log 通过逻辑逆操作逐条撤销。注意 undo log 和 redo log 是两套独立的日志系统，回滚不是 redo 物理重放的"逆过程"，而是 undo 做逻辑回撤；回滚通常比正向写入更慢，事务越长越慢）、从库复制线程退出等待（从库关闭要等 SQL 线程回放完当前事件组再停；主库关闭则直接断开 dump 线程，并不等从库把 binlog 拉完）、全文检索（FTS）索引优化在跑。这些根因都指向同一个事实：<strong>关闭是事务、复制、后台任务的交汇点</strong>。理解了这一点，再去读 <code>SHOW PROCESSLIST</code> 在关闭期的输出就能精准定位卡点。</p>
 <h2 id="s53">3.4 Kafka 的做法</h2>
 <p>Kafka 的生命周期是分布式追加写日志的范式。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 的关闭设计核心是"怎么把自己的离开对集群的冲击降到最小"，刷自己的盘只是最基础的一步。</p>
 <h3 id="s54">启动链路：八阶段</h3>
@@ -1920,7 +1920,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s55">关闭：普通关闭 vs 受控关闭</h3>
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用（<code>controlled.shutdown.enable=false</code>）或失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去重新选举那些原本由它当 Leader 的分区。选举期间分区短暂不可用，客户端会看到抖动。默认配置下 Kafka 走的是受控关闭路径（见下一段），普通关闭只是降级兜底。</p>
-<p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 副本迁移到 ISR（同步副本集合）里还活着的其他副本</strong>。它会向这些副本发 LeaderAndIsr 请求，让它们接任 Leader。等所有 Leader 都迁移完，Controller 回复"你可以走了"，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p>
+<p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 副本迁移到 ISR（同步副本集合）里还活着的其他副本</strong>。它把新的 Leader 任免传达给这些副本——ZK 模式下向副本发 LeaderAndIsr 请求，KRaft 模式下写进元数据日志由各 Broker 应用——让它们接任 Leader。等所有 Leader 都迁移完，Controller 回复"你可以走了"，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 940 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -2022,7 +2022,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>在分布式系统里，优雅关闭是给集群留出交接职责的时间。</strong> 受控关闭就是这条原则的具体协议：它不强求 Broker 走得快，只要求它在退出之前先把 Leader 的职责迁移到其他副本。</p>
 <h3 id="s57">容器化环境下的生命周期</h3>
 <p>容器的约束不分软件，这一小节把三家合在一起看。多数生产部署现已跑在 Kubernetes（K8s）上。K8s 给优雅关闭加了一道硬约束：SIGTERM → <code>terminationGracePeriodSeconds</code>（默认 30 秒）→ SIGKILL。SIGKILL 即 <code>kill -9</code>，跳过一切清理。各系统必须在 grace period 内完成受控关闭，否则被强行杀死。</p>
-<p><strong>Redis</strong> 的 AOF 重写子进程可能远超 30 秒（取决于实例内存大小：fork 拷贝页表耗时随实例内存上升，小实例几十毫秒、大实例可达数百毫秒；COW 写时复制额外耗时在写入密集场景下可达数秒至数十秒），被 SIGKILL 则新写入数据没落盘。preStop hook 里先触发 <code>BGSAVE</code> 再走正常关闭，或调长 grace period。</p>
+<p><strong>Redis</strong> 的优雅关闭不等 AOF/RDB 重写子进程，第一步就把它们杀掉，关闭本身不为重写耗时；真正的耗时来自重写类操作本身——fork 拷贝页表随实例内存上升（小实例几十毫秒、大实例数百毫秒），写入密集下 COW 额外耗时可达数秒至数十秒，超过 30 秒 grace period 就会被 SIGKILL，新写入数据没落盘。preStop hook 里先触发 <code>BGSAVE</code> 再走正常关闭，或调长 grace period。</p>
 <p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，受控关闭时刷脏页但跳过完整 purge 与 change buffer 合并；一旦被 SIGKILL 强杀，连快速关闭流程都没机会走，只能交给下次启动的崩溃恢复。容器环境保留默认 <code>innodb_fast_shutdown=1</code>（它已包含脏页刷盘），grace period 给 120 秒以上；只有升级、大版本切换等需要干净下线的场景才设 0，且须按 3.3 节提示预留档位 0 几分钟到几十分钟甚至更久的耗时。</p>
 <p><strong>Kafka</strong> 受控关闭要等 Controller 迁移 Leader，若 Controller 负载高则 <code>controlled.shutdown.max.retries</code> 可能 30 秒内耗尽，退化为普通关闭。调大重试次数和退避间隔（<code>controlled.shutdown.retry.backoff.ms</code>），grace period 设到 60–120 秒。</p>
 <p><strong>实践清单：</strong> preStop hook 主动检查条件而非 sleep；grace period = 刷盘/迁移耗时 + 30 秒余量；关闭期间 readiness probe 返回 false，避免 K8s 反复重启。</p>
@@ -2070,11 +2070,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <blockquote><strong>关键数字</strong>  <strong>Redis fork 开销：随实例内存增长</strong>。fork 要拷贝页表，阻塞时间随实例内存线性上升，小实例几十毫秒，大实例（几十 GB 以上）可达数百毫秒，还受页表大小和是否开启透明大页（THP）影响。fork 期间主线程停等，客户端可见超时。  <strong>InnoDB 缓冲池：生产典型 8–128GB</strong>。命中率在工作集（频繁访问的数据集合）接近或超过缓冲池大小时急剧下降；1TB 数据库用 64GB 缓冲池，一次未命中 ≈ 一次磁盘随机 I/O，延迟比命中慢三个数量级。  <strong>Kafka PageCache：Linux 默认 <code>vm.dirty_background_ratio</code>=10%、<code>vm.dirty_ratio</code>=20%</strong>。前者达到时内核 flush 线程<strong>异步</strong>后台刷盘、写进程不阻塞；后者达到时写进程被<strong>同步阻塞</strong>强制刷盘。64GB 机器相当于约 6.4GB 的异步写缓冲区（按 10% 计），写满前内核批量刷盘。这是 Kafka 不强制 fsync 仍能达到磁盘吞吐上限的物理基础。</blockquote>
 <p>这套数量级差距，用一张对数坐标图看会更直观。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-  <defs>
-    <marker id="fig_4_1_arrow-red-3-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
-    </marker>
-  </defs>
 
   <!-- ============ 绘图区参数 ============
        X 轴起点 x0 = 240，终点 x1 = 820（宽 580）
@@ -2115,7 +2110,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
        柱高 36，间距 18；首柱 y=112
        1: L1/L2   ~1 ns      -> x 终点 240
        2: 主内存   ~100 ns    -> log10(100)=2 -> 240 + 2/7*580 = 405.7
-       3: SSD顺序 ~1000 ns   -> log10(1000)=3 -> 240 + 3/7*580 = 488.6  [红色高亮]
+       3: SSD顺序 ~1e5 ns（单次延迟与随机同量级）-> log10(1e5)=5 -> 240 + 5/7*580 = 654.3  [红色高亮]
        4: SSD随机 ~100000 ns -> log10(1e5)=5  -> 240 + 5/7*580 = 654.3  [红色高亮]
        5: 机械盘   ~1e7 ns    -> log10(1e7)=7  -> 820
   -->
@@ -2135,9 +2130,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <!-- 柱 3: SSD 顺序读（红色高亮） -->
   <text x="230" y="235" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 顺序读</text>
-  <text x="230" y="250" text-anchor="end" font-size="11" fill="#6B7280">顺序 · ~1 μs</text>
-  <rect x="240" y="224" width="248.6" height="32" fill="#EF4444" opacity="0.85"/>
-  <text x="498" y="244" font-size="11.5" font-weight="600" fill="#EF4444">1 μs (1,000 ns)</text>
+  <text x="230" y="250" text-anchor="end" font-size="11" fill="#6B7280">顺序 · ~100 μs</text>
+  <rect x="240" y="224" width="414.3" height="32" fill="#EF4444" opacity="0.85"/>
+  <text x="664" y="244" font-size="11.5" font-weight="600" fill="#EF4444">≈100 μs（与随机同量级）</text>
 
   <!-- 柱 4: SSD 随机读（红色高亮） -->
   <text x="230" y="285" text-anchor="end" font-size="12.5" font-weight="600" fill="#111827">SSD 随机读</text>
@@ -2152,17 +2147,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="812" y="339" font-size="11.5" font-weight="600" fill="#111827" text-anchor="end">10 ms</text>
   <text x="812" y="352" font-size="9.5" fill="#111827" text-anchor="end">(10,000,000 ns)</text>
 
-  <!-- ============ 红色高亮：顺序 vs 随机 100× 标注 ============ -->
-  <!-- 横线走 bar3/bar4 间隙(y=265)，标注框让开竖线(x=666)，避免穿字/穿框 -->
-  <line x1="500" y1="265" x2="660" y2="265" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
-  <line x1="660" y1="265" x2="660" y2="290" stroke="#EF4444" stroke-width="1.5" marker-end="url(#fig_4_1_arrow-red-3-6)" marker-start="url(#fig_4_1_arrow-red-3-6)"/>
-  <rect x="666" y="258" width="150" height="20" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
-  <text x="741" y="272" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序比随机快 100×</text>
+  <!-- ============ 红色高亮：SSD 顺序 vs 随机（延迟同量级）标注 ============ -->
+  <!-- 两条 SSD 柱等长（同量级），标注框放在两柱端注之间的空档，让开竖线(x=654.3/737.1) -->
+  <rect x="666" y="248" width="196" height="32" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
+  <text x="764" y="263" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序 vs 随机：延迟同量级</text>
+  <text x="764" y="277" text-anchor="middle" font-size="10" fill="#374151">差距在吞吐（带宽 vs IOPS）</text>
 
   <!-- 红字结论（柱状图右侧空白处） -->
-  <rect x="540" y="372" width="290" height="42" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
-  <text x="685" y="406" text-anchor="middle" font-size="10.5" fill="#374151">把随机变顺序，直接换来两个数量级</text>
+  <rect x="540" y="358" width="290" height="64" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
+  <text x="685" y="376" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
+  <text x="685" y="394" text-anchor="middle" font-size="10.5" fill="#374151">机械盘：省寻道，延迟差两个数量级</text>
+  <text x="685" y="411" text-anchor="middle" font-size="10.5" fill="#374151">SSD：差距转向吞吐与写放大</text>
 
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
   <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->
@@ -2179,7 +2174,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」，每一格都是 10 倍差距</text>
 </svg>
 </div><figcaption>图 4-1　存储层次访问延迟的数量级（对数轴）：内存到机械盘横跨五个数量级。</figcaption></figure>
-<p>这张图重点看两处标注。第一，内存柱与机械盘柱的长度差，直接说明了为什么要有缓冲池、为什么 Redis 把数据放进内存。第二，SSD 顺序读与随机读两条柱的对比。同一块盘，访问模式从顺序换成随机，延迟就涨了两个数量级。Kafka 采用顺序写、InnoDB 用 WAL 把随机写改造成顺序写。</p>
+<p>这张图重点看两处标注。第一，内存柱与机械盘柱的长度差，直接说明了为什么要有缓冲池、为什么 Redis 把数据放进内存。第二，SSD 顺序读与随机读两条柱的对比——单次延迟在同一量级，差距不在延迟在吞吐：顺序读吃满盘的顺序带宽，随机读被 IOPS 上限压住。这个差距要分介质说：机械盘上顺序与随机的单次延迟才差着两个数量级（随机要付寻道加旋转的毫秒级代价）；SSD 上差距移到了吞吐与写放大。Kafka 采用顺序写、InnoDB 用 WAL 把随机写改造成顺序写，这套设计诞生于机械盘时代，到 SSD 上收益变成了高吞吐与低写放大。</p>
 <p>这组数字引出三个根本约束。</p>
 <p>第一，内存易失。断电瞬间内存里的内容归零，所有还没写到持久介质上的数据都会消失。任何承诺"持久化"的系统都必须在某个时刻把数据搬到一个断电也不丢的地方。</p>
 <p>第二，内存昂贵且容量有限，磁盘便宜且容量大。同价位下，磁盘容量通常是内存的上百倍。这意味着"全内存"系统天生有容量上限，而"磁盘为主"系统天然适合存海量数据。</p>
@@ -2815,7 +2810,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>表 4-3　三个软件"内存-磁盘"哲学横向对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据存放在哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>redo log + 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1)~O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按偏移量顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 重放 AOF（大实例数分钟）</td><td>重放 redo log + 恢复脏页</td><td>进程重启极快（数据在磁盘，无重放；上万分区时例外，见第 3 章），但 PageCache 冷热影响读性能</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 I/O 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
 <p>逐维度解读，要点都在"为什么不同"。</p>
-<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是物理页变更日志，Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF，见第 8 章），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是"物理到页、逻辑到操作"的混合日志（记到页号与物理偏移，页内记的操作语义），Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF，见第 8 章），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
 <p><strong>内存管理主体</strong>。这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 运维的重心在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。这条最好记：需要按主键查一行数据，Kafka 直接出局。</p>
 <p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或重放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务；例外是分区数巨大时（如上万分区）的日志段校验与索引重建要数分钟（见第 3 章）。例外之外，日常受影响的主要是 PageCache 是否还热。</p>
@@ -3143,7 +3138,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>查询缓存（Query Cache）</strong> 是分层失败的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。设计意图是好的，但它在 8.0 被彻底移除。失败的原因正是分层的错位：缓存做在服务层，而数据失效的源头在引擎层。任何一张表的任何一次写，都要去检查所有引用了这张表的缓存项并使之失效；加之整个缓存由一把全局互斥锁保护，高并发下锁竞争本身就是瓶颈；在高写入负载下，缓存维护的开销远超它带来的收益。缓存本应做在引擎层内部（InnoDB 的缓冲池就是），而不是跨在服务层。这个案例 5.6 节会作为"该移除的层要移除"的例证再用一次。</p>
 <p>服务层内这三段切分，靠的是<strong>结构化中间表示（解析树、执行计划）在子层之间传递</strong>。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这和 Redis 的"直接函数调用"是两种路子。</p>
 <h3 id="s104">5.3.3 存储层：Handler API 与可插拔引擎</h3>
-<p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。所有这些组合起来，就规定了引擎要被 MySQL 调用、必须实现哪些方法。</p>
+<p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>，后两者由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行）。所有这些组合起来，就规定了引擎要被 MySQL 调用、必须实现哪些方法。</p>
 <p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 840 492" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -3341,7 +3336,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s108">5.4.2 逻辑层（API 层）：请求类型分派</h3>
 <p>Kafka 的"逻辑层"在源码里叫 <code>KafkaApis</code>，它做的事比 MySQL 的服务层要薄得多。它不做解析（解析在 Processor 完成），也不做优化（Kafka 没有"查询优化"这回事），就只做<strong>协议适配加请求分派</strong>。</p>
 <p>Kafka 把所有请求类型枚举成 ApiKeys：PRODUCE、FETCH、LIST_OFFSETS、METADATA、LEADER_AND_ISR 等。每一种有自己的版本号，Broker 要兼容新旧版本。<code>KafkaApis.handle()</code> 拿到一个 <code>RequestChannel.Request</code>，按 ApiKeys 走 switch 分派到对应的 <code>handleXxx</code> 方法。</p>
-<p>这一层还负责横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。配额机制限制单个 client 每秒能产生的字节或请求数，防止单一客户端压垮集群。版本协商在协议层完成，Broker 选一个客户端支持的最高版本回应。</p>
+<p>这一层还负责横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。配额机制限制单个 client 每秒能产生的字节或请求数，防止单一客户端压垮集群。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
 <p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢、动一次影响面大，副本管理算法可能半年调一次，绑在一起改一处就得动两处。</p>
 <h3 id="s109">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
 <p>存储层是 Kafka 最具特色的一层。它的核心抽象是 <strong><code>Log</code></strong>，一个非常具体的对象，指一组顺序追加的日志段（LogSegment），不是泛指的"日志"。每个分区对应一个 Log，每个 Log 由多个 LogSegment 组成，每个 LogSegment 在磁盘上是三个文件：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>）。这套字节布局会在第 8 章详讲，这里只看它作为"存储层抽象"的形态。</p>
@@ -3443,7 +3438,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径，存储层与复制层共享一份代码。</figcaption></figure>
 <p>这张图点出了 Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们走同一条 <code>KafkaApis.handleFetchRequest</code> → <code>ReplicaManager.fetchMessages</code> → Log 读取 → sendfile 路径，<strong>只是请求里的标志位不同</strong>（普通消费者 vs 副本同步）。也就是说，<strong>Follower 复制就是"一个特殊的消费者"</strong>。</p>
 <p><strong>存储层和复制层共享同一份代码</strong>。Kafka 不需要为副本同步单独写一套读路径、单独维护一套状态机。复用消费读路径意味着任何对读路径的优化（零拷贝、索引、缓存）都同时惠及复制。任何 bug 修复只改一处。对比一下：很多系统的"主从复制"是独立模块，复制代码和读写代码各写一份，长年累月就会漂移、出 bug。这也是为什么第 9 章讲数据同步时能讲得简洁。</p>
-<p>这一小节的取舍很直接：<strong>Kafka 把存储做得极薄（就是追加写日志），复杂度交给上层（索引、复制、压实）</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 引入后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见第 8 章 8.4.6 节）。</p>
+<p>这一小节的取舍很直接：<strong>Kafka 把存储做得极薄（就是追加写日志），复杂度交给上层（索引、复制、压实）</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 正式 GA（3.6 起以早期版本引入）后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见第 8 章 8.4.6 节）。</p>
 <h3 id="s110">5.4.4 协调层：在 Log 之上的额外一层</h3>
 <p>Kafka 还有一个 Redis 和 MySQL 都没有的层：<strong>协调层</strong>。它包括 ReplicaManager（副本管理）、Partition（分区对象）、Controller（集群控制器），以及 KRaft（取代 ZooKeeper 的元数据管理），细节留给第 7 章。</p>
 <p>需要这一层，是因为 Kafka 是分布式系统。分区的 Leader 在哪台 Broker 上、ISR 里有谁、Controller 怎么协调全集群，这些不属于交互层、不属于 API 层、也不属于存储层。它要解决的是一个独立的问题：<strong>保证多个 Broker 上的副本数据一致</strong>。</p>
@@ -3713,7 +3708,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s126">Kafka：SASL 框架加 JAAS 配置</h3>
 <p>Kafka 的安全设计面对的是一个单机系统不会有的难题：一次数据流动要跨好几跳。客户端把消息发给 Broker，Broker 把消息复制到其他 Broker 的副本，Broker 还要和控制面（ZooKeeper 或 3.x 的 KRaft）通信。任何一跳明文、任何一跳不认证，都是漏洞。Kafka 的应对是把认证、加密、授权都做成可独立启用的模块，让运维按网络域组合配置。</p>
 <p>Kafka 复用 SASL 这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要直接对接企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。</p>
-<p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制，凭证只存服务端（用迭代哈希加盐存储），客户端不需要持有明文密码。相比 PLAIN 机制（客户端要持有明文、网络上虽走 SASL 但 PLAIN 本身无挑战），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
+<p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制（RFC 5802）：客户端要持有密码本身，但密码从不上网——客户端用密码加上服务端下发的盐和双方的随机数算出证明，服务端用自己存的加盐迭代哈希派生密钥来验证，服务端被拖库也拿不到明文密码。相比 PLAIN 机制（密码本身要在网络上走一趟，SASL 之下靠 TLS 兜底），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解，我们在 6.7 节会展开它的设计意义。</p>
 <p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密），对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）；受信内网若要省 CPU，也可以把某一档配成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，图 6-2 画的是其中一种常见布局。</p>
@@ -3825,7 +3820,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>确认身份之后，下一个问题是授权：一个已认证的身份能做哪些操作。三个软件的数据模型形状不同，授权能做到多细也就不一样。</p>
 <h3 id="s128">Redis：键模式加命令类别的二维控制</h3>
 <p>Redis 的授权把权限直接绑到用户，不做角色继承。授权的控制面是两个维度的组合：命令类别和键模式。</p>
-<p>命令类别是关键抽象。Redis 把上百条命令折叠成几个语义组：<code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code>、<code>@fast</code>、<code>@slow</code>。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分桶"的命名让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
+<p>命令类别是关键抽象。Redis 把上百条命令折叠成二十来个类别：既有 <code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code> 这类语义组，也有 <code>@fast</code>、<code>@slow</code> 这类性能分桶。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分桶"的命名让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
 <p>图 6-3 展示了一次完整连接里 Redis ACL 的工作流程。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 497" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -3913,7 +3908,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>连接建立时客户端先用 <code>AUTH alice &lt;密码&gt;</code> 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice。这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查：服务端根据当前用户绑定的规则，分别检查命令类别（GET 属于 @read）和键模式（<code>keys:1</code> 匹配 <code>~keys:*</code>）两个维度，两项都命中才放行。图中 alice 执行 <code>GET keys:1</code> 通过，但执行 <code>FLUSHALL</code> 会被拒绝：<code>FLUSHALL</code> 属于 @dangerous，alice 的规则里没有授予。</p>
 <p>这个"认证一次、每命令授权"的设计，是 Redis 在性能和安全之间找的平衡点：认证握手开销大，因此按会话摊销；授权检查开销小，可以每条命令都执行。</p>
 <p>键模式控制作用范围。<code>~keys:*</code> 限定用户只能访问匹配该模式的键，这让多租户场景下不同应用可以按前缀隔离。6.2 起，通道（channel）权限也独立出来，Pub/Sub 的订阅权限和键空间的读写权限分离，避免一个客户端既能写数据又能订阅敏感事件。</p>
-<p>Redis 的默认策略其实长期没有收紧到"默认安全"。7.x 里 <code>default</code> 用户的内置规则仍是 <code>user default on nopass ~* &amp;* +@all</code>：启用、无密码、全键、全通道、全命令，即无认证状态，靠的是向后兼容，不能指望它替你兜底。真正起作用的是 <code>protected-mode</code>（保护模式，3.2.0 起，默认开启）：当 Redis 绑定全部网卡且没有配置任何密码、<code>AUTH</code> 等认证手段时，它只接受本地回环连接，对外网连接直接拒绝。换句话说，protected-mode 拦的是"裸监听被外网命中"，不替代认证本身。要真正加固，还得运维自己动手：显式给 <code>default</code> 用户设密码或直接禁用（例如 <code>ACL SETUSER default off</code> 禁用用户，或 <code>ACL SETUSER default resetpass</code> 清除密码）。</p>
+<p>Redis 的默认策略其实长期没有收紧到"默认安全"。7.x 里 <code>default</code> 用户的内置规则仍是 <code>user default on nopass ~* &amp;* +@all</code>：启用、无密码、全键、全通道、全命令，即无认证状态，靠的是向后兼容，不能指望它替你兜底。真正起作用的是 <code>protected-mode</code>（保护模式，3.2.0 起，默认开启）：当 Redis 绑定全部网卡且没有配置任何密码、<code>AUTH</code> 等认证手段时，它只接受本地回环连接，对外网连接直接拒绝。换句话说，protected-mode 拦的是"裸监听被外网命中"，不替代认证本身。要真正加固，还得运维自己动手：显式给 <code>default</code> 用户设密码或直接禁用（例如 <code>ACL SETUSER default off</code> 禁用用户，或 <code>ACL SETUSER default resetpass</code> 清空密码并同时移除 nopass 标记——此后没有密码就再也没法认证成 default）。</p>
 <h3 id="s129">MySQL：多层级权限表加 8.0 RBAC</h3>
 <p>MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分五层：全局、数据库、表、列、存储程序。这套层级对应 <code>mysql.user</code>、<code>mysql.db</code>、<code>mysql.tables_priv</code>、<code>mysql.columns_priv</code>、<code>mysql.procs_priv</code> 多张权限表。授权检查时，从全局到列逐层收窄，命中即停。</p>
 <p>图 6-4 展示了这条逐层收窄的检查流程。</p>
@@ -4042,9 +4037,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>性能代价也大。副本同步是大流量长连接，TLS 加解密对吞吐影响明显。要分清这笔开销的来源：长连接稳态下的吞吐损失几乎全部来自记录层的对称加解密（AES-GCM 等 AEAD 套件），和证书用 RSA 还是 ECDSA 无关；证书算法只影响握手阶段的签名运算，而长连接的握手一次摊薄，收益可以忽略。ECDSA 的价值在握手密集的场景（短连接、频繁建连）：握手更快、证书链更小。优化手段因此分别针对这些来源：用硬件指令（AES-NI）压低对称加解密成本、启用 TLS 会话恢复（session resumption，避免重复握手）、在专用硬件上做加密卸载。内部通信和外部通信还可以用不同监听器配不同证书，做到"内网互信证书加外网 CA 签发证书"分层，既省内部开销又保外部严格。</p>
 <h2 id="s135">6.5 审计</h2>
 <p>把认证、授权、加密、审计排个优先级，审计在三个软件里排在最后。审计的每一分细致都是用吞吐换的。</p>
-<p>Redis 只提供 ACL LOG（记录被拒命令的详情，包括时间戳、客户端 IP、被拒命令和参数）和 SLOWLOG（记录执行时间超过阈值的命令）。这两样加在一起能回答"谁被拒了"和"什么慢了"，但距离完整的审计轨迹（谁在什么时候做了什么操作、改了什么数据）还差得远。</p>
+<p>Redis 只提供 ACL LOG（记录被拒命令的详情，包括时间戳、客户端 IP、被拒命令，不含命令参数）和 SLOWLOG（记录执行时间超过阈值的命令）。这两样加在一起能回答"谁被拒了"和"什么慢了"，但距离完整的审计轨迹（谁在什么时候做了什么操作、改了什么数据）还差得远。</p>
 <p>MySQL 的审计能力比 Redis 强，但有门槛。企业版提供审计插件，能做语句级审计、按用户/数据库/主机过滤、把日志输出到文件或 syslog。社区版用户通常只能用 General Log 做近似替代：记录所有客户端发来的 SQL，短时间调试可以，生产环境长时间开启会让磁盘和性能都难以承受。</p>
-<p>Kafka 的原生审计来自 Authorizer 日志：记录每一次授权决策（允许或拒绝），但粒度粗且不包含消息内容。生产环境通常外挂补全：自定义 ProducerInterceptor / ConsumerInterceptor 在客户端拦截并写审计主题，或接 Ranger 这类带审计能力的统一管控层。</p>
+<p>Kafka 的原生审计来自 Authorizer 日志（<code>kafka.authorizer.logger</code>）：每一次授权决策都记，被拒的记为 INFO、放行的记为 DEBUG，默认日志级别下基本只看得到拒绝；粒度粗且不包含消息内容。生产环境通常外挂补全：自定义 ProducerInterceptor / ConsumerInterceptor 在客户端拦截并写审计主题，或接 Ranger 这类带审计能力的统一管控层。</p>
 <p>这三个软件的共同启示是：审计在生产级部署中几乎总是外挂的。如果每条操作都同步写审计日志，性能会显著下降，甚至不可用。接受这个现实之后，务实的选择是把审计日志做成异步、采样或外接专用审计系统。</p>
 <h2 id="s136">6.6 横向对比</h2>
 <p>表 6-1 按认证、授权、加密、审计四维对比三家的安全选择，重点看"为什么分叉"。</p>
@@ -4180,7 +4175,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="620" y="355" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="745" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ KRaft 元数据</text>
-  <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 单进程强一致</text>
+  <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 控制器组多数派强一致</text>
   <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：百万分区 + 快速恢复</text>
 
   <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：可调（acks=all 默认偏 CP，可下调）</text>
@@ -4196,7 +4191,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>它们虽然都从单点起步，但演进的步数和重点各异。Redis 每一代都在补上一代留下的局限：主从解决单点故障，但故障转移要人工，于是 Sentinel 把自动化补上，可写还是集中在一个主上，这才有了 Cluster 的分片。MySQL 三段式则始终守着"不丢数据"这条线，从异步一路推到多数派确认。Kafka 一上来就是分布式，分片和副本是从设计起点就内置的，它真正的演进是在元数据层（从 ZooKeeper 到 KRaft）。理解了这个起点的差异，后面的机制对比就有了统一的参照。</p>
 <h2 id="s148">7.2 Redis 的做法</h2>
 <h3 id="s149">7.2.1 主从复制：高可用的基础，但还不是集群</h3>
-<p>Redis 最朴素的集群化，是主从复制（replication）。在从节点上执行 <code>REPLICAOF host port</code>（旧版叫 <code>SLAVEOF</code>），从节点发起连接，建立后由主节点把数据推送过来：第一次连接时做全量同步，主节点 <code>fork</code> 出子进程，把内存数据写成一个 RDB（快照文件）发给从节点，期间主节点新产生的写命令先存进复制积压缓冲区（replication backlog），RDB 发完再补发这部分增量；之后如果从节点短暂断线又重连，且断线期间主节点的写偏移量（offset）没有超出积压缓冲区的范围，就只补差量，这叫部分重同步（partial resync）。字节级的复制流细节归第 9 章，这里只看它在集群中扮演的角色。</p>
+<p>Redis 最朴素的集群化，是主从复制（replication）。在从节点上执行 <code>REPLICAOF host port</code>（旧版叫 <code>SLAVEOF</code>），从节点发起连接，建立后由主节点把数据推送过来：第一次连接时做全量同步，主节点 <code>fork</code> 出子进程，把内存数据写成一个 RDB（快照文件）发给从节点，期间主节点新产生的写命令先存进这条连接专属的复制缓冲区（注意不是积压缓冲区——replication backlog 是常驻的环形缓冲，职责是服务断线后的部分重同步），RDB 发完再补发这部分增量；之后如果从节点短暂断线又重连，且断线期间主节点的写偏移量（offset）没有超出积压缓冲区的范围，就只补差量，这叫部分重同步（partial resync）。字节级的复制流细节归第 9 章，这里只看它在集群中扮演的角色。</p>
 <p>主从复制解决了一个问题：读可以分担到从节点，主节点坏了可以从从节点恢复数据。但它有三个根本性的局限。第一，复制是<strong>异步</strong>的：主节点写完立即返回客户端，不等从节点确认。这是 Redis 的性能取舍：要快就不能等。代价是主节点刚确认的写、从节点还没收到时主节点宕机，这笔写就丢了。第二，<strong>写仍然集中在单主</strong>。主从复制解决了读扩展和高可用，但没有解决写扩展：所有写还是压在一个主节点上，单机内存仍然是容量上限。第三，<strong>故障转移要人工</strong>。主节点宕了，运维得手动把某个从节点提升为主、再让其他从节点改连新主。对"高可用"这个目标，人工转移不够格。</p>
 <h3 id="s150">7.2.2 Sentinel：把人工故障转移自动化</h3>
 <blockquote><strong>共识算法一分钟直觉</strong>（第一次接触 Raft/Paxos 的读者先读这段）：这类算法要解决的问题只有一个——几台机器怎么对"一件事"达成不可反悔的一致决定。核心机制有三个：<strong>任期号（term/epoch）</strong>，每轮决策带一个单调递增的编号，旧任期的决定说了不算；<strong>多数派投票</strong>，提议要拿到过半节点的票才算通过，任意两个多数派必有交集，所以两个不同决定不可能同时通过，这从数学上杜绝了脑裂；<strong>日志复制</strong>，通过的决定按相同顺序落到各节点的日志里，少数派宕机也不丢。Raft 和 Paxos 是这套思路的两个代表，本章后面遇到的 Sentinel 选举、MGR 的 XCom、Kafka 的 KRaft，都是这三个机制的变体。读懂本章只需要上面的直觉，想深究可以读 Raft 的原始论文。</blockquote>
@@ -4297,7 +4292,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>Redis Cluster 在网络分区时优先保证可用</strong>。拥有多数槽的分区继续服务，少数派分区里的槽因为凑不齐多数派主节点无法完成选举，会短暂不可用但不会脑裂写脏数据。但这里有一个时间窗口：少数派分区里的主节点并不是立刻知道自己被割出去了，在 <code>cluster-node-timeout</code>（默认 15 秒）之内它还会继续接受写入，超时后才停止，这实际上偏向 CP（一致性优先）行为，但窗口期内写到少数派老主上的数据，可能在故障转移后被丢弃。本章开头的库存超卖事故，利用的正是这个时间窗口。社区对此归类有争议（antirez 本人主张 CP），因为分区窗口内它会停写；但生产实践里，异步复制导致的丢写确实存在。标签不重要，重要的是它的行为边界。最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
 <h2 id="s152">7.3 MySQL 的做法</h2>
 <p>理解 MySQL 的集群，得先看清它的基本拓扑。MySQL 集群最核心的组件是<strong>主从复制</strong>：一台主节点（Master，8.0.22/8.0.23 起官方改称 source，新增 START REPLICA、CHANGE REPLICATION SOURCE TO 等语句别名）负责处理所有写请求，把每一条数据变更记进 binlog（二进制日志）；一台或多台从节点（Slave，同期改称 replica）通过订阅主节点的 binlog 来保持数据同步。从节点内部有两个独立线程：I/O 线程负责从主节点拉取 binlog 事件并写入本地的中继日志，SQL 线程负责从中继日志里逐个回放事件。这种"拉取线程 + 回放线程"的分离设计，让网络拉取和本地回放互不阻塞：网络快了先拉取暂存，回放慢了就逐步追赶。</p>
-<p>从这个基础拓扑出发，MySQL 的集群演进走了三步：异步复制（默认，快但可能丢已提交事务）→ 半同步复制（至少等一个从节点确认收到 binlog，弱一致）→ 组复制 MGR（多数派 Paxos 确认，强一致）。每一步都在为更强的一致性付更多的延迟。半同步复制只等从节点 I/O 线程把 binlog 写入 relay log 即确认，不等 SQL 线程回放完毕，所以如果从节点回放慢但 I/O 快，切换后已确认的事务仍可能没回放，数据照样丢。这是半同步"确认但不保证已回放"的边界，也是生产中从"半同步"到"真正不丢"之间最后一段未覆盖的差距。</p>
+<p>从这个基础拓扑出发，MySQL 的集群演进走了三步：异步复制（默认，快但可能丢已提交事务）→ 半同步复制（至少等一个从节点确认收到 binlog，弱一致）→ 组复制 MGR（多数派 Paxos 确认，强一致）。每一步都在为更强的一致性付更多的延迟。半同步复制只等从节点 I/O 线程把 binlog 写入 relay log 即确认，不等 SQL 线程回放完毕。它防住的是"binlog 还没发出去、主就没了"这种丢法；防不住的有两段：确认超时降级回异步后的窗口，以及故障转移时晋升的新主不是回过 ACK 的那个副本（就算晋升的是它，回放没追平，已确认的事务还停在 relay log 里）。所以从"确认收到"到"真正不丢"之间，仍有一段未覆盖的差距。</p>
 <p>这套基础拓扑，用一张图呈现。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 800 341" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -4353,7 +4348,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s153">7.3.1 基于 binlog 的复制：单向、异步、行流</h3>
 <p>MySQL 复制的基础是 binlog，链路就是 7.3 开头那条"主写 binlog → I/O 线程拉到中继日志 → SQL 线程回放"。复制是单向的（只能主到从）、异步的（主写完 binlog 立即返回，不等从节点）。binlog 事件格式（STATEMENT/ROW/MIXED 三种，取舍主要在 STATEMENT 与 ROW 之间，细节归第 9 章），本章只把它当作"变更流的载体"。</p>
 <p>老式复制靠 file + position 定位复制位点：从节点记录"我同步到了 mysql-bin.000003 的第 1580 字节"。这种方式很脆弱：主节点一换、binlog 一滚动，位点的语义就乱了。MySQL 5.6 引入了全局事务标识（GTID，Global Transaction Identifier），格式是 <code>source_id:transaction_id</code>，给每个事务一个全局唯一 ID。从节点只要记"我同步到了哪些 GTID"，主从切换、新从接入都能自动定位，不再依赖脆弱的文件位点。GTID 让 MySQL 复制从"能用"跨到"好用"。</p>
-<p>异步复制的代价：主节点不等从节点，主节点宕机时，那些已经提交、但还没来得及发到从节点的事务就丢了。从延迟方面看也有问题：单 SQL 线程回放意味着从节点只能串行重做主节点的所有写，主节点写并发一高，从节点跟不上，复制延迟越拉越大。MySQL 的多线程复制（MTS，Multi-Threaded Slave）按主节点的组提交（group commit）粒度并行回放：主节点同一组提交的事务之间必然无锁冲突，从节点因此可以安全地并行回放，能缓解，但根治不了回放延迟。存储格式与回放机制见第 8、9 章。</p>
+<p>异步复制的代价：主节点不等从节点，主节点宕机时，那些已经提交、但还没来得及发到从节点的事务就丢了。从延迟方面看也有问题：单 SQL 线程回放意味着从节点只能串行重做主节点的所有写，主节点写并发一高，从节点跟不上，复制延迟越拉越大。MySQL 的多线程复制（MTS，Multi-Threaded Slave；8.0.27 起默认开启，<code>replica_parallel_workers</code> 默认 4，更早版本默认 0 即单线程回放）按主节点的组提交（group commit）粒度并行回放：并行窗口由主节点写进 binlog 的锁区间标记（last_committed / sequence_number）划定，同一组提交的事务之间必然无锁冲突，从节点因此可以安全地并行回放，能缓解，但根治不了回放延迟。存储格式与回放机制见第 8、9 章。</p>
 <h3 id="s154">7.3.2 半同步复制：在异步与全同步之间</h3>
 <p>异步太激进（快但可丢），全同步太保守（不丢但慢）。半同步复制（semi-sync replication）是中间路线：主节点提交事务前，至少等一个从节点确认收到 binlog，用一点延迟换"通常不丢"。参数方面，8.0.26 起半同步相关变量由 <code>master/slave</code> 统一重命名为 <code>source/replica</code>。</p>
 <p>半同步的精确提交流程（<code>AFTER_SYNC</code> vs <code>AFTER_COMMIT</code>）、超时降级语义，以及它为何仍然不能保证零丢失，这些细节详见第 9 章半同步复制一节。</p>
@@ -4724,7 +4719,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
 <p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存承担内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
-<blockquote><strong>关键数字</strong>  <strong>InnoDB 16KB 页：页头、目录等结构性开销约占 1%–2%（一两百到几百字节），其余为记录区与空闲区</strong>。每页容纳约 2–200 行（依行宽而定）；页号即文件偏移，O(1) 随机定位是页式结构的效率根基。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条约 14 字节、V1 约 22 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制/已压缩数据近下限），带宽与存储成本结构性下降。  <strong>Redis RDB 压缩比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。紧凑二进制编码（变长整数 + LZF）使磁盘文件远小于内存实际占用，恢复时快速加载。</blockquote>
+<blockquote><strong>关键数字</strong>  <strong>InnoDB 16KB 页：页头、目录等结构性开销约占 1%–2%（一两百到几百字节），其余为记录区与空闲区</strong>。每页容纳约 2–200 行（依行宽而定）；页号即文件偏移，O(1) 随机定位是页式结构的效率根基。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 压缩比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。紧凑二进制编码（变长整数 + LZF）使磁盘文件远小于内存实际占用，恢复时快速加载。</blockquote>
 <blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台合并（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》第 3 章是很好的起点。</blockquote>
 <h2 id="s177">8.2 Redis 的做法</h2>
 <h3 id="s178">8.2.1 定位先行：磁盘服务于内存</h3>
@@ -5030,8 +5025,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="571" text-anchor="middle" font-size="11" fill="#374151">缓冲池命中率（越小越少污染）</text>
 </svg>
 </div><figcaption>图 8-4　InnoDB 16KB 数据页内部七段布局。</figcaption></figure>
-<p>七段布局里最值得看的是 Page Directory。它是页内的稀疏索引：每隔几条记录（默认每 4–8 条）建一个槽，槽里记的是那条"被拥有"的记录在页内的偏移量（记录之间用前后指针串成有序链表，槽是链表上的稀疏采样点）。页内查找时，先在槽数组里二分定位到不大于目标的最大槽，再从该槽对应的记录顺着链表顺序扫几条。这一招用很少空间（几十个槽）把页内查找从 O(n) 降到 O(log n) 再加几次顺序比较，是在定长页内自建小索引，跟 Kafka 用的稀疏索引同一种思想，尺度小了一个数量级。</p>
-<p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。有两个设计要点。一是变长字段长度逆序存放，记录头里先存最后一个变长字段的长度，倒着读，便于解析与崩溃恢复时边读边定位字段边界。二是大字段（VARCHAR、BLOB、TEXT）超过约页大小的一半时溢出到独立溢出页，行内只留一个 20 字节指针（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。这是"页内紧凑"与"大对象不拖累整页"的折中：大对象不该把整页占满、让其他记录无处安放，更不该跨页撕裂导致一次读要拉好几页。Dynamic 让 B+ 树的非叶子节点更紧凑，单页能装下更多键、树更矮，同样是用格式演进解决历史包袱。</p>
+<p>七段布局里最值得看的是 Page Directory。它是页内的稀疏索引：每隔几条记录（默认每 4–8 条）建一个槽，槽里记的是那条"被拥有"的记录在页内的偏移量（记录之间用单向指针 next_record 串成有序链表，槽是链表上的稀疏采样点）。页内查找时，先在槽数组里二分定位到不大于目标的最大槽，再从该槽对应的记录顺着链表顺序扫几条。这一招用很少空间（几十个槽）把页内查找从 O(n) 降到 O(log n) 再加几次顺序比较，是在定长页内自建小索引，跟 Kafka 用的稀疏索引同一种思想，尺度小了一个数量级。</p>
+<p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。有两个设计要点。一是变长字段长度逆序存放，记录头里先存最后一个变长字段的长度，倒着读，便于解析与崩溃恢复时边读边定位字段边界。二是溢出按整行判定，不以单个字段超页大小一半为准：一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，才从最长的变长列（VARCHAR、BLOB、TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针，挪完还不够再挪次长的；不超过约 40 字节的短 TEXT/BLOB 始终留在行内（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。这是"页内紧凑"与"大对象不拖累整页"的折中：大对象不该把整页占满、让其他记录无处安放，更不该跨页撕裂导致一次读要拉好几页。Dynamic 让 B+ 树的非叶子节点更紧凑，单页能装下更多键、树更矮，同样是用格式演进解决历史包袱。</p>
 <h3 id="s186">8.3.4 redo log + 双写：保证"原地改"在断电后可恢复</h3>
 <p>原地改页最大的风险是断电导致的半写（partial write）。一个 16KB 页，操作系统可能只写了前 4KB 或前 8KB 就断电，剩下的没写：页结构损坏，Page Directory 与 User Records 对不上，校验和不过。更糟的是 redo log 假设页本身完整：redo log 记录的是"对完整页做的物理修改"，重做的前提是页已处于某个一致状态。半写的页连"完整"这一关都没过，redo log 救不了它。</p>
 <p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页刷盘前，先顺序写到一段连续的双写缓冲，再写到正式位置；恢复时若某页校验和不对，从双写缓冲取回那个页的完整副本，再用 redo 重放到最新。双写缓冲早期放在共享表空间的连续区，后来改为独立 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大：同一份脏页要刷两次盘，但因为双写缓冲是连续的顺序写，对性能影响有限。</p>
@@ -5148,7 +5143,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-5　脏页刷盘流程：双写缓冲 → 正式页，配合 redo log 的崩溃恢复路径。</figcaption></figure>
 <p>图中可见完整的双重保护机制：正常写路径上 redo log 先落盘（WAL），脏页先写双写缓冲再写正式位置；崩溃恢复路径上先扫描 redo log，对每条记录检查目标页 LSN，页未损坏且 LSN 落后则重做，页损坏则从双写缓冲取完整副本再重做。两条路径都指向同一个目标，即页完整性：双写缓冲保证页不撕裂，redo log 保证页内容最新。</p>
-<p>MySQL 8.0 在硬件能力提升后给了选择：当底层存储支持原子写（如某些 NVM 设备或带原子写功能的 SSD）时，可以关掉双写缓冲，减少写放大。每一层可靠性机制都是为某类故障加的冗余，当那类故障被下层硬件消灭时，软件冗余就可以撤下来（8.6.4 启示四会再展开）。</p>
+<p>当底层存储支持原子写（如某些 NVM 设备或带原子写功能的 SSD）时，可以关掉双写缓冲（<code>innodb_doublewrite=OFF</code>，这个开关早于 8.0 就存在），减少写放大。每一层可靠性机制都是为某类故障加的冗余，当那类故障被下层硬件消灭时，软件冗余就可以撤下来（8.6.4 启示四会再展开）。</p>
 <h2 id="s187">8.4 Kafka 的做法</h2>
 <h3 id="s188">8.4.1 定位先行：磁盘就是日志本体</h3>
 <p>Kafka 的定位又反过来了。对 Kafka 来说，消息只有一份正本，就存储在磁盘的日志段里。它不像 MySQL 那样自己管缓冲池，页缓存交给操作系统，Kafka 只把字节往日志文件里追加，读时直接从页缓存或磁盘顺序读。这种数据本体就在磁盘日志里的定位把格式设计的约束收得很紧，因此格式要满足三条硬要求：纯追加写（日志段只在尾部追加，旧字节不再改写）、按偏移量（offset）随机读（靠索引而非扫描，定位要快）、成批压缩（带宽稀缺，一批相近消息压在一起能省下数倍的存储与传输成本）。于是 Kafka 的基本结构就是"日志段 + 稀疏索引 + RecordBatch"这三个组成部分。</p>
@@ -5288,7 +5283,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s190">8.4.3 RecordBatch V2：把一批消息当成一个存储单元</h3>
 <p>Kafka 消息格式的关键变化是 V2 引入的 RecordBatch（字段布局见 2.2.3 节表 2-1，这里看它为什么这样演进）。在 V0、V1 时代，最小存储单元是单条消息（Message），每条都自带一份完整元数据：偏移量、时间戳、key 长度、value 长度、CRC、属性。一百万条消息就有一百万份重复元数据，既占空间，又拉低压缩效果：相似数据聚在一起时，压缩算法能找到更多重复模式，但单条消息的元数据把每条记录隔开了。</p>
 <p>V2 把这个单位从单条换成了 Batch（批）。一个 Batch 头部固定 61 字节，存 BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、CRC、Attributes、记录数等整批共享的元数据。Batch 内每条 Record 只存相对量：时间戳差值（相对 Batch 的 BaseTimestamp）、偏移量差值（相对 BaseOffset）、key 与 value 的变长字段。绝大多数差值只要一两个字节就够，单条消息的元数据开销从 V1 的几十字节压到个位数。</p>
-<p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V1 的单条级压缩有结构性提升（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）。</p>
+<p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V0/V1 的整包 wrapper 压缩（外层把一批消息压成一个消息体，内层每条仍各带一份元数据）有结构性提升（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）。</p>
 <p>代价也有：消费者要解整个 Batch 才能读单条。但 Kafka 的消费本来就是成批的：消费者拉一批处理一批，从来不会真去"读一条"。<strong>让存储单元对齐访问单元</strong>，这个代价在成批消费的工作模式下并不显现。</p>
 <p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉，见 9.4 节），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让"重启后能续上"成为磁盘层面的保证。</p>
 <h3 id="s191">8.4.4 双索引：偏移量索引 + 时间戳索引</h3>
@@ -5301,11 +5296,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>演进机制靠 Magic 字段做版本号。Magic 是消息格式里的一个字节，标识这条消息是哪个版本。老 Broker 收到不认识的 Magic 直接拒绝；消费者按 Magic 选不同的解析路径。这种"格式自带版本号"的做法，是支持混合版本部署与平滑升级的标配：跟 RDB 的 version、InnoDB 的页类型字段是同一类机制。</p>
 <p>下面用一张表对比三代格式的字段与演进动机。</p>
 <p><strong>表 8-1　Kafka 消息格式 V0 / V1 / V2 的字段对比与演进动机</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>单条 Message</td><td>单条 Message</td><td>RecordBatch（含多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>每条绝对偏移量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条一条</td><td>每条一条</td><td>Batch 级一条</td></tr><tr><td>压缩</td><td>单条级别，压缩比低</td><td>单条级别，压缩比低</td><td>Batch 级别，压缩比高</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>解决"想知道时间得扫全文件"的问题</td><td>解决"元数据冗余 + 压缩低效"的问题</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>单条 Message</td><td>单条 Message</td><td>RecordBatch（含多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>每条绝对偏移量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条一条</td><td>每条一条</td><td>Batch 级一条</td></tr><tr><td>压缩</td><td>整包 wrapper 压缩（内条仍各带元数据），压缩比低</td><td>整包 wrapper 压缩（内条仍各带元数据），压缩比低</td><td>Batch 级别，压缩比高</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>解决"想知道时间得扫全文件"的问题</td><td>解决"元数据冗余 + 压缩低效"的问题</td></tr></tbody></table></div>
 <p>看演进动机这一列，每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。</p>
 <h3 id="s193">8.4.6 Tiered Storage：从本地日志到分层存储</h3>
 <p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
-<p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者读取时，先尝试本地磁盘，未命中则从远程拉取并缓存到本地（fetch-through 语义）；副本同步不走这条路径——Follower 的 FETCH 一律由 Leader 的本地日志服务，哪怕该段在 Leader 本地已删、只余远程副本。因此本地保留窗口（local retention）必须盖住最慢 ISR 副本的落后量，否则落后副本永远追不上、会被移出 ISR。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
+<p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者读取时，先尝试本地磁盘，未命中则从远程存储流式读取，不把远程段重新物化成本地日志段；副本同步不走这条路径——Follower 的 FETCH 一律由 Leader 的本地日志服务，哪怕该段在 Leader 本地已删、只余远程副本。因此本地保留窗口（local retention）必须盖住最慢 ISR 副本的落后量，否则落后副本永远追不上、会被移出 ISR。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，第 5 章讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
 <p>这一变化带来三方面影响。第一，"日志数据必须在本地磁盘"的假设需要修正：正本仍是日志段，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式反映访问模式"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。日志段在本地与远程之间的完整生命周期，画在图 8-7 里。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 372" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -5412,7 +5407,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s202">8.6.4 启示四：可靠性要付性能代价，但要知道防的是哪类故障</h3>
 <p>每加一层可靠性机制，都对应一类故障，也对应一份性能代价。</p>
 <p>MySQL 的双写缓冲防止断电导致 16KB 页半写，保证页完整性，代价是同一份脏页刷两次盘（写放大）。redo log 保证已提交事务的修改在页未刷盘时也能重放回来，代价是每次修改多记一条日志。CRC 校验用来检测磁盘静默损坏（bit rot），代价是每次读写多算一次校验和。</p>
-<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。MySQL 8.0 在底层存储支持原子写时允许关掉双写缓冲：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但 redo log 不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
+<p>Kafka 的 Batch 级 CRC 保证整批消息完整，Redis 的 RDB 尾部 CRC64 保证快照文件完整，原理都一样。理解每一层机制防的是哪类故障，才能判断什么时候可以撤。当底层存储支持原子写时，MySQL 允许关掉双写缓冲（<code>innodb_doublewrite=OFF</code>）：因为"断电导致页半写"这类故障已被硬件消灭，软件冗余可以撤下来。但 redo log 不能撤：原子写解决不了"已提交事务页未落盘"的问题，那是另一类故障。</p>
 <p>加可靠性机制前，先问"我针对的是哪类故障，这类故障下层有没有更便宜的解法"。盲目堆冗余只会换来无谓的写放大；精准识别故障并让下层承担，这笔开销就降得下来。</p>
 <h3 id="s203">8.6.5 启示五：格式一旦发布就是长期债务</h3>
 <p>最后一条回到 8.1.2 的第四个矛盾。存储格式发布即定型，业务会变、字段要加、编码要换、旧 bug 要修，全都要在原格式上做兼容。版本号、保留字段、Magic、编码切换，都是为未来预留的扩展空间（第 2 章启示四在协议层讲过同一件事：第一个版本没人能把边界想全，先留版本字段）。</p>
@@ -5676,14 +5671,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s211">传播单元：命令本身</h3>
 <p>Redis 选择把命令本身作为传播单元。主节点执行完一条写命令后，把这条命令（用 Redis 序列化协议 RESP 重写后）原样发送给所有副本；副本收到后本地执行一次，状态就对齐了。</p>
 <p>这个选择呼应了第 8 章"AOF 持久化文件复用协议格式"的设计：AOF 持久化记录的就是同一种命令流。于是 Redis 把持久化和复制<strong>复用同一种载体</strong>：一份命令流既写给磁盘（AOF）也写给网络（副本），二者天然一致。能用一种日志说清的事，就不引入第二种。</p>
-<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它处理不了<strong>语义歧义</strong>：比如非确定性命令（<code>SPOP</code>、<code>RANDOMKEY</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 的处理是在复制链路上对这些命令做特殊改写：把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，把分歧在源头消除。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：只把脚本执行产生的写命令效果传给副本，确定性由此保证。早期版本默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
+<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它处理不了<strong>语义歧义</strong>：比如非确定性命令（<code>SPOP</code>、<code>EXPIRE</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 的处理是在复制链路上对这些命令做特殊改写：把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，把分歧在源头消除。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：只把脚本执行产生的写命令效果传给副本，确定性由此保证。早期版本默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
 <h3 id="s212">单向异步：把一致性换成低延迟</h3>
 <p>Redis 复制是<strong>单向异步</strong>的。主节点写完后立即给客户端返回 OK，<strong>不等任何副本确认</strong>；副本通过一条长连接异步地接收命令流并追赶。副本只能有一个主（一个数据集的权威来源），形成树状的复制拓扑。</p>
 <p>这是默认偏 AP（高可用优先）的取向；分区时少数派停写则偏 CP（归类讨论见 7.2.3 节）。主节点的延迟几乎不受副本数量和副本健康度影响，而低延迟正是 Redis 作为缓存/在线存储最看重的特性。代价同样明确：主节点故障时，已经返回给客户端但还没来得及传到副本的写，会永久丢失。Redis 用"可能丢失少量写"换来主节点不受副本拖累：副本再慢再断，主的写入路径都不等它。</p>
-<h3 id="s213">全量同步：fork 出 RDB，传完补积压</h3>
+<h3 id="s213">全量同步：fork 出 RDB，传完补增量</h3>
 <p>副本第一次连上来，或者增量同步无法进行时，就要做全量同步。流程是：</p>
-<ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（<code>?</code> 与 <code>-1</code> 分别表示"未知 run_id"与"无偏移量"，这是 Redis 副本首次连接时发的内部协议命令，不是能在 redis-cli 里直接敲的命令），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存到复制积压缓冲区（replication backlog）</strong>。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把积压缓冲区里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
-<p>这里的关键在第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。backlog 就用来补上"过去那一刻"到"当前"之间的这段空缺。</p>
+<ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（<code>?</code> 与 <code>-1</code> 分别表示"未知 run_id"与"无偏移量"，这是 Redis 副本首次连接时发的内部协议命令，不是能在 redis-cli 里直接敲的命令），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存进这条复制连接专属的输出缓冲区</strong>（不是 replication backlog——那是常驻的环形缓冲，职责是服务断线重连后的部分重同步）。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把副本专属缓冲里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
+<p>这里的关键在第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。这个副本专属缓冲就用来补上"过去那一刻"到"当前"之间的这段空缺。</p>
 <p>另一类代价在两处：<code>BGSAVE</code> 的 fork 在大实例上会有一瞬间的内存翻倍风险（写时复制）和短暂的停顿；RDB 文件在网络上的传输要消耗主节点的出口带宽。全量同步越频繁，这两项代价越痛，所以 Redis 才会重点设计增量同步，把全量降级为"最后手段"。Redis 全量同步与部分重同步的完整分支见图 9-3。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 66 880 554" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -5742,8 +5737,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
   <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
   <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
-  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入 backlog</text>
-  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发积压命令</text>
+  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入连接专属复制缓冲</text>
+  <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发缓冲的命令</text>
   <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
 
   <!-- 右分支连线 -->
@@ -5966,7 +5961,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部说明 -->
   <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步：主提交后等从 ACK（落 relay log）才返回；半同步超时自动降级回异步</text>
+  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（落 relay log）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
 </svg>
 </div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
 <h3 id="s221">异步复制：默认的 AP 形态</h3>
@@ -5982,8 +5977,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>GTID（Global Transaction Identifier，全局事务标识）把位点升级成 <code>source_id:transaction_id</code> 的形式：<code>source_id</code> 是发起事务的源节点的 UUID，<code>transaction_id</code> 是该节点上单调递增的事务序号。每个事务在 binlog 里都有一个全局唯一的 GTID。</p>
 <p>GTID 带来的简化很直接。副本只要告诉新主"我这里有 GTID 1-100"，新主就自动从 101 开始追，不用人工对文件、不用查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此变得直观。位点因此成了一个能拿来推理的工具，不再只是内部细节。</p>
 <h3 id="s224">多线程并行复制：缓解单线程回放瓶颈</h3>
-<p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件，主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
-<p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
+<p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件（8.0.27 起 MTS 默认开启 4 个 worker，更早版本默认单线程），主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
+<p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘；主节点把每个事务的锁区间以 last_committed / sequence_number 标记写进 binlog，副本按这些标记划定可并行窗口）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
 <p>配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。但这个并行的上限是主库的组提交宽度：主库并发低、每次落盘攒不下几个事务时，从库能并行的也只有那几个——串行瓶颈没有消失，只是从从库挪到了主库的提交队列。低写入并发的库，MTS 的提升有限。并行复制与 MGR 共识的关系见图 9-6。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 597" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -6114,7 +6109,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这正是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务：只要多数派存活，已确认的事务就一定在。</p>
 <p>代价是延迟：每一次提交都要承担一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待）。从弱到强有几档：<code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）。读写是否要等本节点追平，按场景选。</p>
 <h3 id="s226">分布式恢复：新成员怎么追上</h3>
-<p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有缺口太大（缺失事务超过 <code>group_replication_clone_threshold</code>，默认 86,400 笔）或所需 binlog 已不可得时，才改用 8.0.17+ 提供的 clone 插件：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + backlog 补差"一样。</p>
+<p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件（参数 <code>group_replication_clone_threshold</code> 看似按缺失事务数触发，默认值实为 int64 上限，默认配置下从不因缺口大小而 clone）：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + 期间增量补发"一样。</p>
 <h3 id="s227">取舍总结</h3>
 <p>MySQL 在数据同步上的取舍是三档：从异步（可丢、最快）到半同步（多数情况下不丢、超时降级）到组复制（多数派强一致、最慢），业务方按场景选档。Redis 则只提供一个默认档，另给一个弱保证参数和一个按写生效的 <code>WAIT</code> 命令（均见 9.2 节）。</p>
 <h2 id="s228">9.4 Kafka 的做法</h2>
@@ -6124,7 +6119,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这一点和第 5 章 Kafka 存储层的 Log 抽象直接呼应：日志天然提供了全序关系，所以"状态机复制里的有序输入序列"在 Kafka 这里是现成的：日志本身就是序列。</p>
 <h3 id="s230">纯拉模式：和消费者走同一条路径</h3>
 <p>Kafka 复制用的是<strong>纯拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis 的"主推"、MySQL 的"I/O 线程拉 + relay log 缓冲"都不同。</p>
-<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。第 5 章的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
+<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应——只有一处读上界的差别：普通消费者被截在高水位 HW 以下，Follower 可以一直读到 LEO（区分标志是请求里的 replica_id 取值：Follower 填自己的 broker id，消费者填 -1）。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。第 5 章的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
 <p>拉模式的代价是 Follower 要自己负责追赶节奏，副本数量多时大量 FETCH 请求会压在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载帮到的是消费者读取，不是副本拉取：消费者读冷段时回源远程存储，而 Follower 的 FETCH 仍由 Leader 本地日志服务，哪怕该段在 Leader 本地已删——所以本地保留窗口必须盖住最慢 ISR 副本的落后量（详见第 8 章 8.4.6 节）。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
 <p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 7 章 7.4.2 节展开；LEO 与 HW 的语义定义就在这里给出，下面直接看它们在同步中的角色。</p>
@@ -6281,7 +6276,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s246">启示四：先定延迟预算，再定一致性档位</h3>
 <p>正如 9.5 解读三所说，三个软件在同一条延迟-一致性曲线上站在不同位置；第 7 章启示二从集群选型看过同一条谱线，这里把它落到复制设计的动作上。MySQL 的半同步超时参数（默认 10 秒）就是这条延迟预算的上限：等副本确认超过 10 秒，主节点就不再等待，降级回异步。设计自己的复制系统时，先问业务能承受多少额外确认往返：延迟预算定了，一致性档位自然就定了。</p>
 <h3 id="s247">启示五：故障恢复是同步的反向问题</h3>
-<p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：日志、位点和截断规则都相同。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，缺口过大才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
+<p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：日志、位点和截断规则都相同。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，补差所需 binlog 已不可得才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
 <p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础：只要保证日志可重放、位点可比对、截断有依据，恢复就能复用同步机制本身。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，真到了故障时，出事的往往就是这些地方。</p>
 <h3 id="s248">反模式提醒</h3>
 <p>三个常见的反模式，都是从正面启示的反面衍生出来的：</p>
@@ -6812,21 +6807,21 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s275">第 1 章 引言 — 为什么是这三个软件</h2>
 <p>[1] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017. —— 跨系统比较架构取舍的方法论范本，本书通过让三个软件回答同一批问题来对比设计的直接参照，强烈推荐配套阅读。 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者将日志当作统一抽象的极简论述，全书核心抽象观的缩影。 [3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人对数据全部放内存这一设计取舍的第一手阐述。</p>
 <h2 id="s276">第 2 章 数据结构与协议 — 为各自的目标而设计</h2>
-<p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，体现 Redis"按数据特征自适应"的设计。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
+<p>[4] Redis. Redis Serialization Protocol (RESP) Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/develop/reference/protocol-spec/. —— RESP 是 Redis 客户端与服务器之间的通信协议，同时 RDB 文件也复用同类编码思路，体现协议与存储格式统一的设计哲学。 [5] Redis. Redis 源码（SDS、listpack 等动态编码）[EB/OL]. [2026-08-14]. https://github.com/redis/redis. —— SDS、ziplist、listpack 等底层数据结构根据数据规模自动选择编码方式，体现 Redis"按数据特征自适应"的设计。 [6] Apache Kafka. KIP-98: Exactly Once Delivery and Transactional Messaging[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-98+-+Exactly+Once+Delivery+and+Transactional+Messaging. —— RecordBatch V2 格式定义批量消息的元数据共享、增量偏移量/时间戳编码，恰好一次语义内嵌于存储格式中。 [7] MySQL. Client/Server Protocol (MySQL Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/dev/mysql-server/latest/PAGE_PROTOCOL.html. —— MySQL 二进制协议（握手、查询、结果集、预处理语句）的完整规范，理解 MySQL 网络层与 SQL 层交互的基础。</p>
 <h2 id="s277">第 3 章 生命周期管理 — 优雅启动与关闭</h2>
-<p>[8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。 [10] Apache Kafka. Controlled Shutdown[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#ctrlshutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</p>
+<p>[8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— MySQL InnoDB 崩溃恢复（分析→重做→回滚三阶段）的理论基石，解释为何 MySQL 启动耗时远超 Redis 和 Kafka。 [10] Apache Kafka. Controlled Shutdown（Kafka Documentation）[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。</p>
 <h2 id="s278">第 4 章 内存与磁盘 — 速度与持久化的平衡</h2>
 <p>[11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解磁盘数据是正本、缓存只是加速这一设计的关键。 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但在依赖顺序写这一点上与它相同。</p>
 <h2 id="s279">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</h2>
-<p>[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。 [14] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，体现分层灵活性的代价。 [15] Apache Kafka. Network Threading Design[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。</p>
+<p>[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。 [14] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，体现分层灵活性的代价。 [15] Apache Kafka. Kafka Documentation: Design / Implementation[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Design 与 Implementation 部分对 Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。</p>
 <h2 id="s280">第 6 章 安全机制 — 权限、加密、审计</h2>
 <p>[16] Redis. Redis ACL[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/. —— 从全局 <code>requirepass</code> 到基于命令类别与键模式细粒度 ACL 的演进设计，性能优先的安全 retrofit 案例。 [17] MySQL. Security Features (Pluggable Authentication / RBAC / TDE)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/security.html. —— 五级权限体系、基于系统表的 RBAC 在 8.0 的落地，以及表空间与日志加密的企业级安全分层。 [18] Apache Kafka. Security (SASL / Delegation Tokens / Listener Separation)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#security. —— SASL 认证框架 + 委派令牌解决多跳身份传播、分层信任监听器适配不同网络域的分布式安全模式。</p>
 <h2 id="s281">第 7 章 集群架构 — 从单点到分布式</h2>
-<p>[19] Redis. Redis Cluster Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/. —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。 [20] MySQL. MySQL Group Replication (MGR) 与 XCom[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/group-replication.html. —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。 [21] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。 [22] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59. —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。</p>
+<p>[19] Redis. Redis Cluster Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/. —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。 [20] MySQL. MySQL Group Replication (MGR) 与 XCom[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/group-replication.html. —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。 [21] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833%3A+Mark+KRaft+as+Production+Ready. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。 [22] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59. —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。</p>
 <h2 id="s282">第 8 章 磁盘存储格式 — 文件结构的设计哲学</h2>
-<p>[23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。 [24] MySQL. InnoDB Page Structure[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。 [25] Redis. RDB File Format 与 RESP Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/persistence/. —— 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计，快照范式文件结构的典型范例。 [26] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志按热度卸载到远程对象存储的架构设计，8.4.6 Tiered Storage 一节的关键参考。</p>
+<p>[23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。 [24] MySQL. InnoDB Page Structure[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。 [25] Redis. Redis Persistence（RDB 文件编码）[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— RDB 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计（官方未发布字节级 RDB 格式规范，此页为最接近的官方来源），快照范式文件结构的典型范例。 [26] Apache Kafka. KIP-405: Kafka Tiered Storage[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405%3A+Kafka+Tiered+Storage. —— Kafka 将本地日志按热度卸载到远程对象存储的架构设计，8.4.6 Tiered Storage 一节的关键参考。</p>
 <h2 id="s283">第 9 章 数据同步机制 — 集群一致性的实现</h2>
-<p>[27] Apache Kafka. KIP-101: Replication Protocol Revamp[EB/OL]. (2015)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。 [28] Apache Kafka. KIP-320: Leader Epochs[EB/OL]. (2018)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-320. —— Leader Epoch 在截断协议中的细化应用，避免副本恢复时按 HW 误截断造成数据丢失与不一致。 [29] Redis. Replication 与 PSYNC2[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/replication/. —— replid/replid2 双标识符、复制偏移量与环形积压缓冲区实现部分重同步的官方描述，PSYNC2 使故障转移后仍可增量同步。 [30] MySQL. GTID-Based Replication[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/replication-gtids.html. —— GTID（<code>source_id:transaction_id</code>）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。 [31] Lamport L. Time, Clocks, and the Ordering of Events in a Distributed System[J]. Communications of the ACM, 1978, 21(7): 558-565. —— 逻辑时钟与 happens-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。</p>
+<p>[27] Apache Kafka. KIP-101: Alter Replication Protocol to use Leader Epoch rather than High Watermark for Truncation[EB/OL]. (2017)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation. —— Leader Epoch 机制解决选主后旧 Leader 偏移量截断歧义，Kafka 副本对齐最关键的修复设计。 [28] Apache Kafka. KIP-320: Allow fetchers to detect and handle log truncation[EB/OL]. (2018)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-320%3A+Allow+fetchers+to+detect+and+handle+log+truncation. —— Leader Epoch 在截断协议中的细化应用，避免副本恢复时按 HW 误截断造成数据丢失与不一致。 [29] Redis. Replication 与 PSYNC2[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/replication/. —— replid/replid2 双标识符、复制偏移量与环形积压缓冲区实现部分重同步的官方描述，PSYNC2 使故障转移后仍可增量同步。 [30] MySQL. GTID-Based Replication[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/replication-gtids.html. —— GTID（<code>source_id:transaction_id</code>）使副本定位独立于文件名和字节偏移，binlog ROW 格式确定性复制的基石。 [31] Lamport L. Time, Clocks, and the Ordering of Events in a Distributed System[J]. Communications of the ACM, 1978, 21(7): 558-565. —— 逻辑时钟与 happens-before 关系的奠基论文，本章"顺序保证是分布式复制的根基"这一论断的理论源头。</p>
 <h2 id="s284">第 10 章 总结：架构设计的共性规律与取舍</h2>
 <p>[32] 同 [1]。—— 贯穿全书的姊妹篇，更广视角的数据系统取舍论述，本章五条共性规律的上位参照。 [33] 同 [22]。—— CAP 定理的形式化证明，本章"一致 vs 可用"这一取舍维度的理论基础。 [34] Gray J, Reuter A. Transaction Processing: Concepts and Techniques[M]. San Francisco: Morgan Kaufmann, 1993. —— 事务、WAL、两阶段提交、恢复语义的系统化集大成著作，以性能换可靠性这一原则的经典源头。</p>
 <hr>
