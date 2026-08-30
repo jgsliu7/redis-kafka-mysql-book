@@ -95,9 +95,9 @@
   <line x1="620" y1="263" x2="620" y2="273" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
   <line x1="620" y1="323" x2="620" y2="333" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
-  <!-- bottom note: 缓存优化 -->
+  <!-- bottom note: 内存授权结构 -->
   <rect x="60" y="478" width="760" height="80" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
-  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 把"账号+库表"的检查结果缓存在内存（权限 bitmap），命中即 O(1)。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，按"账号加库表"组织成权限 bitmap，命中即 O(1)。</text>
   <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>

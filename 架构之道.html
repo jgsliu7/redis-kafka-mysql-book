@@ -4008,14 +4008,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="620" y1="263" x2="620" y2="273" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
   <line x1="620" y1="323" x2="620" y2="333" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
 
-  <!-- bottom note: 缓存优化 -->
+  <!-- bottom note: 内存授权结构 -->
   <rect x="60" y="478" width="760" height="80" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
-  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 把"账号+库表"的检查结果缓存在内存（权限 bitmap），命中即 O(1)。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，按"账号加库表"组织成权限 bitmap，命中即 O(1)。</text>
   <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>
 </div><figcaption>图 6-4　授权检查从全局到列逐层收窄，命中即停；细粒度优先于粗粒度。</figcaption></figure>
-<p>一条 <code>SELECT phone FROM db.users</code> 要先查全局权限表（是否对该账号授予了全库权限），未命中再查数据库级、表级，最后到列级（phone 这一列有没有 SELECT）。这种"逐层收窄、命中即停"的设计有一个直接代价：层级越细检查越慢。MySQL 的应对是把检查结果按"账号加库表"做内存缓存，权限用位图（bitmap）表示，授权检查在绝大多数热路径上就变成一次内存查询。</p>
+<p>一条 <code>SELECT phone FROM db.users</code> 要先查全局权限表（是否对该账号授予了全库权限），未命中再查数据库级、表级，最后到列级（phone 这一列有没有 SELECT）。这种"逐层收窄、命中即停"的设计有一个直接代价：层级越细检查越慢。MySQL 的应对是在启动时把授权表整表载入内存，按"账号加库表"组织成位图（bitmap）化的权限结构，授权检查在绝大多数热路径上就变成一次内存查询。</p>
 <p>8.0 才补齐 RBAC 角色系统，支持 <code>CREATE ROLE</code>、<code>GRANT role TO user</code>、会话级 <code>SET ROLE</code>。MySQL 已有的权限矩阵很复杂，用户量级也大，引入角色必须兼顾"不破坏已有 GRANT 语义"，因此它的做法是"角色等于一组权限的命名集合加会话激活"。这是一种务实的兼容优先：新能力叠加在老模型上，老应用零迁移。</p>
 <p>权限语义按风险分四类：数据操作（DML，包括 SELECT、INSERT、UPDATE、DELETE）、结构变更（DDL，包括 CREATE、ALTER、DROP，更危险）、管理（SUPER、PROCESS、FILE、RELOAD，高度敏感）、复制（REPLICATION SLAVE、REPLICATION CLIENT，专用于复制拓扑）。这种按风险归类的命名本身就是安全设计：它让 DBA 一眼能看出哪些权限该谨慎授予。注意：FILE 权限能读写服务器文件系统，配合 SQL 注入可读任意文件，是高敏权限的典型。</p>
 <h3 id="s130">Kafka：ACL 绑定 "Principal + Operation + Resource" 三元组</h3>
@@ -4030,7 +4030,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>补上 TLS 之后，Redis 也没有把它设为强制。它选择"TLS 可选、按端口开启"：你可以关掉明文端口、只开 TLS 端口，也可以两者并存做平滑迁移。配置上建议限定 <code>tls-protocols TLSv1.2 TLSv1.3</code>，关闭老旧协议，客户端证书按需启用。典型的性能代价是：长连接稳态下开启 TLS，单线程吞吐相比无加密约降至六到八成（具体数值随硬件、TLS 版本、证书算法波动），握手密集（短连接）场景的代价更高。是否启用 TLS，由部署者根据吞吐与安全需求自行权衡。</p>
 <h3 id="s133">MySQL：传输 TLS 加存储 TDE 两层</h3>
 <p>MySQL 的加密覆盖传输和存储两层。传输层 TLS 的配置与服务端证书、CA、客户端证书验证同 Redis、Kafka 大体一致，但 MySQL 多了前面提到的账号级 <code>REQUIRE SSL</code>，让加密变成权限的一部分。</p>
-<p>存储加密让 MySQL 区别于另外两款。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS。TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点：密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。</p>
+<p>存储加密让 MySQL 区别于另外两款。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS（注意这是发行版的边界：社区版自带的只有文件型 keyring_file 插件，能对接 Vault/KMS 的 keyring 插件均属企业版）。TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点：密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。</p>
 <p>redo log 与 undo log 的加密（<code>innodb_redo_log_encrypt</code> / <code>innodb_undo_log_encrypt</code>）自 8.0.1 起就支持，binlog 与 relay log（中继日志）的加密（<code>binlog_encryption</code>）自 8.0.14 起支持。表加密了，但日志明文写在磁盘上，攻击者仍能从日志里拼出敏感数据。日志加密补上了这个缺口。</p>
 <h3 id="s134">Kafka：TLS 覆盖所有通信路径</h3>
 <p>Kafka 的加密范围比单机系统广得多。客户端到 Broker、Broker 到 Broker（副本同步）、Broker 到控制面（KRaft 元数据）都要 TLS，任何一段明文都是漏洞。这是分布式纵深防御的硬要求，也是 Kafka 加密配置比 Redis、MySQL 复杂的根本原因：你要同时管好几条 TLS 通道。</p>
