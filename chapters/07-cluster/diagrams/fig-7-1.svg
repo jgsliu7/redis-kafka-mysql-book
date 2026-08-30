@@ -44,7 +44,7 @@
   <!-- ===== MySQL column ===== -->
   <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="460" y="160" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">① 异步复制</text>
-  <text x="460" y="180" text-anchor="middle" font-size="12" fill="#374151">binlog 推送 · 主不等从</text>
+  <text x="460" y="180" text-anchor="middle" font-size="12" fill="#374151">binlog 拉取（I/O 线程）· 主不等从</text>
   <text x="460" y="196" text-anchor="middle" font-size="12" fill="#374151">问题：主挂可丢已提交事务</text>
 
   <line x1="460" y1="205" x2="460" y2="245" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>

@@ -250,7 +250,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制，凭证只存服务端（用迭代哈希加盐存储），客户端不需要持有明文密码。相比 PLAIN 机制（客户端要持有明文、网络上虽走 SASL 但 PLAIN 本身无挑战），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解，我们在 6.7 节会展开它的设计意义。</p>
-<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密）、受信网络走 <code>SASL_PLAINTEXT</code>（认证但不加密，省 CPU）、对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，图 6-2 展示了它的典型布局。</p>
+<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密），对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）；受信内网若要省 CPU，也可以把某一档配成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，图 6-2 画的是其中一种常见布局。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -579,18 +579,18 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 只提供 ACL LOG（记录被拒命令的详情，包括时间戳、客户端 IP、被拒命令和参数）和 SLOWLOG（记录执行时间超过阈值的命令）。这两样加在一起能回答"谁被拒了"和"什么慢了"，但距离完整的审计轨迹（谁在什么时候做了什么操作、改了什么数据）还差得远。</p>
 <p>MySQL 的审计能力比 Redis 强，但有门槛。企业版提供审计插件，能做语句级审计、按用户/数据库/主机过滤、把日志输出到文件或 syslog。社区版用户通常只能用 General Log 做近似替代：记录所有客户端发来的 SQL，短时间调试可以，生产环境长时间开启会让磁盘和性能都难以承受。</p>
 <p>Kafka 的原生审计来自 Authorizer 日志：记录每一次授权决策（允许或拒绝），但粒度粗且不包含消息内容。生产环境通常外挂补全：自定义 ProducerInterceptor / ConsumerInterceptor 在客户端拦截并写审计主题，或接 Ranger 这类带审计能力的统一管控层。</p>
-<p>这三个软件的共同启示是：审计在生产级部署中几乎总是外挂的。如果每条操作都同步写审计日志，性能会显著下降，甚至不可用。接受这个现实之后，务实的选择是把审计日志做成异步、采样、或外接专用审计系统。</p>
+<p>这三个软件的共同启示是：审计在生产级部署中几乎总是外挂的。如果每条操作都同步写审计日志，性能会显著下降，甚至不可用。接受这个现实之后，务实的选择是把审计日志做成异步、采样或外接专用审计系统。</p>
 <h2 id="s136">6.6 横向对比</h2>
 <p>表 6-1 按认证、授权、加密、审计四维对比三家的安全选择，重点看"为什么分叉"。</p>
 <p><strong>表 6-1　安全机制四维横向对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>对比维度</th><th>Redis（7.x）</th><th>MySQL（8.0）</th><th>Kafka（3.x）</th></tr></thead><tbody><tr><td>默认是否认证</td><td>否（仅可选密码）</td><td>是（强 root 密码）</td><td>否（明文监听器可选）</td></tr><tr><td>认证抽象</td><td>ACL 用户加多密码</td><td>可插拔认证插件</td><td>SASL 框架加 JAAS</td></tr><tr><td>推荐生产认证</td><td>ACL 加 TLS 客户端证书</td><td>caching_sha2_password</td><td>SCRAM-SHA-512</td></tr><tr><td>凭证存储</td><td>内存加 aclfile（ACL SAVE/LOAD）（SHA-256）</td><td>mysql.user（SHA-256 缓存）</td><td>KRaft/ZK（SCRAM 哈希）</td></tr><tr><td>授权模型</td><td>ACL（用户直绑）</td><td>RBAC 加五级层级</td><td>ACL（资源三元组）</td></tr><tr><td>最细粒度</td><td>键模式加命令</td><td>列级</td><td>资源类型级</td></tr><tr><td>角色继承</td><td>无</td><td>8.0 RBAC</td><td>无（外接 Ranger）</td></tr><tr><td>默认策略</td><td>default 用户默认全开，靠 protected-mode 拦外网</td><td>默认安全（强密码、可删匿名）</td><td>AclAuthorizer 无 ACL 默认放行；StandardAuthorizer 默认拒绝</td></tr><tr><td>传输加密</td><td>6.0+ TLS，可选</td><td>TLS（账号级 REQUIRE）</td><td>TLS 全路径（多监听器）</td></tr><tr><td>存储加密</td><td>无原生</td><td>TDE 表空间加日志加密</td><td>无原生（靠磁盘加密）</td></tr><tr><td>审计能力</td><td>ACL LOG 加 SLOWLOG（弱）</td><td>企业审计插件加 General Log</td><td>Authorizer 日志加拦截器（弱）</td></tr><tr><td>性能取向</td><td>性能优先，安全可选</td><td>安全与功能并重</td><td>模块化可组合</td></tr><tr><td>典型部署假设</td><td>可信内网</td><td>企业网络</td><td>混合或云原生多跳</td></tr></tbody></table></div>
-<p>这张表竖着读，能读出姿态差异的来源——数据模型与请求要跨的跳数。三种姿态各对应一种部署形态：内网叠加、企业网络、混合多跳。姿态没有高下，错配才有事故——把内网姿态放到公网，就是本章开头那个爬虫事件的根因。</p>
+<p>这张表竖着读，能读出姿态差异的来源——数据模型与请求要跨的跳数。三种姿态各对应一种部署形态：可信内网、企业网络、混合多跳。姿态没有高下，错配才有事故——把内网姿态放到公网，就是本章开头那个爬虫事件的根因。</p>
 <h3 id="s137">三个软件的安全姿态与生产底线</h3>
 <p>Redis 的安全取向是"内网优先、按需叠加"。它默认假设部署在可信网络，把安全能力做成可选模块。实用底线：开启 ACL 并为每个应用建独立用户、关闭 default 用户、开启 protected-mode、按需开 TLS、用 ACL LOG 加外接采集补审计，补完这套，Redis 才算从"能用"进入"敢上生产"。</p>
 <p>MySQL 走企业级默认安全路线：装好就要求强 root 密码、提供删匿名用户的脚本、可启用 <code>connection_control</code> 插件做连接失败锁定。代价是配置项多、学习曲线陡，但学完之后它能胜任金融、电信这类对合规要求严苛的场景。</p>
 <p>Kafka 把 SASL、TLS、ACL 做成三套可独立启用的模块，让运维按网络域自由组合。代价是配置矩阵复杂，生产化通常需要 Ranger 这类统一管控层来统一管理。评审 Kafka 集群安全时抓住三个重点：监听器分层是否合理、SASL 机制选型、ACL 是否覆盖全部资源。这三个看清了，几十个配置项就容易梳理了。</p>
 <h2 id="s138">6.7 架构启示</h2>
-<p>安全设计的重心在默认值。这五条原则，选型和评审时能直接拿去对照。</p>
+<p>安全设计的重心在默认值。这五条启示，选型和评审时能直接拿去对照。</p>
 <h3 id="s139">启示一：默认安全策略要与典型部署环境匹配</h3>
 <p>Redis 默认开放（假设内网）、MySQL 默认收紧（假设企业网络暴露）、Kafka 的默认是中性（假设混合云）。这三个软件的默认值对应各自对"最可能被怎么部署"的预判。配错默认值等于把攻击面留给了运维者的记性：Redis 历史上那些公网无认证被攻陷的案例，本质都是默认值与实际部署环境错配。</p>
 <p>我做安全评审先看两件事：默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。</p>

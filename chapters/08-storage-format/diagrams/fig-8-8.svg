@@ -62,7 +62,7 @@
 
   <rect x="350" y="560" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="470" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
-  <text x="470" y="605" text-anchor="middle" font-size="10" fill="#374151">Record Batch 变长</text>
+  <text x="470" y="605" text-anchor="middle" font-size="10" fill="#374151">RecordBatch 变长</text>
   <text x="470" y="621" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
   <text x="470" y="635" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
 

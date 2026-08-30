@@ -1,6 +1,6 @@
 # 附录　参考文献与延伸阅读（按章索引）
 
-本书写作参考了大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2-5 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。
+本书写作参考了大量官方文档、Kafka 改进提案（KIP）、经典论文与社区资料。此处按正文章节顺序组织，每章列出 2–5 份最相关的外部参考，附一句话说明它为何对该章重要。版本与参数以官方最新文档为准；书中架构思想长期稳定。著录格式参照 GB/T 7714，在线资源均附访问日期。
 
 ## 第 1 章 引言 — 为什么是这三个软件
 
@@ -25,32 +25,32 @@
 
 [11] MySQL. InnoDB Buffer Pool 与 Write-Ahead Logging[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 三链缓冲池（Free/LRU/Flush List）、Double Write Buffer、Change Buffer 与 WAL 的官方说明，理解磁盘数据是正本、缓存只是加速这一设计的关键。
 [12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但在依赖顺序写这一点上与它相同。
-[13] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志数据按层次卸载到远程存储（如 S3）的架构设计，本章内存-磁盘-远程三级存储体系的关键参考。
 
 ## 第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层
 
-[14] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。
-[15] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，体现分层灵活性的代价。
-[16] Apache Kafka. Network Threading Design[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。
+[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。
+[14] MySQL. The Handler API / Pluggable Storage Engines (Internals Manual)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/storage-engines.html. —— InnoDB 插件式引擎接口（Handler API 的 vtable 多态设计）与 THD 跨层上下文对象的官方说明，体现分层灵活性的代价。
+[15] Apache Kafka. Network Threading Design[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Reactor 多线程网络模型与有界队列背压机制的架构描述，理解 Kafka 分层中最独特的一层的入口。
 
 ## 第 6 章 安全机制 — 权限、加密、审计
 
-[17] Redis. Redis ACL[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/. —— 从全局 `requirepass` 到基于命令类别与键模式细粒度 ACL 的演进设计，性能优先的安全 retrofit 案例。
-[18] MySQL. Security Features (Pluggable Authentication / RBAC / TDE)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/security.html. —— 五级权限体系、基于系统表的 RBAC 在 8.0 的落地，以及表空间与日志加密的企业级安全分层。
-[19] Apache Kafka. Security (SASL / Delegation Tokens / Listener Separation)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#security. —— SASL 认证框架 + 委派令牌解决多跳身份传播、分层信任监听器适配不同网络域的分布式安全模式。
+[16] Redis. Redis ACL[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/. —— 从全局 `requirepass` 到基于命令类别与键模式细粒度 ACL 的演进设计，性能优先的安全 retrofit 案例。
+[17] MySQL. Security Features (Pluggable Authentication / RBAC / TDE)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/security.html. —— 五级权限体系、基于系统表的 RBAC 在 8.0 的落地，以及表空间与日志加密的企业级安全分层。
+[18] Apache Kafka. Security (SASL / Delegation Tokens / Listener Separation)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#security. —— SASL 认证框架 + 委派令牌解决多跳身份传播、分层信任监听器适配不同网络域的分布式安全模式。
 
 ## 第 7 章 集群架构 — 从单点到分布式
 
-[20] Redis. Redis Cluster Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/. —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。
-[21] MySQL. MySQL Group Replication (MGR) 与 XCom[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/group-replication.html. —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。
-[22] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。
-[23] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59. —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。
+[19] Redis. Redis Cluster Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/. —— 16384 槽位哈希分布、Gossip 元数据传播、异步复制与 SDOWN/ODOWN 故障检测的一手规范，Redis 集群设计的官方权威来源。
+[20] MySQL. MySQL Group Replication (MGR) 与 XCom[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/group-replication.html. —— Paxos 变体实现多数派确认、少数派自动退出的 CP 架构设计，正文中与 Redis 和 Kafka 集群对比的两端锚点之一。
+[21] Apache Kafka. KIP-833: Mark KRaft as Production Ready[EB/OL]. (2022)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-833. —— Kafka 自研 Raft 元数据层替代 ZooKeeper 的架构设计，分区上限从万级扩到百万级的核心支撑。
+[22] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59. —— CAP 定理的形式化证明，本书所有 AP/CP 分类讨论的理论根基。
 
 ## 第 8 章 磁盘存储格式 — 文件结构的设计哲学
 
-[24] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。
-[25] MySQL. InnoDB Page Structure[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。
-[26] Redis. RDB File Format 与 RESP Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/persistence/. —— 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计，快照范式文件结构的典型范例。
+[23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。
+[24] MySQL. InnoDB Page Structure[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 16KB 固定页内七段布局（FIL Header / Page Directory / Infimum+Supremum / User Records 等）与动态行格式溢出页处理，页范式文件设计的权威参考。
+[25] Redis. RDB File Format 与 RESP Specification[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/persistence/. —— 变长整数编码（length 字段高 2 位作档位标记）、CRC64 校验与 RESP 协议复用为文件格式的设计，快照范式文件结构的典型范例。
+[26] Apache Kafka. KIP-405: Tiered Storage in Kafka[EB/OL]. (2021)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405. —— Kafka 将本地日志按热度卸载到远程对象存储的架构设计，8.4.6 Tiered Storage 一节的关键参考。
 
 ## 第 9 章 数据同步机制 — 集群一致性的实现
 
@@ -63,7 +63,7 @@
 ## 第 10 章 总结：架构设计的共性规律与取舍
 
 [32] 同 [1]。—— 贯穿全书的姊妹篇，更广视角的数据系统取舍论述，本章五条共性规律的上位参照。
-[33] 同 [23]。—— CAP 定理的形式化证明，本章"一致 vs 可用"这一取舍维度的理论基础。
+[33] 同 [22]。—— CAP 定理的形式化证明，本章"一致 vs 可用"这一取舍维度的理论基础。
 [34] Gray J, Reuter A. Transaction Processing: Concepts and Techniques[M]. San Francisco: Morgan Kaufmann, 1993. —— 事务、WAL、两阶段提交、恢复语义的系统化集大成著作，以性能换可靠性这一原则的经典源头。
 
 ---

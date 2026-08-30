@@ -13,7 +13,7 @@
   <rect x="290" y="84" width="300" height="74" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
   <text x="440" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">规律一 · 先定唯一正本</text>
   <text x="440" y="132" text-anchor="middle" font-size="12.5" fill="#374151">系统里只能有一个正本，其余皆为派生物</text>
-  <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL redo log · Kafka 日志段</text>
+  <text x="440" y="150" text-anchor="middle" font-size="11.5" fill="#6B7280">Redis 内存 · MySQL 数据页+redo log · Kafka 日志段</text>
 
   <!-- "服务"主箭头：从规律一向下分叉到四条 -->
   <line x1="440" y1="158" x2="440" y2="190" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
@@ -88,7 +88,7 @@
   <rect x="318" y="412" width="244" height="180" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
   <text x="440" y="434" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL</text>
   <line x1="334" y1="442" x2="546" y2="442" stroke="#D97706" stroke-width="0.7" stroke-dasharray="3,2"/>
-  <text x="334" y="462" font-size="11.5" fill="#374151">· 规律一：redo log 为正本，缓冲池派生</text>
+  <text x="334" y="462" font-size="11" fill="#374151">· 规律一：页+redo log 为正本，缓冲池派生</text>
   <text x="334" y="482" font-size="11.5" fill="#374151">· 规律二：Handler API 可插拔引擎</text>
   <text x="334" y="502" font-size="11.5" fill="#374151">· 规律三：Change Buffer/group commit</text>
   <text x="334" y="522" font-size="11.5" fill="#374151">· 规律四：双 1 + 半同步的代价</text>
@@ -100,7 +100,7 @@
   <line x1="592" y1="442" x2="804" y2="442" stroke="#059669" stroke-width="0.7" stroke-dasharray="3,2"/>
   <text x="592" y="462" font-size="11.5" fill="#374151">· 规律一：磁盘日志段为正本，副本派生</text>
   <text x="592" y="482" font-size="11.5" fill="#374151">· 规律二：Log 接口分层，冷段可挪</text>
-  <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：Record Batch + 零拷贝</text>
+  <text x="592" y="502" font-size="11.5" fill="#374151">· 规律三：RecordBatch + 零拷贝</text>
   <text x="592" y="522" font-size="11.5" fill="#374151">· 规律四：acks / min.insync 代价</text>
   <text x="592" y="542" font-size="11.5" fill="#374151">· 规律五：HW/LEO + Controller 重选</text>
 

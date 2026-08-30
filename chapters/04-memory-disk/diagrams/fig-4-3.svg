@@ -18,7 +18,7 @@
   <rect x="320" y="92" width="200" height="72" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
   <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 主进程</text>
   <text x="420" y="138" text-anchor="middle" font-size="12" fill="#374151">内存数据结构</text>
-  <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / 压缩列表）</text>
+  <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / listpack）</text>
 
   <!-- arrow client -> redis -->
   <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
@@ -45,7 +45,7 @@
   <text x="360" y="328" font-size="12" fill="#374151">• appendfsync 三档：</text>
   <text x="360" y="346" font-size="11" fill="#374151">　always / everysec(默认) / no</text>
   <text x="360" y="368" font-size="12" fill="#374151">• 重写：按当前内存重生成</text>
-  <text x="360" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（7.x 多部 AOF）</text>
+  <text x="360" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（7.x 多部分 AOF）</text>
 
   <!-- 混合 -->
   <rect x="620" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
@@ -54,7 +54,7 @@
   <text x="640" y="308" font-size="12" fill="#374151">• base = RDB 全量快照</text>
   <text x="640" y="326" font-size="12" fill="#374151">　+ incr = AOF 增量命令</text>
   <text x="640" y="348" font-size="12" fill="#374151">• 恢复快、丢失少</text>
-  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ base 始终为 RDB（行为等效）</text>
+  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ base 默认为 RDB（行为等效）</text>
   <text x="640" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（base + incr）</text>
 
   <!-- arrows from redis to three paths -->
