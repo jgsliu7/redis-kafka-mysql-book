@@ -291,7 +291,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是抽稀的索引层，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
 </svg>
 </div><figcaption>图 2-2　跳表的多层索引与查找路径：以查找 17 为例。</figcaption></figure>
-<p>顺着图里的路径从 head 走到 17：每一步要么前进、要么下沉，越往下一次跨过的节点越少，到底层逐个对齐。本章开头排行榜的例子也是这两段：按分数定位起点走这条下沉路径，按名次拉一段沿底层链表前进。</p>
+<p>图 2-2 中从 head 到 17 的路径：每一步要么前进、要么下沉，越往下一次跨过的节点越少，到底层逐个对齐。本章开头排行榜的例子也是这两段：按分数定位起点走这条下沉路径，按名次拉一段沿底层链表前进。</p>
 <p><strong>字典（dict）</strong> 是 Redis 哈希类型的底层结构，也是 Redis 内部键空间本身。它是一个链式哈希表，用 SipHash 做哈希函数（Redis 4.0 起为防哈希洪泛攻击，从 MurmurHash2 改用带随机种子的 SipHash），冲突用链表解决。</p>
 <p>渐进式 rehash 是 Redis 字典最特别的设计，实现上依赖一个双表结构：每个字典内部同时持有两张哈希表，<code>ht[0]</code> 和 <code>ht[1]</code>。正常情况下只用 <code>ht[0]</code>，<code>ht[1]</code> 是空的。当负载因子（<code>used / size</code>）超过阈值（通常是 1，即扩容条件；或小于 0.1，即缩容条件）时，Redis 不会一次性把所有键从 <code>ht[0]</code> 搬到 <code>ht[1]</code>，因为那会阻塞主线程。它先给 <code>ht[1]</code> 分配一个更大的（或更小的）空间，设一个游标 <code>rehashidx = 0</code>，表示"搬迁进行中"。此后每次对这个字典做增删改查时，Redis 会把 <code>rehashidx</code> 指向的那一个桶里的所有键搬到 <code>ht[1]</code>，然后 <code>rehashidx++</code>。同时，新写入的键直接进 <code>ht[1]</code>，查找和删除则先查 <code>ht[0]</code> 再查 <code>ht[1]</code>。当 <code>rehashidx</code> 走完所有桶，<code>ht[1]</code> 变成新的 <code>ht[0]</code>，旧表释放，<code>rehashidx</code> 重置为 -1，rehash 结束。</p>
 <p>这套机制保证单次字典操作不会因为搬迁而卡顿，每次只搬一个桶，摊还到后续所有操作里。这与前文 SDS 的做法是同一个思想：<strong>用摊还替换集中，把省不掉的工作分摊到后续每次操作里</strong>。这套双表搬迁画出来就是图 2-3。</p>
@@ -657,7 +657,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
 </svg>
 </div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
-<p>把这张图和图 2-2 的跳表放在一起看：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
+<p>这张图与图 2-2 的跳表对照：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
 <p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例：行头存变长字段长度列表（逆序存放，从右往左解析时自然读到每个字段的边界）和 NULL 位图，后面是各列数据。行太长放不下时才动用溢出页，而且按整行判定：一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，从最长的变长列（VARCHAR/BLOB/TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针；很短的 TEXT/BLOB（约 40 字节以内）则始终留在行内。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
 <p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被频繁以相同键值点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log n)。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。</p>
 <h3 id="s30">2.2.3 Kafka 的 RecordBatch：批量、顺序、演进</h3>

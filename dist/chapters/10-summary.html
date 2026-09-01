@@ -219,7 +219,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="512" text-anchor="middle" font-size="11.5" fill="#6B7280">每一层替下一层挡掉大部分访问</text>
 </svg>
 </div><figcaption>图 10-1　存储层次的对照：左侧是处理器的存储层次（寄存器→L1/L2 缓存→内存→磁盘），右侧是 Redis、MySQL、Kafka 在"内存-磁盘"之间的对应分层；两侧是同一条"快而小、慢而大、逐层缓存"的思路。</figcaption></figure>
-<p>这张图的读法是从上往下看：每一层都在替下一层挡访问，挡不住的才落到更慢的一层。三个软件的差异，只是各自把主战场放在了不同的层。</p>
+<p>存储层次由上到下，每一层都在替下一层挡访问，挡不住的才落到更慢的一层。三个软件的差异，只是各自主要服务的层级不同。</p>
 <h3 id="s258">10.2.4 规律四：更强的可靠性要付性能代价，先弄清代价再决定</h3>
 <blockquote><strong>每一次更强的一致性，都是用一次额外的同步等待换来的。代价是明确的，是否接受由设计者决定。</strong></blockquote>
 <p>一致性的代价都不是免费的，它们用参数把这个代价明确标出。Redis 的 <code>appendfsync</code> 有三档：<code>always</code>（每条命令都落盘，最慢但最不丢）、<code>everysec</code>（每秒落盘一次，开启 AOF 后的默认值）、<code>no</code>（交给操作系统决定，最快但可能丢较多），对应"丢多少 vs 慢多少"。MySQL 的 <code>innodb_flush_log_at_trx_commit</code>（控制 redo log 提交时是否 fsync）与 <code>sync_binlog</code>（控制 binlog 提交时是否 fsync）组成双 1 / 双 0 档位（两个都设 1 为"双 1"，最耐断电；都设 0 为"双 0"，最快但断电可丢），是"持久性 vs 吞吐"的取舍。半同步与异步复制的切换，是"延迟 vs 恢复点目标（Recovery Point Objective，RPO）"的取舍。Kafka 的 <code>acks=0/1/all</code> 配合 <code>min.insync.replicas</code>，是"吞吐 vs 不丢"的代价。幂等与事务，靠额外的 Broker 状态机和协议往返，达到了"恰好一次"这个更高的一致性档位。</p>
@@ -384,7 +384,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
 </svg>
 </div><figcaption>图 10-2　实践者选型决策树：四个问题依次收窄，每个叶子对应可借鉴的设计。</figcaption></figure>
-<p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间换时间还是时间换空间）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。决策树的用法：<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么被设计成那个样子。比如你做一个秒杀库存系统，按决策树会走到"持久性优先 + CP 倾向 + 热点读"的叶子，对应 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
+<p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间换时间还是时间换空间）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。用这棵树时，<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么被设计成那个样子。比如你做一个秒杀库存系统，按决策树会走到"持久性优先 + CP 倾向 + 热点读"的叶子，对应 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
 <h3 id="s264">10.3.3 三道判断练习</h3>
 <p>三道练习帮你把框架用起来。每道题从一个场景出发，用本章框架推导，最后说清该借鉴它们的哪条机制。</p>
 <p><strong>练习一："做一个网约车系统，司机位置上报和派单该放 Redis 还是 MySQL？"</strong> 常见的思路是"都是核心系统，统一放 MySQL"。但这两个子问题的访问模式完全不同。司机位置每几秒上报一次，读写都高频，丢一次等下一次上报就补回来，这是"快"的问题，适合放 Redis（GEO 地理位置结构直接支持附近司机查询）。而派单成单属于交易数据：同一单派给两个司机就是事故，状态迁移必须可审计，这是"对"的问题。用规律一（唯一正本）的判据：订单状态机必须以 MySQL 为唯一正本（强一致、双 1、事务保护状态迁移），Redis 只做位置索引与派单候选的快速过滤，算错了可以按 MySQL 重建。借鉴的是"唯一正本"和"让快的一层承担大部分访问，减轻慢层的负载"。</p>
@@ -398,7 +398,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>把 10.3 的五个维度拆成 12 个具体问题，按"数据 / 性能 / 可靠性 / 运维"四类组织。表 10-2 把每个问题连同"三个软件如何回答"和"你的系统该回答什么"摆在一起，作为动手前的自检工具。</p>
 <p><strong>表 10-2　架构设计 checklist（12 问）</strong></p>
 <div class="table-wrap"><table><thead><tr><th>类别</th><th>问题</th><th>Redis 怎么答</th><th>MySQL 怎么答</th><th>Kafka 怎么答</th><th>你的系统该答什么</th></tr></thead><tbody><tr><td>数据</td><td>哪份数据是正本？</td><td>内存键空间</td><td>数据页 + redo log</td><td>日志段</td><td>写下一个名字，并说清派生数据有哪些</td></tr><tr><td>数据</td><td>读写比例与访问模式？</td><td>读多写多、O(1) 访问</td><td>读多写少、随机点查 + 范围扫描</td><td>写多读多、顺序追加 + 偏移量定位</td><td>标出热点路径是读还是写、是随机还是顺序</td></tr><tr><td>数据</td><td>增长上限与冷热比例？</td><td>受内存约束、全热</td><td>受磁盘约束、缓冲池暖热</td><td>受磁盘约束、PageCache 热</td><td>估算 1 年 / 3 年后的量，标出冷热分界</td></tr><tr><td>性能</td><td>P99 延迟要求？</td><td>低延迟优先</td><td>稳定延迟优先</td><td>高吞吐下的可接受延迟</td><td>写一个具体数字，含尾延迟目标</td></tr><tr><td>性能</td><td>吞吐峰值？</td><td>热点 key 与单线程上限</td><td>事务提交与锁冲突上限</td><td>批量、分区、Broker 数决定上限</td><td>写峰值与均值，区分突发与持续</td></tr><tr><td>性能</td><td>是否存在热点？</td><td>单 key 易成热点</td><td>单行/单页易成热点</td><td>单分区易成热点</td><td>标出最热的 key/行/分区与分担方案</td></tr><tr><td>可靠性</td><td>可接受最大丢失量（RPO）？</td><td>默认约 1 秒量级窗口（开启 AOF 后）</td><td>双 1 接近 0</td><td>acks=all 接近 0</td><td>写一个 RPO 数字，并说清谁能拍板</td></tr><tr><td>可靠性</td><td>恢复时间要求（Recovery Time Objective，RTO）？</td><td>RDB 加载或 AOF 重放</td><td>redo 重放 + undo 回滚</td><td>Leader 切换 + 副本同步</td><td>写一个 RTO 数字，并演练过没</td></tr><tr><td>可靠性</td><td>是否跨地域容灾？</td><td>Cluster 跨机房复杂</td><td>MGR 跨机房可行</td><td>MirrorMaker / Cluster Linking</td><td>标出主备地域与切换预案</td></tr><tr><td>运维</td><td>扩容是否停机？</td><td>Cluster 在线 reshard</td><td>在线加节点 + 自动均衡</td><td>加分区受限、加 Broker 可在线</td><td>标出扩容路径与停机窗口</td></tr><tr><td>运维</td><td>配置是否动态生效？</td><td>CONFIG SET 部分动态</td><td>部分参数动态、部分需重启</td><td>多数 Broker 参数动态</td><td>标出哪些参数改了要重启</td></tr><tr><td>运维</td><td>故障排查路径是否清晰？</td><td>slowlog + latency monitor</td><td>slow log + performance_schema</td><td>Broker log + 消费者 lag</td><td>写下你出问题第一时间看哪个指标</td></tr></tbody></table></div>
-<p>这张表的用法是借它们的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，它们的默认值差异巨大：这是业务问题，得让业务方拍板。12 个问题答完，选型往往就自然确定了：约束弄清楚，决策就完成了一大半。</p>
+<p>借它们的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，它们的默认值差异巨大：这是业务问题，得让业务方拍板。12 个问题答完，选型往往就自然确定了：约束弄清楚，决策就完成了一大半。</p>
 <h3 id="s267">10.4.2 从使用者到设计者的四个阶段</h3>
 <p>读这本书的过程，是换一套看问题的方式。这套方式分四个阶段。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 100 900 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">

@@ -667,7 +667,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>表 3-2 沿六个维度并排对比三家的启动与关闭做法，三栏顺序固定 Redis | MySQL | Kafka。</p>
 <p><strong>表 3-2　三个软件生命周期六维对比</strong></p>
 <div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>启动复杂度与耗时主因</td><td>文件加载（AOF 加载 base+incr / RDB 读），快（大实例为数分钟）</td><td>崩溃恢复（redo 重放 + undo 回滚），最重</td><td>分区日志恢复 + 元数据同步，分区多时偏重</td></tr><tr><td>数据恢复语义</td><td>尽量恢复到最近（AOF 优先于 RDB）</td><td>严格恢复出事务一致性（已提交保留、未提交回滚）</td><td>截断到最后一致偏移量（append-only 的天然优势）</td></tr><tr><td>关闭时的数据承诺与可配置性</td><td>用户可选存不存（SAVE / NOSAVE）</td><td>默认快速关闭档（=1），三档可调（<code>innodb_fast_shutdown</code>）</td><td>强制刷盘，无选项</td></tr><tr><td>关闭对集群 / 外部的影响</td><td>仅本机内部事务，不影响其他节点</td><td>仅本机内部事务（主从复制除外）</td><td>集群事件（Leader 迁移、副本重平衡）</td></tr><tr><td>关闭速度与可预测性</td><td>快（仅刷脏）</td><td>慢且不可预测（事务回滚 + 脏页）</td><td>中等（取决于受控关闭时 Leader 迁移耗时）</td></tr><tr><td>与 OS / 运行时的交互范式</td><td>信号协议（SIGTERM）</td><td>信号协议（SIGTERM）</td><td>JVM Shutdown Hook（底层仍是信号）</td></tr></tbody></table></div>
-<p>从表里能读出四组结论。</p>
+<p>四组结论如下。</p>
 <p><strong>第一，复杂度排序与"数据结构 + 一致性承诺"强相关。</strong> 启动复杂度大致是 MySQL &gt; Kafka &gt; Redis，关闭复杂度的顺序也大致相同。原因是承诺越强（事务语义、复制一致性），恢复时要做的工作越多。Redis 的数据结构最简单（内存键值对 + 单线程），恢复就是重放命令。Kafka 的日志结构次之（追加写 + 偏移量），恢复只需截断。MySQL 的关系模型加事务最复杂，恢复要做 redo 重放加 undo 回滚两套动作。</p>
 <p><strong>第二，关闭的"可配置性"反映了各自的定位。</strong> Redis 给出 SAVE/NOSAVE 两个开关，因为它要同时服务缓存和主存两种用户。MySQL 给出三档参数，让 DBA 按场景在关机和开机之间搬运工作。Kafka 不给单机选项，因为它的关闭本来就是集群事件，单机的"存不存盘"不构成问题（日志在 Leader 迁移后还能从其他副本恢复），真正的问题是"Leader 走了谁来接"。</p>
 <p><strong>第三，单机 vs 分布式是分界线。</strong> 前两家关闭只是自己的事，Kafka 的关闭要和 Controller 交接 Leader 职责、牵动整个集群。这道分界在第 7 章展开，Leader 选举、ISR 维护等机制将和这里的受控关闭衔接起来。</p>
