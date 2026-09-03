@@ -76,7 +76,7 @@
 1. **基于 binlog 的复制：单向、异步、行流**
    - 机制：主写 binlog → Dump Thread 推送 → 从 I/O Thread 落 relay log → SQL Thread 回放。GTID（`source_id:transaction_id`）让从库自动定位、避免 file/position 脆弱性。
    - 取舍：异步 = 主不等等从，主挂了可能丢已提交事务；单 SQL 线程回放导致延迟。8.0 的多线程复制（`slave_parallel_type=LOGICAL_CLOCK`）按组提交并行化，缓解但不根治。
-   - 字节级 binlog 格式（STATEMENT/ROW/MIXED）细节归第 8 章存储格式；本章只讲它在集群里承担「变更流的载体」角色。
+   - 字节级 binlog 格式（STATEMENT/ROW/MIXED）细节归第 8 章存储格式；本章只讲它在集群里充当「变更流的载体」角色。
 
 2. **半同步复制：用一点延迟换不丢**
    - 机制：主在事务提交前，等至少一个从 ACK（`rpl_semi_sync_master_wait_for_slave_count`）才返回客户端。
@@ -104,7 +104,7 @@
 
 1. **Partition：分片即并行单位**
    - 机制：Topic 切成 N 个 Partition，每个 Partition 是有序追加日志；生产者按 key 的 `murmur2 % N` 路由，无 key 则粘性/轮询。
-   - 取舍：**顺序性只在分区内成立**——这是 Kafka 一致性承诺的边界。分区数选择 = 吞吐（并行度）与运维开销（文件句柄、选举恢复时间）的权衡；经验值单分区 ~10MB/s 或 ~10k msg/s。
+   - 取舍：**顺序性只在分区内成立**——这是 Kafka 一致性保证的边界。分区数选择 = 吞吐（并行度）与运维开销（文件句柄、选举恢复时间）的权衡；经验值单分区 ~10MB/s 或 ~10k msg/s。
 
 2. **Replica + ISR：副本的「够格」名单**
    - 机制：每个 Partition 有 1 个 Leader + N-1 个 Follower；Leader 读写，Follower 拉取同步。**ISR（同步副本集合）**是「在 `replica.lag.time.max.ms` 内跟上 Leader 的副本」，只有 ISR 里的副本才有资格当选 Leader。

@@ -679,7 +679,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我亲身经历过一次凌晨三点的 <code>kill -9</code>。当时图省事，觉得"Redis 重启就好了"，没等 AOF 刷完就杀了进程。第二天发现丢了十几条订单数据。Redis 本来是会落盘的，问题出在我没给它落盘的时间。从那以后，我把优雅关闭当作必须遵守的操作纪律。</p>
 <h2 id="s65">3.7 小结</h2>
 <p>启动是状态机重建，关闭是逐项兑现启动时做出的保证，两者的复杂度随保证范围递增：从单线程内存（Redis）、关系型事务（MySQL）到分布式集群（Kafka）。优雅关闭宁可多花时间，也要把确定性和交接留够。</p>
-<p>其一，关闭时的刷盘保证：Redis AOF/RDB、MySQL redo log、Kafka append-only log 在"快与持久"之间的取舍，正是第 4 章内存与磁盘管理的核心主线。其二，分层与依赖先行的初始化纪律：第 5 章会从更通用的角度回答同样的问题——为什么要分层、分多深才值。</p><nav class="page-nav"><a href="02-data-structures-protocols.html">← 第 2 章 数据结构与协议 — 为各自的目标而设计</a><a href="04-memory-disk.html">第 4 章 内存与磁盘 — 速度与持久化的平衡 →</a></nav></article>
+<p>其一，关闭时的刷盘保证：Redis AOF/RDB、MySQL redo log、Kafka append-only log 在"快与持久"之间的取舍，正是第 4 章内存与磁盘管理的核心主线。其二，分层与依赖先行的初始化纪律：第 5 章会从更通用的角度讨论同样的问题——为什么要分层、分多深才值。</p><nav class="page-nav"><a href="02-data-structures-protocols.html">← 第 2 章 数据结构与协议 — 为各自的目标而设计</a><a href="04-memory-disk.html">第 4 章 内存与磁盘 — 速度与持久化的平衡 →</a></nav></article>
 </main>
 </div>
 <script>
