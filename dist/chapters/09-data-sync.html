@@ -729,7 +729,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s225">组复制（MGR）：把复制升级为共识</h3>
 <p>MGR（MySQL Group Replication）是把 MySQL 的复制从"异步可丢"推进到"强一致"的关键一步。它的核心思想是：<strong>把 binlog event 当作共识协议（XCom，Paxos 变种）的 log entry，要求多数派确认才能提交</strong>。</p>
 <p>这正是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务：只要多数派存活，已确认的事务就一定在。</p>
-<p>代价是延迟：每一次提交都要承担一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待）。从弱到强有几档：<code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）。读写是否要等本节点追平，按场景选。</p>
+<p>代价是延迟：每一次提交都要多走一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待）。从弱到强有几档：<code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）。读写是否要等本节点追平，按场景选。</p>
 <h3 id="s226">分布式恢复：新成员怎么追上</h3>
 <p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件（参数 <code>group_replication_clone_threshold</code> 看似按缺失事务数触发，默认值实为 int64 上限，默认配置下从不因缺口大小而 clone）：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + 期间增量补发"一样。</p>
 <h3 id="s227">取舍总结</h3>

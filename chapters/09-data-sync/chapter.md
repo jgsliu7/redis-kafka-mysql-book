@@ -185,7 +185,7 @@ MGR（MySQL Group Replication）是把 MySQL 的复制从"异步可丢"推进到
 
 这正是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务：只要多数派存活，已确认的事务就一定在。
 
-代价是延迟：每一次提交都要承担一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 `group_replication_consistency`，默认 `EVENTUAL`（不额外等待）。从弱到强有几档：`BEFORE_ON_PRIMARY_FAILOVER`（仅主切换时等追平）、`BEFORE`（读前等本节点追平）、`AFTER`（写后等全组追平）、`BEFORE_AND_AFTER`（读写都等）。读写是否要等本节点追平，按场景选。
+代价是延迟：每一次提交都要多走一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 `group_replication_consistency`，默认 `EVENTUAL`（不额外等待）。从弱到强有几档：`BEFORE_ON_PRIMARY_FAILOVER`（仅主切换时等追平）、`BEFORE`（读前等本节点追平）、`AFTER`（写后等全组追平）、`BEFORE_AND_AFTER`（读写都等）。读写是否要等本节点追平，按场景选。
 
 ### 分布式恢复：新成员怎么追上
 

@@ -143,7 +143,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>交互层还有一个容易被忽视的细节：<strong>客户端输出缓冲区（client output buffer）</strong>。每个客户端连接有两个写缓冲区，一个固定大小（默认 16KB），一个动态增长。固定区吸收小响应，避免每次回复都 malloc。动态区承接大响应，但有上限（可配置 <code>client-output-buffer-limit</code>），超限就强制关闭连接。交互层和逻辑层在内存里本来就贴在一起，能拿出来的解耦手段就只有这一块缓冲区，靠它防止一个慢客户端把整个进程的内存拖垮。</p>
 <p><strong>Redis 的分层极薄，目标就是低延迟</strong>。交互层和逻辑层在内存上贴着，跨层不花任何抽象成本，副作用是它们也没法独立演进。你不可能像换 MySQL 引擎那样换掉 Redis 的网络层。</p>
 <h3 id="s98">5.2.2 逻辑层：命令表 + robj 统一抽象</h3>
-<p>逻辑层是 Redis 承担命令执行的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 <code>redisCommandTable</code>，6.x 及更早版本定义在 <code>server.c</code> 里（Redis 7.0 重构后，命令表改由 <code>commands/</code> 目录下的 JSON 描述文件自动生成到 <code>commands.c</code>，处理函数仍分布在 <code>server.c</code>、<code>t_string.c</code>、<code>t_list.c</code> 等文件中），每条命令占一行。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。</p>
+<p>逻辑层是 Redis 里执行命令的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 <code>redisCommandTable</code>，6.x 及更早版本定义在 <code>server.c</code> 里（Redis 7.0 重构后，命令表改由 <code>commands/</code> 目录下的 JSON 描述文件自动生成到 <code>commands.c</code>，处理函数仍分布在 <code>server.c</code>、<code>t_string.c</code>、<code>t_list.c</code> 等文件中），每条命令占一行。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。</p>
 <p>命令执行的流水线是这样跑的：RESP 解析完得到参数数组 <code>argv</code> 和参数个数 <code>argc</code> → 用命令名做一次 dict 哈希查到命令表条目 → ACL 权限校验和 arity 校验 → 调用 <code>cmd-&gt;proc(client)</code> 执行 → 跑慢查询日志和 MONITOR 钩子。下面这张图画的是这条流水线，以及 <code>client</code> 结构体怎么把交互层和逻辑层衔接起来。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="-16 64 776 556" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -843,7 +843,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s117">启示四：警惕分层的反模式</h3>
 <p>真正的分层应当引入新的抽象并收窄关注点。三种典型反模式要警惕。</p>
 <p>第一，<strong>镜像分层</strong>：每一层只是给上一层改个名字。比如 Service 层调用 Manager 层、Manager 层调用 Dao 层、Dao 层调用 Mapper，但每一层都只是把参数原样转交。这种"分层"没有引入任何抽象，只是增加了认知负担和调用栈深度。</p>
-<p>第二，<strong>空洞透传</strong>：一层只做转发不加价值。比如一个 API 网关收到请求后，不做任何鉴权、限流、转换，直接转发给后端，这一层就没有承担任何职责。</p>
+<p>第二，<strong>空洞透传</strong>：一层只做转发不加价值。比如一个 API 网关收到请求后，不做任何鉴权、限流、转换，直接转发给后端，这一层就没有任何职责。</p>
 <p>第三，<strong>循环依赖</strong>：A 层依赖 B 层、B 层又依赖 A 层。这破坏了分层的封闭性。本意是"修改局部化"，循环依赖却把两个层的修改耦合在了一起。</p>
 <p>检验分层是否合理的三问，在 5.1 开头已经列过。这里补一个判据：最后一问是硬门槛——没引入新抽象的层，前两问答"是"也白搭。前两问有一个答"否"，这层多半该并掉。</p>
 <p>我评审分层方案时必问一句：这一层挡住了什么变化？答不上来的层，就是我下一步要删的层；为"将来可能需要"预留的扩展点，我至今没见几个真用上的。</p>
