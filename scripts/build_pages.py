@@ -13,7 +13,7 @@ import os
 import shutil
 import sys
 
-from build_html import CHAPTERS, JS, convert, load_svg
+from build_html import CHAPTERS, JS, convert, load_svg, link_xrefs, new_registry, validate_site
 
 ROOT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
@@ -35,7 +35,7 @@ nav.toc li>a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);t
 nav.toc li>a:hover{background:var(--soft)}
 nav.toc li.active>a{background:#eef2ff;color:var(--accent);font-weight:600}
 nav.toc li.nav-sub>a{padding-left:22px;font-size:13px;color:var(--mute)}
-.content{padding:32px 48px 120px;max-width:1000px}
+.content{padding:32px 48px 120px;max-width:1000px;overflow-wrap:anywhere}
 .chapter-meta{color:var(--mute);font-size:13px;margin:0 0 18px}
 .page-nav{display:flex;justify-content:space-between;gap:16px;margin:40px 0 0;padding-top:20px;border-top:1px solid var(--line)}
 .page-nav a{display:block;max-width:48%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);line-height:1.5}
@@ -79,11 +79,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   .layout{grid-template-columns:1fr}
   nav.toc{position:fixed;left:0;top:0;width:292px;background:#fff;z-index:50;transform:translateX(-100%);transition:transform .2s;box-shadow:2px 0 12px rgba(0,0,0,.08)}
   nav.toc.open{transform:translateX(0)}
-  .content{padding:20px 18px 80px;max-width:100%}
+  .content{padding:20px 18px 80px;max-width:100%;min-width:0}
   .toc-toggle{display:inline-block;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
   .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
   .backdrop.show{display:block}
+  /* 窄屏宽图改为容器内横向滚动，文字保持可读 */
+  .svg-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  figure.fig svg{min-width:760px}
 }
+@media print{a.xref{color:inherit}}
 """
 
 
@@ -107,6 +111,7 @@ def slug_for(index, rel):
 def load_chapters():
     items = []
     counter = [0]
+    registry = new_registry()
     for idx, (rel, diag) in enumerate(CHAPTERS):
         path = os.path.join(ROOT, rel)
         md = open(path, encoding="utf-8").read()
@@ -120,7 +125,7 @@ def load_chapters():
                     svgmap["diagrams/" + fn] = '<div class="svg-wrap">' + svg + "</div>"
                 elif fn.endswith('-gpt.png'):
                     gptmap['diagrams/' + fn] = '../../' + diag + '/' + fn
-        body, heads = convert(md, svgmap, gptmap, counter, ('../../' + diag) if diag else '')
+        body, heads = convert(md, svgmap, gptmap, counter, ('../../' + diag) if diag else '', chidx=idx, registry=registry)
         title = next((t for (lvl, t, _hid) in heads if lvl == 1), os.path.basename(rel))
         items.append({
             "index": idx,
@@ -130,7 +135,7 @@ def load_chapters():
             "body": body,
             "heads": heads,
         })
-    return items
+    return items, registry
 
 
 def nav_html(items, current_file=None, depth="chapter"):
@@ -212,18 +217,34 @@ def build_chapter_page(items, idx):
 
 
 def main():
-    items = load_chapters()
+    items, registry = load_chapters()
+    # 交叉引用自动链接（分页模式：跨章 file#frag、同章 #frag）
+    stats = {'linked': 0, 'unresolved': {}}
+    page_for = lambda i: items[i]["file"]
+    for item in items:
+        item["body"] = link_xrefs(item["body"], item["index"], registry, len(CHAPTERS), page_for, stats)
+
+    # 页名用产物真实路径（带 chapters/ 前缀）：validate_site 按源页目录解析相对路径，
+    # 裸文件名会让 "../x.html" 这类错路径在归一化时碰巧命中而假通过
+    pages = [("index.html", build_index(items))]
+    pages += [("chapters/" + item["file"], build_chapter_page(items, idx)) for idx, item in enumerate(items)]
+
+    # 落锤校验（落盘前）：页内重复 id / 跨页坏锚点 / 外部资源
+    audit = validate_site(pages, out_json=os.path.join(ROOT, "qa", "pages-audit.json"), label="paged", stats=stats)
+
     if os.path.isdir(DIST):
         shutil.rmtree(DIST)
     os.makedirs(CHAPTER_DIR, exist_ok=True)
-
-    open(os.path.join(DIST, "index.html"), "w", encoding="utf-8").write(build_index(items))
-    for idx, item in enumerate(items):
-        open(os.path.join(CHAPTER_DIR, item["file"]), "w", encoding="utf-8").write(build_chapter_page(items, idx))
+    for name, html_doc in pages:
+        open(os.path.join(DIST, name), "w", encoding="utf-8").write(html_doc)
 
     print("已生成分页站点: %s" % DIST)
     print("首页: %s" % os.path.join(DIST, "index.html"))
     print("章节页: %d" % len(items))
+    print("交叉引用: 已链接 %d 处 | 未解析 %d 种%s" % (
+        audit["xrefs_linked"], len(audit["xrefs_unresolved"]),
+        ("（" + "、".join("%s×%d" % kv for kv in sorted(audit["xrefs_unresolved"].items())) + "）") if audit["xrefs_unresolved"] else ""))
+    print("构建校验: PASS（重复 id/坏锚点/外部资源 均零）→ qa/pages-audit.json")
 
 
 if __name__ == "__main__":
