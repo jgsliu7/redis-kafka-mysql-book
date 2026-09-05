@@ -67,7 +67,7 @@
   <line x1="790" y1="314" x2="790" y2="332" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrowRed)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="790" y="356" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log）</text>
+  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
   <text x="790" y="374" text-anchor="middle" font-size="11" fill="#374151">不等本地回放完成</text>
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
@@ -88,5 +88,5 @@
   <!-- 底部说明 -->
   <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（落 relay log）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
+  <text x="470" y="584" text-anchor="middle" font-size="10.5" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（写 relay log 并落盘）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
 </svg>

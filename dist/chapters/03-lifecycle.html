@@ -256,8 +256,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>AOF 优先是因为它携带的信息严格多于单独的 RDB。即便 7.0 之后 base 文件默认是 RDB 格式，AOF 目录里还多了一份记录"上次重写之后所有写命令"的 incr 文件。加载 base 只能恢复到重写点，再重放 incr 才能恢复到最近一次刷盘。RDB 单独存在时则只有那一个时点。完整优先于快。RDB 在做全量备份、副本同步、快速重启这些场景里仍然是主力，只是在"启动恢复"这个具体场景下，AOF 信息更全，就该优先加载 AOF。</p>
 <p><strong>第四段：进入事件循环。</strong> <code>aeMain</code> 一启动，Redis 才真正算"可服务"。控制台会打印一条 <code>Ready to accept connections</code> 日志。这是状态机就绪的外显里程碑，运维脚本靠 grep 这一行来判断 Redis 是否就绪。</p>
 <h3 id="s47">关闭：两种触发，两条路径</h3>
-<p>关闭有两种触发方式：客户端发 <code>SHUTDOWN</code> 命令、收到 SIGTERM/SIGINT 信号（systemd stop、容器编排的滚动重启最终都落到这条信号路径上）。无论哪种触发，进入的处理流程都一样，只是"存不存数据"这一步的选择不同。</p>
-<p>图 3-3 画出了完整的关闭流程。</p>
+<p>关闭有两种触发方式：客户端发 <code>SHUTDOWN</code> 命令、收到 SIGTERM/SIGINT 信号（systemd stop、容器编排的滚动重启最终都落到这条信号路径上）。无论哪种触发，进入的处理流程都一样，只是"存不存数据"这一步的选择不同。7.0 起流程之前还多一道等待：还有落后副本时，先暂停写入，等它们追平复制位点再开始关闭，最多等 <code>shutdown-timeout</code>（默认 10 秒），超时记录落后副本后照常退出；<code>SHUTDOWN NOW</code> 可跳过这道等待。</p>
+<p>图 3-3 画出了关闭流程的主体。</p>
 <figure class="fig"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 608" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -352,7 +352,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的生命周期复杂度明显高于另外两者。原因在于它必须保住事务语义（ACID），这是 Redis 不需要处理、Kafka 也不严格保证的东西。这迫使 MySQL 在启动期多做一件 Redis 没有的事：崩溃恢复。在关闭期则多出一个 Redis 没有的取舍：同一批数据清理工作，要么关机时做完，要么留到下次开机再补。</p>
 <h3 id="s50">启动链路：多了"恢复"这一关键环节</h3>
 <p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层加权限系统、服务循环。第二段最耗时，也是它与 Redis 的本质区别所在。</p>
-<p><strong>配置加载段</strong>按固定优先级搜索多个 my.cnf 路径（<code>/etc/my.cnf</code> 优先于 <code>~/.my.cnf</code> 等），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是被 <code>/etc/my.cnf</code> 里某个默认值覆盖了。</p>
+<p><strong>配置加载段</strong>按固定顺序读取多个 my.cnf 路径（Unix 上从 <code>/etc/my.cnf</code> 读到 <code>~/.my.cnf</code>，同名选项后读的覆盖先读的），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是改的配置后面还有一层在覆盖：<code>~/.my.cnf</code> 里的旧值、SET PERSIST 写进 <code>mysqld-auto.cnf</code> 的持久化值，或启动命令行参数。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
 <ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和默认存放在此的 undo log 都还在 <code>ibdata1</code> 中。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。它必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理，最终恢复出严格的事务一致性：已提交的全部保留，未提交的全部回滚。图 3-4 把崩溃恢复画成时序图。</p>
@@ -657,7 +657,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s58">3.5 横向对比</h2>
 <p>表 3-2 按六个维度并排对比三家的启动与关闭做法，三栏顺序固定为 Redis | MySQL | Kafka。</p>
 <p><strong>表 3-2　三个软件生命周期六维对比</strong></p>
-<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>启动复杂度与耗时主因</td><td>文件加载（AOF 加载 base+incr / RDB 读），快（大实例为数分钟）</td><td>崩溃恢复（redo 重放 + undo 回滚），最重</td><td>分区日志恢复 + 元数据同步，分区多时偏重</td></tr><tr><td>数据恢复语义</td><td>尽量恢复到最近（AOF 优先于 RDB）</td><td>严格恢复出事务一致性（已提交保留、未提交回滚）</td><td>截断到最后一致偏移量（append-only 的天然优势）</td></tr><tr><td>关闭时的数据保证与可配置性</td><td>用户可选存不存（SAVE / NOSAVE）</td><td>默认快速关闭档（=1），三档可调（<code>innodb_fast_shutdown</code>）</td><td>强制刷盘，无选项</td></tr><tr><td>关闭对集群 / 外部的影响</td><td>仅本机自身，不影响其他节点</td><td>仅本机自身（主从复制除外）</td><td>集群事件（Leader 迁移、副本重平衡）</td></tr><tr><td>关闭速度与可预测性</td><td>快（仅刷脏）</td><td>慢且不可预测（事务回滚 + 脏页）</td><td>中等（取决于受控关闭时 Leader 迁移耗时）</td></tr><tr><td>与 OS / 运行时的交互范式</td><td>信号协议（SIGTERM）</td><td>信号协议（SIGTERM）</td><td>JVM Shutdown Hook（底层仍是信号）</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>启动复杂度与耗时主因</td><td>文件加载（AOF 加载 base+incr / RDB 读），快（大实例为数分钟）</td><td>崩溃恢复（redo 重放 + undo 回滚），最重</td><td>分区日志恢复 + 元数据同步，分区多时偏重</td></tr><tr><td>数据恢复语义</td><td>尽量恢复到最近（AOF 优先于 RDB）</td><td>严格恢复出事务一致性（已提交保留、未提交回滚）</td><td>截断到最后一致偏移量（append-only 的天然优势）</td></tr><tr><td>关闭时的数据保证与可配置性</td><td>用户可选存不存（SAVE / NOSAVE）</td><td>默认快速关闭档（=1），三档可调（<code>innodb_fast_shutdown</code>）</td><td>强制刷盘，无选项</td></tr><tr><td>关闭对集群 / 外部的影响</td><td>基本只关本机；7.0 起有落后副本时先暂停写、等副本追平复制位点再退出（上限 <code>shutdown-timeout</code> 默认 10 秒）</td><td>仅本机自身（主从复制除外）</td><td>集群事件（Leader 迁移、副本重平衡）</td></tr><tr><td>关闭速度与可预测性</td><td>快（仅刷脏；有落后副本时加等追平，上限 10 秒）</td><td>慢且不可预测（事务回滚 + 脏页）</td><td>中等（取决于受控关闭时 Leader 迁移耗时）</td></tr><tr><td>与 OS / 运行时的交互范式</td><td>信号协议（SIGTERM）</td><td>信号协议（SIGTERM）</td><td>JVM Shutdown Hook（底层仍是信号）</td></tr></tbody></table></div>
 <p>四条结论如下。</p>
 <p><strong>第一，复杂度排序与"数据结构 + 一致性保证"强相关。</strong> 启动复杂度大致是 MySQL &gt; Kafka &gt; Redis，关闭复杂度的顺序也大致相同。原因是保证越强（事务语义、复制一致性），恢复时要做的工作越多。Redis 的数据结构最简单（内存键值对 + 单线程），恢复就是重放命令。Kafka 的日志结构次之（追加写 + 偏移量），恢复只需截断。MySQL 的关系模型加事务最复杂，恢复要做 redo 重放加 undo 回滚两套动作。</p>
 <p><strong>第二，关闭的"可配置性"反映了各自的定位。</strong> Redis 给出 SAVE/NOSAVE 两个开关，因为它要同时服务缓存和主存两种用户。MySQL 给出三档参数，让 DBA 按场景在关机和开机之间分摊工作。Kafka 不给单机选项，因为它的关闭本来就是集群事件，单机的"存不存盘"不构成问题（日志在 Leader 迁移后还能从其他副本恢复），真正的问题是"Leader 走了谁来接"。</p>

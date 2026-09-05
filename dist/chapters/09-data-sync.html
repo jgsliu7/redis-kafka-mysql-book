@@ -562,7 +562,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="790" y1="314" x2="790" y2="332" stroke="#EF4444" stroke-width="1.2" marker-end="url(#fig_9_5_arrowRed)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="790" y="356" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log）</text>
+  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
   <text x="790" y="374" text-anchor="middle" font-size="11" fill="#374151">不等本地回放完成</text>
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
@@ -583,13 +583,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <!-- 底部说明 -->
   <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="11" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（落 relay log）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
+  <text x="470" y="584" text-anchor="middle" font-size="10.5" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（写 relay log 并落盘）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
 </svg>
 </div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
 <h3 id="s221">异步复制：默认的 AP 形态</h3>
 <p>默认配置下，MySQL 复制是异步的：主节点提交事务（写完 binlog 并落盘）就立刻给客户端返回 OK，不等任何副本。但这只是 MySQL 复制的默认形态，不是它的产品定位：MySQL 通过半同步和组复制把一致性一路做到强一致（见下文"半同步复制"一节、第 7 章），整体定位偏 CP。MySQL 以异步复制为默认配置，因为大量 OLTP 场景下，吞吐和延迟比强一致更重要。</p>
 <h3 id="s222">半同步复制：可降级的一致性</h3>
-<p>半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写到 relay log 即回 ACK，不等本地回放）才返回成功。它有两档提交时点。<code>AFTER_SYNC</code>（8.0 默认）是先等副本 ACK 再提交，所有副本看到的事务顺序与主一致。<code>AFTER_COMMIT</code> 反过来：先在引擎层提交，再等 ACK。这一档有个危险窗口：提交后、ACK 前，事务对其他会话已经可见；若此刻主崩溃切换，新主上这笔被读过的数据很可能并不存在，这就是幻读。</p>
+<p>半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 并落盘后即回 ACK，不等本地回放）才返回成功。它有两档提交时点。<code>AFTER_SYNC</code>（8.0 默认）是先等副本 ACK 再提交，所有副本看到的事务顺序与主一致。<code>AFTER_COMMIT</code> 反过来：先在引擎层提交，再等 ACK。这一档有个危险窗口：提交后、ACK 前，事务对其他会话已经可见；若此刻主崩溃切换，新主上这笔被读过的数据很可能并不存在：别的会话已经读到的数据在故障切换后凭空消失，这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
 <p>半同步还可降级：等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 <code>rpl_semi_sync_source_wait_for_replica_count</code> 控制（默认 1）。</p>
 <p>半同步仍不保证零丢失：它只确认"副本收到了"，不确认"副本已提交"，且超时降级后等同异步。第 7 章 7.3.2 节从集群拓扑角度也提到了它作为中间路线的定位。</p>
 <p>从同步的视角看，半同步的设计要点只有一个：一致性可以临时关掉（超时就降级回异步），但关掉这件事必须可观测。如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>能降级的一致性机制，降级状态和正常状态同等重要，都得可观测</strong>：Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩，都是同一个道理。</p>
@@ -742,7 +742,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s230">纯拉模式：和消费者走同一条路径</h3>
 <p>Kafka 复制用的是<strong>纯拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis 的"主推"、MySQL 的"I/O 线程拉 + relay log 缓冲"都不同。</p>
 <p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应——只有一处读上界的差别：普通消费者被截在高水位 HW 以下，Follower 可以一直读到 LEO（区分标志是请求里的 replica_id 取值：Follower 填自己的 broker id，消费者填 -1）。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。第 5 章的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
-<p>拉模式的代价是 Follower 自己掌握追赶节奏，副本数量多时大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载帮到的是消费者读取，不是副本拉取：消费者读冷段时回源远程存储，而 Follower 的 FETCH 仍由 Leader 本地日志服务，哪怕该段在 Leader 本地已删——所以本地保留窗口必须盖住最慢 ISR 副本的落后量（详见第 8 章 8.4.6 节）。</p>
+<p>拉模式的代价是 Follower 自己掌握追赶节奏，副本数量多时大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载直接帮到的是消费者读取，不是副本拉取：消费者读冷段时回源远程存储，Follower 的 FETCH 仍只由 Leader 本地日志服务，拉取位点落到 Leader 本地起点之前时，副本从远程存储重建辅助状态、把日志起点抬到 Leader 本地起点后继续拉，仍能追上（详见第 8 章 8.4.6 节）。本地保留窗口盖住最慢 ISR 副本的落后量，为的是让副本留在本地快路径上，不必走这条远程追赶。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
 <p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 7 章 7.4.2 节展开；LEO 与 HW 的语义定义就在这里给出。</p>
 <p>从同步视角看，LEO 是每个副本的本地位点，HW 是 Leader 据此计算出的"已确认边界"：HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交，消费者才读得到。<strong>副本间的同步进度，由 ISR 里最慢的那一个决定</strong>。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 <code>replica.lag.time.max.ms</code> 阈值之外就被移出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见图 9-7。</p>
