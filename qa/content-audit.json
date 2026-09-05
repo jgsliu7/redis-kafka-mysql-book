@@ -1,0 +1,59 @@
+{
+  "chapters": {
+    "chapters/00-preface.md": {
+      "hanzi_md": 1226,
+      "hanzi_html": 1226
+    },
+    "chapters/01-introduction/chapter.md": {
+      "hanzi_md": 7628,
+      "hanzi_html": 7628
+    },
+    "chapters/02-data-structures-protocols/chapter.md": {
+      "hanzi_md": 7724,
+      "hanzi_html": 7724
+    },
+    "chapters/03-lifecycle/chapter.md": {
+      "hanzi_md": 8806,
+      "hanzi_html": 8806
+    },
+    "chapters/04-memory-disk/chapter.md": {
+      "hanzi_md": 10853,
+      "hanzi_html": 10853
+    },
+    "chapters/05-layered-architecture/chapter.md": {
+      "hanzi_md": 10563,
+      "hanzi_html": 10563
+    },
+    "chapters/06-security/chapter.md": {
+      "hanzi_md": 7994,
+      "hanzi_html": 7994
+    },
+    "chapters/07-cluster/chapter.md": {
+      "hanzi_md": 11370,
+      "hanzi_html": 11370
+    },
+    "chapters/08-storage-format/chapter.md": {
+      "hanzi_md": 12831,
+      "hanzi_html": 12831
+    },
+    "chapters/09-data-sync/chapter.md": {
+      "hanzi_md": 10616,
+      "hanzi_html": 10616
+    },
+    "chapters/10-summary/chapter.md": {
+      "hanzi_md": 7164,
+      "hanzi_html": 7164
+    },
+    "chapters/10-epilogue.md": {
+      "hanzi_md": 1630,
+      "hanzi_html": 1630
+    },
+    "chapters/11-references.md": {
+      "hanzi_md": 1746,
+      "hanzi_html": 1746
+    }
+  },
+  "unreferenced_svgs": [],
+  "figure_gaps": {},
+  "ok": true
+}

@@ -94,6 +94,8 @@ redo 重放和 undo 回滚是两个方向相反的动作，分工也不同。red
 
 崩溃恢复的耗时取决于崩溃那一刻 redo log 里有多少未落盘的修改、有多少未提交的事务。大事务一旦在崩溃点未提交，启动期的 undo 回滚会非常慢，所以我的规矩是：大事务不许长时间运行，再急也要拆小。
 
+这批恢复工作里，有一块不必赶在对外服务之前完成。InnoDB 做完必要的 redo 恢复、定下事务边界之后，未提交事务的逐条回滚可以留给后台线程，实例不必等它走完。期间新事务可能遇到回滚中记录持有的锁，要等锁释放。等到 `ready for connections` 打印出来、连接开始进来，后台的回滚可能仍在进行：里程碑之后还有收尾工作，进程存活、连接成功，还不等于业务延迟已经回到正常水位。
+
 **网络层加权限系统段**建立 Unix 和 TCP 监听 socket，从 mysql 系统表加载用户权限到内存。GRANT/REVOKE 本身立即生效；只有绕过它们，直接用 INSERT/UPDATE 改权限表时才需要执行 `FLUSH PRIVILEGES`，因为内存里的权限快照和磁盘表对不上，需要重新加载。
 
 **服务循环段**进入"每连接一线程"（或线程池）的连接处理模式。至此 MySQL 才对外打印 `ready for connections`。
@@ -183,7 +185,9 @@ Kafka 的日志是 append-only（仅追加）的，这一性质对生命周期�
 
 **Kafka** 受控关闭要等 Controller 迁移 Leader，若 Controller 负载高则 `controlled.shutdown.max.retries` 可能 30 秒内耗尽，退化为普通关闭。建议调大重试次数和退避间隔（`controlled.shutdown.retry.backoff.ms`），把 grace period 设到 60–120 秒。
 
-**实践清单：** preStop hook 主动检查条件而非 sleep；grace period = 刷盘/迁移耗时 + 30 秒余量；关闭期间 readiness probe 返回 false，避免 K8s 反复重启。
+K8s 的探针（probe）有三类，职责各不相同：startup 探针在成功之前抑制另外两类，给慢启动的数据库留出整段恢复时间；liveness 失败触发容器重启；readiness 失败只摘流量、不重启。把"数据库还在恢复"当成存活失败，我见过不止一次：编排系统反复重启它，恢复一次次被打断重来。慢启动应该交给 startup 探针兜底；恢复期要摘的是流量，不是进程。
+
+**实践清单：** preStop hook 主动检查条件而非 sleep；grace period = 刷盘/迁移耗时 + 30 秒余量；关闭期间 readiness probe 返回 false 先摘流量；重启与否由 liveness 判定，与 readiness 无关。
 
 ## 3.5 横向对比
 
