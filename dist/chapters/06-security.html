@@ -231,7 +231,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 6-1　从客户端发起请求到数据落盘，认证、授权、加密、审计各覆盖链路中的一段。</figcaption></figure>
 <p>客户端的请求先穿过传输加密建立的 TLS 隧道，进入服务端后由认证确认身份，由授权界定这条命令或 SQL 能不能执行，执行结果写入磁盘时由存储加密保护，而整个过程的关键事件由审计留痕。四维在一条请求上依次衔接，任何一段缺位都构成漏洞。</p>
 <p>数据系统和普通的 Web 应用在安全上有几个特殊约束。一是<strong>长连接加高频小操作</strong>。Redis 单条 GET、MySQL 单条主键查询的耗时在亚毫秒级，如果每条操作都走完整的认证握手，性能会被拖垮。于是它们都在"会话级认证一次、每操作级授权一次"的模型上做缓存与简化。二是<strong>多租户共享存储</strong>。同一个 Redis 实例、同一个 MySQL 实例、同一个 Kafka 集群往往承载多个应用的不同键、表、主题，授权必须做到细粒度的资源隔离。三是<strong>复制与分布式协调</strong>。主从之间、Broker 之间、Broker 与 KRaft 控制面之间也要互相认证，身份不止"客户端对服务端"这一种，节点对节点、控制面对数据面都要做身份认证。</p>
-<p>这三个软件因先天约束差异，走出了不同的安全路线。Redis 的内核追求极简和单核十万级 QPS（小包 GET/SET 场景），因为长期假设部署在内网，安全特性一直往后排。MySQL 面向企业市场，权限模型从第一天就追求列级、多层级、可审计。Kafka 天生分布式、多跳通信，安全设计必须可组合，于是它选了 SASL（Simple Authentication and Security Layer，简单认证与安全层）框架加监听器分层这条路。这些差异会在 <a class="xref" href="#sec-6.6">6.6 节</a>做系统对比。</p>
+<p>这三个软件因先天约束差异，走出了不同的安全路线。Redis 的内核追求极简和单核十万级 QPS（小包 GET/SET 场景），因为长期假设部署在内网，安全特性一直往后排。MySQL 面向企业市场，权限模型从第一天就追求列级、多层级、可审计。Kafka 天生分布式、多跳通信，安全设计必须可组合，于是它选了 SASL（Simple Authentication and Security Layer，简单认证与安全层）框架加监听器分层这条路。这些差异本章稍后会做系统对比。</p>
 <h2 id="sec-6.2">6.2 认证</h2>
 <p>认证是安全的第一步：在客户端执行任何操作之前，系统必须确认"你是谁"。Redis 内网里一个共享密码就够，MySQL 要按账号、来源、插件把认证做成体系，Kafka 则因为多跳，必须在每一跳都重新认证一次。</p>
 <h3 id="s124">Redis：从全局密码到 ACL 用户</h3>
@@ -253,7 +253,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 复用 SASL 这个抽象层。SASL 下面挂多种机制：PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、GSSAPI（Kerberos）、OAUTHBEARER（OAuth 2.0）。每种机制通过 JAAS（Java Authentication and Authorization Service）配置文件注入 Broker 和客户端。这个选型的逻辑是：Kafka 要直接对接企业 Kerberos 和云原生 OAuth，复用成熟的标准生态比自己发明协议更稳，也更容易通过合规审查。</p>
 <p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制（RFC 5802）：客户端要持有密码本身，但密码从不上网——客户端用密码加上服务端下发的盐和双方的随机数算出证明，服务端用自己存的加盐迭代哈希派生密钥来验证，服务端被拖库也拿不到明文密码。相比 PLAIN 机制（密码本身要在网络上走一趟，SASL 之下靠 TLS 兜底），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
-<p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解，我们在 <a class="xref" href="#sec-6.7">6.7 节</a>会展开它的设计意义。</p>
+<p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解。</p>
 <p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密），对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）；受信内网若要省 CPU，也可以把某一档配成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
 <figure class="fig" id="fig-6-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>

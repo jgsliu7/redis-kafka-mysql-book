@@ -245,7 +245,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>图里每个软件还标了"追求"与"舍弃"两行，值得先看一眼：每一家舍弃的东西，恰好落在另外两家的强项里。</p>
 <h3 id="sec-1.1.2">1.1.2 三种范式，为什么恰好是这三个实现</h3>
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 恰好各居其一。</p>
-<p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色（<a class="xref" href="#sec-1.2.1">1.2.1 节</a>展开）。</p>
+<p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令，覆盖缓存、排行榜、消息队列、锁服务等多种角色。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的标准实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史几乎就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
 <p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。几台普通服务器组成的小集群就能撑起百万级每秒写入：LinkedIn 公开基准里 3 台廉价机曾测到约 200 万次写入/秒（TPS，Transactions Per Second；该基准来自 2014 年 LinkedIn 工程博客，Kafka 0.8.1、100 字节消息、多分区并行下测得，作为历史参考；3.x 在同类硬件上吞吐通常更高）。单分区吞吐的量级见<a class="xref" href="07-cluster.html">第 7 章</a>关键数字。它把整个系统构建在追加写日志之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
 <p>三种范式最终落到这三个软件上，因为它们各自在一条设计取向上走得足够远。Redis 把"快"和"简单"放在第一位，代价是容量受内存约束；MySQL 一直把"对"排在"快"前面，宁可慢也不丢不错；Kafka 用顺序写换吞吐，代价是写进去就不好再改。</p>
@@ -451,7 +451,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>面对同一个问题："Redis 是单线程的"，使用者关心的是"我要避免在一个命令里跑 <code>KEYS *</code>，避免在大集合上做重计算，否则会卡住整个实例"。架构师追问的是：<strong>单线程反而更快的原因、多线程 I/O 的嵌入方式、这套设计在什么规模下开始吃亏以及换成多线程执行需要付出的代价。</strong></p>
 <p>这两种视角的差别，在于使用者盯的是"怎么配"，架构师盯的是"为什么这么选"。下面这张对照表把同一个系统在两种视角下关注的东西并排列出来。</p>
 <p class="tab-label"><strong>表 1-2　使用视角 vs 架构视角对照</strong></p>
-<div class="table-wrap"><table id="table-1-2"><thead><tr><th>关注维度</th><th>使用视角（怎么做）</th><th>架构视角（为什么这么做）</th></tr></thead><tbody><tr><td>提问方式</td><td>怎么配？怎么调？踩过哪些坑？</td><td>为什么这么选？反过来会怎样？边界在哪？</td></tr><tr><td>Redis 单线程</td><td>避免 <code>KEYS</code>、避免重计算、压到多少 QPS（每秒查询数）</td><td>单线程为何反而快？多线程 I/O 如何嵌入？瓶颈何时出现？</td></tr><tr><td>MySQL 日志</td><td>开 binlog、设 sync_binlog、配主从</td><td>redo 与 binlog 为何要两阶段提交？日志作为数据正本，边界到哪为止？</td></tr><tr><td>Kafka 副本</td><td>设 acks=all、min.insync.replicas=2（Kafka 的可靠性参数，详见第 4、7 章）</td><td>ISR 为何要"动态收缩"？主副本切换与一致性如何兼顾？</td></tr><tr><td>知识形态</td><td>配方、参数、最佳实践</td><td>取舍、约束、演化逻辑、可迁移的设计思想</td></tr><tr><td>终极目标</td><td>把现有系统用好、用稳</td><td>理解设计决策，并在自己的系统里做对取舍</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-1-2"><thead><tr><th>关注维度</th><th>使用视角（怎么做）</th><th>架构视角（为什么这么做）</th></tr></thead><tbody><tr><td>提问方式</td><td>怎么配？怎么调？踩过哪些坑？</td><td>为什么这么选？反过来会怎样？边界在哪？</td></tr><tr><td>Redis 单线程</td><td>避免 <code>KEYS</code>、避免重计算、压到多少 QPS（每秒查询数）</td><td>单线程为何反而快？多线程 I/O 如何嵌入？瓶颈何时出现？</td></tr><tr><td>MySQL 日志</td><td>开 binlog、设 sync_binlog、配主从</td><td>redo 与 binlog 为何要两阶段提交？日志作为数据正本，边界到哪为止？</td></tr><tr><td>Kafka 副本</td><td>设 acks=all、min.insync.replicas=2（Kafka 的可靠性参数）</td><td>ISR 为何要"动态收缩"？主副本切换与一致性如何兼顾？</td></tr><tr><td>知识形态</td><td>配方、参数、最佳实践</td><td>取舍、约束、演化逻辑、可迁移的设计思想</td></tr><tr><td>终极目标</td><td>把现有系统用好、用稳</td><td>理解设计决策，并在自己的系统里做对取舍</td></tr></tbody></table></div>
 <p>使用视角问"怎么做"，架构视角问"为什么这么做、反过来会怎样、这套思想能否迁移到我自己设计的系统"。两者互补、不可互相替代。本书要给你的，就是架构视角。</p>
 <h3 id="sec-1.3.2">1.3.2 架构视角的三个方法</h3>
 <p>架构视角落到实处，是三个可以反复使用的方法。</p>

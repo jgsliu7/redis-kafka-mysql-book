@@ -107,7 +107,7 @@ Kafka 的数据结构要同时满足三件事：**磁盘顺序追加 + 批量压
 | `attributes` | 压缩类型 + 时间戳类型 + 事务标记 |
 | `lastOffsetDelta` | 最后一条消息距离 baseOffset 的差值 |
 | `baseTimestamp` / `maxTimestamp` | 这批消息的时间范围 |
-| `producerId` / `producerEpoch` / `baseSequence` | 幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重，见 9.4 节） |
+| `producerId` / `producerEpoch` / `baseSequence` | 幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重） |
 | `recordsCount` | 这批有几条记录 |
 
 头部之后是实际的消息记录。**每条记录不存绝对 offset 和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。差值编码在一个 Batch 内能把编码空间省到很小。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见图 2-7。
