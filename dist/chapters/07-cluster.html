@@ -140,7 +140,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第二，副本怎么一致。</strong> 主节点写完一笔，要不要等从节点确认？不等（异步复制）最快，但主挂了可能丢已提交的写；全等（同步复制）不丢，但任何一个慢从都会拖垮写性能；折中是多数派确认：只要大多数副本确认了就算提交，这也是共识协议的核心思想。一致性强度与写延迟，从来都是此消彼长。</p>
 <p><strong>第三，故障怎么发现与转移。</strong> 一个节点多久没心跳算"死"？是单点判定（主观下线）还是多数派投票（客观下线）？选新主按什么规则（优先级、日志进度、ID）？分区时少数派该怎么办：继续写（可能脑裂：两个主各自接受写入、数据分叉）还是停服（宁可不可用）？这套机制决定了集群在故障时的表现。</p>
 <p><strong>第四，元数据怎么管理。</strong> 哪个节点承载哪些分片？谁是当前的主？副本同步到哪了？这些元数据（metadata）放哪：是集中存到一个协调者（Controller）上，还是去中心化地用 Gossip（闲谈协议：节点间随机互相传播状态，最终全员收敛）让所有节点最终一致？集中式强一致但有单点风险，去中心化无单点但收敛慢。这是集群架构的另一条主线。</p>
-<p>这四个难题之上，还有一条更根本的约束：<strong>CAP 定理</strong>。网络分区（Partition）是分布式绕不开的现实，于是一致性（Consistency）与可用性（Availability）必须取舍。P 是给定的，C 和 A 之间只能偏一头。下文用 AP 指"分区时优先可用、可能丢写"，用 CP 指"分区时优先一致、宁可停服"。三个软件的默认形态里，Redis 偏 AP（异步可丢、但分区时少数派停写，行为边界<a class="xref" href="#sec-7.2.3">见 7.2.3</a>）、MySQL 的默认复制偏 AP、产品定位偏 CP，Kafka 在两端之间可调。这条线索贯穿全章。</p>
+<p>这四个难题之上，还有一条更根本的约束：<strong>CAP 定理</strong>。网络分区（Partition）是分布式绕不开的现实，于是一致性（Consistency）与可用性（Availability）必须取舍。P 是给定的，C 和 A 之间只能偏一头。下文用 AP 指"分区时优先可用、可能丢写"，用 CP 指"分区时优先一致、宁可停服"。三个软件的默认形态里，Redis 偏 AP（异步可丢、但分区时少数派停写，行为边界见 <a class="xref" href="#sec-7.2.3">7.2.3 节</a>）、MySQL 的默认复制偏 AP、产品定位偏 CP，Kafka 在两端之间可调。这条线索贯穿全章。</p>
 <blockquote><strong>关键数字</strong>  <strong>Redis Cluster：16384 个槽</strong>，Gossip bitmap 仅 2KB。实际节点数上限约 500–1000（官方建议不超过 1000；社区生产实践推荐 400–500）；超过后 Gossip 消息膨胀、CPU 开销上升，收敛时间变长。  <strong>MySQL MGR：组大小通常 3/5/7/9 个成员</strong>（奇数个避免平票；MGR 硬上限 9 个成员，组越大 Paxos 共识开销越高）。跨 AZ 部署时每笔事务约要多 5–10ms（同城 AZ 典型 RTT 2–5ms；MGR 的 Paxos 共识需多轮往返，实际增加延迟为 RTT 的 2–3 倍；异地 Region 会更高）；多数派容错，3 个成员可容忍 1 个故障。  <strong>Kafka 单分区吞吐：约 10–50MB/s</strong>（视硬件与消息大小；1KB 消息约 1–5 万条/秒，100 字节消息可达 10 万条/秒以上）。KRaft 模式下分区数可达百万级（ZK 时代单集群实践上限约 20 万，受 ZooKeeper 元数据开销所限）。</blockquote>
 <p>这三个软件各自走了一条不同的路。<a class="xref" href="#fig-7-1">图 7-1</a> 把它们的演进主线并列出来，便于先建立一个总体印象。</p>
 <figure class="fig" id="fig-7-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 920 502" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -183,7 +183,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="175" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：扩展 + 自动容错</text>
 
   <text x="175" y="449" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：异步复制偏 AP，</text>
-  <text x="175" y="467" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">分区时少数派停写偏 CP（见 7.2.3）</text>
+  <text x="175" y="467" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">分区时少数派停写偏 CP（见 7.2.3 节）</text>
 
   
   <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
@@ -491,7 +491,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="sec-7.4.2">7.4.2 Replica 与 ISR：同步达标的副本集合</h3>
 <p>每个分区在物理上有多个副本（replica），其中一个是 Leader、其余是 Follower。所有读写都走 Leader，Follower 主动从 Leader 拉取（fetch）数据追同步。这套 Leader-Follower 模型看着和 Redis、MySQL 的主从很像，但 Kafka 在"谁能当 Leader"上做了一个关键设计：<strong>ISR（In-Sync Replicas，同步副本集合）</strong>。</p>
 <p>ISR 是一个动态集合：只有那些能在 <code>replica.lag.time.max.ms</code> 这个时间窗口内跟上 Leader 进度的副本，才被算作"同步副本"，留在 ISR 里；跟不上（lag 超时）的副本会被 Leader 移出 ISR。当 Leader 故障时，新 Leader <strong>只能从 ISR 里选</strong>：不在 ISR 里的副本，哪怕它数据更全，也没资格当选。这套设计把"副本是否可信"从静态配置（比如写死"3 副本才算数"）变成动态判定（按实际同步进度实时调整）。节点慢下来时自动剔除、不拖累整体，恢复时自动加回。</p>
-<p>ISR 定义了 Kafka 副本同步的边界。它比 MGR 的多数派确认松：MGR 每笔事务都要拿到组内过半成员的 Paxos 确认（<a class="xref" href="#sec-7.3.3">7.3.3 节</a>），写延迟里固定含一次跨节点共识往返，组规模也被共识开销限制在 9 个成员以内（<a class="xref" href="#sec-7.1">见 7.1</a> 关键数字）；个别成员落后虽不阻塞这笔确认，却会触发组内流控、拖慢全组写入。它又比 Redis 的"纯异步"紧：Redis 的从节点哪怕数据落后也不丧失当主资格——Sentinel 只是在候选里按优先级、复制偏移量、runid 挑相对更优的那个（<a class="xref" href="#sec-7.2.2">见 7.2.2</a>），同步进度是择优参考、不是资格门槛；Kafka 把它做成了硬门槛——不在 ISR 里的副本，哪怕数据更全也没资格当选。Kafka 在两者之间走了一条中间路线，用一个动态维护的同步达标副本集合在多数派（强但不灵活）和纯异步（灵活但不保证）之间找平衡。Follower 慢了就移出 ISR，不影响写性能；但 Leader 切换只在 ISR 内选，保证不丢已确认的消息。</p>
+<p>ISR 定义了 Kafka 副本同步的边界。它比 MGR 的多数派确认松：MGR 每笔事务都要拿到组内过半成员的 Paxos 确认（<a class="xref" href="#sec-7.3.3">7.3.3 节</a>），写延迟里固定含一次跨节点共识往返，组规模也被共识开销限制在 9 个成员以内（<a class="xref" href="#sec-7.1">见 7.1</a> 关键数字）；个别成员落后虽不阻塞这笔确认，却会触发组内流控、拖慢全组写入。它又比 Redis 的"纯异步"紧：Redis 的从节点哪怕数据落后也不丧失当主资格——Sentinel 只是在候选里按优先级、复制偏移量、runid 挑相对更优的那个（见 <a class="xref" href="#sec-7.2.2">7.2.2 节</a>），同步进度是择优参考、不是资格门槛；Kafka 把它做成了硬门槛——不在 ISR 里的副本，哪怕数据更全也没资格当选。Kafka 在两者之间走了一条中间路线，用一个动态维护的同步达标副本集合在多数派（强但不灵活）和纯异步（灵活但不保证）之间找平衡。Follower 慢了就移出 ISR，不影响写性能；但 Leader 切换只在 ISR 内选，保证不丢已确认的消息。</p>
 <h3 id="sec-7.4.3">7.4.3 acks：把一致性强度做成可调参数</h3>
 <p>Kafka 在生产者端有一个参数 <code>acks</code>，决定生产者写一条消息时要等多少确认才算成功。三档语义非常清晰：<code>acks=0</code>，生产者发完不等任何确认就走，最快但 Leader 没收到也不重试，可能丢；<code>acks=1</code>（Kafka 3.0 之前的默认），等 Leader 本地写入成功就返回，Leader 宕机而 Follower 还没同步到时仍会丢；<code>acks=all</code>（也叫 <code>-1</code>），等 ISR 里所有副本都确认才返回（自 Kafka 3.0 起成为默认，对应 KIP-679），只要 ISR 非空且 ISR 全部收到，这条消息就不会丢。</p>
 <p><code>acks</code> 让使用者自己选择一致性强度。这是 Kafka 与 Redis、MySQL 在设计上的关键区别：前两者把取舍写死在默认值里，Kafka 把它做成可配置参数。代价是延迟：<code>acks</code> 越严，每条消息要等的副本确认越多，写延迟越高。<code>acks</code> 参数与 <code>min.insync.replicas</code> 的精确交互，以及它们如何共同决定"消息算不算已提交"，见<a class="xref" href="09-data-sync.html">第 9 章</a> acks 参数一节。</p>

@@ -494,7 +494,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="120" y="530" width="600" height="0" rx="6" fill="none"/>
 
   <text x="60" y="546" font-size="11" fill="#EF4444" font-weight="600">代价：</text>
-  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是 MySQL 为「可插拔」支付的固有开销。</text>
+  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是「可插拔」带来的固有开销。</text>
 </svg>
 </div><figcaption>图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。</figcaption></figure>
 <p>这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池（Buffer Pool）→ redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 <code>.ibd</code> 表空间存数据和索引、独立 redo log 文件存 redo log（8.0.30 前为 <code>ib_logfile*</code>，之后为 <code>#innodb_redo</code> 目录）、<code>undo_*</code> 存 undo log，再配合双写缓冲（doublewrite buffer）防止页撕裂。其中表空间的四层结构、redo log 的物理结构与双写，归<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
@@ -836,7 +836,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-5.6">5.6 架构启示</h2>
 <p>同一个分层问题，三个软件的方案完全不同。这五条启示，每条都能在前面某一节找到它对应的具体取舍。</p>
 <h3 id="s114">启示一：分层深度匹配性能目标，而非追求"标准层数"</h3>
-<p>为每次抽象付出的延迟是多少纳秒、多少毫秒，这是分层最硬的计量单位。Redis 的答案是"几乎为零"，所以它的层数少、跨层全是直接调用；MySQL 的答案介于中间：值得为标准化接口付每次行操作的虚函数开销；Kafka 的答案是"毫秒级可以接受，以换取吞吐"，所以它的层多而厚。</p>
+<p>为每次抽象付出的延迟是多少纳秒、多少毫秒，这是分层最硬的计量单位。Redis 的答案是"几乎为零"，所以它的层数少、跨层全是直接调用；MySQL 的答案介于中间：标准化接口值得，代价是每次行操作的虚函数开销；Kafka 的答案是"毫秒级可以接受，以换取吞吐"，所以它的层多而厚。</p>
 <h3 id="s115">启示二：接口稳定性优先于接口优雅性</h3>
 <p>回看这三个软件最成功的接口：Redis 的 <code>robj</code>（type/encoding 分离）、MySQL 的 Handler API（行操作契约）、Kafka 的 Log 格式（顺序追加、按偏移量寻址）。这三者都谈不上优雅。<code>robj</code> 用一个联合体加指针覆盖了所有类型，Handler API 的方法签名又多又碎，Kafka 的 Log 是最朴素的"一段一段的文件"。但它们有一个共同点：<strong>多年不变</strong>。<code>robj</code> 从 Redis 早期到现在核心结构没动过。Handler API 自 MySQL 5.x 插件化以来接口形态稳定。Kafka 的日志格式虽然有版本演进，但"顺序追加 + 偏移量寻址"的根基没变。</p>
 <p>稳定的接口是生态的基础。Redis 的模块生态、MySQL 的几十种引擎、Kafka 围绕 Log 的零拷贝与复制复用，全都建立在这上面。一个反复重构的接口，再精致也站不住，没人敢在它上面做长期依赖。</p>
@@ -857,7 +857,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这五条合起来看，三个软件都没重写过架构。Redis 从一个缓存工具发展为支持多种数据结构、Function、Cluster 的多模数据库，核心层（robj、命令表）始终没动。MySQL 和 Kafka 走的是同一条路：核心接口（Handler API、Log 抽象）十几年不动，新功能都加在外围。</p>
 <h2 id="sec-5.7">5.7 小结</h2>
 <p>回到本章开头的问题：为什么必须分层？分多深？层间靠什么通信？三个软件用各自不同的形态解决了同一个问题：怎么把交互、逻辑、存储分开，且分得划算。</p>
-<p>Redis 的经验是：<strong>性能敏感处，分层要薄，跨层要直接</strong>。它用极少的层和函数调用把延迟降到亚毫秒，代价是放弃存储的可插拔。MySQL 走的是另一端，用 Handler API 接入几十种引擎，<strong>标准化接口能支撑起生态，但要为多态付开销</strong>。Kafka 的分层边界天然是网络，<strong>分层要为水平扩展服务</strong>：交互层是三者中最重的，用来利用多核；存储层做得最薄，以此支撑高吞吐。</p>
+<p>Redis 的经验是：<strong>性能敏感处，分层要薄，跨层要直接</strong>。它用极少的层和函数调用把延迟降到亚毫秒，代价是放弃存储的可插拔。MySQL 走的是另一端，用 Handler API 接入几十种引擎，<strong>标准化接口能支撑起生态，但多态有开销</strong>。Kafka 的分层边界天然是网络，<strong>分层要为水平扩展服务</strong>：交互层是三者中最重的，用来利用多核；存储层做得最薄，以此支撑高吞吐。</p>
 <p>三条经验可以收成一句：</p>
 <p><strong>分层的价值，是让每次修改都有明确的改动位置。</strong></p>
 <p>好分层下，加新功能、换实现、修 bug 各有明确的改动位置；坏分层下，任何修改都牵动全局。区分好坏的标准，是边界画得准不准。</p>
