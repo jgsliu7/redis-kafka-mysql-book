@@ -72,7 +72,7 @@
 
 [35] 同 [1]。—— 跨系统架构取舍的最佳入门，本书反复呼应的核心参照。
 [36] 同 [2]。—— 将日志当作统一抽象的精炼论述，适合快速建立数据系统统一视角。
-[37] Bailis P, Stonebraker M, et al. Readings in Database Systems (Red Book)[M]. Cambridge: MIT Press, 2019. —— 数据库经典论文按主题组织的导读索引，适合有论文阅读需求的读者。
+[37] Bailis P, Hellerstein J M, Stonebraker M. Readings in Database Systems: 5th Edition[M/OL]. (2015)[2026-08-14]. http://www.redbook.io/. —— 数据库经典论文（社群通称 Red Book）按主题组织的导读索引，适合有论文阅读需求的读者。
 [38] Schwartz B, Zaitsev P, Tkachenko V. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2022. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
 [39] Narkhede N, Kreps J, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. Stockholm, 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，十余年后核心架构仍与该文描述一致。
 
