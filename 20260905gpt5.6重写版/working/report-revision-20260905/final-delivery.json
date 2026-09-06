@@ -1,0 +1,23 @@
+{
+  "html": "20260905gpt5.6重写版/20260905gpt5.6版本.html",
+  "html_bytes": 656353,
+  "html_sha256": "ed97c7b2e00148f3d4d2a964ccdaacacf94287fd69de10b4fd035751b4c7dc9d",
+  "source_han_total": 106443,
+  "units": 13,
+  "figures": 53,
+  "code_blocks": 15,
+  "references": 102,
+  "citations": 104,
+  "index_entries": 16,
+  "adoption": {
+    "FIX": 44,
+    "partial": 17,
+    "SKIP": 0
+  },
+  "editorial_operations": 55,
+  "print_pages": 158,
+  "records": {
+    "双审意见落实记录.md": "9a3f3acff341db5b56339ad71c2be8fba4a5f2dbf5885c9dfdb17798027ebe1a",
+    "制作与核验说明.md": "31075c4d0d4434231086af70e784bf04e0e4fc1178471bef75b58577b935129d"
+  }
+}

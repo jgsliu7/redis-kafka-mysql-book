@@ -1,0 +1,21 @@
+{
+  "book": {
+    "figures": 53,
+    "svg": 53,
+    "chapters": 13,
+    "overflow": false,
+    "badLinks": []
+  },
+  "mobile": {
+    "overflow": false,
+    "tocOpen": "true"
+  },
+  "navigation": {
+    "hash": "#chapter-10",
+    "tocOpen": "false"
+  },
+  "pageErrors": [],
+  "networkRequests": [],
+  "svgFiles": 53,
+  "svgTextOutOfCanvas": []
+}

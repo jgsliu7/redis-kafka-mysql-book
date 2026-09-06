@@ -1,0 +1,490 @@
+{
+  "source_sha256": "0723ad28f3cb0ce817654c702415445d4caf6acdc0d64be49a5a65aa3adb9117",
+  "approval": "Final textual variants reviewed by A and C, with B technical cross-check; 22 textual drafts approved. Four image-removal drafts require B unique-information merge before execution. Per-draft proposal labels below preserve initial history; this aggregate status records the final vote.",
+  "cards": [
+    {
+      "id": "C01",
+      "decision": "FIX",
+      "action": "删除1.4.1重复写作史，保留后续主题路线及已有1.3.3实演；序言保留原来历",
+      "teacher_overlap": "语02"
+    },
+    {
+      "id": "C02",
+      "decision": "部分采纳",
+      "action": "先重排MySQL概览，唯一MVCC细节移4.3.7；不把全部1.2压成三句产品标签",
+      "teacher_overlap": "语03"
+    },
+    {
+      "id": "C03",
+      "decision": "部分采纳",
+      "action": "落实下列主讲归属与局部完整判断；不机械改所有章为问题模板、不追求三家等长",
+      "teacher_overlap": "语04/10/12"
+    },
+    {
+      "id": "C04",
+      "decision": "部分采纳",
+      "action": "排行榜已在导读，保留。2.5补明确假设和“先保留现库/何时引入派生排名”两分支，不造历史实测",
+      "teacher_overlap": "语03关联"
+    },
+    {
+      "id": "C05",
+      "decision": "部分采纳",
+      "action": "详细布局仍由2.2.6图2-7主讲，修错位预告；8.4.2减批量收益重述，保留校验/基准依赖/恢复状态",
+      "teacher_overlap": "语04"
+    },
+    {
+      "id": "C06",
+      "decision": "部分采纳",
+      "action": "用2.3.3已有Kafka协商把一个分支说完，不再新增一套虚构网络协议；文件两版演进由8.6.3主讲",
+      "teacher_overlap": "语06"
+    },
+    {
+      "id": "C07",
+      "decision": "部分采纳",
+      "action": "3.3.2保留恢复核心，删同段重复开放连接句，补4章回指；不大段移除redo/undo导致启动无法读懂",
+      "teacher_overlap": "语08/12"
+    },
+    {
+      "id": "C08",
+      "decision": "FIX",
+      "action": "5章主讲Acceptor/Processor/RequestChannel职责；3.4.2只写运行放行与退出依赖。图3-5改成状态约束图，不编造固定函数调用顺序",
+      "teacher_overlap": "语10"
+    },
+    {
+      "id": "C09",
+      "decision": "FIX",
+      "action": "3.5.2新增明确设定的预算表，用T、t1、t2表示已消耗与剩余，不新增实测秒数，不把并发步骤盲相加",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C10",
+      "decision": "FIX",
+      "action": "图4-4重画LRU新老区与同一脏页双重管理关系；保留现参数/限定；语11一并修主语",
+      "teacher_overlap": "语11"
+    },
+    {
+      "id": "C11",
+      "decision": "FIX",
+      "action": "精确替换未兑现预告为页布局/完整性保护，后续WAL条件保留",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C12",
+      "decision": "部分采纳",
+      "action": "事故原文完整保留，不凭推测补Controller→DAO调用链；5.6.1明确两种假设下的候选及代价，完成可检查判断",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C13",
+      "decision": "FIX",
+      "action": "Query Cache末段保留依赖失效责任，删整个服务层被删除/预定删层等未提出的对手",
+      "teacher_overlap": "语13相关"
+    },
+    {
+      "id": "C14",
+      "decision": "FIX",
+      "action": "图5-7退出正文、保留文件及表5-1，将图中独有“普通主线程并非无限低延迟”等条件核入表/邻段；不为保图数重画一幅重复图",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C15",
+      "decision": "部分采纳",
+      "action": "6.4.4把已讲监听器关系改短回指，保留加密成本；6.2.5独有凭证引导与委托令牌不动，不混合成一条所有部署通用安全路径",
+      "teacher_overlap": "语15"
+    },
+    {
+      "id": "C16",
+      "decision": "FIX",
+      "action": "6.5.4用原“应用账号被误用”设定完成证据表，区分数据库账号/应用请求/实际人，明确记录缺失时无法补推",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C17",
+      "decision": "部分采纳",
+      "action": "7.4.4保留acks定义、最小ISR及运行中变化边界，把精确轨迹交9.4.2；删外部副作用复述改具体回指，不大幅抽空7章",
+      "teacher_overlap": "语12相关"
+    },
+    {
+      "id": "C18",
+      "decision": "FIX",
+      "action": "7.2.6保留完整事故；10章保留超卖结果与后来MySQL/Redis调整，缩故障重述；后记不再第三次复述同一事故",
+      "teacher_overlap": "语01/29"
+    },
+    {
+      "id": "C19",
+      "decision": "FIX",
+      "action": "图8-1退出正文，保留8.1.3三行比较与全部独有条件；页布局/索引等有效图不删",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C20",
+      "decision": "FIX",
+      "action": "用五阶段静态文件发布表替换泛问段；显式无并发增量假设、底层持久化前提、不是Redis全部实现",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C21",
+      "decision": "FIX",
+      "action": "将A/B问句矩阵变成完整最小设定：A只识别v1，B读v1/v2；v2新增必需字段，A必须拒绝，禁止默默跳过；保留一般可跳过条件与回退边界",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C22",
+      "decision": "FIX",
+      "action": "图9-1退出正文、保留四问表，核独有信息；HW/LEO与历史分叉两图完整保留",
+      "teacher_overlap": "语19"
+    },
+    {
+      "id": "C23",
+      "decision": "FIX",
+      "action": "9.5保留比较结构，9.5.3补同一次确认写W、候选Q的可用证据/不足证据表，不无条件替三产品排强弱",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C24",
+      "decision": "部分采纳",
+      "action": "优先9.3.4补两种等待点时间表/时间轴；图9-5现仍承担relay/GTID不得直接覆盖丢事实。若B能在不损原图下完成新双轴图，可增新图而不强行复用9-5编号",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C25",
+      "decision": "FIX",
+      "action": "图10-1退出正文；表10-1仍可查；语21在候选后DDL前补成功路径总览，避免把索引图当请求流程",
+      "teacher_overlap": "语21"
+    },
+    {
+      "id": "C26",
+      "decision": "部分采纳",
+      "action": "选观察笔记片段路线；保留未执行声明，不启动配套工程。统一占位符/成功与拒绝分支范围；完成语22/23/24/25/26",
+      "teacher_overlap": "语21—26"
+    },
+    {
+      "id": "C27",
+      "decision": "FIX",
+      "action": "10.8.1删重复固定角色反驳，保留三个组件在本例的实际职责及全部改判条件",
+      "teacher_overlap": "—"
+    },
+    {
+      "id": "C28",
+      "decision": "FIX",
+      "action": "AI/亲历/设定/未执行范围集中后记本版说明；序言和10章保留必要就地短说明；作者介绍不再重复未虚构声明",
+      "teacher_overlap": "语01/27/28/29"
+    },
+    {
+      "id": "C29",
+      "decision": "FIX",
+      "action": "正文统一短标识加短标题，按章固定来源编号；参考条目按现编号排序，不盲改所有ID。引用锚点与书目入口统一，保留真实URL和版本",
+      "teacher_overlap": "语30"
+    },
+    {
+      "id": "C30",
+      "decision": "部分采纳",
+      "action": "做稳定文献锚点、版本来源维护清单、有效的成书信息入口。当前无作者确认署名或勘误渠道，不新增；不为好看伪造出版信息；标题副标题不改",
+      "teacher_overlap": "语29/30"
+    }
+  ],
+  "drafts": [
+    {
+      "id": "C-D01",
+      "cards": [
+        "C01",
+        "语02"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md",
+      "old": "起初按软件整理笔记时，同类机制离得很远，难以比较。改成按主题后，Redis的持久化、InnoDB的日志和Kafka的记录才有机会在相同问题下讨论。这是本书采用主题结构的直接原因。\n\n",
+      "new": "",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D02",
+      "cards": [
+        "C02",
+        "语03"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md",
+      "old": "### 1.2.2 MySQL：关系接口之下还有页、版本和提交过程\n\n应用通过SQL描述查询和修改，通过事务规定哪些修改应一起生效。MySQL服务层负责连接、语句处理和执行计划，存储引擎承担具体的数据访问。本书讨论MySQL时，未特别说明的存储机制以默认引擎InnoDB为对象。把服务层和引擎分开很必要：binlog属于服务层，redo log属于InnoDB，它们并不是同一份日志的两个名字。\n\nInnoDB用页组织存储，默认页大小为16KB，聚簇索引的叶子页保存行记录。B+树支持按键定位与范围访问，缓冲池（Buffer Pool）把正在使用的页保存在内存。一次看起来很简单的SQL，可能涉及多次索引访问、行过滤或排序；查询语言的便利并不消除这些内部工作。第2章从访问过程解释结构，第4章解释页如何进入内存以及何时写回。\n\n并发读写还需要说明可见性。MVCC（多版本并发控制，Multi-Version Concurrency Control）保留重建旧行版本所需的信息，让普通一致性读依据读取视图选择可见版本。它使某些读写不必互相等待，但没有取消数据库里的锁。更新、锁定读、元数据操作与普通一致性读的规则不同，不能用“读不阻塞写”概括所有SQL。\n\n在InnoDB默认的可重复读隔离级别下，同一事务中的一致性读通常使用首次此类读取建立的快照；在读已提交隔离级别下，每次一致性读建立自己的快照。这会影响两个连续查询为什么看到相同或不同结果。这里的“一致性读”是特定读取机制，不等同于分布式系统讨论的线性一致性。[MySQL8.0一致性非锁定读](https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html)明确区分了这些条件。\n\n例如，一笔事务先读到某商品剩余十件，另一笔事务随后提交扣减。前一笔事务再次普通查询，可能仍看到原来的快照。不能据此认定副本复制延迟，也不能据此推导它执行更新时仍只会处理快照中的版本。判断读到旧值的原因，需要先说明读发生在哪里、用什么隔离级别、是不是锁定读。第9章讨论副本旧值之前，会保留这项区别。\n\nredo log（重做日志）服务于崩溃恢复，undo log（回滚日志）支持回滚和旧版本重建，binlog（二进制日志）记录服务层的变更历史，供复制和恢复等用途使用。长事务可能使读取视图仍然需要的旧版本无法及时清理。这是MVCC降低部分读写冲突所伴随的维护成本，而不是某个参数配置不当才会出现的偶然现象。[MySQL8.0多版本机制](https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html)说明了undo的这些职责。\n\n事务为业务提供了很有用的边界，但“支持事务”不是“不丢不错”的产品保证。是否强制刷盘、发生哪类故障、是否切换到尚未获得提交记录的副本，都会影响结果。即便数据库内的事务完全成立，向另一个服务发送通知也未必属于同一个提交过程。第4章先拆开持久化与复制确认，第10章再处理数据库之外的状态。",
+      "new": "### 1.2.2 MySQL：关系接口之下还有页、版本和提交过程\n\n应用通过SQL描述查询和修改，通过事务规定哪些修改应一起生效。MySQL服务层负责连接、语句处理和执行计划，存储引擎承担具体的数据访问。本书讨论MySQL时，未特别说明的存储机制以默认引擎InnoDB为对象。binlog（二进制日志）属于服务层，redo log（重做日志）属于InnoDB，它们承担不同的记录职责。\n\nInnoDB用页和B+树组织行记录，缓冲池保存正在使用的页。查询可能涉及多次索引访问、行过滤或排序，SQL接口并不消除这些内部工作。第2章解释访问结构，第4章说明工作集、页写回与持久化条件。\n\nMVCC（多版本并发控制，Multi-Version Concurrency Control）让普通一致性读依据读取视图选择可见版本，但不取消数据库中的锁。undo log（回滚日志）支持事务回滚与旧版本重建。同一次业务读到旧值，可能来自事务快照，也可能来自落后副本，不能仅凭外观判定原因。读取视图、undo维护成本和两种隔离级别的具体区别，见第4章4.3.7。\n\n事务提供数据库内部的修改边界，持久化和副本切换仍需各自的条件。向另一个服务发送通知也未必属于同一个提交过程。第4章拆开这些恢复职责，第10章再把数据库之外的状态纳入完整设计。",
+      "note": "Only execute with C-D03 migration; first definitions redo/undo retained at new main section; retain original citation metadata.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D03",
+      "cards": [
+        "C02",
+        "语03"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md",
+      "old": "### 4.3.6 change buffer把部分二级索引工作推迟\n\n修改一个当前不在缓冲池的二级索引页，可能先触发随机读取。change buffer记录符合条件的修改，在页随后读入或后台合并时应用，减少立即把目标页读取进来的要求。它有适用限制，例如唯一性检查和某些降序索引条件会影响是否能够使用，不能说所有二级索引修改都进入这里。\n\n这份缓冲也不是只存在于进程内存。在内存中它占用缓冲池的一部分，在磁盘上有系统表空间中的对应组织，使未合并工作能够跨越事务和重启继续存在。相关持久化与恢复机制必须保护这些延迟修改，否则“先缓一缓”就会成为漏更新。[change buffer说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html)列出了范围及合并时机。\n\n合并可以聚合某些访问，却也可能在后续引入I/O。持续产生而无法及时合并的工作，会转化为新的资源压力。第3章快速关闭允许跳过完整合并，并不是认定这些工作没有必要，而是允许它们按恢复协议继续存在。\n\n第2章的自适应哈希索引则是另一类辅助状态：它减少部分热点搜索的重复路径，可以配置是否启用，并有维护和争用成本。change buffer改变写入安排，辅助哈希改变读取定位，doublewrite应对页损坏。三者不宜因为都称“缓冲”或“索引”就按同一种缓存理解。",
+      "new": "### 4.3.6 change buffer把部分二级索引工作推迟\n\n修改一个当前不在缓冲池的二级索引页，可能先触发随机读取。change buffer记录符合条件的修改，在页随后读入或后台合并时应用，减少立即把目标页读取进来的要求。它有适用限制，例如唯一性检查和某些降序索引条件会影响是否能够使用，不能说所有二级索引修改都进入这里。\n\n这份缓冲也不是只存在于进程内存。在内存中它占用缓冲池的一部分，在磁盘上有系统表空间中的对应组织，使未合并工作能够跨越事务和重启继续存在。相关持久化与恢复机制必须保护这些延迟修改，否则“先缓一缓”就会成为漏更新。[change buffer说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html)列出了范围及合并时机。\n\n合并可以聚合某些访问，却也可能在后续引入I/O。持续产生而无法及时合并的工作，会转化为新的资源压力。第3章快速关闭允许跳过完整合并，并不是认定这些工作没有必要，而是允许它们按恢复协议继续存在。\n\n第2章的自适应哈希索引则是另一类辅助状态：它减少部分热点搜索的重复路径，可以配置是否启用，并有维护和争用成本。change buffer改变写入安排，辅助哈希改变读取定位，doublewrite应对页损坏。三者不宜因为都称“缓冲”或“索引”就按同一种缓存理解。\n\n### 4.3.7 读取视图与旧版本也会占用资源\n\n并发读写还需要说明可见性。MVCC（多版本并发控制，Multi-Version Concurrency Control）保留重建旧行版本所需的信息，让普通一致性读依据读取视图选择可见版本。它使某些读写不必互相等待，但没有取消数据库里的锁。更新、锁定读、元数据操作与普通一致性读的规则不同，不能用“读不阻塞写”概括所有SQL。\n\n在InnoDB默认的可重复读隔离级别下，同一事务中的一致性读通常使用首次此类读取建立的快照；在读已提交隔离级别下，每次一致性读建立自己的快照。这会影响两个连续查询为什么看到相同或不同结果。这里的“一致性读”是特定读取机制，不等同于分布式系统讨论的线性一致性。[MySQL8.0一致性非锁定读](https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html)明确区分了这些条件。\n\n例如，一笔事务先读到某商品剩余十件，另一笔事务随后提交扣减。前一笔事务再次普通查询，可能仍看到原来的快照。不能据此认定副本复制延迟，也不能据此推导它执行更新时仍只会处理快照中的版本。判断读到旧值的原因，需要先说明读发生在哪里、用什么隔离级别、是不是锁定读。第9章讨论副本旧值之前，会保留这项区别。\n\nredo log（重做日志）服务于崩溃恢复，undo log（回滚日志）支持回滚和旧版本重建，binlog（二进制日志）记录服务层的变更历史，供复制和恢复等用途使用。长事务可能使读取视图仍然需要的旧版本无法及时清理。这是MVCC降低部分读写冲突所伴随的维护成本，而不是某个参数配置不当才会出现的偶然现象。[MySQL8.0多版本机制](https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html)说明了undo的这些职责。",
+      "note": "Exact source paragraphs from former1.2.2, including references. Must re-read moved existing prose, not just seams. Check first-definition redo/undo after migration.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D04",
+      "cards": [
+        "C04"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md",
+      "old": "如果通过补一个索引即可满足要求，引入第二个状态系统可能不值得；如果高频排名和业务事务能够清楚分离，采用派生排名又可能降低热点查询压力。两种选择都需要证据。开篇那次测试告诉我的首先是要检查实际访问过程，而不是把一次对比变成产品结论。",
+      "new": "这里再作一组设定：现有业务数据已经在MySQL中，适用索引在目标负载下满足前一百名查询，分数修改还需要与业务状态一起提交。在这组条件下，先保留现库的索引访问；新增一份Redis排名会增加同步与重建责任，而现有索引已经满足这里设定的查询要求。\n\n如果后续测量表明排名读取挤占了事务资源，并且业务允许明确的刷新延迟，派生排名才重新成为候选。此时要同时验证读取收益、增量更新成本和重建过程。开篇那次测试告诉我的首先是要检查实际访问过程；派生排名是否值得引入，还要由这些负载与一致性条件判断。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D05",
+      "cards": [
+        "C05",
+        "语04"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md",
+      "old": "表2-1保留V2批次的关键头字段，详细字节边界将在第8章与恢复、兼容一起讨论。",
+      "new": "表2-1与图2-7给出V2批头的关键字段和字节边界。第8章在这份布局基础上讨论批头依赖、校验与恢复。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D06",
+      "cards": [
+        "C05",
+        "语04"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md",
+      "old": "### 8.4.2 RecordBatch 把共享信息移到批头\n\nKafka 的 V2 记录格式以 RecordBatch 组织一组记录。批头保存基础 offset、长度、格式标识、校验和、属性、时间戳信息，以及生产者身份和序列相关字段；每条记录保存自身的长度、时间与 offset 差值、键、值和头部信息。精确字段顺序可查 3.9 的格式定义。[R8-12：Kafka 记录格式](https://kafka.apache.org/39/implementation/message-format/)\n\n批量表示的好处可以从重复字段看出来。如果一批记录共享生产者、压缩方式和时间基准，把这些信息在每条记录中完整保存会产生冗余。把共有部分移入批头，记录内部只保留相对变化，可以减少小消息的固定开销。所示 V2 批头固定部分为 61 字节，但一批的总开销还包括每条记录的长度、键值、头部等信息，不能把 61 除以消息数就当成全部存储成本。\n\n压缩也可以在批范围内进行。相近结构的数据通常有更多重复内容，压缩器可以利用这些共同部分；已压缩或高随机性内容可能收益很小。批越大未必越好：生产者等待凑批增加延迟，接收端需要解压更大的范围，内存峰值也可能变化。压缩率、吞吐和尾延迟要在同一负载下比较。\n\n批内差值编码还依赖基准。没有基础 offset 和基础时间戳，记录中的差值就不能还原成完整位置与时间。为了节约每条记录的表示，格式增加了对批头的依赖。这让批成为自然的解析和校验范围，也使批头损坏可能影响多条记录的读取。\n\n![图 8-6　RecordBatch 与稀疏索引的协作](diagrams/fig-8-6.svg)\n图 8-6　批头保存共享信息，索引把 offset 定位到附近文件位置，再读取批并找到具体记录。\n\n生产者 ID、epoch 和序列号不是装饰性的追踪字段。Broker 需要使用它们识别某些重试和生产者代际，恢复时也需要重建相应状态。它们为幂等和事务协议提供数据基础，但单有字段不能推出任意业务副作用只发生一次。第 9 章将讨论它们与复制历史的关系，第 10 章再区分消息写入与外部数据库操作。",
+      "new": "### 8.4.2 RecordBatch 把共享信息移到批头\n\nKafka的V2记录批头与61字节固定部分见第2章表2-1和图2-7。进入文件读取与恢复时，重要的是哪些信息必须一起有效。每条记录除了批头的分摊成本，还包含自身长度、键值和头部等内容，不能把61除以消息数就当成全部存储成本。精确格式定义见[R8-12：Kafka 记录格式](https://kafka.apache.org/39/implementation/message-format/)。\n\n压缩可以在批范围内进行。相近结构的数据可能有更多可压缩的重复内容，已压缩或高随机性内容则可能收益很小。读取时需要处理相应解压范围，内存峰值也可能变化；选择压缩与批大小仍须结合第2章的凑批等待成本，在同一负载下比较压缩率、吞吐和尾延迟。\n\n批内差值编码还依赖基准。没有基础 offset 和基础时间戳，记录中的差值就不能还原成完整位置与时间。为了节约每条记录的表示，格式增加了对批头的依赖。这让批成为自然的解析和校验范围，也使批头损坏可能影响多条记录的读取。\n\n![图 8-6　RecordBatch 与稀疏索引的协作](diagrams/fig-8-6.svg)\n图 8-6　批头保存共享信息，索引把 offset 定位到附近文件位置，再读取批并找到具体记录。\n\n生产者 ID、epoch 和序列号不是装饰性的追踪字段。Broker 需要使用它们识别某些重试和生产者代际，恢复时也需要重建相应状态。它们为幂等和事务协议提供数据基础，但单有字段不能推出任意业务副作用只发生一次。第 9 章将讨论它们与复制历史的关系，第 10 章再区分消息写入与外部数据库操作。",
+      "note": "Retain dependency, checksum scope, producer state, fig8-6 and official link.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D07",
+      "cards": [
+        "C06",
+        "语06"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md",
+      "old": "### 2.6.3 协议简单，应体现为责任明确\n\n我自己设计新协议，会提前写出第二个版本要怎样出现。若改变返回类型，旧客户端如何辨别；若增加可选字段，无法识别它的解析器如何继续；若连接中断，调用者怎样判断能否重试。这些行为比“头部里预留一个版本号”更接近兼容设计。\n\n协议易读有帮助，能够直接看见控制字段可以降低部分排障成本；二进制字段也能借助工具检查。客户端实现是否可靠，还取决于分包、错误、认证、超时和资源限制。不能用几行示例代码或一个下午的开发时间，替代对这些职责的评价。",
+      "new": "### 2.6.3 协议简单，应体现为责任明确\n\n我自己设计新协议，会提前写出第二个版本要怎样出现。本章的Kafka版本协商提供一个具体例子：客户端确认某项API存在共同支持的版本后，按该版本编码请求；没有共同版本，就应识别为不兼容，而不是把一种新布局直接交给旧解析器。版本字段只有与这些行为相连，才形成兼容约定。\n\n改变返回类型、增加可选字段和连接中断是不同问题。第8章会用新旧文件说明无法识别字段时的读取选择；连接中断后能否重试，则还取决于操作是否可能已经完成，不能由版本号决定。\n\n协议易读有帮助，能够直接看见控制字段可以降低部分排障成本；二进制字段也能借助工具检查。客户端实现是否可靠，还取决于分包、错误、认证、超时和资源限制。",
+      "note": "Use only existing2.3.3 negotiation semantics; no new protocol invented.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D08",
+      "cards": [
+        "C07",
+        "语08"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md",
+      "old": "一个重要边界是恢复工作与接受连接未必严格串行到底。InnoDB在完成必要redo恢复后，可以尽早接受连接；未提交事务的回滚能够由后台线程继续进行，新事务可能因此遇到锁冲突。处于XA准备状态的事务还具有专门规则。MySQL可以在部分回滚尚未完成时开放网络。[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)明确描述了后台回滚。",
+      "new": "一个重要边界是恢复工作与接受连接未必严格串行到底。InnoDB在完成必要redo恢复后，可以尽早接受连接；未提交事务的回滚能够由后台线程继续进行，新事务可能因此遇到锁冲突。处于XA准备状态的事务还具有专门规则。[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)明确描述了后台回滚。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D09",
+      "cards": [
+        "C08",
+        "语10"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md",
+      "old": "### 3.4.2 网络接收、处理与响应分开，仍会互相施加压力\n\nKafka网络层把接收连接、网络I/O和请求处理分到不同角色。Acceptor接收连接并分配给Processor，Processor处理连接上的数据与响应，完整请求经过队列交给请求处理线程。处理完成后，响应回到相应网络处理路径。\n\n图3-5保留这个结构，具体线程数取决于监听器及配置，不把图上的数量当作所有部署的固定值。\n\n![图 3-5 Kafka网络与请求处理](diagrams/fig-3-5.svg)\n图 3-5　Kafka网络与请求处理：接入、网络I/O与请求处理通过队列衔接。\n\n队列使工作可以独立调度，却不会让阶段之间完全不受影响。处理跟不上时，请求队列和内存压力会增加；网络发送慢时，响应也可能积压。队列上限、连接状态和背压共同决定系统怎样限制继续接收。第5章将从职责隔离解释这组线程边界，本章关注它们怎样启动以及怎样停下。\n\n网络资源准备完成以后，仍需考虑权限和相关管理器是否就绪。过早允许处理需要这些依赖的请求，会暴露尚未准备的状态；但先建立监听资源、暂缓处理某些请求可以是合法顺序。关键是放行条件，而不是把“打开端口”固定在所有软件初始化的最后一步。",
+      "new": "### 3.4.2 网络资源准备与请求放行是不同状态\n\nKafka的接入、网络I/O和请求处理具有不同职责；第5章5.4.1完整说明Acceptor、Processor与RequestChannel的交接。生命周期管理关注这些职责何时能够接受工作，以及退出时尚未完成的工作如何处理。\n\n监听资源已经建立，不表示认证和相关管理器已经满足请求的放行条件。先准备监听资源、暂缓处理依赖尚未就绪的请求，可以是合法顺序。图3-5表示这些条件关系，不规定所有版本和部署都具有同一套初始化调用次序。\n\n![图 3-5 Kafka请求处理的放行与退出条件](diagrams/fig-3-5.svg)\n图 3-5　资源准备、依赖就绪与请求放行是不同状态；退出还需要处理已经进入执行路径的请求。\n\n停止接受新请求后，已有请求和响应仍可能占用队列、内存与连接。处理跟不上会形成请求积压，网络发送慢则会延长响应处理。正常退出需要协调这些工作与管理器、日志的停止；期限耗尽或进程异常终止时，未完成结果还要按恢复与重试协议处理。第5章解释运行期间的背压，第3.4.3节继续讨论Broker离开集群时的协调。",
+      "note": "Requires fig3-5 redraw matching condition graph; not unverified fixed Kafka shutdown order.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D10",
+      "cards": [
+        "C09"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md",
+      "old": "MySQL的清理与Kafka的职责协调也一样。统一写“给120秒”不能说明这段时间对目标系统是否足够：数据量、事务、存储、控制器状态和其他副本决定实际工作。时间预算应来自代表性关闭记录与故障场景，并明确超过期限后的恢复路线，而不是在任意经验值上固定再加几十秒。",
+      "new": "MySQL的清理与Kafka的职责协调也一样。统一写“给120秒”不能说明这段时间对目标系统是否足够：数据量、事务、存储、控制器状态和其他副本决定实际工作。时间预算应来自代表性关闭记录与故障场景，并明确超过期限后的恢复路线，而不是在任意经验值上固定再加几十秒。\n\n可以用一个只说明预算计算的设定检查这件事：终止从时刻0开始，总宽限期为T，preStop在t1完成，在途请求处理到t2结束，且0≤t1≤t2≤T。下面把这几项工作假定为串行，便于看清已经消耗的时间；实际若有重叠，应按时间轴记录，不能把各阶段耗时直接相加。\n\n| 检查时点 | 已消耗时间 | 距离总截止时间的余量 | 此时需要判定的事 |\n|---|---|---|---|\n| preStop开始 | 0 | T | 放行条件和停止新请求的动作是什么 |\n| preStop结束 | t1 | T−t1 | 后续处理与持久化能否在剩余时间内完成 |\n| 在途处理结束 | t2 | T−t2 | 清理和状态保存是否仍有足够时间 |\n| 总期限到达 | T | 0 | 未完成结果走哪条恢复、查询或重试路径 |\n\n这个设定没有给出适用于所有系统的退出时长，也不保证所有清理都会执行。它只排除一种预算错误：钩子已经使用的时间，不能在之后重新计算为可用时间。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D11",
+      "cards": [
+        "C11"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md",
+      "old": "日志记录怎样表达页修改，第8章会说明。本章要建立的是先后约束：恢复所需信息已经可靠保存以后，数据页可以晚一点到达最终位置；如果数据页先出现新状态而恢复日志缺失，恢复就可能无法解释这份状态。",
+      "new": "页的布局和完整性保护见第8章。本章要建立的是先后约束：恢复所需信息已经可靠保存以后，数据页可以晚一点到达最终位置；如果数据页先出现新状态而恢复日志缺失，恢复就可能无法解释这份状态。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D12",
+      "cards": [
+        "C13"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md",
+      "old": "Query Cache 被移除，是一个功能在产品演进中退出的事实，不是整个服务层被删除。它提示我们重新评价一项机制，而不是把“删层”作为预定答案。实现可以退出，相关问题却还在：应用缓存、代理缓存和物化结果同样需要明确数据依赖与失效条件，只是把责任放到了其他地方。",
+      "new": "Query Cache退出以后，数据依赖与失效问题仍然存在。应用缓存、代理缓存和物化结果也需要处理这些关系，只是把责任放到了其他地方。评价缓存位置时，仍需比较它能够取得的失效信息、维护成本与省下的执行工作。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D13",
+      "cards": [
+        "C12"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md",
+      "old": "### 5.6.1 先判断要隔离的变化，再选择交接方式\n\nRedis 的类型与编码说明，表示变化可以被限制在一组相关操作里；MySQL 的引擎接口说明，统一入口仍要表达能力差异；Kafka 的队列说明，执行速度不同可以通过有限积压协调。三个机制解决的问题不同，不能都缩成“增加一层”。\n\n回到导出功能，如果共享的是同一套查询条件，那么完整复制查询代码可能增加维护成本；如果共享的是会被导出逻辑改写的状态，那么增加一个只做转发的 Service 也不会自动消除风险。需要先区分共同规则与特定处理，再决定用函数、对象还是独立任务交接。",
+      "new": "### 5.6.1 先判断要隔离的变化，再选择交接方式\n\nRedis 的类型与编码说明，表示变化可以被限制在一组相关操作里；MySQL 的引擎接口说明，统一入口仍要表达能力差异；Kafka 的队列说明，执行速度不同可以通过有限积压协调。三个机制解决的问题不同，不能都缩成“增加一层”。\n\n从查询与导出共用SQL拼接这一现象出发，可以区分两种情况。下面是假设分析，并非对当年具体实现的还原。\n\n| 假定需要处理的变化 | 可先采用的安排 | 减少的风险 | 仍要承担的成本 |\n|---|---|---|---|\n| 查询与导出遵循同一套筛选规则，但导出会修改调用中共享的条件状态 | 保留共同筛选规则，导出使用独立构造的条件；不共享可变调用状态 | 导出修改条件时影响另一条查询路径 | 条件构造和公共规则仍须保持一致，不能靠复制整套查询代码长期分叉 |\n| 查询与导出的字段、排序或资源要求已经不同 | 分开访问接口，明确各自输入与执行约束；仅复用确实相同的底层操作 | 一条路径改变SQL拼接或结果范围时牵动另一条路径 | 增加接口与部分重复代码，需要分别维护与验证 |\n\n如果只是第一种情况，先隔离调用状态，比增加一个只转发参数的Service更直接；如果已经是第二种情况，强行维持同一访问入口反而会累积条件分支。两项选择都需要用实际调用关系验证。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D14",
+      "cards": [
+        "C15"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md",
+      "old": "Kafka 客户端、Broker、副本和控制器之间存在不同连接。某个监听器使用 TLS，不会自动给所有连接加密；节点间选择哪个监听器与安全协议，需要显式配置。集群内部流量也可能经过不同主机或网络设备，数据敏感性不会因为流量被称为“内部”而改变。",
+      "new": "第6.2.4—6.2.5节已经区分应用、节点间与控制面入口。传输保护须落实到实际使用的连接：一个入口配置TLS，不会自动保护其余连接；流量被称为“内部”，也不改变其中数据的敏感性。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D15",
+      "cards": [
+        "C16"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md",
+      "old": "我更愿意从一次具体事件倒推审计需求：若应用账号被误用，哪些记录能确认影响的资源和时间，哪些信息只能估计。这样可以看清当前证据是否足够，而不是先把所有日志开到最大，再希望事后总能查出来。",
+      "new": "我更愿意从一次具体事件倒推审计需求。假设调查发现共享应用账号访问了一个不属于日常业务的表，下面只列三种证据状态，不把它们当成所有产品默认具备的日志能力。\n\n| 实际留下的记录 | 可以进一步确认什么 | 仍不能由此确定什么 |\n|---|---|---|\n| 数据库侧记录了账号、访问对象、操作与时间 | 哪个应用账号在相应时间访问了哪些资源 | 共享该账号的哪个最终用户发起了请求 |\n| 应用侧还记录了请求标识、认证用户及对应数据访问，且能可靠关联到这次操作 | 请求从哪个业务身份进入，并经过哪条访问路径 | 没有记录的中间步骤，不能仅凭时间接近补成事实 |\n| 只剩应用总错误计数，相关访问记录未保留 | 记录周期内的错误总数 | 是否与本次访问有关，以及具体对象、请求和用户，均无法由总数确认 |\n\n这会改变记录选择：为调查补上必要的账号、对象和关联信息，比无差别复制所有查询内容更直接。记录缺失时应保留未知范围；增加采集也要继续满足前面的字段遮蔽、权限与留存约定。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D16",
+      "cards": [
+        "C17"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md",
+      "old": "生产者重试又引入重复问题。幂等生产配置可以约束相应生产会话中的重复追加，事务机制可以扩展某些原子性范围，但它们都不能自动替外部数据库完成一次业务扣款。复制确认、重复控制和外部副作用是三件事，不能用 `acks` 一个参数统一解释。",
+      "new": "生产者重试与外部业务结果另有状态条件。第9章9.4.5区分消费位置与业务输出，第10章10.5把重复发布、目标库提交和消费进度放进同一次失败分析；`acks`不能代替这些协议。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D17",
+      "cards": [
+        "C18"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md",
+      "old": "我曾在活动库存项目里把 Redis Cluster 作为主要存储。网络分区后，旧主短暂接受的部分写入没有保留在新主的数据中，最终出现了超卖。后来改成以 MySQL 记录库存结果，Redis 放在前面承担预处理。这段经历让我重新区分了几件原先混在一起的事：单次操作快、节点能切换、已经向用户确认的结果在切换后仍然存在，并不是同一种保证。",
+      "new": "第7章的库存事故最终出现了超卖。后来改成以MySQL记录库存结果，Redis放在前面承担预处理。这是当时作出的调整；本章从它暴露的确认与恢复问题出发，继续检查事务之外的请求与状态。",
+      "note": "Keep original factual later MySQL+Redis adjustment and oversell result; ch7 keeps complete fault narrative.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D18",
+      "cards": [
+        "C20"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md",
+      "old": "一个可检查的方案应列出生成前、生成中、发布后、清理后各阶段的有效入口。随后逐个假设进程在阶段之间停止：旧入口还能用吗，新入口会指向不完整数据吗，清理能否重试？这种推演经常比再加一个版本字段更早暴露问题。",
+      "new": "下面采用一个静态文件发布的设定：A是已经发布且可恢复的旧文件集合，B是正在生成的新集合，生成期间被发布的内容不再变化。这个限制只为了单独观察发布过程；存在并发增量时，还必须说明增量如何进入A或B以及在哪个时点切换，不能由此表直接推导增量安全。\n\n| 阶段 | 已发布入口 | 额外文件 | 此时停止后的处理 | 尚不能做的事 |\n|---|---|---|---|---|\n| 生成前 | A | 无 | 按A恢复 | 删除A |\n| 生成中 | A | 未完成的B | 仍按A恢复；识别未发布残留 | 让正式入口引用未完成的B |\n| B完成但未发布 | A | 完整B | A仍是当前入口，B能否利用由恢复协议决定 | 因B存在就删除A |\n| 发布B后 | B | 旧A | 校验入口与所需文件，再按规则清理旧集合 | 未满足发布持久化条件就认定A可清理 |\n| 清理后 | B | 可能有清理残留 | 重复清理不改变B的有效性 | 把清理失败当成B失效 |\n\n表中“发布B后”以入口及所需文件满足约定的持久化条件为前提。它列出的是一个设定方案的检查结果，不是Redis全部发布实现，也不证明任意文件系统上的崩溃安全。",
+      "note": "Keep following original paragraph on atomic rename versus data+directory durability.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D19",
+      "cards": [
+        "C21"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md",
+      "old": "导读里的事故中，文件已经有版本号，仍然缺少新旧读写组合的约定。假设存在旧版 A 与新版 B，可以得到四个基础组合。\n\n| 写入者 | 读取者 | 必须明确的行为 |\n|---|---|---|\n| A | A | 现有格式继续可读 |\n| A | B | B是否兼容旧记录，如何补缺省值 |\n| B | B | 新字段、新类型与错误处理按新约定工作 |\n| B | A | A能否跳过扩展；不能时是否可识别拒绝，回退如何处理 |",
+      "new": "导读里的事故中，文件已经有版本号，仍然缺少新旧读写组合的约定。下面另设一个最小例子：旧程序A只认识格式v1；新程序B认识v1和v2；v2增加了一个理解记录所必需的字段。A能够识别格式版本并拒绝不支持的版本，B读取v1时按旧格式含义处理，不凭空推导新增字段的值。\n\n| 写入者及格式 | 读取者 | 本例确定的行为 |\n|---|---|---|\n| A写v1 | A | 按已有v1规则读取 |\n| A写v1 | B | 按v1规则读取，保留旧记录含义 |\n| B写v2 | B | 校验并读取新增必需字段 |\n| B写v2 | A | 识别为不支持的版本并拒绝，不跳过必需字段继续解释 |\n\n如果部署要求随时回退到A，就不能在仍需回退期间无条件启用v2写入；若B保留写v1的能力，可以暂时继续写v1，或另外完成可验证的格式转换与回退方案。这里选择拒绝而不是忽略，是因为新增字段被设定为解释记录所必需。",
+      "note": "Keep all subsequent unknown-optional-field conditions and existing staged-upgrade/rollback/sample verification paragraphs.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D20",
+      "cards": [
+        "C23"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md",
+      "old": "考察一条客户端已经收到成功的写入。先找出成功响应发生时系统承诺了什么，再判断新主是否包含这项承诺所依赖的历史。异步复制中，成功可能早于副本接收；带等待的复制中，还要检查等待是否超时降级，以及候选副本是否属于取得确认的范围。",
+      "new": "设定一条写入W已经向客户端返回成功，原写端P随后失联，候选Q仍可连接。业务要求重新开放后保留W，同时不能让两个写端继续产生不受协调的历史。这个共同问题需要同时检查历史与写端隔离，而不是只测试Q能否连接。\n\n| 已有证据 | 仍缺少什么 | 本次判断 |\n|---|---|---|\n| 只知道Q可连接 | Q是否包含W，P是否仍可接收有效业务写入 | 不足以开放写入 |\n| Q的有效历史可验证地包含W，但P的写入能力尚未隔离 | 旧写端隔离与本部署接替协议要求 | 不能仅凭历史完整就开放 |\n| 已隔离P，但Q的历史不能证明包含W | 满足业务要求的历史来源或受控恢复结果 | 保持暂停并查找恢复依据 |\n| 已隔离P，Q具有所需历史，并满足本部署的恢复与接替条件 | 应用重新放行所需的其他明确条件 | 可以据这些条件继续执行受控开放流程 |\n\n表中的历史证据由具体协议提供。异步复制中的成功可能早于副本接收；带等待的复制还要检查是否超时降级，以及Q是否属于取得所需确认的范围。上一表列出的确认机制因此不是强弱标签，而是判断W保留在哪里的依据。",
+      "note": "Historical completeness alone never authorizes write reopening; retain following unknown response/idempotence paragraphs.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D21",
+      "cards": [
+        "C24"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md",
+      "old": "`AFTER_SYNC` 与 `AFTER_COMMIT` 改变源端等待的位置。前者在源端 binlog 同步后、引擎提交前等待相应确认；后者先完成引擎提交，再等待确认。后者的等待期间，其他会话可能已经看到事务结果，但副本尚未确认接收。在特定故障切换路径中，新主可能没有这笔此前已被读到的事务。[R9-12：半同步等待点与可见性](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html)",
+      "new": "`AFTER_SYNC`与`AFTER_COMMIT`改变源端等待的位置。下表只列正常半同步提交路径的相对顺序，所需副本确认沿用前段的relay log接收与刷盘条件。[R9-12：半同步等待点与可见性](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html)\n\n| 等待点 | 正常提交路径中的相对顺序 | 与故障分析有关的区别 |\n|---|---|---|\n| AFTER_SYNC | 源端binlog同步 → 等待所需副本确认 → 存储引擎提交 | 引擎提交与其他会话可见发生在该等待之后 |\n| AFTER_COMMIT | 源端binlog同步 → 存储引擎提交 → 等待所需副本确认 | 等待期间其他会话可能已看到结果，但副本尚未确认接收；特定故障切换路径下可能失去这些已见事务 |",
+      "note": "Replace original timing paragraph only; retain full preceding ACK and following phantom/selection/fallback/mode paragraphs plus fig9-5. Verify against R9-12.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D22",
+      "cards": [
+        "C27"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md",
+      "old": "同样，数据库、Kafka与Redis不是按“可靠、吞吐、快”的固定角色被放进图中。数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。改变业务对象后，分工也可以改变。",
+      "new": "数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。改变业务对象后，这些职责的分工也可能改变。",
+      "note": "",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D23",
+      "cards": [
+        "C14"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md",
+      "old": "![图 5-7 职责边界与执行边界对照](diagrams/fig-5-7.svg)\n图 5-7　职责边界与执行边界对照：职责通过函数调用、共享上下文或队列交接协作，接口之外仍需处理状态和能力差异。\n\n",
+      "new": "",
+      "note": "Merge any unique SVG semantics before removing embed; clear related prose xrefs; do not delete SVG file.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D24",
+      "cards": [
+        "C19"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md",
+      "old": "![图 8-1　正常访问与恢复对文件的不同要求](diagrams/fig-8-1.svg)\n图 8-1　正常访问路径与恢复路径。图中省略了各系统的复制拓扑，文件位置不直接表示业务权威归属。\n\n",
+      "new": "",
+      "note": "Merge any unique SVG semantics before removing embed; clear related prose xrefs; do not delete SVG file.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D25",
+      "cards": [
+        "C22",
+        "语19"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md",
+      "old": "![图 9-1　数据同步的四项检查](diagrams/fig-9-1.svg)\n图 9-1　传播内容、确认阶段、续传条件和故障处理共同决定同步语义。\n\n",
+      "new": "",
+      "note": "Merge any unique SVG semantics before removing embed; clear related prose xrefs; do not delete SVG file.",
+      "approval": "C proposal; await A/B second vote"
+    },
+    {
+      "id": "C-D26",
+      "cards": [
+        "C25"
+      ],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md",
+      "old": "![图 10-1　前文主题与库存设计的对应](diagrams/fig-10-1.svg)\n图 10-1　每个主题对应一个可检查的设计问题；这张图是主题索引，不是产品评分。\n\n",
+      "new": "",
+      "note": "Merge any unique SVG semantics before removing embed; clear related prose xrefs; do not delete SVG file.",
+      "approval": "C proposal; await A/B second vote"
+    }
+  ],
+  "non_text_actions": [
+    "fig4-4 relational redraw",
+    "fig3-5 lifecycle condition redraw",
+    "citation+reference/edition layout decided jointly",
+    "epilogue/preface consolidation with A draft",
+    "remaining teacher exact corrections via A plan"
+  ]
+}

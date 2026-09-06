@@ -1,0 +1,15 @@
+{
+  "initial_replacements": 118,
+  "followup_replacements": 8,
+  "followup_new_locations": 7,
+  "different_locations": 125,
+  "total_replacement_operations": 126,
+  "changed_manuscript_files": 12,
+  "html_bytes": 651600,
+  "html_sha256": "0723ad28f3cb0ce817654c702415445d4caf6acdc0d64be49a5a65aa3adb9117",
+  "han_total": 105452,
+  "reviews": [
+    "sweeper-A.md",
+    "postreview-C.md"
+  ]
+}

@@ -1,0 +1,609 @@
+[
+  {
+    "id": "语01",
+    "decision": "FIX",
+    "action": "序言删除详细“不会补写吞吐、会议、结果”句；保留第10章为设定示例的一句。与后记本版说明合并完整披露。",
+    "applied_operations": [
+      "A-D19",
+      "A-D20",
+      "A-D21"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语02",
+    "decision": "FIX",
+    "action": "删除1.4.1首段重复写作史；下一段章节关系直接接标题。",
+    "applied_operations": [
+      "C-D01"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语03",
+    "decision": "部分采纳",
+    "action": "收轻1.2.2的MySQL概览；MVCC四段完整迁至4.3.7，原处保留定义、两条来源和回指。Redis/Kafka概览未作无依据截短。",
+    "applied_operations": [
+      "C-D02",
+      "C-D03",
+      "C-D27",
+      "C-D28"
+    ],
+    "partial_reason": "只收轻MySQL概览，Redis/Kafka仍保留能支撑后文的机制线索；不按比例截短。"
+  },
+  {
+    "id": "语04",
+    "decision": "部分采纳",
+    "action": "采用布局保留第2章路线，改2.2.6预告；8.4.2减少批量收益重复，突出校验/恢复依赖。",
+    "applied_operations": [
+      "C-D06",
+      "C-D05"
+    ],
+    "partial_reason": "详细RecordBatch布局保留第2章，修改预告并让第8章转向读取与恢复，未搬图。"
+  },
+  {
+    "id": "语05",
+    "decision": "FIX",
+    "action": "把“而不是仅凭文件里有一个版本字段就自动兼容”换成“不能仅凭存在一个版本字段，就认为双方能够自动兼容”；调整前一分号衔接。",
+    "applied_operations": [
+      "L-语05"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语06",
+    "decision": "FIX",
+    "action": "删除“几行示例代码或一个下午”整句。",
+    "applied_operations": [
+      "C-D07"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语07",
+    "decision": "FIX",
+    "action": "采用“加载期间，应明确哪些管理操作可以执行、哪些数据操作需要拒绝。”",
+    "applied_operations": [
+      "L-语07"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语08",
+    "decision": "FIX",
+    "action": "删除3.3.2段内第二次“MySQL可以在部分回滚尚未完成时开放网络。”",
+    "applied_operations": [
+      "C-D08"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语09",
+    "decision": "FIX",
+    "action": "采用报告示范A整段，但不动后段read_committed限定。",
+    "applied_operations": [
+      "L-语09"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语10",
+    "decision": "部分采纳",
+    "action": "第5章主讲，3.4.2保留最短部件图景并改写放行/在途/停止的作用；图不臆造严格实现顺序。",
+    "applied_operations": [
+      "C-D09",
+      "图3-5重画"
+    ],
+    "partial_reason": "第3章保留放行、在途和退出所需的结构条件，不整节删除网络说明。"
+  },
+  {
+    "id": "语11",
+    "decision": "FIX",
+    "action": "采用报告“内存页……称为脏页”句。",
+    "applied_operations": [
+      "L-语11"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语12",
+    "decision": "部分采纳",
+    "action": "按归属表逐段压4/8复述，优先压8.3.4一般redo场景与8.2.4成本尾段，保留格式独有内容。",
+    "applied_operations": [
+      "A-D27",
+      "A-D28",
+      "A-D29"
+    ],
+    "partial_reason": "迁移成本解释、压缩重复恢复情境，保留manifest、文件版本与失败边界，不机械删掉同名机制。"
+  },
+  {
+    "id": "语13",
+    "decision": "FIX",
+    "action": "改为“这些名称便于对照相应版本的官方接口。”",
+    "applied_operations": [
+      "L-语13"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语14",
+    "decision": "FIX",
+    "action": "“配置文件中遗留的副本”改“配置文件中遗留的旧凭证”。",
+    "applied_operations": [
+      "L-语14"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语15",
+    "decision": "FIX",
+    "action": "采用报告示范B，明确客户端在服务端切换后拒绝连接。",
+    "applied_operations": [
+      "L-语15"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语16",
+    "decision": "FIX",
+    "action": "删除“单节点形态在概念上不存在”反驳句。",
+    "applied_operations": [
+      "L-语16"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语17",
+    "decision": "FIX",
+    "action": "改“数据实际上怎样保存，以及副本怎样追赶”。",
+    "applied_operations": [
+      "L-语17"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语18",
+    "decision": "FIX",
+    "action": "采用B/C收窄句：存储成本的变化、最慢历史读取的耗时变化，需要分别测量。",
+    "applied_operations": [
+      "L-语18"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语19",
+    "decision": "FIX",
+    "action": "正文保留9.1.1表，去图9-1及重复图注；图末独有条件检查现正文是否已承载。",
+    "applied_operations": [
+      "C-D25"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语20",
+    "decision": "FIX",
+    "action": "采用报告补“所需时间”的句子。",
+    "applied_operations": [
+      "L-语20"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语21",
+    "decision": "FIX",
+    "action": "在10.3标题下、表结构前插入报告示范C成功路径概览，补一句拒绝结果不写预留事件。",
+    "applied_operations": [
+      "A-D23"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语22",
+    "decision": "FIX",
+    "action": "改“应用必须确认库存 UPDATE 的影响行数为 1”。",
+    "applied_operations": [
+      "L-语22"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语23",
+    "decision": "FIX",
+    "action": "改“先取得该请求记录的锁并提交事务的一方确定终态”。",
+    "applied_operations": [
+      "L-语23"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语24",
+    "decision": "FIX",
+    "action": "10.5改题“事务内记录事件，事务外发布消息并维护缓存”。",
+    "applied_operations": [
+      "L-语24"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语25",
+    "decision": "FIX",
+    "action": "采用报告示范D三段，后面并发回源整段完整保留。",
+    "applied_operations": [
+      "A-D24"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语26",
+    "decision": "FIX",
+    "action": "10.7.2第一段分成“先查是否偏离既定事务范围”和“符合基线再调资源/入口”的两层。",
+    "applied_operations": [
+      "A-D25"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语27",
+    "decision": "FIX",
+    "action": "采用报告示范E单段。",
+    "applied_operations": [
+      "A-D22"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语28",
+    "decision": "FIX",
+    "action": "改“使我们能够具体分析这些设计，不必只凭使用体验作判断。”",
+    "applied_operations": [
+      "A-D22"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语29",
+    "decision": "部分采纳",
+    "action": "后记分清致谢/本版说明/作者/勘误；完整披露和权属留本版说明；移除制作操作的否定清单。",
+    "applied_operations": [
+      "A-D22",
+      "A-D26"
+    ],
+    "partial_reason": "集中说明已落实；未补作者未提供的署名、出版信息或勘误地址。"
+  },
+  {
+    "id": "语30",
+    "decision": "FIX",
+    "action": "统一正文“章内文献编号＋短标题”，保留现有编号，参考文献按编号排序并维护映射，不重新按出现顺序洗牌。",
+    "applied_operations": [
+      "制作：104处引用统一/102条稳定文献锚/返回链接"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "语31",
+    "decision": "FIX",
+    "action": "3.4.3保留意图→协调条件→本地结束→模式差异；删除被具体条件覆盖的两句宽泛反驳。精确草案见JSON。",
+    "applied_operations": [
+      "L-语31"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C01",
+    "decision": "FIX",
+    "action": "删除1.4.1重复写作史，保留后续主题路线及已有1.3.3实演；序言保留原来历",
+    "teacher_overlap": "语02",
+    "applied_operations": [
+      "C-D01"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C02",
+    "decision": "部分采纳",
+    "action": "先重排MySQL概览，唯一MVCC细节移4.3.7；不把全部1.2压成三句产品标签",
+    "teacher_overlap": "语03",
+    "applied_operations": [
+      "C-D02",
+      "C-D03",
+      "C-D27",
+      "C-D28"
+    ],
+    "partial_reason": "先缩MySQL概览且迁移独有MVCC四段，没有把1.2全部压成产品标签。"
+  },
+  {
+    "id": "C03",
+    "decision": "部分采纳",
+    "action": "将概览、运行成本、文件恢复与复制历史分别确定主讲位置，并完成2/5/8/9章局部判断；保留连续机制讲解。",
+    "teacher_overlap": "语04/10/12",
+    "applied_operations": [
+      "C-D03",
+      "C-D06",
+      "C-D09",
+      "A-D27",
+      "A-D28",
+      "A-D29"
+    ],
+    "partial_reason": "落实主讲归属和具体推演，不把每章改成同一个问题模板，不强求三家等长。"
+  },
+  {
+    "id": "C04",
+    "decision": "部分采纳",
+    "action": "排行榜已在导读，保留。2.5补明确假设和“先保留现库/何时引入派生排名”两分支，不造历史实测",
+    "teacher_overlap": "语03关联",
+    "applied_operations": [
+      "C-D04"
+    ],
+    "partial_reason": "排行榜原本就在导读；保留原入口，补2.5的选择分支，不重复前置。"
+  },
+  {
+    "id": "C05",
+    "decision": "部分采纳",
+    "action": "详细布局仍由2.2.6图2-7主讲，修错位预告；8.4.2减批量收益重述，保留校验/基准依赖/恢复状态",
+    "teacher_overlap": "语04",
+    "applied_operations": [
+      "C-D06",
+      "C-D05"
+    ],
+    "partial_reason": "采用保守路线：第2章保留精确布局，第8章减少批量收益重述。"
+  },
+  {
+    "id": "C06",
+    "decision": "部分采纳",
+    "action": "用2.3.3已有Kafka协商把一个分支说完，不再新增一套虚构网络协议；文件两版演进由8.6.3主讲",
+    "teacher_overlap": "语06",
+    "applied_operations": [
+      "C-D07"
+    ],
+    "partial_reason": "复用已有Kafka协商机制完成兼容分支，没有另造一套网络协议。"
+  },
+  {
+    "id": "C07",
+    "decision": "部分采纳",
+    "action": "3.3.2保留恢复核心，删同段重复开放连接句；不大段移除redo/undo导致启动无法读懂",
+    "teacher_overlap": "语08/12",
+    "applied_operations": [
+      "C-D08"
+    ],
+    "partial_reason": "删除同段重复就绪句，必要redo/undo与后台回滚条件仍在生命周期章。"
+  },
+  {
+    "id": "C08",
+    "decision": "FIX",
+    "action": "5章主讲Acceptor/Processor/RequestChannel职责；3.4.2只写运行放行与退出依赖。图3-5改成状态约束图，不编造固定函数调用顺序",
+    "teacher_overlap": "语10",
+    "applied_operations": [
+      "C-D09",
+      "图3-5重画"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C09",
+    "decision": "FIX",
+    "action": "3.5.2新增明确设定的预算表，用T、t1、t2表示已消耗与剩余，不新增实测秒数，不把并发步骤盲相加",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D10"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C10",
+    "decision": "FIX",
+    "action": "图4-4重画LRU新老区与同一脏页双重管理关系；保留现参数/限定；语11一并修主语",
+    "teacher_overlap": "语11",
+    "applied_operations": [
+      "图4-4重画"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C11",
+    "decision": "FIX",
+    "action": "精确替换未兑现预告为页布局/完整性保护，后续WAL条件保留",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D11"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C12",
+    "decision": "部分采纳",
+    "action": "事故原文完整保留，不凭推测补Controller→DAO调用链；5.6.1明确两种假设下的候选及代价，完成可检查判断",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D13"
+    ],
+    "partial_reason": "新增分析明确是设定，不补写无法确认的历史调用栈或修复结果。"
+  },
+  {
+    "id": "C13",
+    "decision": "FIX",
+    "action": "Query Cache末段保留依赖失效责任，删整个服务层被删除/预定删层等未提出的对手",
+    "teacher_overlap": "语13相关",
+    "applied_operations": [
+      "C-D12"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C14",
+    "decision": "FIX",
+    "action": "图5-7退出正文、保留文件及表5-1，将图中独有“普通主线程并非无限低延迟”等条件核入表/邻段；不为保图数重画一幅重复图",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D23"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C15",
+    "decision": "部分采纳",
+    "action": "6.4.4把已讲监听器关系改短回指，保留加密成本；6.2.5独有凭证引导与委托令牌不动，不混合成一条所有部署通用安全路径",
+    "teacher_overlap": "语15",
+    "applied_operations": [
+      "C-D14"
+    ],
+    "partial_reason": "减少重复入口说明，保留凭证引导、委托令牌和不同部署的连接差异，不拼成统一安全时序。"
+  },
+  {
+    "id": "C16",
+    "decision": "FIX",
+    "action": "6.5.4用原“应用账号被误用”设定完成证据表，区分数据库账号/应用请求/实际人，明确记录缺失时无法补推",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D15"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C17",
+    "decision": "部分采纳",
+    "action": "7.4.4保留acks定义、最小ISR及运行中变化边界，把精确轨迹交9.4.2；删外部副作用复述改具体回指，不大幅抽空7章",
+    "teacher_overlap": "语12相关",
+    "applied_operations": [
+      "C-D16"
+    ],
+    "partial_reason": "第7章保留选主所需的acks/ISR定义，精确等待轨迹和业务副作用移交第9/10章。"
+  },
+  {
+    "id": "C18",
+    "decision": "FIX",
+    "action": "7.2.6保留完整事故；10章保留超卖结果与后来MySQL/Redis调整，缩故障重述；后记不再第三次复述同一事故",
+    "teacher_overlap": "语01/29",
+    "applied_operations": [
+      "C-D17",
+      "A-D22"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C19",
+    "decision": "FIX",
+    "action": "图8-1退出正文，保留8.1.3三行比较与全部独有条件；页布局/索引等有效图不删",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D24"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C20",
+    "decision": "FIX",
+    "action": "用五阶段静态文件发布表替换泛问段；显式无并发增量假设、底层持久化前提、不是Redis全部实现",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D18"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C21",
+    "decision": "FIX",
+    "action": "将A/B问句矩阵变成完整最小设定：A只识别v1，B读v1/v2；v2新增必需字段，A必须拒绝，禁止默默跳过；保留一般可跳过条件与回退边界",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D19"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C22",
+    "decision": "FIX",
+    "action": "图9-1退出正文、保留四问表，核独有信息；HW/LEO与历史分叉两图完整保留",
+    "teacher_overlap": "语19",
+    "applied_operations": [
+      "C-D25"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C23",
+    "decision": "FIX",
+    "action": "9.5保留比较结构，9.5.3补同一次确认写W、候选Q的可用证据/不足证据表，不无条件替三产品排强弱",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D20",
+      "R-01"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C24",
+    "decision": "部分采纳",
+    "action": "9.3.4以双行箭头时序表替代重复的等待点描述；保留relay/GTID图（修前9-5，现9-4），未新增重复图。",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D21"
+    ],
+    "partial_reason": "采用正常路径的双行箭头时序表，保留原relay/GTID图，不新增一张重复图。"
+  },
+  {
+    "id": "C25",
+    "decision": "FIX",
+    "action": "图10-1退出正文；表10-1仍可查；语21在候选后DDL前补成功路径总览，避免把索引图当请求流程",
+    "teacher_overlap": "语21",
+    "applied_operations": [
+      "A-D23",
+      "C-D26"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C26",
+    "decision": "部分采纳",
+    "action": "选用观察笔记片段路线，保留占位符与未执行范围；补成功/拒绝路径概览并完成语22至语26，未启动配套工程。",
+    "teacher_overlap": "语21—26",
+    "applied_operations": [
+      "A-D23"
+    ],
+    "partial_reason": "选择观察笔记片段路线，保留占位符和未执行范围，不交付未经授权扩展的可运行应用或实测。"
+  },
+  {
+    "id": "C27",
+    "decision": "FIX",
+    "action": "10.8.1删重复固定角色反驳，保留三个组件在本例的实际职责及全部改判条件",
+    "teacher_overlap": "—",
+    "applied_operations": [
+      "C-D22"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C28",
+    "decision": "FIX",
+    "action": "AI/亲历/设定/未执行范围集中后记本版说明；序言和10章保留必要就地短说明；作者介绍不再重复未虚构声明",
+    "teacher_overlap": "语01/27/28/29",
+    "applied_operations": [
+      "A-D19",
+      "A-D20",
+      "A-D21",
+      "A-D22",
+      "A-D26"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C29",
+    "decision": "FIX",
+    "action": "正文统一短标识加短标题，按章固定来源编号；参考条目按现编号排序，不盲改所有ID。引用锚点与书目入口统一，保留真实URL和版本",
+    "teacher_overlap": "语30",
+    "applied_operations": [
+      "制作：104处引用统一/102条稳定文献锚/返回链接"
+    ],
+    "partial_reason": ""
+  },
+  {
+    "id": "C30",
+    "decision": "部分采纳",
+    "action": "做稳定文献锚点、版本来源维护清单、有效的成书信息入口。当前无作者确认署名或勘误渠道，不新增；不为好看伪造出版信息；标题副标题不改",
+    "teacher_overlap": "语29/30",
+    "applied_operations": [
+      "A-D22",
+      "制作：16项索引/封面本版入口/来源维护表"
+    ],
+    "partial_reason": "完成导航、索引和来源维护记录；缺少作者确认的出版资料和对外勘误渠道不填造。"
+  }
+]

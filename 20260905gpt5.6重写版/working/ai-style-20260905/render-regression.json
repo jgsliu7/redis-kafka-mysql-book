@@ -1,0 +1,27 @@
+{
+  "desktop": {
+    "units": 13,
+    "svg": 57,
+    "pre": 15,
+    "overflow": false,
+    "badLinks": []
+  },
+  "mobile": {
+    "overflow": false,
+    "tocExpanded": "false",
+    "hash": "#chapter-7"
+  },
+  "pageErrors": [],
+  "networkRequests": [],
+  "print": {
+    "pages": 156,
+    "outsideHorizontalMargins": [],
+    "samples": [
+      "print-cover-1.png",
+      "print-heading-87.png",
+      "print-snapshot-121.png",
+      "print-transaction-140.png"
+    ],
+    "renderer": "PDF.js + @napi-rs/canvas"
+  }
+}

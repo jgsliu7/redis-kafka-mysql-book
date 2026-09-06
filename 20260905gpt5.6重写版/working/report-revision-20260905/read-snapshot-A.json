@@ -1,0 +1,67 @@
+[
+  {
+    "path": "20260905gpt5.6重写版/chapters/00-preface.md",
+    "lines": 25,
+    "sha256": "243a43f1d586c34da6a5864f9a38bb7573bab9f241266ddb0b06ee6a16ba53f4"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/01-introduction/chapter.md",
+    "lines": 215,
+    "sha256": "2645ea1cac1f566910c5abb064769ead9ff31141663bf6b8f8928c18ba06d884"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md",
+    "lines": 279,
+    "sha256": "78c1a9679baf5d94c372b5ba7aec42b76a56bd385837aef03e219fe11145a862"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md",
+    "lines": 284,
+    "sha256": "c832326d35c56b76448fa59fff1cf17229315182c16760d75569398e31bbe5c1"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md",
+    "lines": 369,
+    "sha256": "008edd0ac4bd5f1fe45d0b0daeda00c790dd9cb8a3950e4e9b8f3df6cd212ea7"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md",
+    "lines": 288,
+    "sha256": "1830a61b76f8ce056e5b52d5d0229326486c1289ddc84423492bd32102fc1b4f"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/06-security/chapter.md",
+    "lines": 274,
+    "sha256": "32c81b11611555989f773b855133bf28a4724c0e65415fc8bcf8283af19ad946"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/07-cluster/chapter.md",
+    "lines": 297,
+    "sha256": "ea7cd5d9cee9bcf1d804920262dc6bc6bdc0aabd63a472a26d9bd003cdcf2e12"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/08-storage-format/chapter.md",
+    "lines": 354,
+    "sha256": "4d3bf2df108a9024b0de481e6e6e2ecb6ca9c5bb558a65a63b1e3a9d50864c2c"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/09-data-sync/chapter.md",
+    "lines": 326,
+    "sha256": "0d5ab8dd1c2df6355d8efc9b30234c60d7176769ebf1cc1f881459f472a3569a"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/10-summary/chapter.md",
+    "lines": 405,
+    "sha256": "ec8feedf8fc97c8424fc58c0895b89ad5a3098b74aa52a735df7cebd40f7b8be"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/10-epilogue.md",
+    "lines": 31,
+    "sha256": "84841854f89def453ebb84fffe736c72ab38a745656e1a8072887586cb810aac"
+  },
+  {
+    "path": "20260905gpt5.6重写版/chapters/11-references.md",
+    "lines": 168,
+    "sha256": "4cb5152819fa34b605e92f92b379ec729a231a60b99d7c2a19c99ca6c99c9d5f"
+  }
+]

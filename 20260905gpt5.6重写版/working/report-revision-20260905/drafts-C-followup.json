@@ -1,0 +1,21 @@
+{
+  "state": "A proposed precision adjustments, C agreed; B sole executor",
+  "drafts": [
+    {
+      "id": "C-D27",
+      "cards": ["C02", "语03"],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md",
+      "old": "缓冲池保存正在使用的页。",
+      "new": "缓冲池（Buffer Pool）保存正在使用的页。",
+      "reason": "保留缩短后首现英文对照，不修改缓冲池行为。"
+    },
+    {
+      "id": "C-D28",
+      "cards": ["C02", "语03"],
+      "path": "/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md",
+      "old": "第9章讨论副本旧值之前，会保留这项区别。",
+      "new": "第9章讨论副本旧值时，还会用到这项区别。",
+      "reason": "MVCC整段迁入后让导航明确指后续使用，不暗示第9章再展开同一组理论。"
+    }
+  ]
+}

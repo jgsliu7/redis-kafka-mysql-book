@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif" role="img" aria-labelledby="title"><title id="title">图 4-4 InnoDB缓冲池的页管理关系</title><rect width="900" height="560" fill="#FFFFFF"/><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/></marker><marker id="failure" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/></marker></defs>
+<text x="26" y="32" font-size="18" fill="#111827" font-weight="700">图 4-4　InnoDB缓冲池的页管理关系</text>
+<!-- LRU是一条链中的新老区域；页格不代表默认比例。 -->
+<rect x="50" y="70" width="800" height="200" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.3"/>
+<line x1="560" y1="70" x2="560" y2="270" stroke="#D97706" stroke-dasharray="5 4"/>
+<text x="70" y="100" font-size="15" fill="#D97706" font-weight="700">LRU：新区域</text>
+<text x="580" y="100" font-size="15" fill="#D97706" font-weight="700">同一LRU中的老区域</text>
+<rect x="85" y="140" width="85" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="105" y="180" font-size="13" fill="#374151">缓存页</text>
+<rect x="305" y="140" width="85" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="325" y="180" font-size="13" fill="#374151">缓存页</text>
+<rect x="415" y="140" width="85" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="435" y="180" font-size="13" fill="#374151">缓存页</text>
+<rect x="600" y="140" width="85" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="620" y="180" font-size="13" fill="#374151">缓存页</text>
+<rect x="725" y="140" width="85" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="745" y="180" font-size="13" fill="#374151">缓存页</text>
+<rect x="195" y="140" width="85" height="70" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.3"/>
+<text x="219" y="166" font-size="13" fill="#374151">页P</text>
+<text x="222" y="190" font-size="13" fill="#374151">脏页</text>
+<path d="M171 175 H192" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M281 175 H302" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M391 175 H412" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M501 175 H597" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M686 175 H722" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="70" y="247" font-size="12" fill="#596273">管理缓存页的保留与淘汰</text>
+<text x="580" y="123" font-size="12" fill="#596273">默认老区约37%，此图不按比例绘制</text>
+<!-- Flush引用上方同一个P，不另画一份数据副本。 -->
+<rect x="75" y="360" width="330" height="90" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.3"/>
+<text x="95" y="389" font-size="15" fill="#D97706" font-weight="700">Flush：待刷脏页的管理关系</text>
+<text x="95" y="416" font-size="13" fill="#374151">与最早修改LSN等状态关联</text>
+<text x="95" y="438" font-size="13" fill="#374151">页P同时由LRU和Flush管理</text>
+<path d="M237.5 359 V213" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#failure)"/>
+<text x="255" y="312" font-size="12" fill="#B91C1C">引用同一个脏页</text>
+<!-- Free中的页框尚未装入有效缓存页。 -->
+<rect x="530" y="360" width="320" height="90" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
+<text x="550" y="389" font-size="15" fill="#374151" font-weight="700">Free：可分配的空闲页框</text>
+<text x="550" y="416" font-size="13" fill="#374151">新页需要取得可用页框</text>
+<text x="550" y="438" font-size="13" fill="#374151">有空闲页框，不等于目标页已经缓存</text>
+<path d="M820 326 H642.5 V213" fill="none" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="655" y="305" font-size="12" fill="#596273">新读入页通常从老区首部进入</text>
+<text x="28" y="486" font-size="12" fill="#596273">老区提升取决于时间与访问条件；扫描仍可能影响工作集。</text>
+<text x="28" y="512" font-size="12" fill="#596273">脏页刷出后仍可留在缓冲池；Flush管理顺序不表示页在磁盘上的连续地址。</text>
+<text x="28" y="538" font-size="12" fill="#596273">图示管理关系，页格和连线不代表底层指针布局或三个互斥的内存分区。</text>
+</svg>

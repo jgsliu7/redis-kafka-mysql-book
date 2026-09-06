@@ -1,0 +1,5111 @@
+{
+  "at": "2026-09-05T19:45:03.168932+08:00",
+  "distinct_replacements": 118,
+  "changed_files": 12,
+  "changes": [
+    {
+      "file": "chapters/00-preface.md",
+      "line": 5,
+      "old": "放在一起却看不出它们回答了哪些相同的问题。",
+      "new": "放在一起却看不出它们处理了哪些相同的问题。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 191,
+      "end": 212,
+      "fix_id": "FIX001",
+      "candidate_ids": [
+        "A001"
+      ],
+      "selected_candidate": "A001",
+      "alternatives": [
+        {
+          "id": "A001",
+          "file": "chapters/00-preface.md",
+          "line": 5,
+          "old": "放在一起却看不出它们回答了哪些相同的问题。",
+          "new": "放在一起却看不出它们处理了哪些相同的问题。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 191,
+          "end": 212
+        }
+      ],
+      "old_paragraph": "最初整理笔记时，我按软件分别写。Redis 的持久化写在 Redis 里，Kafka 的日志写在 Kafka 里，各自看都能说清，放在一起却看不出它们回答了哪些相同的问题。后来改成按主题组织，内存、文件、复制、恢复这些事情才有了可以直接比较的位置。这本书保留了这种写法。",
+      "new_paragraph": "最初整理笔记时，我按软件分别写。Redis 的持久化写在 Redis 里，Kafka 的日志写在 Kafka 里，各自看都能说清，放在一起却看不出它们处理了哪些相同的问题。后来改成按主题组织，内存、文件、复制、恢复这些事情才有了可以直接比较的位置。这本书保留了这种写法。"
+    },
+    {
+      "file": "chapters/00-preface.md",
+      "line": 11,
+      "old": "同一个要求，可以由不同层承担；",
+      "new": "同一个要求，可以在不同层实现；",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 611,
+      "end": 626,
+      "fix_id": "FIX002",
+      "candidate_ids": [
+        "A003"
+      ],
+      "selected_candidate": "A003",
+      "alternatives": [
+        {
+          "id": "A003",
+          "file": "chapters/00-preface.md",
+          "line": 11,
+          "old": "同一个要求，可以由不同层承担；",
+          "new": "同一个要求，可以在不同层实现；",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 611,
+          "end": 626
+        }
+      ],
+      "old_paragraph": "所以书里记录三层内容。首先是具体机制。Redis 怎样表示一组数据，InnoDB 怎样组织页，Kafka 怎样追加和读取一段日志，都需要讲到操作过程。省去这些细节，后面的取舍就没有依据。其次是机制之间的比较。同一个要求，可以由不同层承担；一个系统里合理的成本，换到另一个系统里可能无法接受。最后是组合后的决定。当数据库、缓存和消息同时参与一次请求时，各组件单独成立的保证，并不会自动成为整个请求的保证。",
+      "new_paragraph": "所以书里记录三层内容。首先是具体机制。Redis 怎样表示一组数据，InnoDB 怎样组织页，Kafka 怎样追加和读取一段日志，都需要讲到操作过程。省去这些细节，后面的取舍就没有依据。其次是机制之间的比较。同一个要求，可以在不同层实现；一个系统里合理的成本，换到另一个系统里可能无法接受。最后是组合后的决定。当数据库、缓存和消息同时参与一次请求时，各组件单独成立的保证，并不会自动成为整个请求的保证。"
+    },
+    {
+      "file": "chapters/00-preface.md",
+      "line": 17,
+      "old": "我不希望这本书成为一组产品性格的总结。",
+      "new": "我不希望这本书用人的性格概括产品。",
+      "reason": "A新‘只概括产品特点’会把反对产品人格化扩大为反对概括特点；改成反对用人性格概括，待A/B确认。",
+      "votes": [
+        "B",
+        "C"
+      ],
+      "start": 979,
+      "end": 998,
+      "fix_id": "FIX003",
+      "candidate_ids": [
+        "A004"
+      ],
+      "selected_candidate": "A004",
+      "alternatives": [
+        {
+          "id": "A004",
+          "file": "chapters/00-preface.md",
+          "line": 17,
+          "old": "我不希望这本书成为一组产品性格的总结。",
+          "new": "我不希望这本书用人的性格概括产品。",
+          "reason": "A新‘只概括产品特点’会把反对产品人格化扩大为反对概括特点；改成反对用人性格概括，待A/B确认。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 979,
+          "end": 998
+        }
+      ],
+      "old_paragraph": "我不希望这本书成为一组产品性格的总结。Redis 的低延迟不能回答所有缓存一致性问题，MySQL 的事务不能自动覆盖另一个服务的写入，Kafka 的副本也不等于业务处理恰好发生一次。它们是观察样本。沿着一次请求、一次提交或一次恢复追下去，比给软件排一个总名次更有用。",
+      "new_paragraph": "我不希望这本书用人的性格概括产品。Redis 的低延迟不能回答所有缓存一致性问题，MySQL 的事务不能自动覆盖另一个服务的写入，Kafka 的副本也不等于业务处理恰好发生一次。它们是观察样本。沿着一次请求、一次提交或一次恢复追下去，比给软件排一个总名次更有用。"
+    },
+    {
+      "file": "chapters/00-preface.md",
+      "line": 19,
+      "old": "它们的价值不在于证明作者经历丰富，而在于说明原来的判断少考虑了什么。",
+      "new": "记录这些认识，是为了说明原来的判断少考虑了什么，不是为了展示经历。",
+      "reason": "认识的记录目的不变，去作者第三人称，保留不是为了展示经历立场。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1128,
+      "end": 1162,
+      "fix_id": "FIX004",
+      "candidate_ids": [
+        "C01"
+      ],
+      "selected_candidate": "C01",
+      "alternatives": [
+        {
+          "id": "C01",
+          "file": "chapters/00-preface.md",
+          "line": 19,
+          "old": "它们的价值不在于证明作者经历丰富，而在于说明原来的判断少考虑了什么。",
+          "new": "记录这些认识，是为了说明原来的判断少考虑了什么，不是为了展示经历。",
+          "reason": "认识的记录目的不变，去作者第三人称，保留不是为了展示经历立场。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1128,
+          "end": 1162
+        }
+      ],
+      "old_paragraph": "这里也保留一些失败后的认识。它们的价值不在于证明作者经历丰富，而在于说明原来的判断少考虑了什么。一次事故能够推翻当时的某个假设，却不能证明同类系统只能采用一种设计。我会把确定的事实、据此作出的判断和仍受条件限制的部分尽量分开。",
+      "new_paragraph": "这里也保留一些失败后的认识。记录这些认识，是为了说明原来的判断少考虑了什么，不是为了展示经历。一次事故能够推翻当时的某个假设，却不能证明同类系统只能采用一种设计。我会把确定的事实、据此作出的判断和仍受条件限制的部分尽量分开。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 56,
+      "old": "Redis 的主要数据集由内存承担",
+      "new": "Redis 的主要数据集保存在内存中",
+      "reason": "内存保存数据集，保留主要数据集范围。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 2732,
+      "end": 2749,
+      "fix_id": "FIX005",
+      "candidate_ids": [
+        "A006",
+        "B01"
+      ],
+      "selected_candidate": "B01",
+      "alternatives": [
+        {
+          "id": "A006",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 56,
+          "old": "Redis 的主要数据集由内存承担",
+          "new": "Redis 的主要数据集保存在内存中",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2732,
+          "end": 2749
+        },
+        {
+          "id": "B01",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 56,
+          "old": "Redis 的主要数据集由内存承担",
+          "new": "Redis 的主要数据集保存在内存中",
+          "reason": "内存保存数据集，保留主要数据集范围。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 2732,
+          "end": 2749
+        }
+      ],
+      "old_paragraph": "Redis 的主要数据集由内存承担，键和值的组织方式直接影响容量。对于少量元素，紧凑编码可以减少指针和对象头开销；规模扩大后，切换到适于查找或修改的结构。客户端通常仍使用同一组命令。因此，类型是接口约定，编码是内部表示，两者不能混为一谈。第2章解释表示的成本，第5章再看这层间接关系隔离了哪些变化。",
+      "new_paragraph": "Redis 的主要数据集保存在内存中，键和值的组织方式直接影响容量。对于少量元素，紧凑编码可以减少指针和对象头开销；规模扩大后，切换到适于查找或修改的结构。客户端通常仍使用同一组命令。因此，类型是接口约定，编码是内部表示，两者不能混为一谈。第2章解释表示的成本，第5章再看这层间接关系隔离了哪些变化。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 90,
+      "old": "第9章讲副本怎样知道自己位于哪段历史中。",
+      "new": "第9章讲副本怎样确定自身位置属于哪段历史。",
+      "reason": "采用C02，保留原位置+历史两个要素；B已投C02保真。",
+      "votes": [
+        "B",
+        "C"
+      ],
+      "start": 5377,
+      "end": 5397,
+      "fix_id": "FIX006",
+      "candidate_ids": [
+        "A008",
+        "B02",
+        "C02"
+      ],
+      "selected_candidate": "A008",
+      "alternatives": [
+        {
+          "id": "A008",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 90,
+          "old": "第9章讲副本怎样知道自己位于哪段历史中。",
+          "new": "第9章讲副本怎样确定自身位置属于哪段历史。",
+          "reason": "采用C02，保留原位置+历史两个要素；B已投C02保真。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 5377,
+          "end": 5397
+        },
+        {
+          "id": "B02",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 90,
+          "old": "副本怎样知道自己位于哪段历史中",
+          "new": "副本怎样确定自己位于哪段历史中",
+          "reason": "确定属于历史判定技术动作，节点认知去除，导航范围不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 5381,
+          "end": 5396
+        },
+        {
+          "id": "C02",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 90,
+          "old": "副本怎样知道自己位于哪段历史中",
+          "new": "副本怎样确定自身位置属于哪段历史",
+          "reason": "确定自身位置属于历史是技术判定，导航内容未变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5381,
+          "end": 5396
+        }
+      ],
+      "old_paragraph": "副本机制又是另一组约定。ISR（同步副本集合，In-Sync Replicas）描述达到特定同步条件的副本集合，生产者的`acks`和主题的`min.insync.replicas`影响确认条件。它们需要结合故障和选主规则解释，不能把ISR中的副本简单叫作“绝对安全”。第7章讲哪些副本有资格参与，第9章讲副本怎样知道自己位于哪段历史中。",
+      "new_paragraph": "副本机制又是另一组约定。ISR（同步副本集合，In-Sync Replicas）描述达到特定同步条件的副本集合，生产者的`acks`和主题的`min.insync.replicas`影响确认条件。它们需要结合故障和选主规则解释，不能把ISR中的副本简单叫作“绝对安全”。第7章讲哪些副本有资格参与，第9章讲副本怎样确定自身位置属于哪段历史。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 110,
+      "old": "这里没有把某种代价专属地分配给一个产品。",
+      "new": "这些代价并不只存在于某一个产品中。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 6137,
+      "end": 6157,
+      "fix_id": "FIX007",
+      "candidate_ids": [
+        "A009"
+      ],
+      "selected_candidate": "A009",
+      "alternatives": [
+        {
+          "id": "A009",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 110,
+          "old": "这里没有把某种代价专属地分配给一个产品。",
+          "new": "这些代价并不只存在于某一个产品中。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6137,
+          "end": 6157
+        }
+      ],
+      "old_paragraph": "这里没有把某种代价专属地分配给一个产品。三者都需要管理内存，也都需要面对网络故障。差别在于哪些工作进入主要访问路径，哪些状态被纳入接口保证，哪些责任留在应用中。理解这一点，才能比较具体实现怎样分配成本。",
+      "new_paragraph": "这些代价并不只存在于某一个产品中。三者都需要管理内存，也都需要面对网络故障。差别在于哪些工作进入主要访问路径，哪些状态被纳入接口保证，哪些责任留在应用中。理解这一点，才能比较具体实现怎样分配成本。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 117,
+      "old": "即使两个系统都回答“写成功”",
+      "new": "即使两个系统都返回“写成功”",
+      "reason": "协议返回结果替回答，更准确且无范围变化。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 6341,
+      "end": 6355,
+      "fix_id": "FIX008",
+      "candidate_ids": [
+        "B03"
+      ],
+      "selected_candidate": "B03",
+      "alternatives": [
+        {
+          "id": "B03",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 117,
+          "old": "即使两个系统都回答“写成功”",
+          "new": "即使两个系统都返回“写成功”",
+          "reason": "协议返回结果替回答，更准确且无范围变化。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 6341,
+          "end": 6355
+        }
+      ],
+      "old_paragraph": "即使两个系统都回答“写成功”，一个可能表示主节点已经执行，另一个可能包含特定日志刷盘或副本确认。没有把这个差别展开，性能数字可能衡量的根本不是同一件事。后文的对比将尽量围绕这些条件展开，不使用无条件的产品总评分。",
+      "new_paragraph": "即使两个系统都返回“写成功”，一个可能表示主节点已经执行，另一个可能包含特定日志刷盘或副本确认。没有把这个差别展开，性能数字可能衡量的根本不是同一件事。后文的对比将尽量围绕这些条件展开，不使用无条件的产品总评分。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 125,
+      "old": "“摊开工作”和“限制最坏延迟”",
+      "new": "“分步执行”和“限制最坏延迟”",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 6726,
+      "end": 6741,
+      "fix_id": "FIX009",
+      "candidate_ids": [
+        "B04",
+        "A010"
+      ],
+      "selected_candidate": "A010",
+      "alternatives": [
+        {
+          "id": "B04",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 125,
+          "old": "“摊开工作”",
+          "new": "“分摊工作”",
+          "reason": "同段分步迭代与第2章分摊集中工作对应；分摊合法，不改扫描成本或延迟保证。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 6726,
+          "end": 6732
+        },
+        {
+          "id": "A010",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 125,
+          "old": "“摊开工作”和“限制最坏延迟”",
+          "new": "“分步执行”和“限制最坏延迟”",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6726,
+          "end": 6741
+        }
+      ],
+      "old_paragraph": "以Redis的`KEYS`为例，危险不来自命令名字，而来自一次遍历的工作量进入了服务请求路径。在键很多的实例中，一次性扫描可能影响其他请求。把它换成分步迭代，改变的是单次承担的工作量与调用方式；它并没有使扫描总成本消失，也没有保证每一步恰好返回固定数量的元素。第2章讨论渐进式rehash时，会遇到同样的“摊开工作”和“限制最坏延迟”之间的区别。",
+      "new_paragraph": "以Redis的`KEYS`为例，危险不来自命令名字，而来自一次遍历的工作量进入了服务请求路径。在键很多的实例中，一次性扫描可能影响其他请求。把它换成分步迭代，改变的是单次承担的工作量与调用方式；它并没有使扫描总成本消失，也没有保证每一步恰好返回固定数量的元素。第2章讨论渐进式rehash时，会遇到同样的“分步执行”和“限制最坏延迟”之间的区别。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 191,
+      "old": "部署模式与小版本差异属于事实的一部分，不由产品名字省略。",
+      "new": "部署模式与小版本差异也需要说明，不能只写产品名字。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 9568,
+      "end": 9596,
+      "fix_id": "FIX010",
+      "candidate_ids": [
+        "A011"
+      ],
+      "selected_candidate": "A011",
+      "alternatives": [
+        {
+          "id": "A011",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 191,
+          "old": "部署模式与小版本差异属于事实的一部分，不由产品名字省略。",
+          "new": "部署模式与小版本差异也需要说明，不能只写产品名字。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 9568,
+          "end": 9596
+        }
+      ],
+      "old_paragraph": "本版使用以下观察基线。部署模式与小版本差异属于事实的一部分，不由产品名字省略。",
+      "new_paragraph": "本版使用以下观察基线。部署模式与小版本差异也需要说明，不能只写产品名字。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 211,
+      "old": "表用来压缩已有共同维度",
+      "new": "表用来集中比较相同维度",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10343,
+      "end": 10354,
+      "fix_id": "FIX011",
+      "candidate_ids": [
+        "A012"
+      ],
+      "selected_candidate": "A012",
+      "alternatives": [
+        {
+          "id": "A012",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 211,
+          "old": "表用来压缩已有共同维度",
+          "new": "表用来集中比较相同维度",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10343,
+          "end": 10354
+        }
+      ],
+      "old_paragraph": "图用来展示结构、次序或状态关系，表用来压缩已有共同维度。流程图中的箭头表示发生顺序还是数据流，应由上下文说明；对比表没有列出的条件，也不会因此消失。图表后的文字只解释图中不容易直接表达的关系，不把每个框重新念一遍。",
+      "new_paragraph": "图用来展示结构、次序或状态关系，表用来集中比较相同维度。流程图中的箭头表示发生顺序还是数据流，应由上下文说明；对比表没有列出的条件，也不会因此消失。图表后的文字只补充图中不容易直接表达的关系。"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 211,
+      "old": "图表后的文字只解释图中不容易直接表达的关系，不把每个框重新念一遍。",
+      "new": "图表后的文字只补充图中不容易直接表达的关系。",
+      "reason": "只补充图中不易表达关系已包含不复念图框，未净删机制。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10401,
+      "end": 10434,
+      "fix_id": "FIX012",
+      "candidate_ids": [
+        "C03"
+      ],
+      "selected_candidate": "C03",
+      "alternatives": [
+        {
+          "id": "C03",
+          "file": "chapters/01-introduction/chapter.md",
+          "line": 211,
+          "old": "图表后的文字只解释图中不容易直接表达的关系，不把每个框重新念一遍。",
+          "new": "图表后的文字只补充图中不容易直接表达的关系。",
+          "reason": "只补充图中不易表达关系已包含不复念图框，未净删机制。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10401,
+          "end": 10434
+        }
+      ],
+      "old_paragraph": "图用来展示结构、次序或状态关系，表用来压缩已有共同维度。流程图中的箭头表示发生顺序还是数据流，应由上下文说明；对比表没有列出的条件，也不会因此消失。图表后的文字只解释图中不容易直接表达的关系，不把每个框重新念一遍。",
+      "new_paragraph": "图用来展示结构、次序或状态关系，表用来集中比较相同维度。流程图中的箭头表示发生顺序还是数据流，应由上下文说明；对比表没有列出的条件，也不会因此消失。图表后的文字只补充图中不容易直接表达的关系。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 74,
+      "old": "新表承担正常查找",
+      "new": "正常查找改用新表",
+      "reason": "迁移完成前提完整保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 3307,
+      "end": 3315,
+      "fix_id": "FIX013",
+      "candidate_ids": [
+        "A014",
+        "B05"
+      ],
+      "selected_candidate": "B05",
+      "alternatives": [
+        {
+          "id": "A014",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 74,
+          "old": "新表承担正常查找",
+          "new": "正常查找改用新表",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3307,
+          "end": 3315
+        },
+        {
+          "id": "B05",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 74,
+          "old": "新表承担正常查找",
+          "new": "正常查找改用新表",
+          "reason": "迁移完成前提完整保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 3307,
+          "end": 3315
+        }
+      ],
+      "old_paragraph": "扩容后，一个旧桶的元素未必仍在同一新桶。需要根据新表大小确定目标位置，随后更新连接并减少旧表中的元素计数。迁移完成后，旧表释放，新表承担正常查找。能够正确处理“尚未迁移”和“已经迁移”的元素，是把工作分步进行的前提。",
+      "new_paragraph": "扩容后，一个旧桶的元素未必仍在同一新桶。需要根据新表大小确定目标位置，随后更新连接并减少旧表中的元素计数。迁移完成后，旧表释放，正常查找改用新表。能够正确处理“尚未迁移”和“已经迁移”的元素，是把工作分步进行的前提。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 91,
+      "old": "会变化的邻居长度",
+      "new": "会变化的相邻条目长度",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 4216,
+      "end": 4224,
+      "fix_id": "FIX014",
+      "candidate_ids": [
+        "A015"
+      ],
+      "selected_candidate": "A015",
+      "alternatives": [
+        {
+          "id": "A015",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 91,
+          "old": "会变化的邻居长度",
+          "new": "会变化的相邻条目长度",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 4216,
+          "end": 4224
+        }
+      ],
+      "old_paragraph": "这里的改善是局部编码不再引用会变化的邻居长度，不是所有写入都不再搬动数据。Redis7.x采用listpack承担相关紧凑编码用途，旧格式出现在本书时属于演化背景。文件中怎样兼容历史格式，第8章另行讨论。",
+      "new_paragraph": "这里的改善是局部编码不再引用会变化的相邻条目长度，不是所有写入都不再搬动数据。Redis7.x使用listpack实现相关紧凑编码，旧格式出现在本书时属于演化背景。文件中怎样兼容历史格式，第8章另行讨论。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 91,
+      "old": "Redis7.x采用listpack承担相关紧凑编码用途",
+      "new": "Redis7.x使用listpack实现相关紧凑编码",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 4239,
+      "end": 4267,
+      "fix_id": "FIX015",
+      "candidate_ids": [
+        "A016",
+        "B06"
+      ],
+      "selected_candidate": "A016",
+      "alternatives": [
+        {
+          "id": "A016",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 91,
+          "old": "Redis7.x采用listpack承担相关紧凑编码用途",
+          "new": "Redis7.x使用listpack实现相关紧凑编码",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 4239,
+          "end": 4267
+        },
+        {
+          "id": "B06",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 91,
+          "old": "采用listpack承担相关紧凑编码用途",
+          "new": "将listpack用于相关紧凑编码",
+          "reason": "listpack用途和7.x限定未变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 4247,
+          "end": 4267
+        }
+      ],
+      "old_paragraph": "这里的改善是局部编码不再引用会变化的邻居长度，不是所有写入都不再搬动数据。Redis7.x采用listpack承担相关紧凑编码用途，旧格式出现在本书时属于演化背景。文件中怎样兼容历史格式，第8章另行讨论。",
+      "new_paragraph": "这里的改善是局部编码不再引用会变化的相邻条目长度，不是所有写入都不再搬动数据。Redis7.x使用listpack实现相关紧凑编码，旧格式出现在本书时属于演化背景。文件中怎样兼容历史格式，第8章另行讨论。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 155,
+      "old": "不能把它写成“任何批次都原样落盘、从不检查单条记录”。",
+      "new": "批次并不都原样落盘，单条记录也可能需要检查。",
+      "reason": "与A017同一命题，去两次并非形成的拗口；原样落盘非全称、单条检查可能性均保留。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7412,
+      "end": 7439,
+      "fix_id": "FIX016",
+      "candidate_ids": [
+        "A017",
+        "C04"
+      ],
+      "selected_candidate": "C04",
+      "alternatives": [
+        {
+          "id": "A017",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 155,
+          "old": "不能把它写成“任何批次都原样落盘、从不检查单条记录”。",
+          "new": "批次并不都原样落盘，单条记录也可能需要检查。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7412,
+          "end": 7439
+        },
+        {
+          "id": "C04",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 155,
+          "old": "不能把它写成“任何批次都原样落盘、从不检查单条记录”。",
+          "new": "批次并不都原样落盘，单条记录也可能需要检查。",
+          "reason": "与A017同一命题，去两次并非形成的拗口；原样落盘非全称、单条检查可能性均保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7412,
+          "end": 7439
+        }
+      ],
+      "old_paragraph": "Broker可以在满足格式和配置条件的路径上保留批量表示，但接收过程仍需要校验，并可能涉及压缩或格式相关处理。不能把它写成“任何批次都原样落盘、从不检查单条记录”。同样，消费者API最终可以向应用逐条提供记录，线上传输的批次边界不等于应用只能一次处理完整批次。",
+      "new_paragraph": "Broker可以在满足格式和配置条件的路径上保留批量表示，但接收过程仍需要校验，并可能涉及压缩或格式相关处理。批次并不都原样落盘，单条记录也可能需要检查。同样，消费者API最终可以向应用逐条提供记录，线上传输的批次边界不等于应用只能一次处理完整批次。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 181,
+      "old": "不能笼统写成“把密码加密后传回”。",
+      "new": "认证响应并不都采用“把密码加密后传回”的方式。",
+      "reason": "认证响应并非统一密码加密回传；插件/TLS边界仍完整。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 8676,
+      "end": 8693,
+      "fix_id": "FIX017",
+      "candidate_ids": [
+        "C05"
+      ],
+      "selected_candidate": "C05",
+      "alternatives": [
+        {
+          "id": "C05",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 181,
+          "old": "不能笼统写成“把密码加密后传回”。",
+          "new": "认证响应并不都采用“把密码加密后传回”的方式。",
+          "reason": "认证响应并非统一密码加密回传；插件/TLS边界仍完整。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 8676,
+          "end": 8693
+        }
+      ],
+      "old_paragraph": "MySQL经典协议先进行连接握手与认证，再进入命令阶段。能力标志帮助双方约定支持的特性，认证过程由插件及连接条件决定；不能笼统写成“把密码加密后传回”。TLS提供的传输保护与认证响应怎样计算，也属于不同机制，第6章会进一步说明。",
+      "new_paragraph": "MySQL经典协议先进行连接握手与认证，再进入命令阶段。能力标志帮助双方约定支持的特性，认证过程由插件及连接条件决定；认证响应并不都采用“把密码加密后传回”的方式。TLS提供的传输保护与认证响应怎样计算，也属于不同机制，第6章会进一步说明。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 205,
+      "old": "它没有独自决定未知字段是否可以忽略",
+      "new": "仅凭版本号不能确定未知字段是否可以忽略",
+      "reason": "版本号与兼容能力非等价关系完整保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 10044,
+      "end": 10061,
+      "fix_id": "FIX018",
+      "candidate_ids": [
+        "B07"
+      ],
+      "selected_candidate": "B07",
+      "alternatives": [
+        {
+          "id": "B07",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 205,
+          "old": "它没有独自决定未知字段是否可以忽略",
+          "new": "仅凭版本号不能确定未知字段是否可以忽略",
+          "reason": "版本号与兼容能力非等价关系完整保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 10044,
+          "end": 10061
+        }
+      ],
+      "old_paragraph": "版本号解决的是按哪种结构解析。它没有独自决定未知字段是否可以忽略、字段含义是否变化，以及旧客户端是否能理解新行为。可选扩展可以降低升级联动，改变核心语义仍可能要求显式版本升级和调用者适配。",
+      "new_paragraph": "版本号解决的是按哪种结构解析。仅凭版本号不能确定未知字段是否可以忽略、字段含义是否变化，以及旧客户端是否能理解新行为。可选扩展可以降低升级联动，改变核心语义仍可能要求显式版本升级和调用者适配。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 232,
+      "old": "批次避免每条记录重复承担相同元数据",
+      "new": "批次避免每条记录重复保存相同元数据",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 11204,
+      "end": 11221,
+      "fix_id": "FIX019",
+      "candidate_ids": [
+        "A018"
+      ],
+      "selected_candidate": "A018",
+      "alternatives": [
+        {
+          "id": "A018",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 232,
+          "old": "批次避免每条记录重复承担相同元数据",
+          "new": "批次避免每条记录重复保存相同元数据",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11204,
+          "end": 11221
+        }
+      ],
+      "old_paragraph": "三者都在减少重复工作，但减少的位置不同。保存长度避免重复扫描，辅助索引避免重复走某段查找路径，批次避免每条记录重复承担相同元数据。采用其中一种办法，还需要支付维护这份额外状态的代价。结构越复杂不一定越好，状态维护与实际访问是否匹配才决定收益。",
+      "new_paragraph": "三者都在减少重复工作，但减少的位置不同。保存长度避免重复扫描，辅助索引避免重复走某段查找路径，批次避免每条记录重复保存相同元数据。采用其中一种办法，还需要支付维护这份额外状态的代价。结构越复杂不一定越好，状态维护与实际访问是否匹配才决定收益。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 255,
+      "old": "### 2.6.1 我会把结构选择落到操作清单上",
+      "new": "### 2.6.1 结构选择与具体操作",
+      "reason": "同位标题减少我会，与段首作者判断不重复；该段我会全文保留。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 11997,
+      "end": 12021,
+      "fix_id": "FIX020",
+      "candidate_ids": [
+        "C06"
+      ],
+      "selected_candidate": "C06",
+      "alternatives": [
+        {
+          "id": "C06",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 255,
+          "old": "### 2.6.1 我会把结构选择落到操作清单上",
+          "new": "### 2.6.1 结构选择与具体操作",
+          "reason": "同位标题减少我会，与段首作者判断不重复；该段我会全文保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11997,
+          "end": 12021
+        }
+      ],
+      "old_paragraph": "### 2.6.1 我会把结构选择落到操作清单上",
+      "new_paragraph": "### 2.6.1 结构选择与具体操作"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 269,
+      "old": "不认识它的解析器如何继续",
+      "new": "无法识别它的解析器如何继续",
+      "reason": "识别最贴未知字段，不扩大为不支持整个格式。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 12579,
+      "end": 12591,
+      "fix_id": "FIX021",
+      "candidate_ids": [
+        "A019",
+        "B08"
+      ],
+      "selected_candidate": "B08",
+      "alternatives": [
+        {
+          "id": "A019",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 269,
+          "old": "不认识它的解析器如何继续",
+          "new": "无法识别它的解析器如何继续",
+          "reason": "采用B08；未知字段不等同不支持字段，避免范围替换。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 12579,
+          "end": 12591
+        },
+        {
+          "id": "B08",
+          "file": "chapters/02-data-structures-protocols/chapter.md",
+          "line": 269,
+          "old": "不认识它的解析器如何继续",
+          "new": "无法识别它的解析器如何继续",
+          "reason": "识别最贴未知字段，不扩大为不支持整个格式。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 12579,
+          "end": 12591
+        }
+      ],
+      "old_paragraph": "我自己设计新协议，会提前写出第二个版本要怎样出现。若改变返回类型，旧客户端如何辨别；若增加可选字段，不认识它的解析器如何继续；若连接中断，调用者怎样判断能否重试。这些行为比“头部里预留一个版本号”更接近兼容设计。",
+      "new_paragraph": "我自己设计新协议，会提前写出第二个版本要怎样出现。若改变返回类型，旧客户端如何辨别；若增加可选字段，无法识别它的解析器如何继续；若连接中断，调用者怎样判断能否重试。这些行为比“头部里预留一个版本号”更接近兼容设计。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 17,
+      "old": "一个从节点可以回答本地查询",
+      "new": "一个从节点可以响应本地查询",
+      "reason": "响应查询是原动作，无额外保证。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 543,
+      "end": 556,
+      "fix_id": "FIX022",
+      "candidate_ids": [
+        "A021",
+        "B09"
+      ],
+      "selected_candidate": "B09",
+      "alternatives": [
+        {
+          "id": "A021",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 17,
+          "old": "一个从节点可以回答本地查询",
+          "new": "一个从节点可以响应本地查询",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 543,
+          "end": 556
+        },
+        {
+          "id": "B09",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 17,
+          "old": "一个从节点可以回答本地查询",
+          "new": "一个从节点可以响应本地查询",
+          "reason": "响应查询是原动作，无额外保证。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 543,
+          "end": 556
+        }
+      ],
+      "old_paragraph": "就绪也有范围。一个从节点可以回答本地查询，但复制进度可能不满足业务要求；一个Broker已经启动，但某个分区尚未具备预期的副本条件。把所有检查压成“进程在不在”，会漏掉这些差别。把所有检查都放进一个过度严格的探针，又可能使局部故障触发不必要的整体退出。",
+      "new_paragraph": "就绪也有范围。一个从节点可以响应本地查询，但复制进度可能不满足业务要求；一个Broker已经启动，但某个分区尚未具备预期的副本条件。把所有检查简化为“进程在不在”，会漏掉这些差别。把所有检查都放进一个过度严格的探针，又可能使局部故障触发不必要的整体退出。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 17,
+      "old": "把所有检查压成“进程在不在”",
+      "new": "把所有检查简化为“进程在不在”",
+      "reason": "简化比压成搭配自然，两个探针风险保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 602,
+      "end": 616,
+      "fix_id": "FIX023",
+      "candidate_ids": [
+        "A022",
+        "B10"
+      ],
+      "selected_candidate": "B10",
+      "alternatives": [
+        {
+          "id": "A022",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 17,
+          "old": "把所有检查压成“进程在不在”",
+          "new": "把所有检查简化为“进程在不在”",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 602,
+          "end": 616
+        },
+        {
+          "id": "B10",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 17,
+          "old": "把所有检查压成“进程在不在”",
+          "new": "把所有检查简化为“进程在不在”",
+          "reason": "简化比压成搭配自然，两个探针风险保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 602,
+          "end": 616
+        }
+      ],
+      "old_paragraph": "就绪也有范围。一个从节点可以回答本地查询，但复制进度可能不满足业务要求；一个Broker已经启动，但某个分区尚未具备预期的副本条件。把所有检查压成“进程在不在”，会漏掉这些差别。把所有检查都放进一个过度严格的探针，又可能使局部故障触发不必要的整体退出。",
+      "new_paragraph": "就绪也有范围。一个从节点可以响应本地查询，但复制进度可能不满足业务要求；一个Broker已经启动，但某个分区尚未具备预期的副本条件。把所有检查简化为“进程在不在”，会漏掉这些差别。把所有检查都放进一个过度严格的探针，又可能使局部故障触发不必要的整体退出。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 32,
+      "old": "恢复机制必须能够面对这些中断点，而不是只认识“正常运行后被杀”这一种情况。",
+      "new": "恢复机制必须处理这些中断点，不能只处理“正常运行后被杀”这一种情况。",
+      "reason": "采用B11并保留句号。原先强调整个阶段范围，直接替换认知动词即可。",
+      "votes": [
+        "B",
+        "C"
+      ],
+      "start": 1186,
+      "end": 1223,
+      "fix_id": "FIX024",
+      "candidate_ids": [
+        "B11",
+        "A023"
+      ],
+      "selected_candidate": "A023",
+      "alternatives": [
+        {
+          "id": "B11",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 32,
+          "old": "恢复机制必须能够面对这些中断点，而不是只认识“正常运行后被杀”这一种情况",
+          "new": "恢复机制必须处理这些中断点，不能只处理“正常运行后被杀”这一种情况",
+          "reason": "所有阶段中断范围保留，不把必须处理改为保证恢复成功。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 1186,
+          "end": 1222
+        },
+        {
+          "id": "A023",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 32,
+          "old": "恢复机制必须能够面对这些中断点，而不是只认识“正常运行后被杀”这一种情况。",
+          "new": "恢复机制必须处理这些中断点，不能只处理“正常运行后被杀”这一种情况。",
+          "reason": "采用B11并保留句号。原先强调整个阶段范围，直接替换认知动词即可。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 1186,
+          "end": 1223
+        }
+      ],
+      "old_paragraph": "异常退出可能发生在任何阶段，包括尚未完成初始化和正在关闭时。恢复机制必须能够面对这些中断点，而不是只认识“正常运行后被杀”这一种情况。临时文件是否可识别、已完成阶段能否重复执行、外部角色是否会过期，都属于这个问题。",
+      "new_paragraph": "异常退出可能发生在任何阶段，包括尚未完成初始化和正在关闭时。恢复机制必须处理这些中断点，不能只处理“正常运行后被杀”这一种情况。临时文件是否可识别、已完成阶段能否重复执行、外部角色是否会过期，都属于这个问题。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 44,
+      "old": "后续代码不必在每次使用时猜测是否已经赋值",
+      "new": "后续代码不必在每次使用时检查是否已经赋值",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1574,
+      "end": 1594,
+      "fix_id": "FIX025",
+      "candidate_ids": [
+        "A025"
+      ],
+      "selected_candidate": "A025",
+      "alternatives": [
+        {
+          "id": "A025",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 44,
+          "old": "后续代码不必在每次使用时猜测是否已经赋值",
+          "new": "后续代码不必在每次使用时检查是否已经赋值",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1574,
+          "end": 1594
+        }
+      ],
+      "old_paragraph": "Redis先建立默认配置，再读取配置文件和启动参数。这样，未显式指定的项具有已知来源，后续代码不必在每次使用时猜测是否已经赋值。但默认值只是初始化安排的一部分：字段范围、参数组合、文件权限和实际资源是否满足要求，仍需要检查。",
+      "new_paragraph": "Redis先建立默认配置，再读取配置文件和启动参数。这样，未显式指定的项具有已知来源，后续代码不必在每次使用时检查是否已经赋值。但默认值只是初始化安排的一部分：字段范围、参数组合、文件权限和实际资源是否满足要求，仍需要检查。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 79,
+      "old": "图3-3列出条件分支，而不是把关闭画成没有失败出口的一条直线。",
+      "new": "图3-3列出正常关闭的条件分支与失败出口。",
+      "reason": "分支与失败出口是图的真实内容，不比较不存在画法。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 3270,
+      "end": 3301,
+      "fix_id": "FIX026",
+      "candidate_ids": [
+        "C07"
+      ],
+      "selected_candidate": "C07",
+      "alternatives": [
+        {
+          "id": "C07",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 79,
+          "old": "图3-3列出条件分支，而不是把关闭画成没有失败出口的一条直线。",
+          "new": "图3-3列出正常关闭的条件分支与失败出口。",
+          "reason": "分支与失败出口是图的真实内容，不比较不存在画法。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3270,
+          "end": 3301
+        }
+      ],
+      "old_paragraph": "图3-3列出条件分支，而不是把关闭画成没有失败出口的一条直线。",
+      "new_paragraph": "图3-3列出正常关闭的条件分支与失败出口。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 86,
+      "old": "这里保留命令语义，刻意不提供一条组合所有强制选项的生产命令。",
+      "new": "这些选项需要按退出条件分别选择，不能直接组合成通用的生产命令。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 3619,
+      "end": 3649,
+      "fix_id": "FIX027",
+      "candidate_ids": [
+        "A026"
+      ],
+      "selected_candidate": "A026",
+      "alternatives": [
+        {
+          "id": "A026",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 86,
+          "old": "这里保留命令语义，刻意不提供一条组合所有强制选项的生产命令。",
+          "new": "这些选项需要按退出条件分别选择，不能直接组合成通用的生产命令。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3619,
+          "end": 3649
+        }
+      ],
+      "old_paragraph": "这里保留命令语义，刻意不提供一条组合所有强制选项的生产命令。为了查看当前持久化和复制状态，可以在具有相应管理权限的连接上使用以下只读命令。",
+      "new_paragraph": "这些选项需要按退出条件分别选择，不能直接组合成通用的生产命令。为了查看当前持久化和复制状态，可以在具有相应管理权限的连接上使用以下只读命令。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 129,
+      "old": "不能写成“所有回滚都完成，MySQL才开放网络”。",
+      "new": "MySQL可以在部分回滚尚未完成时开放网络。",
+      "reason": "前句已明确必要redo后连接与后台回滚，肯定句为同一允许关系。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5274,
+      "end": 5299,
+      "fix_id": "FIX028",
+      "candidate_ids": [
+        "C08"
+      ],
+      "selected_candidate": "C08",
+      "alternatives": [
+        {
+          "id": "C08",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 129,
+          "old": "不能写成“所有回滚都完成，MySQL才开放网络”。",
+          "new": "MySQL可以在部分回滚尚未完成时开放网络。",
+          "reason": "前句已明确必要redo后连接与后台回滚，肯定句为同一允许关系。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5274,
+          "end": 5299
+        }
+      ],
+      "old_paragraph": "一个重要边界是恢复工作与接受连接未必严格串行到底。InnoDB在完成必要redo恢复后，可以尽早接受连接；未提交事务的回滚能够由后台线程继续进行，新事务可能因此遇到锁冲突。处于XA准备状态的事务还具有专门规则。不能写成“所有回滚都完成，MySQL才开放网络”。[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)明确描述了后台回滚。",
+      "new_paragraph": "一个重要边界是恢复工作与接受连接未必严格串行到底。InnoDB在完成必要redo恢复后，可以尽早接受连接；未提交事务的回滚能够由后台线程继续进行，新事务可能因此遇到锁冲突。处于XA准备状态的事务还具有专门规则。MySQL可以在部分回滚尚未完成时开放网络。[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)明确描述了后台回滚。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 171,
+      "old": "也不是只把最后一个半条记录截掉就结束",
+      "new": "也不是仅截掉末尾不完整的记录就结束",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7344,
+      "end": 7362,
+      "fix_id": "FIX029",
+      "candidate_ids": [
+        "A028"
+      ],
+      "selected_candidate": "A028",
+      "alternatives": [
+        {
+          "id": "A028",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 171,
+          "old": "也不是只把最后一个半条记录截掉就结束",
+          "new": "也不是仅截掉末尾不完整的记录就结束",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7344,
+          "end": 7362
+        }
+      ],
+      "old_paragraph": "本地日志恢复要辨认正常关闭留下的标记、恢复位置、日志段与索引。异常退出可能要求扫描未确认完成的部分，识别损坏或不完整尾部，重建必要索引及生产者状态。并不是每次重启都从头完整扫描每个历史段，也不是只把最后一个半条记录截掉就结束。",
+      "new_paragraph": "本地日志恢复要辨认正常关闭留下的标记、恢复位置、日志段与索引。异常退出可能要求扫描未确认完成的部分，识别损坏或不完整尾部，重建必要索引及生产者状态。并不是每次重启都从头完整扫描每个历史段，也不是仅截掉末尾不完整的记录就结束。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 219,
+      "old": "探针应检查自己负责的条件",
+      "new": "探针应检查对应的条件",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 9614,
+      "end": 9626,
+      "fix_id": "FIX030",
+      "candidate_ids": [
+        "A030"
+      ],
+      "selected_candidate": "A030",
+      "alternatives": [
+        {
+          "id": "A030",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 219,
+          "old": "探针应检查自己负责的条件",
+          "new": "探针应检查对应的条件",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 9614,
+          "end": 9626
+        }
+      ],
+      "old_paragraph": "如果把“数据库尚在恢复”当作存活失败，编排系统可能不断重启它，使恢复一直无法完成。相反，只用进程存在作为readiness，也可能把流量引到未完成加载的节点。探针应检查自己负责的条件，不是检查越多越严格就越可靠。",
+      "new_paragraph": "如果把“数据库尚在恢复”当作存活失败，编排系统可能不断重启它，使恢复一直无法完成。相反，只用进程存在作为readiness，也可能把流量引到未完成加载的节点。探针应检查对应的条件，不是检查越多越严格就越可靠。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 249,
+      "old": "### 3.6.1 我会先说明哪些请求在什么状态下被允许",
+      "new": "### 3.6.1 请求放行的状态条件",
+      "reason": "标题变状态条件路标，段内我更关心与条件列表保留。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10888,
+      "end": 10916,
+      "fix_id": "FIX031",
+      "candidate_ids": [
+        "C09"
+      ],
+      "selected_candidate": "C09",
+      "alternatives": [
+        {
+          "id": "C09",
+          "file": "chapters/03-lifecycle/chapter.md",
+          "line": 249,
+          "old": "### 3.6.1 我会先说明哪些请求在什么状态下被允许",
+          "new": "### 3.6.1 请求放行的状态条件",
+          "reason": "标题变状态条件路标，段内我更关心与条件列表保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10888,
+          "end": 10916
+        }
+      ],
+      "old_paragraph": "### 3.6.1 我会先说明哪些请求在什么状态下被允许",
+      "new_paragraph": "### 3.6.1 请求放行的状态条件"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 17,
+      "old": "机械盘还要承担寻道和旋转",
+      "new": "机械盘还需要寻道和旋转",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 688,
+      "end": 700,
+      "fix_id": "FIX032",
+      "candidate_ids": [
+        "A034"
+      ],
+      "selected_candidate": "A034",
+      "alternatives": [
+        {
+          "id": "A034",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 17,
+          "old": "机械盘还要承担寻道和旋转",
+          "new": "机械盘还需要寻道和旋转",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 688,
+          "end": 700
+        }
+      ],
+      "old_paragraph": "DRAM、处理器缓存和持久设备具有不同的访问和保存特征。处理器缓存未命中可能访问DRAM，数据不在内存缓存时又可能需要存储I/O。机械盘还要承担寻道和旋转，SSD没有这些机械动作，却仍受控制器、闪存管理、队列和写放大影响。顺序访问的收益在两类设备上并不完全相同。",
+      "new_paragraph": "DRAM、处理器缓存和持久设备具有不同的访问和保存特征。处理器缓存未命中可能访问DRAM，数据不在内存缓存时又可能需要存储I/O。机械盘还需要寻道和旋转，SSD没有这些机械动作，却仍受控制器、闪存管理、队列和写放大影响。顺序访问的收益在两类设备上并不完全相同。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 68,
+      "old": "若数据承担唯一业务记录",
+      "new": "若数据是唯一的业务记录",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 2436,
+      "end": 2447,
+      "fix_id": "FIX033",
+      "candidate_ids": [
+        "A035"
+      ],
+      "selected_candidate": "A035",
+      "alternatives": [
+        {
+          "id": "A035",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 68,
+          "old": "若数据承担唯一业务记录",
+          "new": "若数据是唯一的业务记录",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2436,
+          "end": 2447
+        }
+      ],
+      "old_paragraph": "在数据被当作缓存时，可以定义可淘汰范围；若数据承担唯一业务记录，简单淘汰会直接改变事实。因而“内存满了怎么办”是数据责任问题，不能只按命中率选择一个听起来更先进的算法。",
+      "new_paragraph": "在数据被当作缓存时，可以定义可淘汰范围；若数据是唯一的业务记录，简单淘汰会直接改变事实。因而“内存满了怎么办”是数据责任问题，不能只按命中率选择一个听起来更先进的算法。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 78,
+      "old": "算法并不知道业务已经改变",
+      "new": "算法不能直接识别业务变化",
+      "reason": "直接识别保留LFU访问与衰减计算，不像A原案新增只能依据访问记录。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 3126,
+      "end": 3138,
+      "fix_id": "FIX034",
+      "candidate_ids": [
+        "A036",
+        "B12"
+      ],
+      "selected_candidate": "B12",
+      "alternatives": [
+        {
+          "id": "A036",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 78,
+          "old": "算法并不知道业务已经改变",
+          "new": "算法不能直接识别业务变化",
+          "reason": "采用B12；A‘只能依据访问记录’会遗漏时间衰减，不能因去拟人新增‘只能’限制。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 3126,
+          "end": 3138
+        },
+        {
+          "id": "B12",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 78,
+          "old": "算法并不知道业务已经改变",
+          "new": "算法不能直接识别业务变化",
+          "reason": "直接识别保留LFU访问与衰减计算，不像A原案新增只能依据访问记录。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 3126,
+          "end": 3138
+        }
+      ],
+      "old_paragraph": "衰减避免一个过去很热、现在不再使用的键永久占据优势。`lfu-log-factor`影响计数增长，`lfu-decay-time`影响衰减时间尺度；相关路径在访问或评估时处理衰减，不需要为每个键配置一个定时器。热度变化比衰减更快时，旧热点仍可能占用空间，算法并不知道业务已经改变。",
+      "new_paragraph": "衰减避免一个过去很热、现在不再使用的键永久占据优势。`lfu-log-factor`影响计数增长，`lfu-decay-time`影响衰减时间尺度；相关路径在访问或评估时处理衰减，不需要为每个键配置一个定时器。热度变化比衰减更快时，旧热点仍可能占用空间，算法不能直接识别业务变化。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 146,
+      "old": "还承担延迟写回的状态",
+      "new": "还保存等待写回的修改",
+      "reason": "缓冲池保存未刷出的修改，与前句脏页一致。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 6303,
+      "end": 6313,
+      "fix_id": "FIX035",
+      "candidate_ids": [
+        "A037",
+        "B13"
+      ],
+      "selected_candidate": "B13",
+      "alternatives": [
+        {
+          "id": "A037",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 146,
+          "old": "还承担延迟写回的状态",
+          "new": "还保存着尚未写回的数据",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6303,
+          "end": 6313
+        },
+        {
+          "id": "B13",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 146,
+          "old": "还承担延迟写回的状态",
+          "new": "还保存等待写回的修改",
+          "reason": "缓冲池保存未刷出的修改，与前句脏页一致。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 6303,
+          "end": 6313
+        }
+      ],
+      "old_paragraph": "InnoDB缓冲池保存正在使用的页。查询需要某页时，先检查它是否在内存；不在时，再读取并纳入管理。修改页以后，内存中的版本与数据文件不同，成为脏页。缓冲池因此不只是一个可随时删除的只读副本集合，还承担延迟写回的状态。",
+      "new_paragraph": "InnoDB缓冲池保存正在使用的页。查询需要某页时，先检查它是否在内存；不在时，再读取并纳入管理。修改页以后，内存中的版本与数据文件不同，成为脏页。缓冲池因此不只是一个可随时删除的只读副本集合，还保存等待写回的修改。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 163,
+      "old": "不能把“减少污染”写成“热数据完全不受影响”。",
+      "new": "减少缓存污染，并不意味着热数据完全不受影响。",
+      "reason": "减少污染与完全无影响的非等价关系不变。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7104,
+      "end": 7127,
+      "fix_id": "FIX036",
+      "candidate_ids": [
+        "C10"
+      ],
+      "selected_candidate": "C10",
+      "alternatives": [
+        {
+          "id": "C10",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 163,
+          "old": "不能把“减少污染”写成“热数据完全不受影响”。",
+          "new": "减少缓存污染，并不意味着热数据完全不受影响。",
+          "reason": "减少污染与完全无影响的非等价关系不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7104,
+          "end": 7127
+        }
+      ],
+      "old_paragraph": "中点插入降低了扫描页立即占据热区的机会，并未取消扫描的I/O和CPU成本。扫描仍可能持续很久，也可能重复访问足以满足提升条件；真正工作集超过内存时，热点之间也会竞争。不能把“减少污染”写成“热数据完全不受影响”。",
+      "new_paragraph": "中点插入降低了扫描页立即占据热区的机会，并未取消扫描的I/O和CPU成本。扫描仍可能持续很久，也可能重复访问足以满足提升条件；真正工作集超过内存时，热点之间也会竞争。减少缓存污染，并不意味着热数据完全不受影响。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 173,
+      "old": "旧日志就仍可能被恢复需要",
+      "new": "恢复就仍可能需要旧日志",
+      "reason": "恢复需要日志改主动语序，无信息增删。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 7596,
+      "end": 7608,
+      "fix_id": "FIX037",
+      "candidate_ids": [
+        "A038",
+        "B14"
+      ],
+      "selected_candidate": "B14",
+      "alternatives": [
+        {
+          "id": "A038",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 173,
+          "old": "旧日志就仍可能被恢复需要",
+          "new": "恢复时就仍可能需要旧日志",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7596,
+          "end": 7608
+        },
+        {
+          "id": "B14",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 173,
+          "old": "旧日志就仍可能被恢复需要",
+          "new": "恢复就仍可能需要旧日志",
+          "reason": "恢复需要日志改主动语序，无信息增删。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 7596,
+          "end": 7608
+        }
+      ],
+      "old_paragraph": "redo有有限容量，需要checkpoint推进释放可复用空间。若脏页长期无法写回，旧日志就仍可能被恢复需要，日志空间压力最终影响前台。增加日志容量可以提供更大余量，却不能在存储长期跟不上时无限吸收写入。缓冲是时间上的调节，不是持续吞吐能力的替代。",
+      "new_paragraph": "redo有有限容量，需要checkpoint推进释放可复用空间。若脏页长期无法写回，恢复就仍可能需要旧日志，日志空间压力最终影响前台。增加日志容量可以提供更大余量，却不能在存储长期跟不上时无限吸收写入。缓冲是时间上的调节，不是持续吞吐能力的替代。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 261,
+      "old": "不能无依据写成下降到固定比例。",
+      "new": "缺少测量依据，就无法给出固定的下降比例。",
+      "reason": "下降幅度仍需测量，没有新增幅度或吞吐数。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 12024,
+      "end": 12039,
+      "fix_id": "FIX038",
+      "candidate_ids": [
+        "C11"
+      ],
+      "selected_candidate": "C11",
+      "alternatives": [
+        {
+          "id": "C11",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 261,
+          "old": "不能无依据写成下降到固定比例。",
+          "new": "缺少测量依据，就无法给出固定的下降比例。",
+          "reason": "下降幅度仍需测量，没有新增幅度或吞吐数。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 12024,
+          "end": 12039
+        }
+      ],
+      "old_paragraph": "Kafka通常不要求每次生产写入都先执行本地`fsync`才返回，常规路径利用操作系统写回，并通过副本机制增加可恢复性。日志刷新参数可以改变本地同步安排，但不会替代副本协议。开启更频繁刷新可能增加等待，影响幅度需要实测，不能无依据写成下降到固定比例。",
+      "new_paragraph": "Kafka通常不要求每次生产写入都先执行本地`fsync`才返回，常规路径利用操作系统写回，并通过副本机制增加可恢复性。日志刷新参数可以改变本地同步安排，但不会替代副本协议。开启更频繁刷新可能增加等待，影响幅度需要实测，缺少测量依据，就无法给出固定的下降比例。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 265,
+      "old": "复制确认不能凭空留下磁盘数据",
+      "new": "复制确认不能使未持久化的数据保留在磁盘上",
+      "reason": "前句已限定共同掉电且均未持久化，替换未扩大故障范围。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 12363,
+      "end": 12377,
+      "fix_id": "FIX039",
+      "candidate_ids": [
+        "B15"
+      ],
+      "selected_candidate": "B15",
+      "alternatives": [
+        {
+          "id": "B15",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 265,
+          "old": "复制确认不能凭空留下磁盘数据",
+          "new": "复制确认不能使未持久化的数据保留在磁盘上",
+          "reason": "前句已限定共同掉电且均未持久化，替换未扩大故障范围。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 12363,
+          "end": 12377
+        }
+      ],
+      "old_paragraph": "这里的日志接受不等于各节点强制刷盘。多节点仍存活时，可以利用它们的记录恢复一个失败节点；若相关节点同时掉电且记录均未持久化，复制确认不能凭空留下磁盘数据。`acks`因而不与Redis的`appendfsync`或MySQL的redo刷盘参数逐档对应。",
+      "new_paragraph": "这里的日志接受不等于各节点强制刷盘。多节点仍存活时，可以利用它们的记录恢复一个失败节点；若相关节点同时掉电且记录均未持久化，复制确认不能使未持久化的数据保留在磁盘上。`acks`因而不与Redis的`appendfsync`或MySQL的redo刷盘参数逐档对应。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 319,
+      "old": "这些条件不是用来给每次操作增加一串免责括号，而是选择架构时实际要作的决定。",
+      "new": "这些条件对应选择架构时实际要作的决定。",
+      "reason": "采用B16；原免责括号不是技术信息，原new继续保留防御性元说明且新增落实一句，没有必要。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 14219,
+      "end": 14256,
+      "fix_id": "FIX040",
+      "candidate_ids": [
+        "A040",
+        "B16",
+        "C12"
+      ],
+      "selected_candidate": "C12",
+      "alternatives": [
+        {
+          "id": "A040",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 319,
+          "old": "这些条件不是用来给每次操作增加一串免责括号，而是选择架构时实际要作的决定。",
+          "new": "这些条件对应选择架构时实际要作的决定。",
+          "reason": "采用B16。紧接句仍说明不同业务、成功语义和恢复责任；免责是重复的修稿姿态，不承担独立技术事实。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 14219,
+          "end": 14256
+        },
+        {
+          "id": "B16",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 319,
+          "old": "这些条件不是用来给每次操作增加一串免责括号，而是选择架构时实际要作的决定。",
+          "new": "这些条件对应选择架构时实际要作的决定。",
+          "reason": "采用，后句不同业务及成功/恢复责任原样保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 14219,
+          "end": 14256
+        },
+        {
+          "id": "C12",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 319,
+          "old": "这些条件不是用来给每次操作增加一串免责括号，而是选择架构时实际要作的决定。",
+          "new": "这些条件对应选择架构时实际要作的决定。",
+          "reason": "采用B16；原免责括号不是技术信息，原new继续保留防御性元说明且新增落实一句，没有必要。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 14219,
+          "end": 14256
+        }
+      ],
+      "old_paragraph": "这些条件不是用来给每次操作增加一串免责括号，而是选择架构时实际要作的决定。不同业务可以接受不同结果，前提是成功语义和恢复责任事先清楚。",
+      "new_paragraph": "这些条件对应选择架构时实际要作的决定。不同业务可以接受不同结果，前提是成功语义和恢复责任事先清楚。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 333,
+      "old": "InnoDB需要知道页是否脏，Redis淘汰要知道哪些键可以删除",
+      "new": "InnoDB需要检查页是否脏，Redis淘汰需要确定哪些键可以删除",
+      "reason": "检查脏状态比保存脏状态更少实现归属假设。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 14727,
+      "end": 14759,
+      "fix_id": "FIX041",
+      "candidate_ids": [
+        "A041",
+        "B17"
+      ],
+      "selected_candidate": "B17",
+      "alternatives": [
+        {
+          "id": "A041",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 333,
+          "old": "InnoDB需要知道页是否脏，Redis淘汰要知道哪些键可以删除",
+          "new": "InnoDB需要检查页是否脏，Redis淘汰需要确定哪些键可以删除",
+          "reason": "采用B17。原‘知道’不等于‘记录’，避免仅因替词改变状态维护动作。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 14727,
+          "end": 14759
+        },
+        {
+          "id": "B17",
+          "file": "chapters/04-memory-disk/chapter.md",
+          "line": 333,
+          "old": "InnoDB需要知道页是否脏，Redis淘汰要知道哪些键可以删除",
+          "new": "InnoDB需要检查页是否脏，Redis淘汰需要确定哪些键可以删除",
+          "reason": "检查脏状态比保存脏状态更少实现归属假设。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 14727,
+          "end": 14759
+        }
+      ],
+      "old_paragraph": "缓存一页文件、缓存一条业务记录、缓存一次查询结果，失效条件和恢复方式不同。InnoDB需要知道页是否脏，Redis淘汰要知道哪些键可以删除，Kafka页缓存由内核按文件页管理。它们的区别不只是缓存位于哪一层，而是这一层掌握哪些语义。",
+      "new_paragraph": "缓存一页文件、缓存一条业务记录、缓存一次查询结果，失效条件和恢复方式不同。InnoDB需要检查页是否脏，Redis淘汰需要确定哪些键可以删除，Kafka页缓存由内核按文件页管理。它们的区别不只是缓存位于哪一层，而是这一层掌握哪些语义。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 19,
+      "old": "不能把它们塞进某个框，就当作依赖已经处理完了。",
+      "new": "不能仅把它们归入某个模块，就认为依赖已经处理完了。",
+      "reason": "框换模块与本段职责分类相符。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 965,
+      "end": 988,
+      "fix_id": "FIX042",
+      "candidate_ids": [
+        "A042",
+        "C13"
+      ],
+      "selected_candidate": "C13",
+      "alternatives": [
+        {
+          "id": "A042",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 19,
+          "old": "不能把它们塞进某个框，就当作依赖已经处理完了",
+          "new": "不能只把它们列入某个模块，就认定依赖已经处理完了",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 965,
+          "end": 987
+        },
+        {
+          "id": "C13",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 19,
+          "old": "不能把它们塞进某个框，就当作依赖已经处理完了。",
+          "new": "不能仅把它们归入某个模块，就认为依赖已经处理完了。",
+          "reason": "框换模块与本段职责分类相符。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 965,
+          "end": 988
+        }
+      ],
+      "old_paragraph": "本章用交互、逻辑、存储三个名称标识职责。交互处理连接和报文，逻辑解释操作的含义，存储维护数据及其访问方法。这是观察时采用的分类，不声称三个项目的源码目录都严格按这个结构组织。认证、事务上下文、复制和资源限制还可能同时影响几项职责，不能把它们塞进某个框，就当作依赖已经处理完了。",
+      "new_paragraph": "本章用交互、逻辑、存储三个名称标识职责。交互处理连接和报文，逻辑解释操作的含义，存储维护数据及其访问方法。这是观察时采用的分类，不声称三个项目的源码目录都严格按这个结构组织。认证、事务上下文、复制和资源限制还可能同时影响几项职责，不能仅把它们归入某个模块，就认为依赖已经处理完了。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 53,
+      "old": "需要注意，Redis 7.x 示例配置",
+      "new": "Redis 7.x 示例配置",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 2604,
+      "end": 2623,
+      "fix_id": "FIX043",
+      "candidate_ids": [
+        "A044"
+      ],
+      "selected_candidate": "A044",
+      "alternatives": [
+        {
+          "id": "A044",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 53,
+          "old": "需要注意，Redis 7.x 示例配置",
+          "new": "Redis 7.x 示例配置",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2604,
+          "end": 2623
+        }
+      ],
+      "old_paragraph": "`client-output-buffer-limit` 按客户端类型设置限制，硬限制针对当前占用，软限制还结合持续时间。需要注意，Redis 7.x 示例配置中普通客户端的该项默认值为零，含义是没有由这项配置施加的输出缓冲上限；不能概括为所有客户端默认都会在同一阈值被关闭。实际配置与客户端类别要一起看。[R5-01](https://redis.io/docs/latest/develop/reference/clients/)",
+      "new_paragraph": "`client-output-buffer-limit` 按客户端类型设置限制，硬限制针对当前占用，软限制还结合持续时间。Redis 7.x 示例配置中普通客户端的该项默认值为零，含义是没有由这项配置施加的输出缓冲上限；不能概括为所有客户端默认都会在同一阈值被关闭。实际配置与客户端类别要一起看。[R5-01](https://redis.io/docs/latest/develop/reference/clients/)"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 55,
+      "old": "把缓冲区画在图上，只完成了解耦的一半；另一半是说明积压受什么约束。",
+      "new": "除了缓冲区，还需要明确积压受什么约束。",
+      "reason": "一半并非度量，核心是缓冲和积压约束两件工作；前面资源归属全文保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 2844,
+      "end": 2877,
+      "fix_id": "FIX044",
+      "candidate_ids": [
+        "B18"
+      ],
+      "selected_candidate": "B18",
+      "alternatives": [
+        {
+          "id": "B18",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 55,
+          "old": "把缓冲区画在图上，只完成了解耦的一半；另一半是说明积压受什么约束。",
+          "new": "除了缓冲区，还需要明确积压受什么约束。",
+          "reason": "一半并非度量，核心是缓冲和积压约束两件工作；前面资源归属全文保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 2844,
+          "end": 2877
+        }
+      ],
+      "old_paragraph": "这个边界值得保留，因为命令执行速度与客户端接收速度本来就可能不同。但边界的正确性还包括资源归属：待发送结果算谁的内存，积压何时结束，超限以后是断开连接还是限制生产。把缓冲区画在图上，只完成了解耦的一半；另一半是说明积压受什么约束。",
+      "new_paragraph": "这个边界值得保留，因为命令执行速度与客户端接收速度本来就可能不同。但边界的正确性还包括资源归属：待发送结果算谁的内存，积压何时结束，超限以后是断开连接还是限制生产。除了缓冲区，还需要明确积压受什么约束。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 90,
+      "old": "类型和编码分别回答语义与表示问题",
+      "new": "类型说明操作语义，编码说明内部表示",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 4482,
+      "end": 4498,
+      "fix_id": "FIX045",
+      "candidate_ids": [
+        "A046"
+      ],
+      "selected_candidate": "A046",
+      "alternatives": [
+        {
+          "id": "A046",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 90,
+          "old": "类型和编码分别回答语义与表示问题",
+          "new": "类型说明操作语义，编码说明内部表示",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 4482,
+          "end": 4498
+        }
+      ],
+      "old_paragraph": "这两行通过 `redis-cli` 执行，`example:key` 应替换成测试键。键不存在会得到相应空结果；键存在时，类型和编码分别回答语义与表示问题。输出不能直接作为性能排名：同一种紧凑编码是否合适，仍取决于元素数量、值长度和操作分布。为了观察编码转换而调整阈值，也应另设测试数据和恢复步骤，不能把生产键当作演示材料。",
+      "new_paragraph": "这两行通过 `redis-cli` 执行，`example:key` 应替换成测试键。键不存在会得到相应空结果；键存在时，类型说明操作语义，编码说明内部表示。输出不能直接作为性能排名：同一种紧凑编码是否合适，仍取决于元素数量、值长度和操作分布。为了观察编码转换而调整阈值，也应另设测试数据和恢复步骤，不能把生产键当作演示材料。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 114,
+      "old": "连接处理知道客户端是谁，SQL 层知道正在执行什么，引擎操作又需要相应事务信息。",
+      "new": "连接处理使用客户端身份，SQL 层使用当前执行信息，引擎操作又需要相应事务信息。",
+      "reason": "不改为保存/维护主体，也不把执行信息缩成处理当前语句；采用C与B新确认版本。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5867,
+      "end": 5907,
+      "fix_id": "FIX046",
+      "candidate_ids": [
+        "A048",
+        "B19",
+        "C14"
+      ],
+      "selected_candidate": "C14",
+      "alternatives": [
+        {
+          "id": "A048",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 114,
+          "old": "连接处理知道客户端是谁，SQL 层知道正在执行什么",
+          "new": "连接处理使用客户端身份，SQL 层使用当前执行信息",
+          "reason": "C14最终与B已互核；保留使用上下文的信息，避免把提供/读取上下文改成保存责任。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 5867,
+          "end": 5892
+        },
+        {
+          "id": "B19",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 114,
+          "old": "连接处理知道客户端是谁，SQL 层知道正在执行什么",
+          "new": "连接处理使用客户端身份，SQL 层使用当前执行信息",
+          "reason": "知道→保留可能新加保存职责；使用与THD上下文传递吻合，采用C/B已经确认的最小版本。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 5867,
+          "end": 5892
+        },
+        {
+          "id": "C14",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 114,
+          "old": "连接处理知道客户端是谁，SQL 层知道正在执行什么，引擎操作又需要相应事务信息。",
+          "new": "连接处理使用客户端身份，SQL 层使用当前执行信息，引擎操作又需要相应事务信息。",
+          "reason": "不改为保存/维护主体，也不把执行信息缩成处理当前语句；采用C与B新确认版本。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5867,
+          "end": 5907
+        }
+      ],
+      "old_paragraph": "`THD` 是观察会话状态的重要对象。当前数据库、字符集、会话变量、语句诊断、事务相关上下文和执行状态，都可能经它到达后续处理路径。连接处理知道客户端是谁，SQL 层知道正在执行什么，引擎操作又需要相应事务信息。共享上下文使这些信息能够被使用，而不必在每个函数之间展开一份完整的参数清单。",
+      "new_paragraph": "`THD` 是观察会话状态的重要对象。当前数据库、字符集、会话变量、语句诊断、事务相关上下文和执行状态，都可能经它到达后续处理路径。连接处理使用客户端身份，SQL 层使用当前执行信息，引擎操作又需要相应事务信息。共享上下文使这些信息能够被使用，而不必在每个函数之间展开一份完整的参数清单。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 137,
+      "old": "`handlerton` 则承担引擎级注册及相关回调",
+      "new": "`handlerton` 则提供引擎级注册及相关回调",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7252,
+      "end": 7278,
+      "fix_id": "FIX047",
+      "candidate_ids": [
+        "A049"
+      ],
+      "selected_candidate": "A049",
+      "alternatives": [
+        {
+          "id": "A049",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 137,
+          "old": "`handlerton` 则承担引擎级注册及相关回调",
+          "new": "`handlerton` 则提供引擎级注册及相关回调",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7252,
+          "end": 7278
+        }
+      ],
+      "old_paragraph": "这里有两个层次需要分开。`handler` 对象提供表和行访问相关操作，`handlerton` 则承担引擎级注册及相关回调。把所有方法都列为某一个对象的成员，容易误导实现理解。本书保留这些名称用于对应官方接口，不列出一份看似完整但随版本演进的函数清单。",
+      "new_paragraph": "这里有两个层次需要分开。`handler` 对象提供表和行访问相关操作，`handlerton` 则提供引擎级注册及相关回调。把所有方法都列为某一个对象的成员，容易误导实现理解。本书保留这些名称用于对应官方接口，不列出一份看似完整但随版本演进的函数清单。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 156,
+      "old": "应用缓存、代理缓存和物化结果同样需要回答数据依赖与失效条件",
+      "new": "应用缓存、代理缓存和物化结果同样需要明确数据依赖与失效条件",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 8478,
+      "end": 8507,
+      "fix_id": "FIX048",
+      "candidate_ids": [
+        "A050"
+      ],
+      "selected_candidate": "A050",
+      "alternatives": [
+        {
+          "id": "A050",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 156,
+          "old": "应用缓存、代理缓存和物化结果同样需要回答数据依赖与失效条件",
+          "new": "应用缓存、代理缓存和物化结果同样需要明确数据依赖与失效条件",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 8478,
+          "end": 8507
+        }
+      ],
+      "old_paragraph": "Query Cache 被移除，是一个功能在产品演进中退出的事实，不是整个服务层被删除。它提示我们重新评价一项机制，而不是把“删层”作为预定答案。实现可以退出，相关问题却还在：应用缓存、代理缓存和物化结果同样需要回答数据依赖与失效条件，只是把责任放到了其他地方。",
+      "new_paragraph": "Query Cache 被移除，是一个功能在产品演进中退出的事实，不是整个服务层被删除。它提示我们重新评价一项机制，而不是把“删层”作为预定答案。实现可以退出，相关问题却还在：应用缓存、代理缓存和物化结果同样需要明确数据依赖与失效条件，只是把责任放到了其他地方。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 185,
+      "old": "并非所有协议变化都能在适配层被消化",
+      "new": "并非所有协议变化都能在适配层内处理",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10025,
+      "end": 10042,
+      "fix_id": "FIX049",
+      "candidate_ids": [
+        "A051"
+      ],
+      "selected_candidate": "A051",
+      "alternatives": [
+        {
+          "id": "A051",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 185,
+          "old": "并非所有协议变化都能在适配层被消化",
+          "new": "并非所有协议变化都能在适配层内处理",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10025,
+          "end": 10042
+        }
+      ],
+      "old_paragraph": "把协议适配与领域操作分开，有助于让多个协议版本使用相近的内部能力。然而，并非所有协议变化都能在适配层被消化。如果新请求增加了新的事务或一致性要求，内部状态和执行规则也必须改变。接口隔离的是可被表达转换消除的差异，无法隔离语义本身的增加。",
+      "new_paragraph": "把协议适配与领域操作分开，有助于让多个协议版本使用相近的内部能力。然而，并非所有协议变化都能在适配层内处理。如果新请求增加了新的事务或一致性要求，内部状态和执行规则也必须改变。接口隔离的是可被表达转换消除的差异，无法隔离语义本身的增加。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 204,
+      "old": "这里更值得注意的是接口条件",
+      "new": "这里还涉及接口条件",
+      "reason": "去注意力指令，保留本地文件及加密/格式条件。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 11085,
+      "end": 11098,
+      "fix_id": "FIX050",
+      "candidate_ids": [
+        "B20"
+      ],
+      "selected_candidate": "B20",
+      "alternatives": [
+        {
+          "id": "B20",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 204,
+          "old": "这里更值得注意的是接口条件",
+          "new": "这里还涉及接口条件",
+          "reason": "去注意力指令，保留本地文件及加密/格式条件。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11085,
+          "end": 11098
+        }
+      ],
+      "old_paragraph": "对于适合直接从本地文件发送的记录，Kafka 可以利用文件到网络的传输能力，减少数据在用户态缓冲中的往返复制。第 4 章已经解释页缓存，这里更值得注意的是接口条件：若后续处理需要改变字节，或者网络层必须在用户态完成加密，就不能把所有数据都当作原样转发。[R5-07](https://kafka.apache.org/39/design/design/)",
+      "new_paragraph": "对于适合直接从本地文件发送的记录，Kafka 可以利用文件到网络的传输能力，减少数据在用户态缓冲中的往返复制。第 4 章已经解释页缓存，这里还涉及接口条件：若后续处理需要改变字节，或者网络层必须在用户态完成加密，就不能把所有数据都当作原样转发。[R5-07](https://kafka.apache.org/39/design/design/)"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 212,
+      "old": "恢复与异常路径确实需要知道数据位于哪里",
+      "new": "恢复与异常处理确实需要确定数据位于哪里",
+      "reason": "恢复与异常处理确定位置，不新增下载历史段要求。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 11611,
+      "end": 11630,
+      "fix_id": "FIX051",
+      "candidate_ids": [
+        "A053",
+        "B21"
+      ],
+      "selected_candidate": "B21",
+      "alternatives": [
+        {
+          "id": "A053",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 212,
+          "old": "恢复与异常路径确实需要知道数据位于哪里",
+          "new": "恢复与异常处理确实需要确定数据位置",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11611,
+          "end": 11630
+        },
+        {
+          "id": "B21",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 212,
+          "old": "恢复与异常路径确实需要知道数据位于哪里",
+          "new": "恢复与异常处理确实需要确定数据位于哪里",
+          "reason": "恢复与异常处理确定位置，不新增下载历史段要求。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11611,
+          "end": 11630
+        }
+      ],
+      "old_paragraph": "Kafka 3.9.0 的分层存储允许在满足配置和实现条件时，把符合条件的历史段保存到远程存储。相关组件负责远程段与元数据管理，本地与远程读取需要协调。这个变化保留了客户端按分区和 offset 访问记录的主要使用方式，却不是“整个上层和复制层完全无感”。恢复与异常路径确实需要知道数据位于哪里。[R5-08](https://kafka.apache.org/39/operations/tiered-storage/)",
+      "new_paragraph": "Kafka 3.9.0 的分层存储允许在满足配置和实现条件时，把符合条件的历史段保存到远程存储。相关组件负责远程段与元数据管理，本地与远程读取需要协调。这个变化保留了客户端按分区和 offset 访问记录的主要使用方式，却不是“整个上层和复制层完全无感”。恢复与异常处理确实需要确定数据位于哪里。[R5-08](https://kafka.apache.org/39/operations/tiered-storage/)"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 220,
+      "old": "Broker 需要知道分区由谁负责、副本处于什么状态，消费组需要知道成员与分配",
+      "new": "Broker 需要获取分区归属与副本状态，消费组需要获取成员与分配信息",
+      "reason": "获取比维护保守，未指定元数据维护归属。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 11915,
+      "end": 11954,
+      "fix_id": "FIX052",
+      "candidate_ids": [
+        "A054",
+        "B22"
+      ],
+      "selected_candidate": "B22",
+      "alternatives": [
+        {
+          "id": "A054",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 220,
+          "old": "Broker 需要知道分区由谁负责、副本处于什么状态，消费组需要知道成员与分配",
+          "new": "Broker 需要获取分区归属与副本状态，消费组需要获取成员与分配信息",
+          "reason": "采用B22。‘维护’比‘知道’新增管理归属，‘获取’较忠实于信息依赖。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 11915,
+          "end": 11954
+        },
+        {
+          "id": "B22",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 220,
+          "old": "Broker 需要知道分区由谁负责、副本处于什么状态，消费组需要知道成员与分配",
+          "new": "Broker 需要获取分区归属与副本状态，消费组需要获取成员与分配信息",
+          "reason": "获取比维护保守，未指定元数据维护归属。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11915,
+          "end": 11954
+        }
+      ],
+      "old_paragraph": "Broker 需要知道分区由谁负责、副本处于什么状态，消费组需要知道成员与分配，Controller 则处理集群元数据。KRaft 使元数据通过控制器仲裁组管理；本书以 3.9.0 的 KRaft 部署为主，ZooKeeper 只作为演进对照。不同协调职责有不同状态，不能合成一个“保证一致性”的黑盒。",
+      "new_paragraph": "Broker 需要获取分区归属与副本状态，消费组需要获取成员与分配信息，Controller 则处理集群元数据。KRaft 使元数据通过控制器仲裁组管理；本书以 3.9.0 的 KRaft 部署为主，ZooKeeper 只作为演进对照。不同协调职责有不同状态，不能合成一个“保证一致性”的黑盒。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 242,
+      "old": "表中没有“可替换性最好”的结论。",
+      "new": "这些替换能力没有统一的优劣排名。",
+      "reason": "表内替换对象/契约不同，优劣不能统一排名不变。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 12991,
+      "end": 13007,
+      "fix_id": "FIX053",
+      "candidate_ids": [
+        "C15"
+      ],
+      "selected_candidate": "C15",
+      "alternatives": [
+        {
+          "id": "C15",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 242,
+          "old": "表中没有“可替换性最好”的结论。",
+          "new": "这些替换能力没有统一的优劣排名。",
+          "reason": "表内替换对象/契约不同，优劣不能统一排名不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 12991,
+          "end": 13007
+        }
+      ],
+      "old_paragraph": "表中没有“可替换性最好”的结论。Redis 把同一种类型的表示变化局部化，MySQL 支持具有不同能力的引擎，Kafka 维持日志访问语义并演进其内部实现。三者替换的对象不同，维护的契约也不同。只有先指定变化，再比较影响范围，才不会把某一种扩展能力当成所有系统的必选项。",
+      "new_paragraph": "这些替换能力没有统一的优劣排名。Redis 把同一种类型的表示变化局部化，MySQL 支持具有不同能力的引擎，Kafka 维持日志访问语义并演进其内部实现。三者替换的对象不同，维护的契约也不同。只有先指定变化，再比较影响范围，才不会把某一种扩展能力当成所有系统的必选项。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 270,
+      "old": "分层并不能替业务自动作答",
+      "new": "分层不能自动确定这些业务行为",
+      "reason": "仍是超时、结果确认、幂等行为需要业务决定。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 14319,
+      "end": 14331,
+      "fix_id": "FIX054",
+      "candidate_ids": [
+        "A055",
+        "B23"
+      ],
+      "selected_candidate": "B23",
+      "alternatives": [
+        {
+          "id": "A055",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 270,
+          "old": "分层并不能替业务自动作答",
+          "new": "分层不能自动确定这些业务行为",
+          "reason": "采用B23，保留分层不足以自动确定的限制；A‘单独确定’会弱化与分层关系。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 14319,
+          "end": 14331
+        },
+        {
+          "id": "B23",
+          "file": "chapters/05-layered-architecture/chapter.md",
+          "line": 270,
+          "old": "分层并不能替业务自动作答",
+          "new": "分层不能自动确定这些业务行为",
+          "reason": "仍是超时、结果确认、幂等行为需要业务决定。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 14319,
+          "end": 14331
+        }
+      ],
+      "old_paragraph": "取消同样需要沿着路径追踪。客户端已经超时，不代表服务端尚未执行；请求仍在队列中与已经完成数据修改，是不同状态。接口如果只返回一个笼统超时，上层就需要额外的方法确认结果，或者用幂等标识容纳重复。这些问题会在第 10 章的组合案例中再次出现，分层并不能替业务自动作答。",
+      "new_paragraph": "取消同样需要沿着路径追踪。客户端已经超时，不代表服务端尚未执行；请求仍在队列中与已经完成数据修改，是不同状态。接口如果只返回一个笼统超时，上层就需要额外的方法确认结果，或者用幂等标识容纳重复。这些问题会在第 10 章的组合案例中再次出现，分层不能自动确定这些业务行为。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 13,
+      "old": "四个问题，不能互相代答",
+      "new": "四项工作不能互相替代",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 427,
+      "end": 438,
+      "fix_id": "FIX055",
+      "candidate_ids": [
+        "A057"
+      ],
+      "selected_candidate": "A057",
+      "alternatives": [
+        {
+          "id": "A057",
+          "file": "chapters/06-security/chapter.md",
+          "line": 13,
+          "old": "四个问题，不能互相代答",
+          "new": "四项工作不能互相替代",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 427,
+          "end": 438
+        }
+      ],
+      "old_paragraph": "### 四个问题，不能互相代答",
+      "new_paragraph": "### 四项工作不能互相替代"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 32,
+      "old": "已有会话何时感知变化",
+      "new": "已有会话何时受这些变化影响",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1331,
+      "end": 1341,
+      "fix_id": "FIX056",
+      "candidate_ids": [
+        "A058"
+      ],
+      "selected_candidate": "A058",
+      "alternatives": [
+        {
+          "id": "A058",
+          "file": "chapters/06-security/chapter.md",
+          "line": 32,
+          "old": "已有会话何时感知变化",
+          "new": "已有会话何时受这些变化影响",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1331,
+          "end": 1341
+        }
+      ],
+      "old_paragraph": "数据服务经常使用长连接，身份验证的成本可以由多次操作分担。但授权必须针对当前操作及资源，不能因为握手时通过认证，就放行会话中任何命令。密码轮换、账号禁用和权限撤销还会提出一个额外问题：已有会话何时感知变化。",
+      "new_paragraph": "数据服务经常使用长连接，身份验证的成本可以由多次操作分担。但授权必须针对当前操作及资源，不能因为握手时通过认证，就放行会话中任何命令。密码轮换、账号禁用和权限撤销还会提出一个额外问题：已有会话何时受这些变化影响。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 42,
+      "old": "旧秘密并没有因此失效",
+      "new": "旧凭证并没有因此失效",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1812,
+      "end": 1822,
+      "fix_id": "FIX057",
+      "candidate_ids": [
+        "A059"
+      ],
+      "selected_candidate": "A059",
+      "alternatives": [
+        {
+          "id": "A059",
+          "file": "chapters/06-security/chapter.md",
+          "line": 42,
+          "old": "旧秘密并没有因此失效",
+          "new": "旧凭证并没有因此失效",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1812,
+          "end": 1822
+        }
+      ],
+      "old_paragraph": "Redis ACL 用户可以配置多个密码，这为轮换提供了过渡空间：先让新旧凭证都可用，迁移客户端，再撤旧凭证。但允许重叠与完成轮换是两回事。仍在使用旧密码的客户端、长期未重连的连接，以及配置文件中遗留的副本，都需要有观察和退出办法。只把新密码加入服务端，旧秘密并没有因此失效。",
+      "new_paragraph": "Redis ACL 用户可以配置多个密码，这为轮换提供了过渡空间：先让新旧凭证都可用，迁移客户端，再撤旧凭证。但允许重叠与完成轮换是两回事。仍在使用旧密码的客户端、长期未重连的连接，以及配置文件中遗留的副本，都需要有观察和退出办法。只把新密码加入服务端，旧凭证并没有因此失效。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 58,
+      "old": "秘密注入方式",
+      "new": "凭证注入方式",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 2656,
+      "end": 2662,
+      "fix_id": "FIX058",
+      "candidate_ids": [
+        "A060"
+      ],
+      "selected_candidate": "A060",
+      "alternatives": [
+        {
+          "id": "A060",
+          "file": "chapters/06-security/chapter.md",
+          "line": 58,
+          "old": "秘密注入方式",
+          "new": "凭证注入方式",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2656,
+          "end": 2662
+        }
+      ],
+      "old_paragraph": "如果在 shell 中调用 `redis-cli`，带 `>` 的参数还需要正确引用；这也是示例特意说明执行位置的原因。凭证还可能进入命令历史，实际管理应使用符合环境要求的秘密注入方式。本例只展示规则含义，不能代替生产凭证发放流程。",
+      "new_paragraph": "如果在 shell 中调用 `redis-cli`，带 `>` 的参数还需要正确引用；这也是示例特意说明执行位置的原因。凭证还可能进入命令历史，实际管理应使用符合环境要求的凭证注入方式。本例只展示规则含义，不能代替生产凭证发放流程。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 99,
+      "old": "服务端怎样保护验证秘密",
+      "new": "服务端怎样保护验证所需的秘密信息",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5003,
+      "end": 5014,
+      "fix_id": "FIX059",
+      "candidate_ids": [
+        "A061"
+      ],
+      "selected_candidate": "A061",
+      "alternatives": [
+        {
+          "id": "A061",
+          "file": "chapters/06-security/chapter.md",
+          "line": 99,
+          "old": "服务端怎样保护验证秘密",
+          "new": "服务端怎样保护验证所需的秘密信息",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5003,
+          "end": 5014
+        }
+      ],
+      "old_paragraph": "Kafka 的委托令牌提供另一种凭证生命周期：通过已认证通道申请，后续使用有效期受限的令牌，并处理续期与撤销。它可以减少分发长期凭证的需要，却不自动保存每次业务调用的最终用户身份。令牌代表谁、谁可续期、服务端怎样保护验证秘密，仍属于完整设计的一部分。",
+      "new_paragraph": "Kafka 的委托令牌提供另一种凭证生命周期：通过已认证通道申请，后续使用有效期受限的令牌，并处理续期与撤销。它可以减少分发长期凭证的需要，却不自动保存每次业务调用的最终用户身份。令牌代表谁、谁可续期、服务端怎样保护验证所需的秘密信息，仍属于完整设计的一部分。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 133,
+      "old": "不能把 ZooKeeper 模式的 `AclAuthorizer` 默认写成放行所有人，也不能把 `StandardAuthorizer` 的默认拒绝说成不可配置。",
+      "new": "ZooKeeper 模式的 `AclAuthorizer` 并非默认放行所有人，`StandardAuthorizer` 的默认拒绝也可以通过配置改变。",
+      "reason": "3.9内置授权器默认与可配置条件保留，未扩大外部授权器范围。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 6981,
+      "end": 7063,
+      "fix_id": "FIX060",
+      "candidate_ids": [
+        "C16"
+      ],
+      "selected_candidate": "C16",
+      "alternatives": [
+        {
+          "id": "C16",
+          "file": "chapters/06-security/chapter.md",
+          "line": 133,
+          "old": "不能把 ZooKeeper 模式的 `AclAuthorizer` 默认写成放行所有人，也不能把 `StandardAuthorizer` 的默认拒绝说成不可配置。",
+          "new": "ZooKeeper 模式的 `AclAuthorizer` 并非默认放行所有人，`StandardAuthorizer` 的默认拒绝也可以通过配置改变。",
+          "reason": "3.9内置授权器默认与可配置条件保留，未扩大外部授权器范围。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6981,
+          "end": 7063
+        }
+      ],
+      "old_paragraph": "对 Apache Kafka 3.9 内置授权器，启用授权器而资源没有匹配 ACL 时，默认只允许超级用户；显式设置 `allow.everyone.if.no.acl.found=true` 才改变这项行为。不能把 ZooKeeper 模式的 `AclAuthorizer` 默认写成放行所有人，也不能把 `StandardAuthorizer` 的默认拒绝说成不可配置。未启用授权器与启用了但没有 ACL，是两个不同状态。[R6-08](https://kafka.apache.org/39/security/authorization-and-acls/)",
+      "new_paragraph": "对 Apache Kafka 3.9 内置授权器，启用授权器而资源没有匹配 ACL 时，默认只允许超级用户；显式设置 `allow.everyone.if.no.acl.found=true` 才改变这项行为。ZooKeeper 模式的 `AclAuthorizer` 并非默认放行所有人，`StandardAuthorizer` 的默认拒绝也可以通过配置改变。未启用授权器与启用了但没有 ACL，是两个不同状态。[R6-08](https://kafka.apache.org/39/security/authorization-and-acls/)"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 135,
+      "old": "却使问题失去边界",
+      "new": "却掩盖了究竟缺少哪项权限",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7218,
+      "end": 7226,
+      "fix_id": "FIX061",
+      "candidate_ids": [
+        "A062"
+      ],
+      "selected_candidate": "A062",
+      "alternatives": [
+        {
+          "id": "A062",
+          "file": "chapters/06-security/chapter.md",
+          "line": 135,
+          "old": "却使问题失去边界",
+          "new": "却掩盖了究竟缺少哪项权限",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7218,
+          "end": 7226
+        }
+      ],
+      "old_paragraph": "授权变更后出现拒绝时，实际主体、资源、操作和有效规则共同决定缺少哪项权限。临时授予全资源 ALL 也许能让请求通过，却使问题失去边界，并可能把这个临时状态长期留下。成功请求只能证明当前权限足够，不能证明权限最小；还需要验证应该失败的操作确实失败。",
+      "new_paragraph": "授权变更后出现拒绝时，实际主体、资源、操作和有效规则共同决定缺少哪项权限。临时授予全资源 ALL 也许能让请求通过，却掩盖了究竟缺少哪项权限，并可能把这个临时状态长期留下。成功请求只能证明当前权限足够，不能证明权限最小；还需要验证应该失败的操作确实失败。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 193,
+      "old": "前者知道业务上下文",
+      "new": "前者保存业务上下文",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10331,
+      "end": 10340,
+      "fix_id": "FIX062",
+      "candidate_ids": [
+        "A063"
+      ],
+      "selected_candidate": "A063",
+      "alternatives": [
+        {
+          "id": "A063",
+          "file": "chapters/06-security/chapter.md",
+          "line": 193,
+          "old": "前者知道业务上下文",
+          "new": "前者保存业务上下文",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10331,
+          "end": 10340
+        }
+      ],
+      "old_paragraph": "如果需要证明谁修改了某项业务状态，数据库账号可能只对应共享连接池。此时还需要应用请求标识、业务主体和事务结果的关联记录。应用记录与数据库记录各自不能替代另一方：前者知道业务上下文，后者更接近实际执行。组合之后仍要处理时钟、重试和失败时的记录缺口。",
+      "new_paragraph": "如果需要证明谁修改了某项业务状态，数据库账号可能只对应共享连接池。此时还需要应用请求标识、业务主体和事务结果的关联记录。应用记录与数据库记录各自不能替代另一方：前者保存业务上下文，后者更接近实际执行。组合之后仍要处理时钟、重试和失败时的记录缺口。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 224,
+      "old": "表中的差异没有给出一个统一的“最细粒度”冠军。",
+      "new": "表中的差异不能形成一个统一的权限粒度排名。",
+      "reason": "不可统一排名的判断不变，冠军比喻去除。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 11702,
+      "end": 11725,
+      "fix_id": "FIX063",
+      "candidate_ids": [
+        "A064",
+        "B24"
+      ],
+      "selected_candidate": "B24",
+      "alternatives": [
+        {
+          "id": "A064",
+          "file": "chapters/06-security/chapter.md",
+          "line": 224,
+          "old": "表中的差异没有给出一个统一的“最细粒度”冠军。",
+          "new": "三类权限的粒度不能用同一标准排名。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11702,
+          "end": 11725
+        },
+        {
+          "id": "B24",
+          "file": "chapters/06-security/chapter.md",
+          "line": 224,
+          "old": "表中的差异没有给出一个统一的“最细粒度”冠军。",
+          "new": "表中的差异不能形成一个统一的权限粒度排名。",
+          "reason": "不可统一排名的判断不变，冠军比喻去除。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11702,
+          "end": 11725
+        }
+      ],
+      "old_paragraph": "表中的差异没有给出一个统一的“最细粒度”冠军。列权限和键模式限制不同对象，主题权限也不能直接与列数比较。真正有意义的是当前业务的授权单位：应用是否需要读取某些字段，是否需要共享主题，是否需要在同一实例隔离键空间。资源模型不合适时，强行叠加复杂规则可能比拆分数据更难维护。",
+      "new_paragraph": "表中的差异不能形成一个统一的权限粒度排名。列权限和键模式限制不同对象，主题权限也不能直接与列数比较。真正有意义的是当前业务的授权单位：应用是否需要读取某些字段，是否需要共享主题，是否需要在同一实例隔离键空间。资源模型不合适时，强行叠加复杂规则可能比拆分数据更难维护。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 250,
+      "old": "下一段服务看到的主体",
+      "new": "下游服务接收到的主体",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 12817,
+      "end": 12827,
+      "fix_id": "FIX064",
+      "candidate_ids": [
+        "A065"
+      ],
+      "selected_candidate": "A065",
+      "alternatives": [
+        {
+          "id": "A065",
+          "file": "chapters/06-security/chapter.md",
+          "line": 250,
+          "old": "下一段服务看到的主体",
+          "new": "下游服务接收到的主体",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 12817,
+          "end": 12827
+        }
+      ],
+      "old_paragraph": "应用连接数据库时可能使用服务账号，原始用户身份只存在于应用内；Broker 处理客户端请求与节点间复制，也使用不同连接身份。下一段服务看到的主体，不一定还是最初的用户。这个问题同样存在于 Redis、MySQL 的代理与应用链路中，不是 Kafka 独有。",
+      "new_paragraph": "应用连接数据库时可能使用服务账号，原始用户身份只存在于应用内；Broker 处理客户端请求与节点间复制，也使用不同连接身份。下游服务接收到的主体，不一定还是最初的用户。这个问题同样存在于 Redis、MySQL 的代理与应用链路中，不是 Kafka 独有。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 256,
+      "old": "账号离职或服务下线后如何撤销",
+      "new": "人员离职或服务下线后如何撤销相关账号",
+      "reason": "人员离职和账号撤销各自主语正确。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 13051,
+      "end": 13065,
+      "fix_id": "FIX065",
+      "candidate_ids": [
+        "A066",
+        "B25"
+      ],
+      "selected_candidate": "B25",
+      "alternatives": [
+        {
+          "id": "A066",
+          "file": "chapters/06-security/chapter.md",
+          "line": 256,
+          "old": "账号离职或服务下线后如何撤销",
+          "new": "人员离职或服务下线后如何撤销账号",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 13051,
+          "end": 13065
+        },
+        {
+          "id": "B25",
+          "file": "chapters/06-security/chapter.md",
+          "line": 256,
+          "old": "账号离职或服务下线后如何撤销",
+          "new": "人员离职或服务下线后如何撤销相关账号",
+          "reason": "人员离职和账号撤销各自主语正确。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 13051,
+          "end": 13065
+        }
+      ],
+      "old_paragraph": "一套认证配置刚启用时能工作，只是生命周期的开始。账号离职或服务下线后如何撤销，证书到期前怎样更换，密钥服务故障时数据能否恢复，都会影响控制的长期有效性。把这些动作交给外部平台可以减少重复实现，但依赖关系也要进入部署与恢复说明。",
+      "new_paragraph": "一套认证配置刚启用时能工作，只是生命周期的开始。人员离职或服务下线后如何撤销相关账号，证书到期前怎样更换，密钥服务故障时数据能否恢复，都会影响控制的长期有效性。把这些动作交给外部平台可以减少重复实现，但依赖关系也要进入部署与恢复说明。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 258,
+      "old": "本章最值得保留的检查，不是“哪个产品更安全”，而是当前请求从入口到数据、再到日志记录的责任是否明确。",
+      "new": "安全检查需要明确当前请求从入口到数据、再到日志记录的责任，而非脱离这些责任比较哪个产品更安全。",
+      "reason": "原句保留的判据是责任是否明确，候选new只说检查对象，未明说判据；补回明确。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 13142,
+      "end": 13192,
+      "fix_id": "FIX066",
+      "candidate_ids": [
+        "C17"
+      ],
+      "selected_candidate": "C17",
+      "alternatives": [
+        {
+          "id": "C17",
+          "file": "chapters/06-security/chapter.md",
+          "line": 258,
+          "old": "本章最值得保留的检查，不是“哪个产品更安全”，而是当前请求从入口到数据、再到日志记录的责任是否明确。",
+          "new": "安全检查需要明确当前请求从入口到数据、再到日志记录的责任，而非脱离这些责任比较哪个产品更安全。",
+          "reason": "原句保留的判据是责任是否明确，候选new只说检查对象，未明说判据；补回明确。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 13142,
+          "end": 13192
+        }
+      ],
+      "old_paragraph": "本章最值得保留的检查，不是“哪个产品更安全”，而是当前请求从入口到数据、再到日志记录的责任是否明确。任何一项能力若只有接口、没有实际配置与验证，都还不能算当前部署已经具备。",
+      "new_paragraph": "安全检查需要明确当前请求从入口到数据、再到日志记录的责任，而非脱离这些责任比较哪个产品更安全。任何一项能力若只有接口、没有实际配置与验证，都还不能算当前部署已经具备。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 27,
+      "old": "Kafka 的分区同时承担日志顺序和并行单位",
+      "new": "Kafka 的分区既限定日志顺序，也是并行处理的单位",
+      "reason": "限定日志顺序、并行处理单位两个含义完整。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 946,
+      "end": 968,
+      "fix_id": "FIX067",
+      "candidate_ids": [
+        "A067",
+        "B26"
+      ],
+      "selected_candidate": "B26",
+      "alternatives": [
+        {
+          "id": "A067",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 27,
+          "old": "Kafka 的分区同时承担日志顺序和并行单位",
+          "new": "Kafka 的分区同时是日志排序和并行处理的单位",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 946,
+          "end": 968
+        },
+        {
+          "id": "B26",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 27,
+          "old": "Kafka 的分区同时承担日志顺序和并行单位",
+          "new": "Kafka 的分区既限定日志顺序，也是并行处理的单位",
+          "reason": "限定日志顺序、并行处理单位两个含义完整。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 946,
+          "end": 968
+        }
+      ],
+      "old_paragraph": "分片映射可以再加一层中间单位。Redis 的槽把键映射与节点分配分开；Kafka 的分区同时承担日志顺序和并行单位；关系数据的分片方案则还要处理关联查询与事务范围。选择粒度时，需要同时考虑迁移成本与跨分片操作，不是单纯把单位分得越细越好。",
+      "new_paragraph": "分片映射可以再加一层中间单位。Redis 的槽把键映射与节点分配分开；Kafka 的分区既限定日志顺序，也是并行处理的单位；关系数据的分片方案则还要处理关联查询与事务范围。选择粒度时，需要同时考虑迁移成本与跨分片操作，不是单纯把单位分得越细越好。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 31,
+      "old": "### 7.1.3 故障检测只提供怀疑，不能提供全知",
+      "new": "### 7.1.3 故障检测不能仅凭超时确定原因",
+      "reason": "仅凭超时限定准确，检测与旧主限制正文全部保留。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1163,
+      "end": 1189,
+      "fix_id": "FIX068",
+      "candidate_ids": [
+        "C18",
+        "A068",
+        "B27"
+      ],
+      "selected_candidate": "C18",
+      "alternatives": [
+        {
+          "id": "C18",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 31,
+          "old": "### 7.1.3 故障检测只提供怀疑，不能提供全知",
+          "new": "### 7.1.3 故障检测不能仅凭超时确定原因",
+          "reason": "仅凭超时限定准确，检测与旧主限制正文全部保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1163,
+          "end": 1189
+        },
+        {
+          "id": "A068",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 31,
+          "old": "故障检测只提供怀疑，不能提供全知",
+          "new": "故障检测无法仅凭超时确定原因",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1173,
+          "end": 1189
+        },
+        {
+          "id": "B27",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 31,
+          "old": "故障检测只提供怀疑，不能提供全知",
+          "new": "故障检测不能仅凭超时确定原因",
+          "reason": "采用C18，仅凭保留观察依据不足而非检测永不确定的限定。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 1173,
+          "end": 1189
+        }
+      ],
+      "old_paragraph": "### 7.1.3 故障检测只提供怀疑，不能提供全知",
+      "new_paragraph": "### 7.1.3 故障检测不能仅凭超时确定原因"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 66,
+      "old": "而不是凭空知道哪个副本具有所有刚刚确认的写入。",
+      "new": "并不能直接证明哪个副本具有所有刚刚确认的写入。",
+      "reason": "不能证明保留自动化不增历史证据边界。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 3023,
+      "end": 3046,
+      "fix_id": "FIX069",
+      "candidate_ids": [
+        "A070",
+        "B28",
+        "C19"
+      ],
+      "selected_candidate": "C19",
+      "alternatives": [
+        {
+          "id": "A070",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 66,
+          "old": "而不是凭空知道哪个副本具有所有刚刚确认的写入",
+          "new": "却不能据此确定哪个副本具有所有刚刚确认的写入",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3023,
+          "end": 3045
+        },
+        {
+          "id": "B28",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 66,
+          "old": "而不是凭空知道哪个副本具有所有刚刚确认的写入",
+          "new": "不能据此确定哪个副本具有所有刚刚确认的写入",
+          "reason": "自动化遵循条件不额外证明新主历史，原限制保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 3023,
+          "end": 3045
+        },
+        {
+          "id": "C19",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 66,
+          "old": "而不是凭空知道哪个副本具有所有刚刚确认的写入。",
+          "new": "并不能直接证明哪个副本具有所有刚刚确认的写入。",
+          "reason": "不能证明保留自动化不增历史证据边界。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3023,
+          "end": 3046
+        }
+      ],
+      "old_paragraph": "选取新主还需要排除不适合接管的副本，再依据优先级、复制进度及标识等规则选择。把优先级与进度画成一张简单排序表，不能省略候选资格与断连状态。自动化的意义是按既定条件重复执行转移，而不是凭空知道哪个副本具有所有刚刚确认的写入。",
+      "new_paragraph": "选取新主还需要排除不适合接管的副本，再依据优先级、复制进度及标识等规则选择。把优先级与进度画成一张简单排序表，不能省略候选资格与断连状态。自动化的意义是按既定条件重复执行转移，并不能直接证明哪个副本具有所有刚刚确认的写入。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 124,
+      "old": "选主工具需要理解候选节点的状态",
+      "new": "选主工具需要检查候选节点的状态",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5987,
+      "end": 6002,
+      "fix_id": "FIX070",
+      "candidate_ids": [
+        "A071"
+      ],
+      "selected_candidate": "A071",
+      "alternatives": [
+        {
+          "id": "A071",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 124,
+          "old": "选主工具需要理解候选节点的状态",
+          "new": "选主工具需要检查候选节点的状态",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5987,
+          "end": 6002
+        }
+      ],
+      "old_paragraph": "等待点、等待数量和超时后的行为共同决定效果。尤其是超时降级后继续异步写入，保证会发生变化；故障转移选了没有相应确认数据的副本，也可能失去原本希望保留的事务。选主工具需要理解候选节点的状态，不能把“开启半同步”当作其余转移流程的替代。",
+      "new_paragraph": "等待点、等待数量和超时后的行为共同决定效果。尤其是超时降级后继续异步写入，保证会发生变化；故障转移选了没有相应确认数据的副本，也可能失去原本希望保留的事务。选主工具需要检查候选节点的状态，不能把“开启半同步”当作其余转移流程的替代。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 142,
+      "old": "本地刷盘同样是另一条责任",
+      "new": "本地刷盘同样是另一项工作",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7055,
+      "end": 7067,
+      "fix_id": "FIX071",
+      "candidate_ids": [
+        "A072"
+      ],
+      "selected_candidate": "A072",
+      "alternatives": [
+        {
+          "id": "A072",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 142,
+          "old": "本地刷盘同样是另一条责任",
+          "new": "本地刷盘同样是另一项工作",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7055,
+          "end": 7067
+        }
+      ],
+      "old_paragraph": "本地刷盘同样是另一条责任。共识和组通信说明节点如何接受历史，不自动替代设备、日志配置和备份。讨论“不会丢”时必须说明容忍的是单节点故障、多少成员同时故障，还是整个故障域失去存储。脱离失败模型的数学保证，无法指导实际部署。",
+      "new_paragraph": "本地刷盘同样是另一项工作。共识和组通信说明节点如何接受历史，不自动替代设备、日志配置和备份。讨论“不会丢”时必须说明容忍的是单节点故障、多少成员同时故障，还是整个故障域失去存储。脱离失败模型的数学保证，无法指导实际部署。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 156,
+      "old": "正在执行的事务却不能凭空无缝搬过去",
+      "new": "正在执行的事务却不能直接迁移过去",
+      "reason": "Router只能路由新连接，原未决事务不能迁移；无缝搬修辞去除。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 7758,
+      "end": 7775,
+      "fix_id": "FIX072",
+      "candidate_ids": [
+        "B29"
+      ],
+      "selected_candidate": "B29",
+      "alternatives": [
+        {
+          "id": "B29",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 156,
+          "old": "正在执行的事务却不能凭空无缝搬过去",
+          "new": "正在执行的事务却不能直接迁移过去",
+          "reason": "Router只能路由新连接，原未决事务不能迁移；无缝搬修辞去除。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 7758,
+          "end": 7775
+        }
+      ],
+      "old_paragraph": "主节点切换后，新连接可以被路由到新的合适节点；正在执行的事务却不能凭空无缝搬过去。旧连接可能中断，应用仍要判断事务结果并决定是否重试。代理提供地址和角色适配，不会使超时结果从不确定变成确定。这与第 5 章讨论的接口失败语义相同，只是现在发生在多节点拓扑中。",
+      "new_paragraph": "主节点切换后，新连接可以被路由到新的合适节点；正在执行的事务却不能直接迁移过去。旧连接可能中断，应用仍要判断事务结果并决定是否重试。代理提供地址和角色适配，不会使超时结果从不确定变成确定。这与第 5 章讨论的接口失败语义相同，只是现在发生在多节点拓扑中。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 211,
+      "old": "它承担成员、主题、分区及相关配置的状态",
+      "new": "它保存成员、主题、分区及相关配置的状态",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10867,
+      "end": 10886,
+      "fix_id": "FIX073",
+      "candidate_ids": [
+        "A073"
+      ],
+      "selected_candidate": "A073",
+      "alternatives": [
+        {
+          "id": "A073",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 211,
+          "old": "它承担成员、主题、分区及相关配置的状态",
+          "new": "它保存成员、主题、分区及相关配置的状态",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10867,
+          "end": 10886
+        }
+      ],
+      "old_paragraph": "元数据日志在实现中有特定标识与存储布局，但不是应用随意生产消费的普通业务主题。它承担成员、主题、分区及相关配置的状态，访问与恢复方式也不同。把它简称为“元数据也放进 Kafka 主题”，会让读者误以为可以用普通生产者绕过控制面直接维护集群。",
+      "new_paragraph": "元数据日志在实现中有特定标识与存储布局，但不是应用随意生产消费的普通业务主题。它保存成员、主题、分区及相关配置的状态，访问与恢复方式也不同。把它简称为“元数据也放进 Kafka 主题”，会让读者误以为可以用普通生产者绕过控制面直接维护集群。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 263,
+      "old": "在故障时可能产生完全不同的责任",
+      "new": "在故障时可能需要完全不同的后续处理",
+      "reason": "下一段已讨论等待/补偿，后续处理准确承接责任的含义。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 13270,
+      "end": 13285,
+      "fix_id": "FIX074",
+      "candidate_ids": [
+        "B30"
+      ],
+      "selected_candidate": "B30",
+      "alternatives": [
+        {
+          "id": "B30",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 263,
+          "old": "在故障时可能产生完全不同的责任",
+          "new": "在故障时可能需要完全不同的后续处理",
+          "reason": "下一段已讨论等待/补偿，后续处理准确承接责任的含义。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 13270,
+          "end": 13285
+        }
+      ],
+      "old_paragraph": "ISR 不足时拒写、半同步超时后降级、旧主在检测窗口内尚未停写，是会改变业务结果的具体行为。评审这些选择时，我更关心应用能否识别保证变化，以及能否承受相应后果。吞吐相近的两个配置，在故障时可能产生完全不同的责任。",
+      "new_paragraph": "ISR 不足时拒写、半同步超时后降级、旧主在检测窗口内尚未停写，是会改变业务结果的具体行为。评审这些选择时，我更关心应用能否识别保证变化，以及能否承受相应后果。吞吐相近的两个配置，在故障时可能需要完全不同的后续处理。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 271,
+      "old": "KRaft 改善一种管理方式，不等于给任何硬件发放“百万分区”的保证。",
+      "new": "KRaft 改善一种管理方式，不等于任何硬件都能支持“百万分区”。",
+      "reason": "支持能力取代发放保证，原百万及任意硬件不变。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 13582,
+      "end": 13617,
+      "fix_id": "FIX075",
+      "candidate_ids": [
+        "C20",
+        "A074",
+        "B31"
+      ],
+      "selected_candidate": "C20",
+      "alternatives": [
+        {
+          "id": "C20",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 271,
+          "old": "KRaft 改善一种管理方式，不等于给任何硬件发放“百万分区”的保证。",
+          "new": "KRaft 改善一种管理方式，不等于任何硬件都能支持“百万分区”。",
+          "reason": "支持能力取代发放保证，原百万及任意硬件不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 13582,
+          "end": 13617
+        },
+        {
+          "id": "A074",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 271,
+          "old": "不等于给任何硬件发放“百万分区”的保证",
+          "new": "不代表任何硬件都能支持百万分区",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 13597,
+          "end": 13616
+        },
+        {
+          "id": "B31",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 271,
+          "old": "不等于给任何硬件发放“百万分区”的保证",
+          "new": "不等于保证任何硬件都能支持“百万分区”",
+          "reason": "只换发放保证修辞，百万及任意硬件限制未变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 13597,
+          "end": 13616
+        }
+      ],
+      "old_paragraph": "但元数据也不是集群上限的唯一原因。网络、磁盘、最忙分片和客户端行为都可能先成为限制。KRaft 改善一种管理方式，不等于给任何硬件发放“百万分区”的保证。容量数字必须和版本、配置、工作负载及恢复目标一起出现。",
+      "new_paragraph": "但元数据也不是集群上限的唯一原因。网络、磁盘、最忙分片和客户端行为都可能先成为限制。KRaft 改善一种管理方式，不等于任何硬件都能支持“百万分区”。容量数字必须和版本、配置、工作负载及恢复目标一起出现。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 293,
+      "old": "元数据管理让这些变化能够被系统理解",
+      "new": "元数据管理使这些变化可以被系统识别和处理",
+      "reason": "避免‘记录这些变化’暗示新增变化记录机制，保留可解释和可处理的原义；待A/B确认。",
+      "votes": [
+        "B",
+        "C"
+      ],
+      "start": 14410,
+      "end": 14427,
+      "fix_id": "FIX076",
+      "candidate_ids": [
+        "A075"
+      ],
+      "selected_candidate": "A075",
+      "alternatives": [
+        {
+          "id": "A075",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 293,
+          "old": "元数据管理让这些变化能够被系统理解",
+          "new": "元数据管理使这些变化可以被系统识别和处理",
+          "reason": "避免‘记录这些变化’暗示新增变化记录机制，保留可解释和可处理的原义；待A/B确认。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 14410,
+          "end": 14427
+        }
+      ],
+      "old_paragraph": "分片改变数据放置，副本增加冗余，故障转移改变服务角色，元数据管理让这些变化能够被系统理解。它们可以组合，却不能互相代替。集群比单机多出的能力，需要由这些机制在相同故障条件下共同兑现。",
+      "new_paragraph": "分片改变数据放置，副本增加冗余，故障转移改变服务角色，元数据管理使这些变化可以被系统识别和处理。它们可以组合，却不能互相代替。集群比单机多出的能力，需要由这些机制在相同故障条件下共同兑现。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 297,
+      "old": "集群拓扑告诉我们数据应该到哪里",
+      "new": "集群拓扑说明数据应放在哪里",
+      "reason": "拓扑解释数据放置而不独立规定业务目标，说明比规定保真；待A/B确认。",
+      "votes": [
+        "B",
+        "C"
+      ],
+      "start": 14647,
+      "end": 14662,
+      "fix_id": "FIX077",
+      "candidate_ids": [
+        "A076"
+      ],
+      "selected_candidate": "A076",
+      "alternatives": [
+        {
+          "id": "A076",
+          "file": "chapters/07-cluster/chapter.md",
+          "line": 297,
+          "old": "集群拓扑告诉我们数据应该到哪里",
+          "new": "集群拓扑说明数据应放在哪里",
+          "reason": "拓扑解释数据放置而不独立规定业务目标，说明比规定保真；待A/B确认。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 14647,
+          "end": 14662
+        }
+      ],
+      "old_paragraph": "第 8 章把这些状态落到字节布局，检查文件能否定位、校验和恢复；第 9 章再追踪日志历史与复制进度。集群拓扑告诉我们数据应该到哪里，后面两章解释数据实际上怎样保存与追上。",
+      "new_paragraph": "第 8 章把这些状态落到字节布局，检查文件能否定位、校验和恢复；第 9 章再追踪日志历史与复制进度。集群拓扑说明数据应放在哪里，后面两章解释数据实际上怎样保存与追上。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 7,
+      "old": "磁盘格式容易被当成实现末节",
+      "new": "磁盘格式容易被当成实现细节",
+      "reason": "实现细节是通行搭配，冒号后的轻视态度仍然保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 161,
+      "end": 174,
+      "fix_id": "FIX078",
+      "candidate_ids": [
+        "B32"
+      ],
+      "selected_candidate": "B32",
+      "alternatives": [
+        {
+          "id": "B32",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 7,
+          "old": "磁盘格式容易被当成实现末节",
+          "new": "磁盘格式容易被当成实现细节",
+          "reason": "实现细节是通行搭配，冒号后的轻视态度仍然保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 161,
+          "end": 174
+        }
+      ],
+      "old_paragraph": "磁盘格式容易被当成实现末节：对象已经定义好了，找个序列化工具存下来即可。但数据一旦离开当前进程，指针、对象生命周期和编译器布局就不再是可靠的解释依据。文件要说明一条记录在哪里结束，哪个字段决定后面的解码方式，损坏后还能信任哪一部分。升级时，读写双方甚至不一定同时变化。",
+      "new_paragraph": "磁盘格式容易被当成实现细节：对象已经定义好了，找个序列化工具存下来即可。但数据一旦离开当前进程，指针、对象生命周期和编译器布局就不再是可靠的解释依据。文件要说明一条记录在哪里结束，哪个字段决定后面的解码方式，损坏后还能信任哪一部分。升级时，读写双方甚至不一定同时变化。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 9,
+      "old": "每一种结构承担什么操作",
+      "new": "每一种结构支持什么操作",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 465,
+      "end": 476,
+      "fix_id": "FIX079",
+      "candidate_ids": [
+        "A077"
+      ],
+      "selected_candidate": "A077",
+      "alternatives": [
+        {
+          "id": "A077",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 9,
+          "old": "每一种结构承担什么操作",
+          "new": "每一种结构支持什么操作",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 465,
+          "end": 476
+        }
+      ],
+      "old_paragraph": "本章比较三个具体对象：Redis 用于重建内存状态的 RDB 与 AOF，InnoDB 支持按页访问的表空间，以及 Kafka 按分区组织的日志段。它们不是三种互斥的存储定律。Redis 同时使用快照与追加记录，InnoDB 在数据页之外也使用日志，Kafka 的历史段还会经历删除、compaction 和远程迁移。真正值得追问的是：每一种结构承担什么操作，省下哪一步，又把工作交给了哪里。",
+      "new_paragraph": "本章比较三个具体对象：Redis 用于重建内存状态的 RDB 与 AOF，InnoDB 支持按页访问的表空间，以及 Kafka 按分区组织的日志段。它们不是三种互斥的存储定律。Redis 同时使用快照与追加记录，InnoDB 在数据页之外也使用日志，Kafka 的历史段还会经历删除、compaction 和远程迁移。真正值得追问的是：每一种结构支持什么操作，省下哪一步，又把工作交给了哪里。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 13,
+      "old": "一份文件必须交代的事情",
+      "new": "文件格式需要明确的内容",
+      "reason": "标题改内容路标，下文所有边界/编码工作未删。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 623,
+      "end": 634,
+      "fix_id": "FIX080",
+      "candidate_ids": [
+        "B33"
+      ],
+      "selected_candidate": "B33",
+      "alternatives": [
+        {
+          "id": "B33",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 13,
+          "old": "一份文件必须交代的事情",
+          "new": "文件格式需要明确的内容",
+          "reason": "标题改内容路标，下文所有边界/编码工作未删。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 623,
+          "end": 634
+        }
+      ],
+      "old_paragraph": "## 8.1 一份文件必须交代的事情",
+      "new_paragraph": "## 8.1 文件格式需要明确的内容"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 21,
+      "old": "某条记录声称后面还有一百字节",
+      "new": "某条记录标明后面还有一百字节",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 986,
+      "end": 1000,
+      "fix_id": "FIX081",
+      "candidate_ids": [
+        "A078"
+      ],
+      "selected_candidate": "A078",
+      "alternatives": [
+        {
+          "id": "A078",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 21,
+          "old": "某条记录声称后面还有一百字节",
+          "new": "某条记录标明后面还有一百字节",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 986,
+          "end": 1000
+        }
+      ],
+      "old_paragraph": "文件还需要区分正常结束与意外截断。如果某条记录声称后面还有一百字节，实际只剩二十字节，读取者可以识别不完整。若文件正好停在一条完整记录之后，是否说明这是合法结尾，取决于格式有没有结束标记、记录总数或其他完整性证据。长度检查、校验和、结束标记各自回答不同问题，不能互相顶替。",
+      "new_paragraph": "文件还需要区分正常结束与意外截断。如果某条记录标明后面还有一百字节，实际只剩二十字节，读取者可以识别不完整。若文件正好停在一条完整记录之后，是否说明这是合法结尾，取决于格式有没有结束标记、记录总数或其他完整性证据。长度检查、校验和、结束标记各自回答不同问题，不能互相顶替。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 29,
+      "old": "Kafka 可以把多条记录压进一个 RecordBatch",
+      "new": "Kafka 可以把多条记录组成一个 RecordBatch",
+      "reason": "组成批次比压进准确，不把批处理等同压缩。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 1322,
+      "end": 1351,
+      "fix_id": "FIX082",
+      "candidate_ids": [
+        "B34"
+      ],
+      "selected_candidate": "B34",
+      "alternatives": [
+        {
+          "id": "B34",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 29,
+          "old": "Kafka 可以把多条记录压进一个 RecordBatch",
+          "new": "Kafka 可以把多条记录组成一个 RecordBatch",
+          "reason": "组成批次比压进准确，不把批处理等同压缩。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 1322,
+          "end": 1351
+        }
+      ],
+      "old_paragraph": "InnoDB 可能为了读取一行而加载一个页；Kafka 可以把多条记录压进一个 RecordBatch；Redis 从 RDB 恢复时需要遍历文件中的对象，而恢复后的查询再由内存索引承担。这里至少有业务记录、缓存单元、编码单元和存储读写单元，未必相等。",
+      "new_paragraph": "InnoDB 可能为了读取一行而加载一个页；Kafka 可以把多条记录组成一个 RecordBatch；Redis 从 RDB 恢复时需要遍历文件中的对象，而恢复后的查询再通过内存索引执行。这里至少有业务记录、缓存单元、编码单元和存储读写单元，未必相等。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 29,
+      "old": "恢复后的查询再由内存索引承担",
+      "new": "恢复后的查询再通过内存索引执行",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1379,
+      "end": 1393,
+      "fix_id": "FIX083",
+      "candidate_ids": [
+        "A080"
+      ],
+      "selected_candidate": "A080",
+      "alternatives": [
+        {
+          "id": "A080",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 29,
+          "old": "恢复后的查询再由内存索引承担",
+          "new": "恢复后的查询再通过内存索引执行",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1379,
+          "end": 1393
+        }
+      ],
+      "old_paragraph": "InnoDB 可能为了读取一行而加载一个页；Kafka 可以把多条记录压进一个 RecordBatch；Redis 从 RDB 恢复时需要遍历文件中的对象，而恢复后的查询再由内存索引承担。这里至少有业务记录、缓存单元、编码单元和存储读写单元，未必相等。",
+      "new_paragraph": "InnoDB 可能为了读取一行而加载一个页；Kafka 可以把多条记录组成一个 RecordBatch；Redis 从 RDB 恢复时需要遍历文件中的对象，而恢复后的查询再通过内存索引执行。这里至少有业务记录、缓存单元、编码单元和存储读写单元，未必相等。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 58,
+      "old": "版本决定加载器是否知道如何解析后续内容",
+      "new": "版本决定加载器能否解析后续内容",
+      "reason": "未把版本本身当有效文件充分条件，后文仍限定多项校验。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 2615,
+      "end": 2634,
+      "fix_id": "FIX084",
+      "candidate_ids": [
+        "A081",
+        "B35"
+      ],
+      "selected_candidate": "B35",
+      "alternatives": [
+        {
+          "id": "A081",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 58,
+          "old": "版本决定加载器是否知道如何解析后续内容",
+          "new": "版本决定加载器能否解析后续内容",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2615,
+          "end": 2634
+        },
+        {
+          "id": "B35",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 58,
+          "old": "版本决定加载器是否知道如何解析后续内容",
+          "new": "版本决定加载器能否解析后续内容",
+          "reason": "未把版本本身当有效文件充分条件，后文仍限定多项校验。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 2615,
+          "end": 2634
+        }
+      ],
+      "old_paragraph": "魔数帮助识别格式，版本决定加载器是否知道如何解析后续内容。文件扩展名只是操作系统中的名称，不能替代文件内容检查。反过来，魔数正确也不证明文件有效；后面的类型码、长度、对象内容和校验仍然需要检查。[R8-01：Redis 7.2 RDB 类型及操作码](https://github.com/redis/redis/blob/7.2/src/rdb.h)",
+      "new_paragraph": "魔数帮助识别格式，版本决定加载器能否解析后续内容。文件扩展名只是操作系统中的名称，不能替代文件内容检查。反过来，魔数正确也不证明文件有效；后面的类型码、长度、对象内容和校验仍然需要检查。[R8-01：Redis 7.2 RDB 类型及操作码](https://github.com/redis/redis/blob/7.2/src/rdb.h)"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 62,
+      "old": "取决于旧加载器能否理解",
+      "new": "取决于旧加载器能否解析",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 3052,
+      "end": 3063,
+      "fix_id": "FIX085",
+      "candidate_ids": [
+        "A082"
+      ],
+      "selected_candidate": "A082",
+      "alternatives": [
+        {
+          "id": "A082",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 62,
+          "old": "取决于旧加载器能否理解",
+          "new": "取决于旧加载器能否解析",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3052,
+          "end": 3063
+        }
+      ],
+      "old_paragraph": "RDB 的对象类型与内存实现之间存在转换空间，但也不是彻底无关。某些紧凑编码有对应的持久化类型，加载器需要识别它们；另一些对象会以元素序列保存，再由加载过程构造当前实现。因而“内存结构升级完全不需要改变磁盘格式”过强。更准确的边界是：文件不保存进程指针，加载器可以转换旧表示，但新增类型是否需要提高格式版本，取决于旧加载器能否理解。[R8-02：RDB 保存与加载实现](https://github.com/redis/redis/blob/7.2/src/rdb.c)",
+      "new_paragraph": "RDB 的对象类型与内存实现之间存在转换空间，但也不是彻底无关。某些紧凑编码有对应的持久化类型，加载器需要识别它们；另一些对象会以元素序列保存，再由加载过程构造当前实现。因而“内存结构升级完全不需要改变磁盘格式”过强。更准确的边界是：文件不保存进程指针，加载器可以转换旧表示，但新增类型是否需要提高格式版本，取决于旧加载器能否解析。[R8-02：RDB 保存与加载实现](https://github.com/redis/redis/blob/7.2/src/rdb.c)"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 99,
+      "old": "理解重写可以先看三个时刻。",
+      "new": "重写过程涉及三个时刻。",
+      "reason": "三个时刻仍是起前/开始/准备好后，非删结构信息。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5221,
+      "end": 5234,
+      "fix_id": "FIX086",
+      "candidate_ids": [
+        "A083",
+        "C21"
+      ],
+      "selected_candidate": "C21",
+      "alternatives": [
+        {
+          "id": "A083",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 99,
+          "old": "理解重写可以先看三个时刻。",
+          "new": "重写涉及三个时刻。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5221,
+          "end": 5234
+        },
+        {
+          "id": "C21",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 99,
+          "old": "理解重写可以先看三个时刻。",
+          "new": "重写过程涉及三个时刻。",
+          "reason": "三个时刻仍是起前/开始/准备好后，非删结构信息。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5221,
+          "end": 5234
+        }
+      ],
+      "old_paragraph": "理解重写可以先看三个时刻。重写开始前，已有基础文件和增量文件组成当前恢复序列。开始重写时，父进程启用新的增量文件承接后续写入，子进程从其看到的数据状态生成新基础文件。新基础文件准备好后，新的 manifest 将它与必要增量文件组成新的有效序列，旧文件随后进入可回收范围。",
+      "new_paragraph": "重写过程涉及三个时刻。重写开始前，已有基础文件和增量文件组成当前恢复序列。开始重写时，父进程启用新的增量文件承接后续写入，子进程从其看到的数据状态生成新基础文件。新基础文件准备好后，新的 manifest 将它与必要增量文件组成新的有效序列，旧文件随后进入可回收范围。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 104,
+      "old": "这里值得注意的不是文件名更复杂，而是切换对象变了。",
+      "new": "这里改变的是切换对象。",
+      "reason": "去伪对立，下一句立即明确整组恢复文件；三条件不删。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 5471,
+      "end": 5496,
+      "fix_id": "FIX087",
+      "candidate_ids": [
+        "A084",
+        "B36"
+      ],
+      "selected_candidate": "B36",
+      "alternatives": [
+        {
+          "id": "A084",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 104,
+          "old": "这里值得注意的不是文件名更复杂，而是切换对象变了。",
+          "new": "切换对象是整组恢复文件。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5471,
+          "end": 5496
+        },
+        {
+          "id": "B36",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 104,
+          "old": "这里值得注意的不是文件名更复杂，而是切换对象变了。",
+          "new": "这里改变的是切换对象。",
+          "reason": "去伪对立，下一句立即明确整组恢复文件；三条件不删。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 5471,
+          "end": 5496
+        }
+      ],
+      "old_paragraph": "这里值得注意的不是文件名更复杂，而是切换对象变了。重写结果不是孤立的一个文件，它必须与重写期间新增的变化配套。只有新基础状态而没有对应增量，会漏掉后来的写入；只有增量而缺少它依赖的基础状态，也不能重建完整数据。manifest 把这个关系显式保存下来。",
+      "new_paragraph": "这里改变的是切换对象。重写结果不是孤立的一个文件，它必须与重写期间新增的变化配套。只有新基础状态而没有对应增量，会漏掉后来的写入；只有增量而缺少它依赖的基础状态，也不能重建完整数据。manifest 把这个关系显式保存下来。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 155,
+      "old": "事务和恢复机制还必须知道这些变化",
+      "new": "事务和恢复机制还必须处理这些变化",
+      "reason": "处理比A新增记录并处理更少实现假设。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 8449,
+      "end": 8465,
+      "fix_id": "FIX088",
+      "candidate_ids": [
+        "A085",
+        "B37"
+      ],
+      "selected_candidate": "B37",
+      "alternatives": [
+        {
+          "id": "A085",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 155,
+          "old": "事务和恢复机制还必须知道这些变化",
+          "new": "事务和恢复机制还必须处理这些变化",
+          "reason": "采用B37。A‘记录并处理’增加具体记录主体，不必为替掉知道引入。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 8449,
+          "end": 8465
+        },
+        {
+          "id": "B37",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 155,
+          "old": "事务和恢复机制还必须知道这些变化",
+          "new": "事务和恢复机制还必须处理这些变化",
+          "reason": "处理比A新增记录并处理更少实现假设。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 8449,
+          "end": 8465
+        }
+      ],
+      "old_paragraph": "分裂带来的成本不只是多写一页。缓存中的多个页需要被访问，索引结构的连接需要保持一致，事务和恢复机制还必须知道这些变化。插入顺序、主键宽度和行长度会改变页填充与分裂行为，因此“都是同一条 INSERT”并不意味着它们在存储层的成本相同。",
+      "new_paragraph": "分裂带来的成本不只是多写一页。缓存中的多个页需要被访问，索引结构的连接需要保持一致，事务和恢复机制还必须处理这些变化。插入顺序、主键宽度和行长度会改变页填充与分裂行为，因此“都是同一条 INSERT”并不意味着它们在存储层的成本相同。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 165,
+      "old": "讨论该版本之后的文件时不应继续把所有双写内容画在旧系统表空间位置。",
+      "new": "该版本之后的双写内容不再全部位于旧系统表空间位置。",
+      "reason": "8.0.20及不再全部旧位置仍在，不改当前布局事实。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 8995,
+      "end": 9028,
+      "fix_id": "FIX089",
+      "candidate_ids": [
+        "C22"
+      ],
+      "selected_candidate": "C22",
+      "alternatives": [
+        {
+          "id": "C22",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 165,
+          "old": "讨论该版本之后的文件时不应继续把所有双写内容画在旧系统表空间位置。",
+          "new": "该版本之后的双写内容不再全部位于旧系统表空间位置。",
+          "reason": "8.0.20及不再全部旧位置仍在，不改当前布局事实。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 8995,
+          "end": 9028
+        }
+      ],
+      "old_paragraph": "InnoDB 的双写机制在把脏页写到最终位置前，先保存可用于恢复的页副本。最终页写入不完整时，可以借助完整副本恢复页，再结合日志推进到可恢复状态。MySQL 8.0.20 起双写文件的组织有所变化，讨论该版本之后的文件时不应继续把所有双写内容画在旧系统表空间位置。[R8-09：InnoDB 双写缓冲与文件](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)",
+      "new_paragraph": "InnoDB 的双写机制在把脏页写到最终位置前，先保存可用于恢复的页副本。最终页写入不完整时，可以借助完整副本恢复页，再结合日志推进到可恢复状态。MySQL 8.0.20 起双写文件的组织有所变化，该版本之后的双写内容不再全部位于旧系统表空间位置。[R8-09：InnoDB 双写缓冲与文件](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 201,
+      "old": "批头承担共享信息",
+      "new": "批头保存共享信息",
+      "reason": "批头保存共享信息，字段范围不变。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 11189,
+      "end": 11197,
+      "fix_id": "FIX090",
+      "candidate_ids": [
+        "A087",
+        "B38"
+      ],
+      "selected_candidate": "B38",
+      "alternatives": [
+        {
+          "id": "A087",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 201,
+          "old": "批头承担共享信息",
+          "new": "批头保存共享信息",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11189,
+          "end": 11197
+        },
+        {
+          "id": "B38",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 201,
+          "old": "批头承担共享信息",
+          "new": "批头保存共享信息",
+          "reason": "批头保存共享信息，字段范围不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11189,
+          "end": 11197
+        }
+      ],
+      "old_paragraph": "图 8-6　批头承担共享信息，索引把 offset 定位到附近文件位置，再读取批并找到具体记录。",
+      "new_paragraph": "图 8-6　批头保存共享信息，索引把 offset 定位到附近文件位置，再读取批并找到具体记录。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 231,
+      "old": "这个表把字段与保证分开。",
+      "new": "字段与保证需要分开。",
+      "reason": "字段与保证的区分保留，下一句协议如何使用信息完整。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 12952,
+      "end": 12964,
+      "fix_id": "FIX091",
+      "candidate_ids": [
+        "C23"
+      ],
+      "selected_candidate": "C23",
+      "alternatives": [
+        {
+          "id": "C23",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 231,
+          "old": "这个表把字段与保证分开。",
+          "new": "字段与保证需要分开。",
+          "reason": "字段与保证的区分保留，下一句协议如何使用信息完整。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 12952,
+          "end": 12964
+        }
+      ],
+      "old_paragraph": "这个表把字段与保证分开。字段提供证据，协议规定如何利用证据。拿掉协议处理，只留下文件中的几个整数，并不能维持相同语义。反过来，协议如果需要跨重启保留状态，文件或检查点中又必须有足够的信息重建它。",
+      "new_paragraph": "字段与保证需要分开。字段提供证据，协议规定如何利用证据。拿掉协议处理，只留下文件中的几个整数，并不能维持相同语义。反过来，协议如果需要跨重启保留状态，文件或检查点中又必须有足够的信息重建它。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 246,
+      "old": "不代表复制实现完全无感",
+      "new": "不代表复制实现无需调整",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 14049,
+      "end": 14060,
+      "fix_id": "FIX092",
+      "candidate_ids": [
+        "A088"
+      ],
+      "selected_candidate": "A088",
+      "alternatives": [
+        {
+          "id": "A088",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 246,
+          "old": "不代表复制实现完全无感",
+          "new": "不代表复制实现无需调整",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 14049,
+          "end": 14060
+        }
+      ],
+      "old_paragraph": "分层存储展示了格式复用的价值：记录和日志段组织可以继续服务远程历史，不需要为了移动存储位置重定义消息本身。但上层协议保持兼容，不代表复制实现完全无感。远程元数据、索引获取、辅助状态恢复和删除次序都增加了新的协调工作。",
+      "new_paragraph": "分层存储展示了格式复用的价值：记录和日志段组织可以继续服务远程历史，不需要为了移动存储位置重定义消息本身。但上层协议保持兼容，不代表复制实现无需调整。远程元数据、索引获取、辅助状态恢复和删除次序都增加了新的协调工作。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 280,
+      "old": "文件格式在这里承担的是保存足够元数据",
+      "new": "文件格式在这里需要保存足够元数据",
+      "reason": "去承担的是空动作，元数据恢复用途不变。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 15633,
+      "end": 15651,
+      "fix_id": "FIX093",
+      "candidate_ids": [
+        "B39"
+      ],
+      "selected_candidate": "B39",
+      "alternatives": [
+        {
+          "id": "B39",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 280,
+          "old": "文件格式在这里承担的是保存足够元数据",
+          "new": "文件格式在这里需要保存足够元数据",
+          "reason": "去承担的是空动作，元数据恢复用途不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 15633,
+          "end": 15651
+        }
+      ],
+      "old_paragraph": "这个例子使用抽象位置，不把 Redis、MySQL、Kafka 的具体位置结构等同。实际系统还需要历史身份、事务边界、检查点或 epoch 来判断能否衔接。第 9 章将详细讨论它们。文件格式在这里承担的是保存足够元数据，让恢复程序有证据作出判断。",
+      "new_paragraph": "这个例子使用抽象位置，不把 Redis、MySQL、Kafka 的具体位置结构等同。实际系统还需要历史身份、事务边界、检查点或 epoch 来判断能否衔接。第 9 章将详细讨论它们。文件格式在这里需要保存足够元数据，让恢复程序有证据作出判断。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 316,
+      "old": "系统需要知道依赖哪个层提供什么保证",
+      "new": "系统依赖的层及其提供的保证需要明确",
+      "reason": "明确依赖层保证，无新持久化保证。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 17037,
+      "end": 17054,
+      "fix_id": "FIX094",
+      "candidate_ids": [
+        "A089",
+        "B40"
+      ],
+      "selected_candidate": "B40",
+      "alternatives": [
+        {
+          "id": "A089",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 316,
+          "old": "系统需要知道依赖哪个层提供什么保证",
+          "new": "系统设计需要明确依赖哪个层提供什么保证",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 17037,
+          "end": 17054
+        },
+        {
+          "id": "B40",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 316,
+          "old": "系统需要知道依赖哪个层提供什么保证",
+          "new": "系统依赖的层及其提供的保证需要明确",
+          "reason": "明确依赖层保证，无新持久化保证。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 17037,
+          "end": 17054
+        }
+      ],
+      "old_paragraph": "这里的判断不能只停在文件系统操作是否原子。某个改名可以原子地改变名称关系，设备掉电后该目录项与文件内容是否都已持久化，是不同层面的条件。系统需要知道依赖哪个层提供什么保证，才不会把未写出的数据用一个成功改名掩盖过去。",
+      "new_paragraph": "这里的判断不能只停在文件系统操作是否原子。某个改名可以原子地改变名称关系，设备掉电后该目录项与文件内容是否都已持久化，是不同层面的条件。系统依赖的层及其提供的保证需要明确，才不会把未写出的数据用一个成功改名掩盖过去。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 320,
+      "old": "导读里的事故已经有版本号，因此修复不应再次停在“预留版本号”。真正缺少的是新旧读写组合的约定。",
+      "new": "导读里的事故中，文件已经有版本号，仍然缺少新旧读写组合的约定。",
+      "reason": "原修复可以理解为事故修复而非必然修稿指令；但合并后已有版本号/缺约定事实完整，更自然，赞成表达合并。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 17102,
+      "end": 17149,
+      "fix_id": "FIX095",
+      "candidate_ids": [
+        "C24"
+      ],
+      "selected_candidate": "C24",
+      "alternatives": [
+        {
+          "id": "C24",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 320,
+          "old": "导读里的事故已经有版本号，因此修复不应再次停在“预留版本号”。真正缺少的是新旧读写组合的约定。",
+          "new": "导读里的事故中，文件已经有版本号，仍然缺少新旧读写组合的约定。",
+          "reason": "原修复可以理解为事故修复而非必然修稿指令；但合并后已有版本号/缺约定事实完整，更自然，赞成表达合并。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 17102,
+          "end": 17149
+        }
+      ],
+      "old_paragraph": "导读里的事故已经有版本号，因此修复不应再次停在“预留版本号”。真正缺少的是新旧读写组合的约定。假设存在旧版 A 与新版 B，可以得到四个基础组合。",
+      "new_paragraph": "导读里的事故中，文件已经有版本号，仍然缺少新旧读写组合的约定。假设存在旧版 A 与新版 B，可以得到四个基础组合。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 341,
+      "old": "我会把每一份额外数据旁边写明",
+      "new": "我会在每一份额外数据旁边写明",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 17930,
+      "end": 17944,
+      "fix_id": "FIX096",
+      "candidate_ids": [
+        "A090"
+      ],
+      "selected_candidate": "A090",
+      "alternatives": [
+        {
+          "id": "A090",
+          "file": "chapters/08-storage-format/chapter.md",
+          "line": 341,
+          "old": "我会把每一份额外数据旁边写明",
+          "new": "我会在每一份额外数据旁边写明",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 17930,
+          "end": 17944
+        }
+      ],
+      "old_paragraph": "我会把每一份额外数据旁边写明它能恢复什么、从哪个状态开始恢复、还依赖什么。某份数据只减少恢复用时也有价值，无须把它夸成新的正确性保证。相反，若所有恢复都依赖同一份已经过期的历史，再多文件也不能补上缺失的变化。",
+      "new_paragraph": "我会在每一份额外数据旁边写明它能恢复什么、从哪个状态开始恢复、还依赖什么。某份数据只减少恢复用时也有价值，无须把它夸成新的正确性保证。相反，若所有恢复都依赖同一份已经过期的历史，再多文件也不能补上缺失的变化。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 48,
+      "old": "历史身份回答“这是谁的哪段变化”，进度回答“已经走到哪里”",
+      "new": "历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”",
+      "reason": "标明历史与进度，原两个区分维度不变。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 1823,
+      "end": 1852,
+      "fix_id": "FIX097",
+      "candidate_ids": [
+        "A091",
+        "B41"
+      ],
+      "selected_candidate": "B41",
+      "alternatives": [
+        {
+          "id": "A091",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 48,
+          "old": "历史身份回答“这是谁的哪段变化”，进度回答“已经走到哪里”",
+          "new": "历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”",
+          "reason": "采用B41；标明比标识一个问句搭配自然，原两个维度不变。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 1823,
+          "end": 1852
+        },
+        {
+          "id": "B41",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 48,
+          "old": "历史身份回答“这是谁的哪段变化”，进度回答“已经走到哪里”",
+          "new": "历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”",
+          "reason": "标明历史与进度，原两个区分维度不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 1823,
+          "end": 1852
+        }
+      ],
+      "old_paragraph": "历史身份回答“这是谁的哪段变化”，进度回答“已经走到哪里”。还需要第三项：发送方是否仍保留进度之后的内容。A 记得位置 100，并不意味着 B 还存着 101 到 120。日志清理或缓冲覆盖可能使历史内容不再可得，位点元数据却仍然完好。",
+      "new_paragraph": "历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”。还需要第三项：发送方是否仍保留进度之后的内容。A 保存着位置 100，并不意味着 B 还存着 101 到 120。日志清理或缓冲覆盖可能使历史内容不再可得，位点元数据却仍然完好。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 48,
+      "old": "A 记得位置 100，并不意味着 B 还存着 101 到 120。",
+      "new": "A 保存着位置 100，并不意味着 B 还存着 101 到 120。",
+      "reason": "只改记得为保存着，101至120及历史窗口不变。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 1876,
+      "end": 1909,
+      "fix_id": "FIX098",
+      "candidate_ids": [
+        "A092",
+        "B42",
+        "C25"
+      ],
+      "selected_candidate": "C25",
+      "alternatives": [
+        {
+          "id": "A092",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 48,
+          "old": "A 记得位置 100",
+          "new": "A 保存着位置 100",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1876,
+          "end": 1886
+        },
+        {
+          "id": "B42",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 48,
+          "old": "A 记得位置 100",
+          "new": "A 保存了位置 100",
+          "reason": "节点保存位置元数据，不暗示保存实际日志内容。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 1876,
+          "end": 1886
+        },
+        {
+          "id": "C25",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 48,
+          "old": "A 记得位置 100，并不意味着 B 还存着 101 到 120。",
+          "new": "A 保存着位置 100，并不意味着 B 还存着 101 到 120。",
+          "reason": "只改记得为保存着，101至120及历史窗口不变。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 1876,
+          "end": 1909
+        }
+      ],
+      "old_paragraph": "历史身份回答“这是谁的哪段变化”，进度回答“已经走到哪里”。还需要第三项：发送方是否仍保留进度之后的内容。A 记得位置 100，并不意味着 B 还存着 101 到 120。日志清理或缓冲覆盖可能使历史内容不再可得，位点元数据却仍然完好。",
+      "new_paragraph": "历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”。还需要第三项：发送方是否仍保留进度之后的内容。A 保存着位置 100，并不意味着 B 还存着 101 到 120。日志清理或缓冲覆盖可能使历史内容不再可得，位点元数据却仍然完好。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 112,
+      "old": "等待解决的是确认条件，不负责回滚先前已经执行的操作",
+      "new": "等待用于满足确认条件，不会回滚先前已经执行的操作",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5390,
+      "end": 5415,
+      "fix_id": "FIX099",
+      "candidate_ids": [
+        "A093"
+      ],
+      "selected_candidate": "A093",
+      "alternatives": [
+        {
+          "id": "A093",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 112,
+          "old": "等待解决的是确认条件，不负责回滚先前已经执行的操作",
+          "new": "等待用于满足确认条件，不会回滚先前已经执行的操作",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5390,
+          "end": 5415
+        }
+      ],
+      "old_paragraph": "假设应用先写入，再等待副本确认，等待超时。此时原写入可能已经执行，并且某些副本稍后仍会收到它。把超时当作“写入未发生”，然后以新的业务请求重复扣减，就可能制造业务重复。等待解决的是确认条件，不负责回滚先前已经执行的操作。",
+      "new_paragraph": "假设应用先写入，再等待副本确认，等待超时。此时原写入可能已经执行，并且某些副本稍后仍会收到它。把超时当作“写入未发生”，然后以新的业务请求重复扣减，就可能制造业务重复。等待用于满足确认条件，不会回滚先前已经执行的操作。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 126,
+      "old": "复制错误被停止并暴露出来",
+      "new": "复制遇到错误时停止，并报告错误",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 6062,
+      "end": 6074,
+      "fix_id": "FIX100",
+      "candidate_ids": [
+        "A094"
+      ],
+      "selected_candidate": "A094",
+      "alternatives": [
+        {
+          "id": "A094",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 126,
+          "old": "复制错误被停止并暴露出来",
+          "new": "复制遇到错误时停止，并报告错误",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6062,
+          "end": 6074
+        }
+      ],
+      "old_paragraph": "传输的是逻辑变化还带来结构约束。副本需要相容的表定义和可应用状态；升级或 DDL 的顺序不当，可能使后续事件无法解释。复制错误被停止并暴露出来，通常比静默跳过错误更容易保住数据关系，但恢复还需要查明究竟缺了哪一段变化。",
+      "new_paragraph": "传输的是逻辑变化还带来结构约束。副本需要相容的表定义和可应用状态；升级或 DDL 的顺序不当，可能使后续事件无法解释。复制遇到错误时停止，并报告错误，通常比静默跳过错误更容易保住数据关系，但恢复还需要查明究竟缺了哪一段变化。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 139,
+      "old": "这条接收与应用的分离",
+      "new": "接收与应用的这种分离",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 6755,
+      "end": 6765,
+      "fix_id": "FIX101",
+      "candidate_ids": [
+        "A095"
+      ],
+      "selected_candidate": "A095",
+      "alternatives": [
+        {
+          "id": "A095",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 139,
+          "old": "这条接收与应用的分离",
+          "new": "接收与应用的这种分离",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 6755,
+          "end": 6765
+        }
+      ],
+      "old_paragraph": "这条接收与应用的分离，正是导读事件的机制来源。订单变化可能已经到达副本日志，但尚未应用到查询使用的表。把查询切回主节点可以避开这一特定副本延迟，但还需要事务隔离、连接路由和故障切换保证读到合适状态；“读主”不是所有一致性问题的通用解法。",
+      "new_paragraph": "接收与应用的这种分离，正是导读事件的机制来源。订单变化可能已经到达副本日志，但尚未应用到查询使用的表。把查询切回主节点可以避开这一特定副本延迟，但还需要事务隔离、连接路由和故障切换保证读到合适状态；“读主”不是所有一致性问题的通用解法。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 151,
+      "old": "GTID 因而既是方便，也是约束。",
+      "new": "GTID 因而既带来便利，也增加约束。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7558,
+      "end": 7575,
+      "fix_id": "FIX102",
+      "candidate_ids": [
+        "A096"
+      ],
+      "selected_candidate": "A096",
+      "alternatives": [
+        {
+          "id": "A096",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 151,
+          "old": "GTID 因而既是方便，也是约束。",
+          "new": "GTID 因而既带来便利，也增加约束。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7558,
+          "end": 7575
+        }
+      ],
+      "old_paragraph": "GTID 因而既是方便，也是约束。它使迁移与换源时可以按事务身份推理，同时要求维护人员知道哪些操作会产生本地独有历史。只盯着“复制线程在运行”，无法证明所有节点拥有相同事务集合和相同业务数据。",
+      "new_paragraph": "GTID 因而既带来便利，也增加约束。它使迁移与换源时可以按事务身份推理，同时要求维护人员知道哪些操作会产生本地独有历史。只盯着“复制线程在运行”，无法证明所有节点拥有相同事务集合和相同业务数据。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 159,
+      "old": "这个风险应直接称为“故障切换后先前可见事务可能消失”，而不是 SQL 隔离级别里的幻读。",
+      "new": "故障切换后先前可见事务可能消失，与 SQL 隔离级别里的幻读是两类问题。",
+      "reason": "故障/先前可见/可能与幻读区别全保留。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 8122,
+      "end": 8166,
+      "fix_id": "FIX103",
+      "candidate_ids": [
+        "C26"
+      ],
+      "selected_candidate": "C26",
+      "alternatives": [
+        {
+          "id": "C26",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 159,
+          "old": "这个风险应直接称为“故障切换后先前可见事务可能消失”，而不是 SQL 隔离级别里的幻读。",
+          "new": "故障切换后先前可见事务可能消失，与 SQL 隔离级别里的幻读是两类问题。",
+          "reason": "故障/先前可见/可能与幻读区别全保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 8122,
+          "end": 8166
+        }
+      ],
+      "old_paragraph": "这个风险应直接称为“故障切换后先前可见事务可能消失”，而不是 SQL 隔离级别里的幻读。幻读讨论一个事务中重复范围查询看见新的匹配行，两者的问题边界不同。术语分清，读者才不会误以为提高隔离级别就能修复复制确认窗口。",
+      "new_paragraph": "故障切换后先前可见事务可能消失，与 SQL 隔离级别里的幻读是两类问题。幻读讨论一个事务中重复范围查询看见新的匹配行，两者的问题边界不同。术语分清，读者才不会误以为提高隔离级别就能修复复制确认窗口。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 161,
+      "old": "等待副本数量也不等于等待任意所有副本。",
+      "new": "等待指定数量的副本，也不等于等待所有副本。",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 8231,
+      "end": 8250,
+      "fix_id": "FIX104",
+      "candidate_ids": [
+        "A097"
+      ],
+      "selected_candidate": "A097",
+      "alternatives": [
+        {
+          "id": "A097",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 161,
+          "old": "等待副本数量也不等于等待任意所有副本。",
+          "new": "等待指定数量的副本，也不等于等待所有副本。",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 8231,
+          "end": 8250
+        }
+      ],
+      "old_paragraph": "等待副本数量也不等于等待任意所有副本。系统按配置要求取得确认，故障转移方案必须选择具有适当历史的候选。副本已经收到日志但尚未应用时，恢复还要处理回放；确认不应该被误读成所有读取位置都即时可见。",
+      "new_paragraph": "等待指定数量的副本，也不等于等待所有副本。系统按配置要求取得确认，故障转移方案必须选择具有适当历史的候选。副本已经收到日志但尚未应用时，恢复还要处理回放；确认不应该被误读成所有读取位置都即时可见。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 205,
+      "old": "协议需要知道哪些位置属于当前有效历史、哪些尾部没有相应保证",
+      "new": "协议需要区分哪些位置属于当前有效历史、哪些尾部没有相应保证",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 10873,
+      "end": 10902,
+      "fix_id": "FIX105",
+      "candidate_ids": [
+        "A098"
+      ],
+      "selected_candidate": "A098",
+      "alternatives": [
+        {
+          "id": "A098",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 205,
+          "old": "协议需要知道哪些位置属于当前有效历史、哪些尾部没有相应保证",
+          "new": "协议需要区分哪些位置属于当前有效历史、哪些尾部没有相应保证",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 10873,
+          "end": 10902
+        }
+      ],
+      "old_paragraph": "截断也不等于随意删除所有较新的数据。协议需要知道哪些位置属于当前有效历史、哪些尾部没有相应保证。若发生了超出系统假设的故障，已确认数据也可能面临风险；恢复流程的存在不应被写成“任何切换都不丢”。分析要回到此前确认所依赖的副本和存储状态。",
+      "new_paragraph": "截断也不等于随意删除所有较新的数据。协议需要区分哪些位置属于当前有效历史、哪些尾部没有相应保证。若发生了超出系统假设的故障，已确认数据也可能面临风险；恢复流程的存在不应被写成“任何切换都不丢”。分析要回到此前确认所依赖的副本和存储状态。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 215,
+      "old": "从观察方法看，这是一处应当修正概括的例子。过去从“Follower 获取由本地日志服务”得到的运维经验，不能不看新版本就升级为永久规则。",
+      "new": "“Follower 获取由本地日志服务”这一运维经验受实现版本限制，不能直接作为永久规则。",
+      "reason": "前句为观察用途提示，后文仍明确续传资料来源及版本，删后无技术净失。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 11455,
+      "end": 11523,
+      "fix_id": "FIX106",
+      "candidate_ids": [
+        "C27"
+      ],
+      "selected_candidate": "C27",
+      "alternatives": [
+        {
+          "id": "C27",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 215,
+          "old": "从观察方法看，这是一处应当修正概括的例子。过去从“Follower 获取由本地日志服务”得到的运维经验，不能不看新版本就升级为永久规则。",
+          "new": "“Follower 获取由本地日志服务”这一运维经验受实现版本限制，不能直接作为永久规则。",
+          "reason": "前句为观察用途提示，后文仍明确续传资料来源及版本，删后无技术净失。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11455,
+          "end": 11523
+        }
+      ],
+      "old_paragraph": "从观察方法看，这是一处应当修正概括的例子。过去从“Follower 获取由本地日志服务”得到的运维经验，不能不看新版本就升级为永久规则。更稳妥的概括是：续传必须有可解释的历史及所需状态来源；来源究竟在本地还是远程，由具体版本实现决定。",
+      "new_paragraph": "“Follower 获取由本地日志服务”这一运维经验受实现版本限制，不能直接作为永久规则。更稳妥的概括是：续传必须有可解释的历史及所需状态来源；来源究竟在本地还是远程，由具体版本实现决定。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 295,
+      "old": "两种顺序都没有凭空解决跨系统原子性",
+      "new": "两种顺序都没有解决跨系统原子性",
+      "reason": "凭空无独立信息，原两失败窗口保留。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 14874,
+      "end": 14891,
+      "fix_id": "FIX107",
+      "candidate_ids": [
+        "B44"
+      ],
+      "selected_candidate": "B44",
+      "alternatives": [
+        {
+          "id": "B44",
+          "file": "chapters/09-data-sync/chapter.md",
+          "line": 295,
+          "old": "两种顺序都没有凭空解决跨系统原子性",
+          "new": "两种顺序都没有解决跨系统原子性",
+          "reason": "凭空无独立信息，原两失败窗口保留。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 14874,
+          "end": 14891
+        }
+      ],
+      "old_paragraph": "如果消费者把 offset 提交在业务修改之前，崩溃后可能跳过尚未完成的工作；如果在业务修改之后提交，响应丢失或崩溃可能导致同一记录重做。两种顺序都没有凭空解决跨系统原子性，只是选择了不同失败窗口。",
+      "new_paragraph": "如果消费者把 offset 提交在业务修改之前，崩溃后可能跳过尚未完成的工作；如果在业务修改之后提交，响应丢失或崩溃可能导致同一记录重做。两种顺序都没有解决跨系统原子性，只是选择了不同失败窗口。"
+    },
+    {
+      "file": "chapters/10-epilogue.md",
+      "line": 5,
+      "old": "这一层认为下一层已完成，下一层只保证收到；这一处以为失败没有生效，另一处其实已经提交。",
+      "new": "对下一层的预期是已经完成，实际保证却只是收到；失败被理解为没有生效，实际操作却已经提交。",
+      "reason": "预期与实际行为对照保留；未新增亲历或项目结论。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 234,
+      "end": 277,
+      "fix_id": "FIX108",
+      "candidate_ids": [
+        "A106",
+        "B49"
+      ],
+      "selected_candidate": "B49",
+      "alternatives": [
+        {
+          "id": "A106",
+          "file": "chapters/10-epilogue.md",
+          "line": 5,
+          "old": "这一层认为下一层已完成，下一层只保证收到；这一处以为失败没有生效，另一处其实已经提交。",
+          "new": "对下一层的预期是已经完成，实际保证却只是收到；失败被理解为没有生效，实际操作却已经提交。",
+          "reason": "采用B49。A新‘这一层把…当成’仍是认知拟人；B用人的预期与实际行为，不新增第一人称经历。",
+          "source": "cross-C.json",
+          "votes": [
+            "B",
+            "C"
+          ],
+          "start": 234,
+          "end": 277
+        },
+        {
+          "id": "B49",
+          "file": "chapters/10-epilogue.md",
+          "line": 5,
+          "old": "这一层认为下一层已完成，下一层只保证收到；这一处以为失败没有生效，另一处其实已经提交。",
+          "new": "对下一层的预期是已经完成，实际保证却只是收到；失败被理解为没有生效，实际操作却已经提交。",
+          "reason": "预期与实际行为对照保留；未新增亲历或项目结论。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 234,
+          "end": 277
+        }
+      ],
+      "old_paragraph": "刚工作时，我关心命令、索引和参数，能让系统正常运行，就认为问题已经解决。后来开始负责设计，选型会上要解释理由，事故后要回看原先的假设。很多问题没有发生在某个组件内部，而是发生在几个各自合理的选择之间：这一层认为下一层已完成，下一层只保证收到；这一处以为失败没有生效，另一处其实已经提交。",
+      "new_paragraph": "刚工作时，我关心命令、索引和参数，能让系统正常运行，就认为问题已经解决。后来开始负责设计，选型会上要解释理由，事故后要回看原先的假设。很多问题没有发生在某个组件内部，而是发生在几个各自合理的选择之间：对下一层的预期是已经完成，实际保证却只是收到；失败被理解为没有生效，实际操作却已经提交。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 55,
+      "old": "每个主题承担一个可检查的设计问题",
+      "new": "每个主题对应一个可检查的设计问题",
+      "reason": "主题对应问题，修承担问题搭配。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 2075,
+      "end": 2091,
+      "fix_id": "FIX109",
+      "candidate_ids": [
+        "A099",
+        "B45"
+      ],
+      "selected_candidate": "B45",
+      "alternatives": [
+        {
+          "id": "A099",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 55,
+          "old": "每个主题承担一个可检查的设计问题",
+          "new": "每个主题对应一个可检查的设计问题",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 2075,
+          "end": 2091
+        },
+        {
+          "id": "B45",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 55,
+          "old": "每个主题承担一个可检查的设计问题",
+          "new": "每个主题对应一个可检查的设计问题",
+          "reason": "主题对应问题，修承担问题搭配。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 2075,
+          "end": 2091
+        }
+      ],
+      "old_paragraph": "图 10-1　每个主题承担一个可检查的设计问题；这张图是主题索引，不是产品评分。",
+      "new_paragraph": "图 10-1　每个主题对应一个可检查的设计问题；这张图是主题索引，不是产品评分。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 84,
+      "old": "应用在重新开放写入口前必须知道旧写端已被隔离，新写端包含所需历史",
+      "new": "应用在重新开放写入口前必须确认旧写端已被隔离，新写端包含所需历史",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 3342,
+      "end": 3374,
+      "fix_id": "FIX110",
+      "candidate_ids": [
+        "A100"
+      ],
+      "selected_candidate": "A100",
+      "alternatives": [
+        {
+          "id": "A100",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 84,
+          "old": "应用在重新开放写入口前必须知道旧写端已被隔离，新写端包含所需历史",
+          "new": "应用在重新开放写入口前必须确认旧写端已被隔离，新写端包含所需历史",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 3342,
+          "end": 3374
+        }
+      ],
+      "old_paragraph": "初版不自动提升任意数据库副本。运维可以选择经过验证的高可用方案，但应用在重新开放写入口前必须知道旧写端已被隔离，新写端包含所需历史。若团队暂时做不到，就选择故障期间暂停，不能让“自动恢复可用”成为默认覆盖“不丢确认结果”的理由。",
+      "new_paragraph": "初版不自动提升任意数据库副本。运维可以选择经过验证的高可用方案，但应用在重新开放写入口前必须确认旧写端已被隔离，新写端包含所需历史。若团队暂时做不到，就选择故障期间暂停，不能让“自动恢复可用”成为默认覆盖“不丢确认结果”的理由。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 137,
+      "old": "它解决数据库提交与发送消息无法自然原子的接口问题",
+      "new": "它解决数据库提交与发送消息不能自然组成原子操作的接口问题",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 5496,
+      "end": 5520,
+      "fix_id": "FIX111",
+      "candidate_ids": [
+        "A101"
+      ],
+      "selected_candidate": "A101",
+      "alternatives": [
+        {
+          "id": "A101",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 137,
+          "old": "它解决数据库提交与发送消息无法自然原子的接口问题",
+          "new": "它解决数据库提交与发送消息不能自然组成原子操作的接口问题",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 5496,
+          "end": 5520
+        }
+      ],
+      "old_paragraph": "outbox 是与业务结果同事务保存的待发布事件，不是另一个库存正本。它解决数据库提交与发送消息无法自然原子的接口问题。即使 Kafka 暂时不可用，预留结果与需要发布的事件仍可以先在数据库一起提交，后续发布器再传递。[R10-02：事务性 outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)",
+      "new_paragraph": "outbox 是与业务结果同事务保存的待发布事件，不是另一个库存正本。它解决数据库提交与发送消息不能自然组成原子操作的接口问题。即使 Kafka 暂时不可用，预留结果与需要发布的事件仍可以先在数据库一起提交，后续发布器再传递。[R10-02：事务性 outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 183,
+      "old": "不要把发送 Kafka 消息或调用远程服务夹在这个事务中，延长持锁时间并不会使跨系统提交自动原子。",
+      "new": "这个事务不包含 Kafka 消息发送或远程服务调用；把这些操作放进事务会延长持锁时间，也不会使跨系统提交自动具有原子性。",
+      "reason": "赞成方案陈述保留禁止远程调用的具体选择；只补具有原子性解决谓语搭配，不更改事务事实。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7102,
+      "end": 7151,
+      "fix_id": "FIX112",
+      "candidate_ids": [
+        "B46",
+        "C28"
+      ],
+      "selected_candidate": "C28",
+      "alternatives": [
+        {
+          "id": "B46",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 183,
+          "old": "不要把发送 Kafka 消息或调用远程服务夹在这个事务中，延长持锁时间并不会使跨系统提交自动原子。",
+          "new": "这个事务不包含 Kafka 消息发送或远程服务调用；把这些操作放进事务会延长持锁时间，也不会使跨系统提交自动具有原子性。",
+          "reason": "采用C28保留本例明确排除这些操作的选择；再补具有原子性以修原子直接作谓语。不得只留后果而删除本例选择。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 7102,
+          "end": 7151
+        },
+        {
+          "id": "C28",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 183,
+          "old": "不要把发送 Kafka 消息或调用远程服务夹在这个事务中，延长持锁时间并不会使跨系统提交自动原子。",
+          "new": "这个事务不包含 Kafka 消息发送或远程服务调用；把这些操作放进事务会延长持锁时间，也不会使跨系统提交自动具有原子性。",
+          "reason": "赞成方案陈述保留禁止远程调用的具体选择；只补具有原子性解决谓语搭配，不更改事务事实。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7102,
+          "end": 7151
+        }
+      ],
+      "old_paragraph": "只有 COMMIT 得到成功结果后，服务才返回预留成功。事务内的库存变化、请求结果与事件要么一起提交，要么在回滚后都不生效。不要把发送 Kafka 消息或调用远程服务夹在这个事务中，延长持锁时间并不会使跨系统提交自动原子。[R10-04：事务提交与回滚](https://dev.mysql.com/doc/refman/8.0/en/commit.html)",
+      "new_paragraph": "只有 COMMIT 得到成功结果后，服务才返回预留成功。事务内的库存变化、请求结果与事件要么一起提交，要么在回滚后都不生效。这个事务不包含 Kafka 消息发送或远程服务调用；把这些操作放进事务会延长持锁时间，也不会使跨系统提交自动具有原子性。[R10-04：事务提交与回滚](https://dev.mysql.com/doc/refman/8.0/en/commit.html)"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 195,
+      "old": "业务协议负责决定接下来怎样对外回应",
+      "new": "业务协议规定接下来怎样对外回应",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 7829,
+      "end": 7846,
+      "fix_id": "FIX113",
+      "candidate_ids": [
+        "A102"
+      ],
+      "selected_candidate": "A102",
+      "alternatives": [
+        {
+          "id": "A102",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 195,
+          "old": "业务协议负责决定接下来怎样对外回应",
+          "new": "业务协议规定接下来怎样对外回应",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 7829,
+          "end": 7846
+        }
+      ],
+      "old_paragraph": "并发唯一键竞争还可能等待或产生死锁。应用需要有界重试，保留相同业务标识，并对数据库错误类别作区分。重试次数耗尽时返回可查询的未知结果，而不是替用户生成新标识。MySQL 的锁与死锁处理提供数据库层行为，业务协议负责决定接下来怎样对外回应。[R10-10：死锁处理](https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html)",
+      "new_paragraph": "并发唯一键竞争还可能等待或产生死锁。应用需要有界重试，保留相同业务标识，并对数据库错误类别作区分。重试次数耗尽时返回可查询的未知结果，而不是替用户生成新标识。MySQL 的锁与死锁处理提供数据库层行为，业务协议规定接下来怎样对外回应。[R10-10：死锁处理](https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html)"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 264,
+      "old": "它代表尚未履行的发布责任",
+      "new": "它记录尚未完成的发布任务",
+      "reason": "发布任务为原真实工作，不改变清理条件或审计要求。",
+      "votes": [
+        "A",
+        "B"
+      ],
+      "start": 10686,
+      "end": 10698,
+      "fix_id": "FIX114",
+      "candidate_ids": [
+        "B47"
+      ],
+      "selected_candidate": "B47",
+      "alternatives": [
+        {
+          "id": "B47",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 264,
+          "old": "它代表尚未履行的发布责任",
+          "new": "它记录尚未完成的发布任务",
+          "reason": "发布任务为原真实工作，不改变清理条件或审计要求。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 10686,
+          "end": 10698
+        }
+      ],
+      "old_paragraph": "未发送事件不能仅凭创建时间过旧就删除。它代表尚未履行的发布责任；清理前要满足已确认发布和规定审计保留期。发布器持续失败会使 outbox 增长，容量告警、发布延迟和故障处理因此成为系统运行要求。事务性 outbox 消除了业务提交与记录发布意图之间的空缺，没有消除消息系统依赖。",
+      "new_paragraph": "未发送事件不能仅凭创建时间过旧就删除。它记录尚未完成的发布任务；清理前要满足已确认发布和规定审计保留期。发布器持续失败会使 outbox 增长，容量告警、发布延迟和故障处理因此成为系统运行要求。事务性 outbox 消除了业务提交与记录发布意图之间的空缺，没有消除消息系统依赖。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 282,
+      "old": "但输出事务已经记住事件身份。",
+      "new": "但输出事务已经保存了事件身份。",
+      "reason": "只改记住为保存了；同事务和offset先后完整。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 11645,
+      "end": 11659,
+      "fix_id": "FIX115",
+      "candidate_ids": [
+        "B48",
+        "C29",
+        "A103"
+      ],
+      "selected_candidate": "C29",
+      "alternatives": [
+        {
+          "id": "B48",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 282,
+          "old": "但输出事务已经记住事件身份",
+          "new": "但输出事务已经保存事件身份",
+          "reason": "保存事件身份对应同事务去重记录，不更改提交次序。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "B"
+          ],
+          "start": 11645,
+          "end": 11658
+        },
+        {
+          "id": "C29",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 282,
+          "old": "但输出事务已经记住事件身份。",
+          "new": "但输出事务已经保存了事件身份。",
+          "reason": "只改记住为保存了；同事务和offset先后完整。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11645,
+          "end": 11659
+        },
+        {
+          "id": "A103",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 282,
+          "old": "输出事务已经记住事件身份",
+          "new": "输出事务已经保存事件身份",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 11646,
+          "end": 11658
+        }
+      ],
+      "old_paragraph": "数据库提交后、offset提交前崩溃，事件会重复读取，但输出事务已经记住事件身份。offset提交失败不能通过删除去重记录解决；应保留已提交业务结果并允许再次读取。反过来，去重记录若提前提交而输出失败，就会制造“看似已处理、结果却没有”的空缺，因此二者必须在同一目标库事务。",
+      "new_paragraph": "数据库提交后、offset提交前崩溃，事件会重复读取，但输出事务已经保存了事件身份。offset提交失败不能通过删除去重记录解决；应保留已提交业务结果并允许再次读取。反过来，去重记录若提前提交而输出失败，就会制造“看似已处理、结果却没有”的空缺，因此二者必须在同一目标库事务。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 288,
+      "old": "预留事务仍向数据库判定",
+      "new": "预留结果仍由数据库事务判定",
+      "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 12073,
+      "end": 12084,
+      "fix_id": "FIX116",
+      "candidate_ids": [
+        "A104"
+      ],
+      "selected_candidate": "A104",
+      "alternatives": [
+        {
+          "id": "A104",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 288,
+          "old": "预留事务仍向数据库判定",
+          "new": "预留结果仍由数据库事务判定",
+          "reason": "已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 12073,
+          "end": 12084
+        }
+      ],
+      "old_paragraph": "Redis 保存商品展示与近似库存，不保存本例唯一的预留结果。实例丢失后，可以限流回源并逐步重建缓存；在重建期间，预留事务仍向数据库判定，展示接口则可以暂时返回简化内容或降低请求量。",
+      "new_paragraph": "Redis 保存商品展示与近似库存，不保存本例唯一的预留结果。实例丢失后，可以限流回源并逐步重建缓存；在重建期间，预留结果仍由数据库事务判定，展示接口则可以暂时返回简化内容或降低请求量。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 388,
+      "old": "数据库承担本例容易放在一个事务里的不变量，Kafka承担可延后传递的事件，Redis承担可以重新加载的展示数据。",
+      "new": "数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。",
+      "reason": "保留‘容易放在一个事务里的’限定，否则可能把响应不变量也写成数据库单事务保证；待A/B确认。",
+      "votes": [
+        "A",
+        "B",
+        "C"
+      ],
+      "start": 16822,
+      "end": 16878,
+      "fix_id": "FIX117",
+      "candidate_ids": [
+        "A105"
+      ],
+      "selected_candidate": "A105",
+      "alternatives": [
+        {
+          "id": "A105",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 388,
+          "old": "数据库承担本例容易放在一个事务里的不变量，Kafka承担可延后传递的事件，Redis承担可以重新加载的展示数据。",
+          "new": "数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。",
+          "reason": "保留‘容易放在一个事务里的’限定，否则可能把响应不变量也写成数据库单事务保证；待A/B确认。",
+          "source": "cross-C.json",
+          "votes": [
+            "A",
+            "B",
+            "C"
+          ],
+          "start": 16822,
+          "end": 16878
+        }
+      ],
+      "old_paragraph": "同样，数据库、Kafka与Redis不是按“可靠、吞吐、快”的固定角色被放进图中。数据库承担本例容易放在一个事务里的不变量，Kafka承担可延后传递的事件，Redis承担可以重新加载的展示数据。改变业务对象后，分工也可以改变。",
+      "new_paragraph": "同样，数据库、Kafka与Redis不是按“可靠、吞吐、快”的固定角色被放进图中。数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。改变业务对象后，分工也可以改变。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 398,
+      "old": "范围清楚不是自证正确，范围之内仍要经过测试和运行验证。",
+      "new": "明确范围后，范围之内的行为仍要经过测试和运行验证。",
+      "reason": "不单靠范围证明正确、仍须验证的意思完整保留，不撤出版边界。",
+      "votes": [
+        "A",
+        "C"
+      ],
+      "start": 17329,
+      "end": 17356,
+      "fix_id": "FIX118",
+      "candidate_ids": [
+        "C30"
+      ],
+      "selected_candidate": "C30",
+      "alternatives": [
+        {
+          "id": "C30",
+          "file": "chapters/10-summary/chapter.md",
+          "line": 398,
+          "old": "范围清楚不是自证正确，范围之内仍要经过测试和运行验证。",
+          "new": "明确范围后，范围之内的行为仍要经过测试和运行验证。",
+          "reason": "不单靠范围证明正确、仍须验证的意思完整保留，不撤出版边界。",
+          "source": "cross-A.json",
+          "votes": [
+            "A",
+            "C"
+          ],
+          "start": 17329,
+          "end": 17356
+        }
+      ],
+      "old_paragraph": "本章的设计也保留了未覆盖范围：支付与履约、跨SKU事务、多地域无损切换，以及任意第三方副作用的原子完成。范围清楚不是自证正确，范围之内仍要经过测试和运行验证。到这里，选择已经足够具体：有可实现的数据关系，有失败后的动作，有能够推翻当前选择的指标。后续优化可以围绕这些证据推进，而不必再次从产品印象开始。",
+      "new_paragraph": "本章的设计也保留了未覆盖范围：支付与履约、跨SKU事务、多地域无损切换，以及任意第三方副作用的原子完成。明确范围后，范围之内的行为仍要经过测试和运行验证。到这里，选择已经足够具体：有可实现的数据关系，有失败后的动作，有能够推翻当前选择的指标。后续优化可以围绕这些证据推进，而不必再次从产品印象开始。"
+    }
+  ]
+}

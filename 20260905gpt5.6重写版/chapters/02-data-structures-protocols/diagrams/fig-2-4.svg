@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 43 880 427" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
+    </marker>
+  </defs>
+
+
+  <!-- ============ ziplist（上）============ -->
+  <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录「前一元素的长度」</text>
+
+  <!-- 元素结构说明标签 -->
+  <text x="60" y="90" font-size="11.5" fill="#6B7280">元素 = ［prevlen 前一元素长度］＋［encoding］＋［data］</text>
+
+  <!-- 变更前 -->
+  <text x="60" y="122" font-size="12.5" font-weight="700" fill="#374151">变更前：entry1 长度 = 60 字节（&lt; 254）</text>
+  <!-- entry1 -->
+  <rect x="60"  y="132" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="150" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry1（60 字节）</text>
+  <text x="150" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
+  <!-- entry2 -->
+  <rect x="250" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="325" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry2</text>
+  <text x="325" y="166" text-anchor="middle" font-size="10.5" fill="#065F46">prevlen=1B（记 60）</text>
+  <!-- entry3 -->
+  <rect x="410" y="132" width="150" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="485" y="150" text-anchor="middle" font-size="11.5" fill="#92400E">entry3</text>
+  <text x="485" y="166" text-anchor="middle" font-size="10.5" fill="#6B7280">prevlen=1B</text>
+
+  <!-- 触发：entry1 变长 -->
+  <text x="60" y="212" font-size="12.5" font-weight="700" fill="#B91C1C">变更后：entry1 增大到 ≥ 254 字节 → 触发连锁</text>
+  <!-- entry1 变大 -->
+  <rect x="60"  y="222" width="180" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="150" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry1（≥254 字节）</text>
+  <text x="150" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">变长了</text>
+  <!-- entry2 prevlen 撑大 1→5 -->
+  <rect x="250" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="325" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry2可能变长</text>
+  <text x="325" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- entry3可能受影响 -->
+  <rect x="410" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="485" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry3可能受影响</text>
+  <text x="485" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
+  <!-- 继续 -->
+  <text x="580" y="248" font-size="12" fill="#B91C1C">依相邻长度决定</text>
+
+  <!-- 连锁箭头 -->
+  <line x1="240" y1="244" x2="250" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <line x1="400" y1="244" x2="410" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <line x1="560" y1="244" x2="574" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+
+  <text x="60" y="292" font-size="12" fill="#374151">若后续元素也跨过长度编码阈值，prevlen的变化可能继续传播</text>
+
+  <!-- 分隔线 -->
+  <line x1="60" y1="312" x2="820" y2="312" stroke="#E5E7EB" stroke-width="1.2"/>
+
+  <!-- ============ listpack（下）============ -->
+  <text x="60" y="342" font-size="14" font-weight="700" fill="#4F46E5">listpack：每个元素只记录「自己的长度」</text>
+
+  <rect x="60"  y="356" width="180" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="150" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry1（变长）</text>
+  <text x="150" y="392" text-anchor="middle" font-size="10.5" fill="#6B7280">尾部长度编码</text>
+  <rect x="250" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="325" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry2 不受影响</text>
+  <text x="325" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
+  <rect x="410" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="485" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry3 不受影响</text>
+  <text x="485" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
+
+  <!-- 断开的连锁：打叉 -->
+  <line x1="243" y1="366" x2="247" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="247" y1="366" x2="243" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="403" y1="366" x2="407" y2="390" stroke="#059669" stroke-width="2"/>
+  <line x1="407" y1="366" x2="403" y2="390" stroke="#059669" stroke-width="2"/>
+
+  <text x="60" y="426" font-size="12" fill="#374151">listpack移除对前驱长度的依赖；插入或扩张仍可能移动后续字节，不能据此保证常数耗时</text>
+</svg>

@@ -1,0 +1,730 @@
+[
+  {
+    "path": "chapters/01-introduction/chapter.md",
+    "old": "[Redis 数据类型说明](https://redis.io/docs/latest/develop/data-types/)",
+    "new": "[R1-01：Redis 数据类型说明](#ref-r1-01)",
+    "id": "R1-01",
+    "url": "https://redis.io/docs/latest/develop/data-types/"
+  },
+  {
+    "path": "chapters/01-introduction/chapter.md",
+    "old": "[MySQL8.0一致性非锁定读](https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html)",
+    "new": "[R1-02：MySQL8.0一致性非锁定读](#ref-r1-02)",
+    "id": "R1-02",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html"
+  },
+  {
+    "path": "chapters/01-introduction/chapter.md",
+    "old": "[MySQL8.0多版本机制](https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html)",
+    "new": "[R1-03：MySQL8.0多版本机制](#ref-r1-03)",
+    "id": "R1-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html"
+  },
+  {
+    "path": "chapters/01-introduction/chapter.md",
+    "old": "[3.9设计文档](https://kafka.apache.org/39/design/design/)",
+    "new": "[R1-04：3.9设计文档](#ref-r1-04)",
+    "id": "R1-04",
+    "url": "https://kafka.apache.org/39/design/design/"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[SDS实现](https://github.com/redis/redis/blob/7.2.5/src/sds.c)",
+    "new": "[R2-01：SDS实现](#ref-r2-01)",
+    "id": "R2-01",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/sds.c"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[字典实现](https://github.com/redis/redis/blob/7.2.5/src/dict.c)",
+    "new": "[R2-02：字典实现](#ref-r2-02)",
+    "id": "R2-02",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/dict.c"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[Redis7.2.5集合实现](https://github.com/redis/redis/blob/7.2.5/src/t_set.c)",
+    "new": "[R2-03：Redis7.2.5集合实现](#ref-r2-03)",
+    "id": "R2-03",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/t_set.c"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[MySQL8.0行格式说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)",
+    "new": "[R2-04：MySQL8.0行格式说明](#ref-r2-04)",
+    "id": "R2-04",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[自适应哈希索引说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html)",
+    "new": "[R2-05：自适应哈希索引说明](#ref-r2-05)",
+    "id": "R2-05",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[Kafka3.9消息格式](https://kafka.apache.org/39/implementation/message-format/)",
+    "new": "[R2-06：Kafka3.9消息格式](#ref-r2-06)",
+    "id": "R2-06",
+    "url": "https://kafka.apache.org/39/implementation/message-format/"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[RESP规范](https://redis.io/docs/latest/develop/reference/protocol-spec/)",
+    "new": "[R2-07：RESP规范](#ref-r2-07)",
+    "id": "R2-07",
+    "url": "https://redis.io/docs/latest/develop/reference/protocol-spec/"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[文本结果集](https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html)",
+    "new": "[R2-08：文本结果集](#ref-r2-08)",
+    "id": "R2-08",
+    "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[二进制结果集](https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html)",
+    "new": "[R2-09：二进制结果集](#ref-r2-09)",
+    "id": "R2-09",
+    "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html"
+  },
+  {
+    "path": "chapters/02-data-structures-protocols/chapter.md",
+    "old": "[Kafka3.9协议](https://kafka.apache.org/39/design/protocol/)",
+    "new": "[R2-10：Kafka3.9协议](#ref-r2-10)",
+    "id": "R2-10",
+    "url": "https://kafka.apache.org/39/design/protocol/"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[SHUTDOWN文档](https://redis.io/docs/latest/commands/shutdown/)",
+    "new": "[R3-01：SHUTDOWN文档](#ref-r3-01)",
+    "id": "R3-01",
+    "url": "https://redis.io/docs/latest/commands/shutdown/"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[MySQL8.0选项文件](https://dev.mysql.com/doc/refman/8.0/en/option-files.html)",
+    "new": "[R3-02：MySQL8.0选项文件](#ref-r3-02)",
+    "id": "R3-02",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/option-files.html"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)",
+    "new": "[R3-03：InnoDB恢复说明](#ref-r3-03)",
+    "id": "R3-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[参数定义](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown)",
+    "new": "[R3-04：innodb_fast_shutdown 参数定义](#ref-r3-04)",
+    "id": "R3-04",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[Kafka3.9.0 BrokerLifecycleManager](https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala)",
+    "new": "[R3-05：Kafka3.9.0 BrokerLifecycleManager](#ref-r3-05)",
+    "id": "R3-05",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[探针定义](https://kubernetes.io/docs/concepts/workloads/pods/probes/)",
+    "new": "[R3-06：探针定义](#ref-r3-06)",
+    "id": "R3-06",
+    "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/"
+  },
+  {
+    "path": "chapters/03-lifecycle/chapter.md",
+    "old": "[容器生命周期钩子](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)",
+    "new": "[R3-07：容器生命周期钩子](#ref-r3-07)",
+    "id": "R3-07",
+    "url": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[Redis淘汰说明](https://redis.io/docs/latest/develop/reference/eviction/)",
+    "new": "[R4-01：Redis淘汰说明](#ref-r4-01)",
+    "id": "R4-01",
+    "url": "https://redis.io/docs/latest/develop/reference/eviction/"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[Redis持久化说明](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/)",
+    "new": "[R4-02：Redis持久化说明](#ref-r4-02)",
+    "id": "R4-02",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[WAITAOF定义](https://redis.io/docs/latest/commands/waitaof/)",
+    "new": "[R4-03：WAITAOF定义](#ref-r4-03)",
+    "id": "R4-03",
+    "url": "https://redis.io/docs/latest/commands/waitaof/"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[缓冲池抗扫描说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html)",
+    "new": "[R4-04：缓冲池抗扫描说明](#ref-r4-04)",
+    "id": "R4-04",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[redo提交策略](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit)",
+    "new": "[R4-05：redo提交策略](#ref-r4-05)",
+    "id": "R4-05",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[binlog同步选项](https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog)",
+    "new": "[R4-06：binlog同步选项](#ref-r4-06)",
+    "id": "R4-06",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[doublewrite说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)",
+    "new": "[R4-07：doublewrite说明](#ref-r4-07)",
+    "id": "R4-07",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[change buffer说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html)",
+    "new": "[R4-08：change buffer说明](#ref-r4-08)",
+    "id": "R4-08",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[MySQL8.0一致性非锁定读](https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html)",
+    "new": "[R1-02：MySQL8.0一致性非锁定读](#ref-r1-02)",
+    "id": "R1-02",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[MySQL8.0多版本机制](https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html)",
+    "new": "[R1-03：MySQL8.0多版本机制](#ref-r1-03)",
+    "id": "R1-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[Linux虚拟内存参数](https://docs.kernel.org/admin-guide/sysctl/vm.html)",
+    "new": "[R4-09：Linux虚拟内存参数](#ref-r4-09)",
+    "id": "R4-09",
+    "url": "https://docs.kernel.org/admin-guide/sysctl/vm.html"
+  },
+  {
+    "path": "chapters/04-memory-disk/chapter.md",
+    "old": "[生产者配置](https://kafka.apache.org/39/configuration/producer-configs/)",
+    "new": "[R4-10：生产者配置](#ref-r4-10)",
+    "id": "R4-10",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-01](https://redis.io/docs/latest/develop/reference/clients/)",
+    "new": "[R5-01：Redis 客户端处理](#ref-r5-01)",
+    "id": "R5-01",
+    "url": "https://redis.io/docs/latest/develop/reference/clients/"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-02](https://redis.io/docs/latest/commands/unlink/)",
+    "new": "[R5-02：UNLINK 命令](#ref-r5-02)",
+    "id": "R5-02",
+    "url": "https://redis.io/docs/latest/commands/unlink/"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-03](https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html)",
+    "new": "[R5-03：可插拔存储引擎概述](#ref-r5-03)",
+    "id": "R5-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-04](https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html)",
+    "new": "[R5-04：Query Cache 的工作方式（MySQL 5.7 历史资料）](#ref-r5-04)",
+    "id": "R5-04",
+    "url": "https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-05](https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html)",
+    "new": "[R5-05：MySQL 8.0 新增及移除的功能](#ref-r5-05)",
+    "id": "R5-05",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-06](https://kafka.apache.org/39/design/protocol/)",
+    "new": "[R5-06：Kafka 协议](#ref-r5-06)",
+    "id": "R5-06",
+    "url": "https://kafka.apache.org/39/design/protocol/"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-07](https://kafka.apache.org/39/design/design/)",
+    "new": "[R5-07：Kafka 设计](#ref-r5-07)",
+    "id": "R5-07",
+    "url": "https://kafka.apache.org/39/design/design/"
+  },
+  {
+    "path": "chapters/05-layered-architecture/chapter.md",
+    "old": "[R5-08](https://kafka.apache.org/39/operations/tiered-storage/)",
+    "new": "[R5-08：Kafka 分层存储](#ref-r5-08)",
+    "id": "R5-08",
+    "url": "https://kafka.apache.org/39/operations/tiered-storage/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-01](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/)",
+    "new": "[R6-01：Redis 访问控制列表](#ref-r6-01)",
+    "id": "R6-01",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-02](https://redis.io/docs/latest/commands/acl-dryrun/)",
+    "new": "[R6-02：ACL DRYRUN 命令](#ref-r6-02)",
+    "id": "R6-02",
+    "url": "https://redis.io/docs/latest/commands/acl-dryrun/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-03](https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html)",
+    "new": "[R6-03：Caching SHA-2 认证插件](#ref-r6-03)",
+    "id": "R6-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-04](https://kafka.apache.org/39/security/authentication-using-sasl/)",
+    "new": "[R6-04：使用 SASL 认证](#ref-r6-04)",
+    "id": "R6-04",
+    "url": "https://kafka.apache.org/39/security/authentication-using-sasl/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-05](https://redis.io/docs/latest/operate/oss_and_stack/management/security/)",
+    "new": "[R6-05：Redis 安全机制](#ref-r6-05)",
+    "id": "R6-05",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-06](https://dev.mysql.com/doc/refman/8.0/en/request-access.html)",
+    "new": "[R6-06：访问控制：请求验证](#ref-r6-06)",
+    "id": "R6-06",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/request-access.html"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-07](https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html)",
+    "new": "[R6-07：部分撤销权限](#ref-r6-07)",
+    "id": "R6-07",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-08](https://kafka.apache.org/39/security/authorization-and-acls/)",
+    "new": "[R6-08：授权与 ACL](#ref-r6-08)",
+    "id": "R6-08",
+    "url": "https://kafka.apache.org/39/security/authorization-and-acls/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-09](https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/)",
+    "new": "[R6-09：Redis TLS](#ref-r6-09)",
+    "id": "R6-09",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/"
+  },
+  {
+    "path": "chapters/06-security/chapter.md",
+    "old": "[R6-10](https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html)",
+    "new": "[R6-10：InnoDB 静态数据加密](#ref-r6-10)",
+    "id": "R6-10",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-01](https://doi.org/10.1145/564585.564601)",
+    "new": "[R7-01：Brewer’s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services](#ref-r7-01)",
+    "id": "R7-01",
+    "url": "https://doi.org/10.1145/564585.564601"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-02](https://redis.io/docs/latest/commands/wait/)",
+    "new": "[R7-02：WAIT 命令](#ref-r7-02)",
+    "id": "R7-02",
+    "url": "https://redis.io/docs/latest/commands/wait/"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-03](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/)",
+    "new": "[R7-03：Redis Sentinel](#ref-r7-03)",
+    "id": "R7-03",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-04](https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/)",
+    "new": "[R7-04：Redis Cluster 规范](#ref-r7-04)",
+    "id": "R7-04",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-05](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)",
+    "new": "[R7-05：半同步复制](#ref-r7-05)",
+    "id": "R7-05",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-06](https://dev.mysql.com/doc/refman/8.0/en/group-replication.html)",
+    "new": "[R7-06：Group Replication](#ref-r7-06)",
+    "id": "R7-06",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication.html"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-07](https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html)",
+    "new": "[R7-07：组复制一致性保证](#ref-r7-07)",
+    "id": "R7-07",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-08](https://kafka.apache.org/39/configuration/producer-configs/)",
+    "new": "[R7-08：生产者配置](#ref-r7-08)",
+    "id": "R7-08",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-09](https://kafka.apache.org/39/configuration/topic-level-configs/)",
+    "new": "[R7-09：主题配置](#ref-r7-09)",
+    "id": "R7-09",
+    "url": "https://kafka.apache.org/39/configuration/topic-level-configs/"
+  },
+  {
+    "path": "chapters/07-cluster/chapter.md",
+    "old": "[R7-10](https://kafka.apache.org/39/operations/kraft/)",
+    "new": "[R7-10：KRaft 运维](#ref-r7-10)",
+    "id": "R7-10",
+    "url": "https://kafka.apache.org/39/operations/kraft/"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-01：Redis 7.2 RDB 类型及操作码](https://github.com/redis/redis/blob/7.2/src/rdb.h)",
+    "new": "[R8-01：Redis 7.2 RDB 类型及操作码](#ref-r8-01)",
+    "id": "R8-01",
+    "url": "https://github.com/redis/redis/blob/7.2/src/rdb.h"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-02：RDB 保存与加载实现](https://github.com/redis/redis/blob/7.2/src/rdb.c)",
+    "new": "[R8-02：RDB 保存与加载实现](#ref-r8-02)",
+    "id": "R8-02",
+    "url": "https://github.com/redis/redis/blob/7.2/src/rdb.c"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-03：RESP 规范](https://redis.io/docs/latest/develop/reference/protocol-spec/)",
+    "new": "[R8-03：RESP 规范](#ref-r8-03)",
+    "id": "R8-03",
+    "url": "https://redis.io/docs/latest/develop/reference/protocol-spec/"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-04：Redis 持久化与多部分 AOF](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/)",
+    "new": "[R8-04：Redis 持久化与多部分 AOF](#ref-r8-04)",
+    "id": "R8-04",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-05：Redis 7.2 AOF 清单及重写实现](https://github.com/redis/redis/blob/7.2/src/aof.c)",
+    "new": "[R8-05：Redis 7.2 AOF 清单及重写实现](#ref-r8-05)",
+    "id": "R8-05",
+    "url": "https://github.com/redis/redis/blob/7.2/src/aof.c"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-06：InnoDB 页大小配置](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size)",
+    "new": "[R8-06：InnoDB 页大小配置](#ref-r8-06)",
+    "id": "R8-06",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-07：InnoDB 文件空间管理](https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html)",
+    "new": "[R8-07：InnoDB 文件空间管理](#ref-r8-07)",
+    "id": "R8-07",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-08：InnoDB 行格式](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)",
+    "new": "[R8-08：InnoDB 行格式](#ref-r8-08)",
+    "id": "R8-08",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-09：InnoDB 双写缓冲与文件](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)",
+    "new": "[R8-09：InnoDB 双写缓冲与文件](#ref-r8-09)",
+    "id": "R8-09",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-10：InnoDB redo log](https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html)",
+    "new": "[R8-10：InnoDB redo log](#ref-r8-10)",
+    "id": "R8-10",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-11：Kafka 3.9 设计与日志管理](https://kafka.apache.org/39/design/design/)",
+    "new": "[R8-11：Kafka 3.9 设计与日志管理](#ref-r8-11)",
+    "id": "R8-11",
+    "url": "https://kafka.apache.org/39/design/design/"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-12：Kafka 记录格式](https://kafka.apache.org/39/implementation/message-format/)",
+    "new": "[R8-12：Kafka 记录格式](#ref-r8-12)",
+    "id": "R8-12",
+    "url": "https://kafka.apache.org/39/implementation/message-format/"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-13：Kafka 3.9.0 OffsetIndex](https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java)",
+    "new": "[R8-13：Kafka 3.9.0 OffsetIndex](#ref-r8-13)",
+    "id": "R8-13",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-14：Kafka 3.9.0 TimeIndex](https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java)",
+    "new": "[R8-14：Kafka 3.9.0 TimeIndex](#ref-r8-14)",
+    "id": "R8-14",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-15：KIP-405 分层存储设计](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage)",
+    "new": "[R8-15：KIP-405 分层存储设计](#ref-r8-15)",
+    "id": "R8-15",
+    "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage"
+  },
+  {
+    "path": "chapters/08-storage-format/chapter.md",
+    "old": "[R8-16：Kafka 3.9.0 TierStateMachine](https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java)",
+    "new": "[R8-16：Kafka 3.9.0 TierStateMachine](#ref-r8-16)",
+    "id": "R8-16",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-01：Redis 复制机制](https://redis.io/docs/latest/operate/oss_and_stack/management/replication/)",
+    "new": "[R9-01：Redis 复制机制](#ref-r9-01)",
+    "id": "R9-01",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-02：Redis 脚本复制说明](https://redis.io/docs/latest/develop/programmability/eval-intro/)",
+    "new": "[R9-02：Redis 脚本复制说明](#ref-r9-02)",
+    "id": "R9-02",
+    "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-03：Redis 7.2 复制实现](https://github.com/redis/redis/blob/7.2/src/replication.c)",
+    "new": "[R9-03：Redis 7.2 复制实现](#ref-r9-03)",
+    "id": "R9-03",
+    "url": "https://github.com/redis/redis/blob/7.2/src/replication.c"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-04：WAIT 的范围与限制](https://redis.io/docs/latest/commands/wait/)",
+    "new": "[R9-04：WAIT 的范围与限制](#ref-r9-04)",
+    "id": "R9-04",
+    "url": "https://redis.io/docs/latest/commands/wait/"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-05：WAITAOF](https://redis.io/docs/latest/commands/waitaof/)",
+    "new": "[R9-05：WAITAOF](#ref-r9-05)",
+    "id": "R9-05",
+    "url": "https://redis.io/docs/latest/commands/waitaof/"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-06：binlog 格式](https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html)",
+    "new": "[R9-06：binlog 格式](#ref-r9-06)",
+    "id": "R9-06",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-07：复制线程](https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html)",
+    "new": "[R9-07：复制线程](#ref-r9-07)",
+    "id": "R9-07",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-08：多线程副本配置](https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html)",
+    "new": "[R9-08：多线程副本配置](#ref-r9-08)",
+    "id": "R9-08",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-09：GTID 格式与存储](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html)",
+    "new": "[R9-09：GTID 格式与存储](#ref-r9-09)",
+    "id": "R9-09",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-10：GTID 自动定位](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html)",
+    "new": "[R9-10：GTID 自动定位](#ref-r9-10)",
+    "id": "R9-10",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-11：半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)",
+    "new": "[R9-11：半同步复制](#ref-r9-11)",
+    "id": "R9-11",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-12：半同步等待点与可见性](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html)",
+    "new": "[R9-12：半同步等待点与可见性](#ref-r9-12)",
+    "id": "R9-12",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-13：生产者 acks](https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks)",
+    "new": "[R9-13：生产者 acks](#ref-r9-13)",
+    "id": "R9-13",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-14：最小 ISR 配置](https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas)",
+    "new": "[R9-14：最小 ISR 配置](#ref-r9-14)",
+    "id": "R9-14",
+    "url": "https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-15：KIP-101 的恢复问题与方案](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation)",
+    "new": "[R9-15：KIP-101 的恢复问题与方案](#ref-r9-15)",
+    "id": "R9-15",
+    "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-16：3.9.0 TierStateMachine 与恢复条件](https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java)",
+    "new": "[R9-16：3.9.0 TierStateMachine 与恢复条件](#ref-r9-16)",
+    "id": "R9-16",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java"
+  },
+  {
+    "path": "chapters/09-data-sync/chapter.md",
+    "old": "[R9-17：KafkaConsumer 的位置与提交说明](https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)",
+    "new": "[R9-17：KafkaConsumer 的位置与提交说明](#ref-r9-17)",
+    "id": "R9-17",
+    "url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-01：CHECK 约束](https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html)",
+    "new": "[R10-01：CHECK 约束](#ref-r10-01)",
+    "id": "R10-01",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-02：事务性 outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)",
+    "new": "[R10-02：事务性 outbox](#ref-r10-02)",
+    "id": "R10-02",
+    "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-03：UPDATE 与锁](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html)",
+    "new": "[R10-03：UPDATE 与锁](#ref-r10-03)",
+    "id": "R10-03",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-04：事务提交与回滚](https://dev.mysql.com/doc/refman/8.0/en/commit.html)",
+    "new": "[R10-04：事务提交与回滚](#ref-r10-04)",
+    "id": "R10-04",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/commit.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-10：死锁处理](https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html)",
+    "new": "[R10-10：死锁处理](#ref-r10-10)",
+    "id": "R10-10",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-05：InnoDB 锁定读取](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html)",
+    "new": "[R10-05：InnoDB 锁定读取](#ref-r10-05)",
+    "id": "R10-05",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-06：Kafka 生产者幂等配置](https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence)",
+    "new": "[R10-06：Kafka 生产者幂等配置](#ref-r10-06)",
+    "id": "R10-06",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-07：消费者进度提交](https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)",
+    "new": "[R10-07：消费者进度提交](#ref-r10-07)",
+    "id": "R10-07",
+    "url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-08：InnoDB 与事务持久性](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit)",
+    "new": "[R10-08：InnoDB 与事务持久性](#ref-r10-08)",
+    "id": "R10-08",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit"
+  },
+  {
+    "path": "chapters/10-summary/chapter.md",
+    "old": "[R10-09：binlog同步](https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog)",
+    "new": "[R10-09：binlog同步](#ref-r10-09)",
+    "id": "R10-09",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog"
+  }
+]

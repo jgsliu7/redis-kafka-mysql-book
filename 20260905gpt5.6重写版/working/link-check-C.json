@@ -1,0 +1,860 @@
+{
+  "date": "2026-09-05",
+  "scope": "HTTP GET, at most 512 bytes read, 18 second timeout, 6 concurrent workers; no retry; HTTP status is not factual verification",
+  "results": [
+    {
+      "url": "https://redis.io/docs/latest/develop/data-types/",
+      "references": [
+        "chapters/01-introduction/chapter.md:52",
+        "chapters/11-references.md:13"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/develop/data-types/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html",
+      "references": [
+        "chapters/01-introduction/chapter.md:72",
+        "chapters/11-references.md:14"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html",
+      "references": [
+        "chapters/01-introduction/chapter.md:76",
+        "chapters/11-references.md:15"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/design/design/",
+      "references": [
+        "chapters/01-introduction/chapter.md:92",
+        "chapters/05-layered-architecture/chapter.md:204",
+        "chapters/08-storage-format/chapter.md:184",
+        "chapters/11-references.md:16",
+        "chapters/11-references.md:62",
+        "chapters/11-references.md:103"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/design/design/"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2.5/src/sds.c",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:42",
+        "chapters/11-references.md:20"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2.5/src/sds.c"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2.5/src/dict.c",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:76",
+        "chapters/11-references.md:21"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2.5/src/dict.c"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2.5/src/t_set.c",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:97",
+        "chapters/11-references.md:22"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2.5/src/t_set.c"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:121",
+        "chapters/08-storage-format/chapter.md:145",
+        "chapters/11-references.md:23",
+        "chapters/11-references.md:100"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:125",
+        "chapters/11-references.md:24"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/implementation/message-format/",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:153",
+        "chapters/08-storage-format/chapter.md:192",
+        "chapters/11-references.md:25",
+        "chapters/11-references.md:104"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/implementation/message-format/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/develop/reference/protocol-spec/",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:177",
+        "chapters/08-storage-format/chapter.md:85",
+        "chapters/11-references.md:26",
+        "chapters/11-references.md:95"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/develop/reference/protocol-spec/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:185",
+        "chapters/11-references.md:27"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:185",
+        "chapters/11-references.md:28"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/design/protocol/",
+      "references": [
+        "chapters/02-data-structures-protocols/chapter.md:203",
+        "chapters/05-layered-architecture/chapter.md:183",
+        "chapters/11-references.md:29",
+        "chapters/11-references.md:61"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/design/protocol/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/commands/shutdown/",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:84",
+        "chapters/11-references.md:33"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/commands/shutdown/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/option-files.html",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:101",
+        "chapters/11-references.md:34"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/option-files.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:129",
+        "chapters/11-references.md:35"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:147",
+        "chapters/11-references.md:36"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:199",
+        "chapters/11-references.md:37"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala"
+    },
+    {
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:217",
+        "chapters/11-references.md:38"
+      ],
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/"
+    },
+    {
+      "url": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/",
+      "references": [
+        "chapters/03-lifecycle/chapter.md:225",
+        "chapters/11-references.md:39"
+      ],
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:74",
+        "chapters/11-references.md:43"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/develop/reference/eviction/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:123",
+        "chapters/08-storage-format/chapter.md:97",
+        "chapters/11-references.md:44",
+        "chapters/11-references.md:96"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/commands/waitaof/",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:125",
+        "chapters/09-data-sync/chapter.md:110",
+        "chapters/11-references.md:45",
+        "chapters/11-references.md:116"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/commands/waitaof/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:156",
+        "chapters/11-references.md:46"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:196",
+        "chapters/10-summary/chapter.md:325",
+        "chapters/11-references.md:47",
+        "chapters/11-references.md:140"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:196",
+        "chapters/10-summary/chapter.md:325",
+        "chapters/11-references.md:48",
+        "chapters/11-references.md:141"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:206",
+        "chapters/08-storage-format/chapter.md:165",
+        "chapters/11-references.md:49",
+        "chapters/11-references.md:101"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:214",
+        "chapters/11-references.md:50"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://docs.kernel.org/admin-guide/sysctl/vm.html",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:242",
+        "chapters/11-references.md:51"
+      ],
+      "status": 200,
+      "final_url": "https://docs.kernel.org/admin-guide/sysctl/vm.html"
+    },
+    {
+      "url": "https://kafka.apache.org/39/configuration/producer-configs/",
+      "references": [
+        "chapters/04-memory-disk/chapter.md:263",
+        "chapters/07-cluster/chapter.md:169",
+        "chapters/11-references.md:52",
+        "chapters/11-references.md:87"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/configuration/producer-configs/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/develop/reference/clients/",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:53",
+        "chapters/11-references.md:56"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/develop/reference/clients/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/commands/unlink/",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:96",
+        "chapters/11-references.md:57"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/commands/unlink/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:135",
+        "chapters/11-references.md:58"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:150",
+        "chapters/11-references.md:59"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:150",
+        "chapters/11-references.md:60"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/operations/tiered-storage/",
+      "references": [
+        "chapters/05-layered-architecture/chapter.md:212",
+        "chapters/11-references.md:63"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/operations/tiered-storage/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/",
+      "references": [
+        "chapters/06-security/chapter.md:44",
+        "chapters/11-references.md:67"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/commands/acl-dryrun/",
+      "references": [
+        "chapters/06-security/chapter.md:68",
+        "chapters/11-references.md:68"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/commands/acl-dryrun/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html",
+      "references": [
+        "chapters/06-security/chapter.md:76",
+        "chapters/11-references.md:69"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/security/authentication-using-sasl/",
+      "references": [
+        "chapters/06-security/chapter.md:84",
+        "chapters/11-references.md:70"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/security/authentication-using-sasl/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/",
+      "references": [
+        "chapters/06-security/chapter.md:112",
+        "chapters/11-references.md:71"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/request-access.html",
+      "references": [
+        "chapters/06-security/chapter.md:116",
+        "chapters/11-references.md:72"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/request-access.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html",
+      "references": [
+        "chapters/06-security/chapter.md:121",
+        "chapters/11-references.md:73"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/security/authorization-and-acls/",
+      "references": [
+        "chapters/06-security/chapter.md:133",
+        "chapters/11-references.md:74"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/security/authorization-and-acls/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/",
+      "references": [
+        "chapters/06-security/chapter.md:145",
+        "chapters/11-references.md:75"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html",
+      "references": [
+        "chapters/06-security/chapter.md:155",
+        "chapters/11-references.md:76"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://doi.org/10.1145/564585.564601",
+      "references": [
+        "chapters/07-cluster/chapter.md:41",
+        "chapters/11-references.md:80"
+      ],
+      "status": 403,
+      "final_url": "https://dl.acm.org/doi/10.1145/564585.564601",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://redis.io/docs/latest/commands/wait/",
+      "references": [
+        "chapters/07-cluster/chapter.md:58",
+        "chapters/09-data-sync/chapter.md:108",
+        "chapters/11-references.md:81",
+        "chapters/11-references.md:115"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/commands/wait/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/",
+      "references": [
+        "chapters/07-cluster/chapter.md:62",
+        "chapters/11-references.md:82"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/",
+      "references": [
+        "chapters/07-cluster/chapter.md:72",
+        "chapters/11-references.md:83"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html",
+      "references": [
+        "chapters/07-cluster/chapter.md:122",
+        "chapters/09-data-sync/chapter.md:155",
+        "chapters/11-references.md:84",
+        "chapters/11-references.md:122"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication.html",
+      "references": [
+        "chapters/07-cluster/chapter.md:130",
+        "chapters/11-references.md:85"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html",
+      "references": [
+        "chapters/07-cluster/chapter.md:138",
+        "chapters/11-references.md:86"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/configuration/topic-level-configs/",
+      "references": [
+        "chapters/07-cluster/chapter.md:187",
+        "chapters/11-references.md:88"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/configuration/topic-level-configs/"
+    },
+    {
+      "url": "https://kafka.apache.org/39/operations/kraft/",
+      "references": [
+        "chapters/07-cluster/chapter.md:209",
+        "chapters/11-references.md:89"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/operations/kraft/"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2/src/rdb.h",
+      "references": [
+        "chapters/08-storage-format/chapter.md:58",
+        "chapters/11-references.md:93"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2/src/rdb.h"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2/src/rdb.c",
+      "references": [
+        "chapters/08-storage-format/chapter.md:62",
+        "chapters/11-references.md:94"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2/src/rdb.c"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2/src/aof.c",
+      "references": [
+        "chapters/08-storage-format/chapter.md:106",
+        "chapters/11-references.md:97"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2/src/aof.c"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size",
+      "references": [
+        "chapters/08-storage-format/chapter.md:124",
+        "chapters/11-references.md:98"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html",
+      "references": [
+        "chapters/08-storage-format/chapter.md:128",
+        "chapters/11-references.md:99"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html",
+      "references": [
+        "chapters/08-storage-format/chapter.md:170",
+        "chapters/11-references.md:102"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java",
+      "references": [
+        "chapters/08-storage-format/chapter.md:207",
+        "chapters/11-references.md:105"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java"
+    },
+    {
+      "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java",
+      "references": [
+        "chapters/08-storage-format/chapter.md:211",
+        "chapters/11-references.md:106"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java"
+    },
+    {
+      "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage",
+      "references": [
+        "chapters/08-storage-format/chapter.md:235",
+        "chapters/11-references.md:107"
+      ],
+      "status": 200,
+      "final_url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage"
+    },
+    {
+      "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java",
+      "references": [
+        "chapters/08-storage-format/chapter.md:239",
+        "chapters/09-data-sync/chapter.md:211",
+        "chapters/11-references.md:108",
+        "chapters/11-references.md:127"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java"
+    },
+    {
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/",
+      "references": [
+        "chapters/09-data-sync/chapter.md:56",
+        "chapters/11-references.md:112"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/"
+    },
+    {
+      "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/",
+      "references": [
+        "chapters/09-data-sync/chapter.md:60",
+        "chapters/11-references.md:113"
+      ],
+      "status": 200,
+      "final_url": "https://redis.io/docs/latest/develop/programmability/eval-intro/"
+    },
+    {
+      "url": "https://github.com/redis/redis/blob/7.2/src/replication.c",
+      "references": [
+        "chapters/09-data-sync/chapter.md:77",
+        "chapters/11-references.md:114"
+      ],
+      "status": 200,
+      "final_url": "https://github.com/redis/redis/blob/7.2/src/replication.c"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:120",
+        "chapters/11-references.md:117"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:130",
+        "chapters/11-references.md:118"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:137",
+        "chapters/11-references.md:119"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:143",
+        "chapters/11-references.md:120"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:147",
+        "chapters/11-references.md:121"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:157",
+        "chapters/11-references.md:123"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks",
+      "references": [
+        "chapters/09-data-sync/chapter.md:186",
+        "chapters/11-references.md:124"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks"
+    },
+    {
+      "url": "https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas",
+      "references": [
+        "chapters/09-data-sync/chapter.md:186",
+        "chapters/11-references.md:125"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas"
+    },
+    {
+      "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation",
+      "references": [
+        "chapters/09-data-sync/chapter.md:198",
+        "chapters/11-references.md:126"
+      ],
+      "status": 200,
+      "final_url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation"
+    },
+    {
+      "url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html",
+      "references": [
+        "chapters/09-data-sync/chapter.md:221",
+        "chapters/10-summary/chapter.md:284",
+        "chapters/11-references.md:128",
+        "chapters/11-references.md:139"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html"
+    },
+    {
+      "url": "https://gitee.com/flainliu/redis-kafka-books",
+      "references": [
+        "chapters/10-epilogue.md:31"
+      ],
+      "status": 404,
+      "final_url": "https://gitee.com/flainliu/redis-kafka-books",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html",
+      "references": [
+        "chapters/10-summary/chapter.md:90",
+        "chapters/11-references.md:132"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html",
+      "references": [
+        "chapters/10-summary/chapter.md:137",
+        "chapters/11-references.md:133"
+      ],
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html",
+      "references": [
+        "chapters/10-summary/chapter.md:159",
+        "chapters/11-references.md:134"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/commit.html",
+      "references": [
+        "chapters/10-summary/chapter.md:183",
+        "chapters/11-references.md:135"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/commit.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html",
+      "references": [
+        "chapters/10-summary/chapter.md:195",
+        "chapters/11-references.md:136"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+      "references": [
+        "chapters/10-summary/chapter.md:214",
+        "chapters/11-references.md:137"
+      ],
+      "status": 403,
+      "final_url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence",
+      "references": [
+        "chapters/10-summary/chapter.md:262",
+        "chapters/11-references.md:138"
+      ],
+      "status": 200,
+      "final_url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence"
+    }
+  ]
+}

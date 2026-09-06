@@ -1,0 +1,19 @@
+{
+  "sha256": "0723ad28f3cb0ce817654c702415445d4caf6acdc0d64be49a5a65aa3adb9117",
+  "units": {
+    "preface": 13,
+    "chapter-1": 166,
+    "chapter-2": 314,
+    "chapter-3": 203,
+    "chapter-4": 294,
+    "chapter-5": 244,
+    "chapter-6": 208,
+    "chapter-7": 240,
+    "chapter-8": 331,
+    "chapter-9": 276,
+    "chapter-10": 218,
+    "epilogue": 16,
+    "references": 120
+  },
+  "method": "HTMLParser main chapter visible text, excludes style/script/navigation; includes headings, paragraphs, tables, code and SVG text"
+}

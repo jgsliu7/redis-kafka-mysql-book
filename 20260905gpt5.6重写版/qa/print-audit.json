@@ -1,0 +1,14 @@
+{
+  "renderer": "PDF.js + @napi-rs/canvas",
+  "pages": 158,
+  "textOutsideHorizontalMargins": [],
+  "pagesWithUnder60TextCharacters": [],
+  "sampleImages": [
+    "print-final-1.png",
+    "print-final-31.png",
+    "print-final-79.png",
+    "print-final-139.png",
+    "print-final-142.png",
+    "print-final-157.png"
+  ]
+}

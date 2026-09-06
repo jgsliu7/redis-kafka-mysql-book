@@ -1,0 +1,28 @@
+{
+  "output": "20260905gpt5.6版本.html",
+  "draft": false,
+  "missing": [],
+  "manuscript_units": 13,
+  "han_by_unit": {
+    "chapters/00-preface.md": 1214,
+    "chapters/01-introduction/chapter.md": 7759,
+    "chapters/02-data-structures-protocols/chapter.md": 8967,
+    "chapters/03-lifecycle/chapter.md": 8601,
+    "chapters/04-memory-disk/chapter.md": 11528,
+    "chapters/05-layered-architecture/chapter.md": 11258,
+    "chapters/06-security/chapter.md": 9504,
+    "chapters/07-cluster/chapter.md": 10394,
+    "chapters/08-storage-format/chapter.md": 12977,
+    "chapters/09-data-sync/chapter.md": 10891,
+    "chapters/10-summary/chapter.md": 10391,
+    "chapters/10-epilogue.md": 914,
+    "chapters/11-references.md": 2045
+  },
+  "han_total": 106443,
+  "svg_count": 53,
+  "unique_svg_count": 53,
+  "duplicate_ids": [],
+  "broken_anchors": [],
+  "external_assets": [],
+  "bytes": 656353
+}

@@ -1,0 +1,122 @@
+# C 对 A106 的独立交叉票
+
+本轮先完整读13单元再读A106清单，逐项结合已读上下文判定；106并非确诊。职责/任务分配与认知拟人分开，改变保存主体或保证范围不按换词直接执行。
+
+- **A001 FIX** [chapters/00-preface.md:5](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/00-preface.md:5)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`放在一起却看不出它们处理了哪些相同的问题。`
+- **A002 SKIP** [chapters/00-preface.md:9](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/00-preface.md:9)：业务责任还包括缓存更新等工作，不等于全部都是‘保证’；原句为接口职责，非人格道德责任。
+- **A003 FIX** [chapters/00-preface.md:11](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/00-preface.md:11)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`同一个要求，可以在不同层实现；`
+- **A004 ADJUST** [chapters/00-preface.md:17](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/00-preface.md:17)：A新‘只概括产品特点’会把反对产品人格化扩大为反对概括特点；改成反对用人性格概括，待A/B确认。 最终候选：`我不希望这本书用人的性格概括产品。`
+- **A005 SKIP** [chapters/01-introduction/chapter.md:13](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:13)：处理同一次业务并有不同职责是实际系统分工；新句可通但没有必须修改的听感问题。
+- **A006 FIX** [chapters/01-introduction/chapter.md:56](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:56)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`Redis 的主要数据集保存在内存中`
+- **A007 SKIP** [chapters/01-introduction/chapter.md:66](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:66)：模块负责具体连接/语句/访问是正常职责陈述，不属于人专属认知动作；不为禁词删负责。
+- **A008 ADJUST** [chapters/01-introduction/chapter.md:90](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:90)：采用C02，保留原位置+历史两个要素；B已投C02保真。 最终候选：`第9章讲副本怎样确定自身位置属于哪段历史。`
+- **A009 FIX** [chapters/01-introduction/chapter.md:110](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:110)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`这些代价并不只存在于某一个产品中。`
+- **A010 FIX** [chapters/01-introduction/chapter.md:125](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:125)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`“分步执行”和“限制最坏延迟”`
+- **A011 FIX** [chapters/01-introduction/chapter.md:191](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:191)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`部署模式与小版本差异也需要说明，不能只写产品名字。`
+- **A012 FIX** [chapters/01-introduction/chapter.md:211](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/01-introduction/chapter.md:211)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`表用来集中比较相同维度`
+- **A013 SKIP** [chapters/02-data-structures-protocols/chapter.md:17](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:17)：旧句紧接具体操作推导，并非无内容阅读收益；新句‘也要据此分别比较’仍是读法指令，没有改进。
+- **A014 FIX** [chapters/02-data-structures-protocols/chapter.md:74](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:74)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`正常查找改用新表`
+- **A015 FIX** [chapters/02-data-structures-protocols/chapter.md:91](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:91)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`会变化的相邻条目长度`
+- **A016 FIX** [chapters/02-data-structures-protocols/chapter.md:91](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:91)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`Redis7.x使用listpack实现相关紧凑编码`
+- **A017 FIX** [chapters/02-data-structures-protocols/chapter.md:155](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:155)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`批次并不都原样落盘，单条记录也可能需要检查。`
+- **A018 FIX** [chapters/02-data-structures-protocols/chapter.md:232](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:232)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`批次避免每条记录重复保存相同元数据`
+- **A019 ADJUST** [chapters/02-data-structures-protocols/chapter.md:269](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/02-data-structures-protocols/chapter.md:269)：采用B08；未知字段不等同不支持字段，避免范围替换。 最终候选：`无法识别它的解析器如何继续`
+- **A020 SKIP** [chapters/03-lifecycle/chapter.md:7](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:7)：信号负责某类动作是功能说明；新句‘只会让进程停止’比原句更易否认SIGTERM触发应用处理的可能，不作纯表达改。
+- **A021 FIX** [chapters/03-lifecycle/chapter.md:17](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:17)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`一个从节点可以响应本地查询`
+- **A022 FIX** [chapters/03-lifecycle/chapter.md:17](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:17)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`把所有检查简化为“进程在不在”`
+- **A023 ADJUST** [chapters/03-lifecycle/chapter.md:32](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:32)：采用B11并保留句号。原先强调整个阶段范围，直接替换认知动词即可。 最终候选：`恢复机制必须处理这些中断点，不能只处理“正常运行后被杀”这一种情况。`
+- **A024 SKIP** [chapters/03-lifecycle/chapter.md:38](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:38)：本节责任包括集群资格与外部角色，改成提供服务可能收窄；正常工程责任用语可保留。
+- **A025 FIX** [chapters/03-lifecycle/chapter.md:44](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:44)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`后续代码不必在每次使用时检查是否已经赋值`
+- **A026 FIX** [chapters/03-lifecycle/chapter.md:86](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:86)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`这些选项需要按退出条件分别选择，不能直接组合成通用的生产命令。`
+- **A027 SKIP** [chapters/03-lifecycle/chapter.md:169](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:169)：Broker获得服务职责是协议资格说明；不是人格化承诺，不作纯删词。
+- **A028 FIX** [chapters/03-lifecycle/chapter.md:171](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:171)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`也不是仅截掉末尾不完整的记录就结束`
+- **A029 SKIP** [chapters/03-lifecycle/chapter.md:217](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:217)：探针职责包括触发重启和摘流，不能收窄为检查不同条件；旧句功能归属清楚。
+- **A030 FIX** [chapters/03-lifecycle/chapter.md:219](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:219)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`探针应检查对应的条件`
+- **A031 SKIP** [chapters/03-lifecycle/chapter.md:251](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:251)：‘启动成功’信号的承诺是接口契约范围，原句有作者判断，不因承诺二字删除。
+- **A032 SKIP** [chapters/03-lifecycle/chapter.md:275](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/03-lifecycle/chapter.md:275)：正常关闭还有持久化/角色交接责任，未必只是运行期尚未完成工作；保留范围。
+- **A033 SKIP** [chapters/04-memory-disk/chapter.md:9](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:9)：资源承担职责是访问与恢复路径分工，原句没有人格化心理或情感；改变仅属偏好。
+- **A034 FIX** [chapters/04-memory-disk/chapter.md:17](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:17)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`机械盘还需要寻道和旋转`
+- **A035 FIX** [chapters/04-memory-disk/chapter.md:68](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:68)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`若数据是唯一的业务记录`
+- **A036 ADJUST** [chapters/04-memory-disk/chapter.md:78](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:78)：采用B12；A‘只能依据访问记录’会遗漏时间衰减，不能因去拟人新增‘只能’限制。 最终候选：`算法不能直接识别业务变化`
+- **A037 FIX** [chapters/04-memory-disk/chapter.md:146](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:146)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`还保存着尚未写回的数据`
+- **A038 FIX** [chapters/04-memory-disk/chapter.md:173](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:173)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`恢复时就仍可能需要旧日志`
+- **A039 SKIP** [chapters/04-memory-disk/chapter.md:259](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:259)：‘回答不同问题’是标题对机制适用范围的正常描述，并未描写软件心理；没有必要一概替换。
+- **A040 ADJUST** [chapters/04-memory-disk/chapter.md:319](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:319)：采用B16。紧接句仍说明不同业务、成功语义和恢复责任；免责是重复的修稿姿态，不承担独立技术事实。 最终候选：`这些条件对应选择架构时实际要作的决定。`
+- **A041 ADJUST** [chapters/04-memory-disk/chapter.md:333](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/04-memory-disk/chapter.md:333)：采用B17。原‘知道’不等于‘记录’，避免仅因替词改变状态维护动作。 最终候选：`InnoDB需要检查页是否脏，Redis淘汰需要确定哪些键可以删除`
+- **A042 FIX** [chapters/05-layered-architecture/chapter.md:19](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:19)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`不能只把它们列入某个模块，就认定依赖已经处理完了`
+- **A043 SKIP** [chapters/05-layered-architecture/chapter.md:43](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:43)：解析器确实保留解析进度，负责标明模块分工；无错误。
+- **A044 FIX** [chapters/05-layered-architecture/chapter.md:53](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:53)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`Redis 7.x 示例配置`
+- **A045 SKIP** [chapters/05-layered-architecture/chapter.md:79](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:79)：类型操作实际选择和转换表示，是正常执行职责；不是人类认知。
+- **A046 FIX** [chapters/05-layered-architecture/chapter.md:90](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:90)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`类型说明操作语义，编码说明内部表示`
+- **A047 SKIP** [chapters/05-layered-architecture/chapter.md:94](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:94)：内存分配器申请和归还空间为实际任务；正常‘负责’无需一概删。
+- **A048 ADJUST** [chapters/05-layered-architecture/chapter.md:114](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:114)：C14最终与B已互核；保留使用上下文的信息，避免把提供/读取上下文改成保存责任。 最终候选：`连接处理使用客户端身份，SQL 层使用当前执行信息`
+- **A049 FIX** [chapters/05-layered-architecture/chapter.md:137](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:137)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：``handlerton` 则提供引擎级注册及相关回调`
+- **A050 FIX** [chapters/05-layered-architecture/chapter.md:156](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:156)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`应用缓存、代理缓存和物化结果同样需要明确数据依赖与失效条件`
+- **A051 FIX** [chapters/05-layered-architecture/chapter.md:185](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:185)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`并非所有协议变化都能在适配层内处理`
+- **A052 SKIP** [chapters/05-layered-architecture/chapter.md:212](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:212)：组件管理远程段和元数据属于真实任务分工；不用把负责全部当病。
+- **A053 FIX** [chapters/05-layered-architecture/chapter.md:212](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:212)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`恢复与异常处理确实需要确定数据位置`
+- **A054 ADJUST** [chapters/05-layered-architecture/chapter.md:220](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:220)：采用B22。‘维护’比‘知道’新增管理归属，‘获取’较忠实于信息依赖。 最终候选：`Broker 需要获取分区归属与副本状态，消费组需要获取成员与分配信息`
+- **A055 ADJUST** [chapters/05-layered-architecture/chapter.md:270](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:270)：采用B23，保留分层不足以自动确定的限制；A‘单独确定’会弱化与分层关系。 最终候选：`分层不能自动确定这些业务行为`
+- **A056 SKIP** [chapters/05-layered-architecture/chapter.md:280](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/05-layered-architecture/chapter.md:280)：请求适配等各模块承担明确工作为工程职责，原句搭配成立。
+- **A057 FIX** [chapters/06-security/chapter.md:13](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:13)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`四项工作不能互相替代`
+- **A058 FIX** [chapters/06-security/chapter.md:32](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:32)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`已有会话何时受这些变化影响`
+- **A059 FIX** [chapters/06-security/chapter.md:42](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:42)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`旧凭证并没有因此失效`
+- **A060 FIX** [chapters/06-security/chapter.md:58](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:58)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`凭证注入方式`
+- **A061 FIX** [chapters/06-security/chapter.md:99](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:99)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`服务端怎样保护验证所需的秘密信息`
+- **A062 FIX** [chapters/06-security/chapter.md:135](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:135)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`却掩盖了究竟缺少哪项权限`
+- **A063 FIX** [chapters/06-security/chapter.md:193](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:193)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`前者保存业务上下文`
+- **A064 FIX** [chapters/06-security/chapter.md:224](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:224)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`三类权限的粒度不能用同一标准排名。`
+- **A065 FIX** [chapters/06-security/chapter.md:250](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:250)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`下游服务接收到的主体`
+- **A066 FIX** [chapters/06-security/chapter.md:256](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/06-security/chapter.md:256)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`人员离职或服务下线后如何撤销账号`
+- **A067 FIX** [chapters/07-cluster/chapter.md:27](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:27)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`Kafka 的分区同时是日志排序和并行处理的单位`
+- **A068 FIX** [chapters/07-cluster/chapter.md:31](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:31)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`故障检测无法仅凭超时确定原因`
+- **A069 SKIP** [chapters/07-cluster/chapter.md:50](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:50)：槽/复制/故障转移标题概括各自作用，职责为技术责任，不具人格化含义。
+- **A070 FIX** [chapters/07-cluster/chapter.md:66](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:66)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`却不能据此确定哪个副本具有所有刚刚确认的写入`
+- **A071 FIX** [chapters/07-cluster/chapter.md:124](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:124)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`选主工具需要检查候选节点的状态`
+- **A072 FIX** [chapters/07-cluster/chapter.md:142](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:142)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`本地刷盘同样是另一项工作`
+- **A073 FIX** [chapters/07-cluster/chapter.md:211](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:211)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`它保存成员、主题、分区及相关配置的状态`
+- **A074 FIX** [chapters/07-cluster/chapter.md:271](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:271)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`不代表任何硬件都能支持百万分区`
+- **A075 ADJUST** [chapters/07-cluster/chapter.md:293](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:293)：避免‘记录这些变化’暗示新增变化记录机制，保留可解释和可处理的原义；待A/B确认。 最终候选：`元数据管理使这些变化可以被系统识别和处理`
+- **A076 ADJUST** [chapters/07-cluster/chapter.md:297](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/07-cluster/chapter.md:297)：拓扑解释数据放置而不独立规定业务目标，说明比规定保真；待A/B确认。 最终候选：`集群拓扑说明数据应放在哪里`
+- **A077 FIX** [chapters/08-storage-format/chapter.md:9](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:9)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`每一种结构支持什么操作`
+- **A078 FIX** [chapters/08-storage-format/chapter.md:21](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:21)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`某条记录标明后面还有一百字节`
+- **A079 SKIP** [chapters/08-storage-format/chapter.md:21](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:21)：三项检查回答不同问题为正常解释关系；新句只是同义替换，并未改善实质阅读阻力。
+- **A080 FIX** [chapters/08-storage-format/chapter.md:29](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:29)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`恢复后的查询再通过内存索引执行`
+- **A081 FIX** [chapters/08-storage-format/chapter.md:58](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:58)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`版本决定加载器能否解析后续内容`
+- **A082 FIX** [chapters/08-storage-format/chapter.md:62](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:62)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`取决于旧加载器能否解析`
+- **A083 FIX** [chapters/08-storage-format/chapter.md:99](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:99)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`重写涉及三个时刻。`
+- **A084 FIX** [chapters/08-storage-format/chapter.md:104](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:104)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`切换对象是整组恢复文件。`
+- **A085 ADJUST** [chapters/08-storage-format/chapter.md:155](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:155)：采用B37。A‘记录并处理’增加具体记录主体，不必为替掉知道引入。 最终候选：`事务和恢复机制还必须处理这些变化`
+- **A086 SKIP** [chapters/08-storage-format/chapter.md:186](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:186)：索引和批格式负责定位为机制作用，不是人专属动词；无需机械删。
+- **A087 FIX** [chapters/08-storage-format/chapter.md:201](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:201)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`批头保存共享信息`
+- **A088 FIX** [chapters/08-storage-format/chapter.md:246](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:246)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`不代表复制实现无需调整`
+- **A089 FIX** [chapters/08-storage-format/chapter.md:316](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:316)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`系统设计需要明确依赖哪个层提供什么保证`
+- **A090 FIX** [chapters/08-storage-format/chapter.md:341](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/08-storage-format/chapter.md:341)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`我会在每一份额外数据旁边写明`
+- **A091 ADJUST** [chapters/09-data-sync/chapter.md:48](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:48)：采用B41；标明比标识一个问句搭配自然，原两个维度不变。 最终候选：`历史身份标明“这是谁的哪段变化”，进度标明“已经走到哪里”`
+- **A092 FIX** [chapters/09-data-sync/chapter.md:48](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:48)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`A 保存着位置 100`
+- **A093 FIX** [chapters/09-data-sync/chapter.md:112](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:112)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`等待用于满足确认条件，不会回滚先前已经执行的操作`
+- **A094 FIX** [chapters/09-data-sync/chapter.md:126](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:126)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`复制遇到错误时停止，并报告错误`
+- **A095 FIX** [chapters/09-data-sync/chapter.md:139](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:139)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`接收与应用的这种分离`
+- **A096 FIX** [chapters/09-data-sync/chapter.md:151](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:151)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`GTID 因而既带来便利，也增加约束。`
+- **A097 FIX** [chapters/09-data-sync/chapter.md:161](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:161)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`等待指定数量的副本，也不等于等待所有副本。`
+- **A098 FIX** [chapters/09-data-sync/chapter.md:205](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/09-data-sync/chapter.md:205)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`协议需要区分哪些位置属于当前有效历史、哪些尾部没有相应保证`
+- **A099 FIX** [chapters/10-summary/chapter.md:55](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:55)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`每个主题对应一个可检查的设计问题`
+- **A100 FIX** [chapters/10-summary/chapter.md:84](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:84)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`应用在重新开放写入口前必须确认旧写端已被隔离，新写端包含所需历史`
+- **A101 FIX** [chapters/10-summary/chapter.md:137](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:137)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`它解决数据库提交与发送消息不能自然组成原子操作的接口问题`
+- **A102 FIX** [chapters/10-summary/chapter.md:195](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:195)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`业务协议规定接下来怎样对外回应`
+- **A103 FIX** [chapters/10-summary/chapter.md:282](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:282)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`输出事务已经保存事件身份`
+- **A104 FIX** [chapters/10-summary/chapter.md:288](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:288)：已结合本轮全文上下文核对：改法修复认知/硬搭配或写作语域，不改变机制、条件、数字、来源或亲历。 最终候选：`预留结果仍由数据库事务判定`
+- **A105 ADJUST** [chapters/10-summary/chapter.md:388](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-summary/chapter.md:388)：保留‘容易放在一个事务里的’限定，否则可能把响应不变量也写成数据库单事务保证；待A/B确认。 最终候选：`本例中容易放在一个事务里的不变量由数据库维护，Kafka传递允许延后送达的事件，Redis保存可以重新加载的展示数据。`
+- **A106 ADJUST** [chapters/10-epilogue.md:5](/Users/liu/dev/demos/redis-kafka-books/20260905gpt5.6重写版/chapters/10-epilogue.md:5)：采用B49。A新‘这一层把…当成’仍是认知拟人；B用人的预期与实际行为，不新增第一人称经历。 最终候选：`对下一层的预期是已经完成，实际保证却只是收到；失败被理解为没有生效，实际操作却已经提交。`
+
+计数：{"FIX":70,"SKIP":20,"ADJUST":16}。ADJUST中引用B已有候选者，C认可该最终句。后续B已完整读本表并同意全部16项的最终句（A105按下方覆盖），A004/A075/A076也已取得B第二票。
+
+## 最终句覆盖与投票补充
+
+- A105采用A、B、C均确认的限定版：`数据库维护本例容易放在一个事务里的不变量，可延后传递的事件通过Kafka发送，Redis保存可以重新加载的展示数据。`。保留‘容易放在一个事务里的’范围，不能改成数据库维护全部不变量。
+- C14采用A、B、C均确认的版本：`连接处理使用客户端身份，SQL 层使用当前执行信息，引擎操作又需要相应事务信息。` 使用上下文不等于新增保存归属。
+- C12采用B16：`这些条件对应选择架构时实际要作的决定。` A、B、C认可；邻句继续规定成功语义和恢复责任。
+- C17采用A调整、C确认版：`安全检查需要明确当前请求从入口到数据、再到日志记录的责任，而非脱离这些责任比较哪个产品更安全。` 保留责任需要明确的判断。
+- C28采用C主体、A调整、C确认版：`这个事务不包含 Kafka 消息发送或远程服务调用；把这些操作放进事务会延长持锁时间，也不会使跨系统提交自动具有原子性。` B已认主体，末尾只补原子性的自然搭配。
+
+本文是审查票；正文仍由B唯一执行，按最终去重清单为准。

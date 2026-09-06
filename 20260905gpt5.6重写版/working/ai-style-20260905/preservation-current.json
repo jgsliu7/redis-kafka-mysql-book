@@ -1,0 +1,170 @@
+{
+  "scope": "Expression-edit preservation only; hashes do not prove semantic equivalence",
+  "units": 13,
+  "files": [
+    {
+      "file": "chapters/00-preface.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 1309,
+      "after_han": 1305
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 8304,
+      "after_han": 8290
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 8784,
+      "after_han": 8785
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 8477,
+      "after_han": 8460
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 10944,
+      "after_han": 10938
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 11101,
+      "after_han": 11083
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 9199,
+      "after_han": 9211
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 10421,
+      "after_han": 10421
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 13005,
+      "after_han": 12961
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 10609,
+      "after_han": 10585
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 10232,
+      "after_han": 10247
+    },
+    {
+      "file": "chapters/10-epilogue.md",
+      "source_changed": true,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 1216,
+      "after_han": 1217
+    },
+    {
+      "file": "chapters/11-references.md",
+      "source_changed": false,
+      "checks": {
+        "code_sha256": true,
+        "numbers_sha256": true,
+        "urls_sha256": true,
+        "inline_code_sha256": true
+      },
+      "before_han": 1949,
+      "after_han": 1949
+    }
+  ],
+  "svg_count": 57,
+  "svg_unchanged": true,
+  "changed_svg": [],
+  "existing_scripts_unchanged": true,
+  "styles_unchanged": true,
+  "original_tracked_unchanged": true,
+  "original_tracked_current": "a5017e3274c88d32bc43d9796a4d90d7f0940c414d0b7828921b07c9353bf984",
+  "passed": true
+}

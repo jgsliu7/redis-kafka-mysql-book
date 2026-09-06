@@ -1,0 +1,614 @@
+[
+  {
+    "id": "R1-01",
+    "title": "Redis 数据类型说明",
+    "url": "https://redis.io/docs/latest/develop/data-types/",
+    "line": "- **R1-01**　Redis 项目．[Redis 数据类型说明](https://redis.io/docs/latest/develop/data-types/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R1-02",
+    "title": "MySQL8.0一致性非锁定读",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html",
+    "line": "- **R1-02**　Oracle．[MySQL8.0一致性非锁定读](https://dev.mysql.com/doc/refman/8.0/en/innodb-consistent-read.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R1-03",
+    "title": "MySQL8.0多版本机制",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html",
+    "line": "- **R1-03**　Oracle．[MySQL8.0多版本机制](https://dev.mysql.com/doc/refman/8.0/en/innodb-multi-versioning.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R1-04",
+    "title": "3.9设计文档",
+    "url": "https://kafka.apache.org/39/design/design/",
+    "line": "- **R1-04**　Apache Kafka 项目．[3.9设计文档](https://kafka.apache.org/39/design/design/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-01",
+    "title": "SDS实现",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/sds.c",
+    "line": "- **R2-01**　Redis 项目．[SDS实现](https://github.com/redis/redis/blob/7.2.5/src/sds.c)．Redis 7.2.5 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-02",
+    "title": "字典实现",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/dict.c",
+    "line": "- **R2-02**　Redis 项目．[字典实现](https://github.com/redis/redis/blob/7.2.5/src/dict.c)．Redis 7.2.5 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-03",
+    "title": "Redis7.2.5集合实现",
+    "url": "https://github.com/redis/redis/blob/7.2.5/src/t_set.c",
+    "line": "- **R2-03**　Redis 项目．[Redis7.2.5集合实现](https://github.com/redis/redis/blob/7.2.5/src/t_set.c)．Redis 7.2.5 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-04",
+    "title": "MySQL8.0行格式说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html",
+    "line": "- **R2-04**　Oracle．[MySQL8.0行格式说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-05",
+    "title": "自适应哈希索引说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html",
+    "line": "- **R2-05**　Oracle．[自适应哈希索引说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-adaptive-hash.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-06",
+    "title": "Kafka3.9消息格式",
+    "url": "https://kafka.apache.org/39/implementation/message-format/",
+    "line": "- **R2-06**　Apache Kafka 项目．[Kafka3.9消息格式](https://kafka.apache.org/39/implementation/message-format/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-07",
+    "title": "RESP规范",
+    "url": "https://redis.io/docs/latest/develop/reference/protocol-spec/",
+    "line": "- **R2-07**　Redis 项目．[RESP规范](https://redis.io/docs/latest/develop/reference/protocol-spec/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-08",
+    "title": "文本结果集",
+    "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html",
+    "line": "- **R2-08**　Oracle．[文本结果集](https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html)．MySQL 协议开发资料．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-09",
+    "title": "二进制结果集",
+    "url": "https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html",
+    "line": "- **R2-09**　Oracle．[二进制结果集](https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html)．MySQL 协议开发资料．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R2-10",
+    "title": "Kafka3.9协议",
+    "url": "https://kafka.apache.org/39/design/protocol/",
+    "line": "- **R2-10**　Apache Kafka 项目．[Kafka3.9协议](https://kafka.apache.org/39/design/protocol/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-01",
+    "title": "SHUTDOWN文档",
+    "url": "https://redis.io/docs/latest/commands/shutdown/",
+    "line": "- **R3-01**　Redis 项目．[SHUTDOWN文档](https://redis.io/docs/latest/commands/shutdown/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-02",
+    "title": "MySQL8.0选项文件",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/option-files.html",
+    "line": "- **R3-02**　Oracle．[MySQL8.0选项文件](https://dev.mysql.com/doc/refman/8.0/en/option-files.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-03",
+    "title": "InnoDB恢复说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html",
+    "line": "- **R3-03**　Oracle．[InnoDB恢复说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-04",
+    "title": "innodb_fast_shutdown 参数定义",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown",
+    "line": "- **R3-04**　Oracle．[innodb_fast_shutdown 参数定义](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_fast_shutdown)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-05",
+    "title": "Kafka3.9.0 BrokerLifecycleManager",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala",
+    "line": "- **R3-05**　Apache Kafka 项目．[Kafka3.9.0 BrokerLifecycleManager](https://github.com/apache/kafka/blob/3.9.0/core/src/main/scala/kafka/server/BrokerLifecycleManager.scala)．Kafka 3.9.0 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-06",
+    "title": "探针定义",
+    "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+    "line": "- **R3-06**　Kubernetes 项目．[探针定义](https://kubernetes.io/docs/concepts/workloads/pods/probes/)．在线文档；行为范围见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R3-07",
+    "title": "容器生命周期钩子",
+    "url": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/",
+    "line": "- **R3-07**　Kubernetes 项目．[容器生命周期钩子](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)．在线文档；行为范围见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-01",
+    "title": "Redis淘汰说明",
+    "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+    "line": "- **R4-01**　Redis 项目．[Redis淘汰说明](https://redis.io/docs/latest/develop/reference/eviction/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-02",
+    "title": "Redis持久化说明",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+    "line": "- **R4-02**　Redis 项目．[Redis持久化说明](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-03",
+    "title": "WAITAOF定义",
+    "url": "https://redis.io/docs/latest/commands/waitaof/",
+    "line": "- **R4-03**　Redis 项目．[WAITAOF定义](https://redis.io/docs/latest/commands/waitaof/)．Redis 7.2 起．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-04",
+    "title": "缓冲池抗扫描说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html",
+    "line": "- **R4-04**　Oracle．[缓冲池抗扫描说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-midpoint_insertion.html)．MySQL 8.0；小版本限制见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-05",
+    "title": "redo提交策略",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit",
+    "line": "- **R4-05**　Oracle．[redo提交策略](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit)．MySQL 8.0；小版本限制见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-06",
+    "title": "binlog同步选项",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog",
+    "line": "- **R4-06**　Oracle．[binlog同步选项](https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog)．MySQL 8.0；小版本限制见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-07",
+    "title": "doublewrite说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html",
+    "line": "- **R4-07**　Oracle．[doublewrite说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)．MySQL 8.0；小版本限制见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-08",
+    "title": "change buffer说明",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html",
+    "line": "- **R4-08**　Oracle．[change buffer说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html)．MySQL 8.0；小版本限制见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-09",
+    "title": "Linux虚拟内存参数",
+    "url": "https://docs.kernel.org/admin-guide/sysctl/vm.html",
+    "line": "- **R4-09**　Linux 内核项目．[Linux虚拟内存参数](https://docs.kernel.org/admin-guide/sysctl/vm.html)．内核虚拟内存参数在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R4-10",
+    "title": "生产者配置",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/",
+    "line": "- **R4-10**　Apache Kafka 项目．[生产者配置](https://kafka.apache.org/39/configuration/producer-configs/)．Kafka 3.9．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-01",
+    "title": "Redis 客户端处理",
+    "url": "https://redis.io/docs/latest/develop/reference/clients/",
+    "line": "- **R5-01**　Redis 项目．[Redis 客户端处理](https://redis.io/docs/latest/develop/reference/clients/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-02",
+    "title": "UNLINK 命令",
+    "url": "https://redis.io/docs/latest/commands/unlink/",
+    "line": "- **R5-02**　Redis 项目．[UNLINK 命令](https://redis.io/docs/latest/commands/unlink/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-03",
+    "title": "可插拔存储引擎概述",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html",
+    "line": "- **R5-03**　Oracle．[可插拔存储引擎概述](https://dev.mysql.com/doc/refman/8.0/en/pluggable-storage-overview.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-04",
+    "title": "Query Cache 的工作方式（MySQL 5.7 历史资料）",
+    "url": "https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html",
+    "line": "- **R5-04**　Oracle．[Query Cache 的工作方式（MySQL 5.7 历史资料）](https://dev.mysql.com/doc/refman/5.7/en/query-cache-operation.html)．MySQL 5.7（历史）．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-05",
+    "title": "MySQL 8.0 新增及移除的功能",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html",
+    "line": "- **R5-05**　Oracle．[MySQL 8.0 新增及移除的功能](https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-06",
+    "title": "Kafka 协议",
+    "url": "https://kafka.apache.org/39/design/protocol/",
+    "line": "- **R5-06**　Apache Kafka 项目．[Kafka 协议](https://kafka.apache.org/39/design/protocol/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-07",
+    "title": "Kafka 设计",
+    "url": "https://kafka.apache.org/39/design/design/",
+    "line": "- **R5-07**　Apache Kafka 项目．[Kafka 设计](https://kafka.apache.org/39/design/design/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R5-08",
+    "title": "Kafka 分层存储",
+    "url": "https://kafka.apache.org/39/operations/tiered-storage/",
+    "line": "- **R5-08**　Apache Kafka 项目．[Kafka 分层存储](https://kafka.apache.org/39/operations/tiered-storage/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-01",
+    "title": "Redis 访问控制列表",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/",
+    "line": "- **R6-01**　Redis 项目．[Redis 访问控制列表](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-02",
+    "title": "ACL DRYRUN 命令",
+    "url": "https://redis.io/docs/latest/commands/acl-dryrun/",
+    "line": "- **R6-02**　Redis 项目．[ACL DRYRUN 命令](https://redis.io/docs/latest/commands/acl-dryrun/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-03",
+    "title": "Caching SHA-2 认证插件",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html",
+    "line": "- **R6-03**　Oracle．[Caching SHA-2 认证插件](https://dev.mysql.com/doc/refman/8.0/en/caching-sha2-pluggable-authentication.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-04",
+    "title": "使用 SASL 认证",
+    "url": "https://kafka.apache.org/39/security/authentication-using-sasl/",
+    "line": "- **R6-04**　Apache Kafka 项目．[使用 SASL 认证](https://kafka.apache.org/39/security/authentication-using-sasl/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-05",
+    "title": "Redis 安全机制",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/",
+    "line": "- **R6-05**　Redis 项目．[Redis 安全机制](https://redis.io/docs/latest/operate/oss_and_stack/management/security/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-06",
+    "title": "访问控制：请求验证",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/request-access.html",
+    "line": "- **R6-06**　Oracle．[访问控制：请求验证](https://dev.mysql.com/doc/refman/8.0/en/request-access.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-07",
+    "title": "部分撤销权限",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html",
+    "line": "- **R6-07**　Oracle．[部分撤销权限](https://dev.mysql.com/doc/refman/8.0/en/partial-revokes.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-08",
+    "title": "授权与 ACL",
+    "url": "https://kafka.apache.org/39/security/authorization-and-acls/",
+    "line": "- **R6-08**　Apache Kafka 项目．[授权与 ACL](https://kafka.apache.org/39/security/authorization-and-acls/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-09",
+    "title": "Redis TLS",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/",
+    "line": "- **R6-09**　Redis 项目．[Redis TLS](https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R6-10",
+    "title": "InnoDB 静态数据加密",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html",
+    "line": "- **R6-10**　Oracle．[InnoDB 静态数据加密](https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-01",
+    "title": "Brewer’s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services",
+    "url": "https://doi.org/10.1145/564585.564601",
+    "line": "- **R7-01**　Seth Gilbert、Nancy Lynch．[Brewer’s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services](https://doi.org/10.1145/564585.564601)．ACM SIGACT News, 2002, 33(2): 51–59．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-02",
+    "title": "WAIT 命令",
+    "url": "https://redis.io/docs/latest/commands/wait/",
+    "line": "- **R7-02**　Redis 项目．[WAIT 命令](https://redis.io/docs/latest/commands/wait/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-03",
+    "title": "Redis Sentinel",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/",
+    "line": "- **R7-03**　Redis 项目．[Redis Sentinel](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-04",
+    "title": "Redis Cluster 规范",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/",
+    "line": "- **R7-04**　Redis 项目．[Redis Cluster 规范](https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-05",
+    "title": "半同步复制",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html",
+    "line": "- **R7-05**　Oracle．[半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-06",
+    "title": "Group Replication",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication.html",
+    "line": "- **R7-06**　Oracle．[Group Replication](https://dev.mysql.com/doc/refman/8.0/en/group-replication.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-07",
+    "title": "组复制一致性保证",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html",
+    "line": "- **R7-07**　Oracle．[组复制一致性保证](https://dev.mysql.com/doc/refman/8.0/en/group-replication-consistency-guarantees.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-08",
+    "title": "生产者配置",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/",
+    "line": "- **R7-08**　Apache Kafka 项目．[生产者配置](https://kafka.apache.org/39/configuration/producer-configs/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-09",
+    "title": "主题配置",
+    "url": "https://kafka.apache.org/39/configuration/topic-level-configs/",
+    "line": "- **R7-09**　Apache Kafka 项目．[主题配置](https://kafka.apache.org/39/configuration/topic-level-configs/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R7-10",
+    "title": "KRaft 运维",
+    "url": "https://kafka.apache.org/39/operations/kraft/",
+    "line": "- **R7-10**　Apache Kafka 项目．[KRaft 运维](https://kafka.apache.org/39/operations/kraft/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-01",
+    "title": "Redis 7.2 RDB 类型及操作码",
+    "url": "https://github.com/redis/redis/blob/7.2/src/rdb.h",
+    "line": "- **R8-01**　Redis 项目．[Redis 7.2 RDB 类型及操作码](https://github.com/redis/redis/blob/7.2/src/rdb.h)．Redis 7.2 分支源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-02",
+    "title": "RDB 保存与加载实现",
+    "url": "https://github.com/redis/redis/blob/7.2/src/rdb.c",
+    "line": "- **R8-02**　Redis 项目．[RDB 保存与加载实现](https://github.com/redis/redis/blob/7.2/src/rdb.c)．Redis 7.2 分支源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-03",
+    "title": "RESP 规范",
+    "url": "https://redis.io/docs/latest/develop/reference/protocol-spec/",
+    "line": "- **R8-03**　Redis 项目．[RESP 规范](https://redis.io/docs/latest/develop/reference/protocol-spec/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-04",
+    "title": "Redis 持久化与多部分 AOF",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+    "line": "- **R8-04**　Redis 项目．[Redis 持久化与多部分 AOF](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-05",
+    "title": "Redis 7.2 AOF 清单及重写实现",
+    "url": "https://github.com/redis/redis/blob/7.2/src/aof.c",
+    "line": "- **R8-05**　Redis 项目．[Redis 7.2 AOF 清单及重写实现](https://github.com/redis/redis/blob/7.2/src/aof.c)．Redis 7.2 分支源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-06",
+    "title": "InnoDB 页大小配置",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size",
+    "line": "- **R8-06**　Oracle．[InnoDB 页大小配置](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_page_size)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-07",
+    "title": "InnoDB 文件空间管理",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html",
+    "line": "- **R8-07**　Oracle．[InnoDB 文件空间管理](https://dev.mysql.com/doc/refman/8.0/en/innodb-file-space.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-08",
+    "title": "InnoDB 行格式",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html",
+    "line": "- **R8-08**　Oracle．[InnoDB 行格式](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-09",
+    "title": "InnoDB 双写缓冲与文件",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html",
+    "line": "- **R8-09**　Oracle．[InnoDB 双写缓冲与文件](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-10",
+    "title": "InnoDB redo log",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html",
+    "line": "- **R8-10**　Oracle．[InnoDB redo log](https://dev.mysql.com/doc/refman/8.0/en/innodb-redo-log.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-11",
+    "title": "Kafka 3.9 设计与日志管理",
+    "url": "https://kafka.apache.org/39/design/design/",
+    "line": "- **R8-11**　Apache Kafka 项目．[Kafka 3.9 设计与日志管理](https://kafka.apache.org/39/design/design/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-12",
+    "title": "Kafka 记录格式",
+    "url": "https://kafka.apache.org/39/implementation/message-format/",
+    "line": "- **R8-12**　Apache Kafka 项目．[Kafka 记录格式](https://kafka.apache.org/39/implementation/message-format/)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-13",
+    "title": "Kafka 3.9.0 OffsetIndex",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java",
+    "line": "- **R8-13**　Apache Kafka 项目．[Kafka 3.9.0 OffsetIndex](https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/OffsetIndex.java)．Kafka 3.9.0 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-14",
+    "title": "Kafka 3.9.0 TimeIndex",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java",
+    "line": "- **R8-14**　Apache Kafka 项目．[Kafka 3.9.0 TimeIndex](https://github.com/apache/kafka/blob/3.9.0/storage/src/main/java/org/apache/kafka/storage/internals/log/TimeIndex.java)．Kafka 3.9.0 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-15",
+    "title": "KIP-405 分层存储设计",
+    "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage",
+    "line": "- **R8-15**　Apache Kafka 项目．[KIP-405 分层存储设计](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/97554472/KIP-405%2BKafka%2BTiered%2BStorage)．设计提案；采用范围见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R8-16",
+    "title": "Kafka 3.9.0 TierStateMachine",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java",
+    "line": "- **R8-16**　Apache Kafka 项目．[Kafka 3.9.0 TierStateMachine](https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java)．Kafka 3.9.0 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-01",
+    "title": "Redis 复制机制",
+    "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/",
+    "line": "- **R9-01**　Redis 项目．[Redis 复制机制](https://redis.io/docs/latest/operate/oss_and_stack/management/replication/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-02",
+    "title": "Redis 脚本复制说明",
+    "url": "https://redis.io/docs/latest/develop/programmability/eval-intro/",
+    "line": "- **R9-02**　Redis 项目．[Redis 脚本复制说明](https://redis.io/docs/latest/develop/programmability/eval-intro/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-03",
+    "title": "Redis 7.2 复制实现",
+    "url": "https://github.com/redis/redis/blob/7.2/src/replication.c",
+    "line": "- **R9-03**　Redis 项目．[Redis 7.2 复制实现](https://github.com/redis/redis/blob/7.2/src/replication.c)．Redis 7.2 分支源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-04",
+    "title": "WAIT 的范围与限制",
+    "url": "https://redis.io/docs/latest/commands/wait/",
+    "line": "- **R9-04**　Redis 项目．[WAIT 的范围与限制](https://redis.io/docs/latest/commands/wait/)．Redis 7.x 讨论基线，在线文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-05",
+    "title": "WAITAOF",
+    "url": "https://redis.io/docs/latest/commands/waitaof/",
+    "line": "- **R9-05**　Redis 项目．[WAITAOF](https://redis.io/docs/latest/commands/waitaof/)．Redis 7.2 起．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-06",
+    "title": "binlog 格式",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html",
+    "line": "- **R9-06**　Oracle．[binlog 格式](https://dev.mysql.com/doc/refman/8.0/en/binary-log-formats.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-07",
+    "title": "复制线程",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html",
+    "line": "- **R9-07**　Oracle．[复制线程](https://dev.mysql.com/doc/refman/8.0/en/replication-threads.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-08",
+    "title": "多线程副本配置",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html",
+    "line": "- **R9-08**　Oracle．[多线程副本配置](https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-09",
+    "title": "GTID 格式与存储",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html",
+    "line": "- **R9-09**　Oracle．[GTID 格式与存储](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-concepts.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-10",
+    "title": "GTID 自动定位",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html",
+    "line": "- **R9-10**　Oracle．[GTID 自动定位](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-auto-positioning.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-11",
+    "title": "半同步复制",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html",
+    "line": "- **R9-11**　Oracle．[半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-12",
+    "title": "半同步等待点与可见性",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html",
+    "line": "- **R9-12**　Oracle．[半同步等待点与可见性](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync-interface.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-13",
+    "title": "生产者 acks",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks",
+    "line": "- **R9-13**　Apache Kafka 项目．[生产者 acks](https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_acks)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-14",
+    "title": "最小 ISR 配置",
+    "url": "https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas",
+    "line": "- **R9-14**　Apache Kafka 项目．[最小 ISR 配置](https://kafka.apache.org/39/configuration/broker-configs/#brokerconfigs_min.insync.replicas)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-15",
+    "title": "KIP-101 的恢复问题与方案",
+    "url": "https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation",
+    "line": "- **R9-15**　Apache Kafka 项目．[KIP-101 的恢复问题与方案](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/67634337/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation)．设计提案；采用范围见正文．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-16",
+    "title": "3.9.0 TierStateMachine 与恢复条件",
+    "url": "https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java",
+    "line": "- **R9-16**　Apache Kafka 项目．[3.9.0 TierStateMachine 与恢复条件](https://github.com/apache/kafka/blob/3.9.0/core/src/main/java/kafka/server/TierStateMachine.java)．Kafka 3.9.0 源码．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R9-17",
+    "title": "KafkaConsumer 的位置与提交说明",
+    "url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html",
+    "line": "- **R9-17**　Apache Kafka 项目．[KafkaConsumer 的位置与提交说明](https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)．Kafka 3.9 系列 API 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-01",
+    "title": "CHECK 约束",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html",
+    "line": "- **R10-01**　Oracle．[CHECK 约束](https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-02",
+    "title": "事务性 outbox",
+    "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html",
+    "line": "- **R10-02**　Amazon Web Services．[事务性 outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)．AWS Prescriptive Guidance．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-03",
+    "title": "UPDATE 与锁",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html",
+    "line": "- **R10-03**　Oracle．[UPDATE 与锁](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-04",
+    "title": "事务提交与回滚",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/commit.html",
+    "line": "- **R10-04**　Oracle．[事务提交与回滚](https://dev.mysql.com/doc/refman/8.0/en/commit.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-10",
+    "title": "死锁处理",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html",
+    "line": "- **R10-10**　Oracle．[死锁处理](https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-05",
+    "title": "InnoDB 锁定读取",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html",
+    "line": "- **R10-05**　Oracle．[InnoDB 锁定读取](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-06",
+    "title": "Kafka 生产者幂等配置",
+    "url": "https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence",
+    "line": "- **R10-06**　Apache Kafka 项目．[Kafka 生产者幂等配置](https://kafka.apache.org/39/configuration/producer-configs/#producerconfigs_enable.idempotence)．Kafka 3.9 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-07",
+    "title": "消费者进度提交",
+    "url": "https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html",
+    "line": "- **R10-07**　Apache Kafka 项目．[消费者进度提交](https://kafka.apache.org/39/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)．Kafka 3.9 系列 API 文档．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-08",
+    "title": "InnoDB 与事务持久性",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit",
+    "line": "- **R10-08**　Oracle．[InnoDB 与事务持久性](https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit)．MySQL 8.0．[引用日期：2026-09-05]。"
+  },
+  {
+    "id": "R10-09",
+    "title": "binlog同步",
+    "url": "https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog",
+    "line": "- **R10-09**　Oracle．[binlog同步](https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_sync_binlog)．MySQL 8.0．[引用日期：2026-09-05]。"
+  }
+]
