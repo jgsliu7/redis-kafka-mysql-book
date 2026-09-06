@@ -115,7 +115,7 @@
 
 - **授权：ACL 绑定"Principal + Operation + Resource"三元组**
   - 资源类型：Topic / Group / Cluster / TransactionalId / DelegationToken。每类资源有自己的操作集（Read/Write/Create/Delete/Alter/Describe/ClusterAction/All）。
-  - 关键取舍：Kafka 原生只有 ACL，没有 RBAC。理由——流平台的主语通常是"应用/服务"而非"人"，服务身份（Principal）相对稳定，角色层收益不大；企业要 RBAC 时通常外接 Ranger/Sentry。
+  - 关键取舍：Kafka 原生只有 ACL，没有 RBAC。理由——流平台的主语通常是"应用/服务"而非"人"，服务身份（Principal）相对稳定，角色层收益不大；企业要 RBAC 时通常外接 Ranger。
   - 前缀授权（`--resource-pattern-type prefixed`）让"给 app-a 这个服务所有 app-a.* 主题的读写"一行配置完成，避免逐主题授权——这是为多租户场景设计的便利性。
   - `allow.everyone.if.no.acl.found` 默认应设 `false`：无 ACL 即拒绝，这是"默认拒绝"原则在 Kafka 上的落地，但默认值历史上是 true（向后兼容的代价），生产必须显式改。
 

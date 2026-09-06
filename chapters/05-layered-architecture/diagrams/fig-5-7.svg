@@ -47,7 +47,7 @@
   <text x="560" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL</text>
   <rect x="470" y="92" width="180" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="560" y="116" text-anchor="middle" font-size="13" fill="#111827">连接 / 认证</text>
-  <text x="560" y="136" text-anchor="middle" font-size="11" fill="#374151">thread-per-conn / 线程池</text>
+  <text x="560" y="136" text-anchor="middle" font-size="10" fill="#374151">thread-per-connection / 线程池</text>
 
   <rect x="470" y="200" width="180" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="560" y="224" text-anchor="middle" font-size="13" fill="#111827">解析 → 优化 → 执行</text>

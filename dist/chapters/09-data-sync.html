@@ -912,7 +912,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>数据放一份不够，多份就要让它们看起来像一份：Redis 用命令流、MySQL 用 binlog event、Kafka 以有序消息为载体。形式不同，底层是同一个模型：状态机复制，保证相同输入序列、相同执行顺序，副本终将一致。</p>
 <p>共性框架只有四个部件：传播单元（传什么）、位点（传到哪了）、一致性参数（传到什么程度算数）、故障恢复（断了怎么续）。</p>
 <p>一致性不是要么有要么无，而是一连串档位上的取舍。这三个软件把档位做成了参数和默认值，让使用者按延迟预算选择。</p>
-<p>导读里"缓存和数据库不一致时该以谁为准"的答案不在多副本，而在正本（source of truth）：数据库是正本、缓存是可重建的派生数据，见<a class="xref" href="10-summary.html">第 10 章</a>规律一。</p>
+<p>导读里"缓存和数据库不一致时该以谁为准"的答案不在多副本，而在正本（source of truth）：数据库是正本、缓存是可重建的派生数据。</p>
 <p>本章的状态机复制和位点对齐，是<a class="xref" href="10-summary.html">第 10 章</a>规律五的核心印证。</p><nav class="page-nav"><a href="08-storage-format.html">← 第 8 章 磁盘存储格式 — 文件结构的设计哲学</a><a href="10-summary.html">第 10 章 总结：架构设计的共性规律与取舍 →</a></nav></article>
 </main>
 </div>

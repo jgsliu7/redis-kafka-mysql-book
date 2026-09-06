@@ -53,7 +53,7 @@
   <!-- Stage 6: 存储加密 -->
   <rect x="610" y="250" width="110" height="60" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="665" y="278" text-anchor="middle" font-size="14" fill="#111827" font-weight="600">存储加密</text>
-  <text x="665" y="296" text-anchor="middle" font-size="11" fill="#374151">TDE / 落盘</text>
+  <text x="665" y="296" text-anchor="middle" font-size="11" fill="#374151">落盘加密</text>
 
   <!-- arrow down to disk -->
   <line x1="665" y1="310" x2="665" y2="348" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
@@ -77,7 +77,7 @@
   <text x="805" y="348" text-anchor="middle" font-size="10" fill="#92400E">的旁路记录</text>
 
   <!-- Audit arrows from pipeline to audit box (dashed) -->
-  <line x1="720" y1="180" x2="758" y2="180" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <line x1="712" y1="180" x2="758" y2="180" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
   <line x1="720" y1="280" x2="758" y2="280" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
 
   <!-- Legend / four-dimension labels under pipeline -->

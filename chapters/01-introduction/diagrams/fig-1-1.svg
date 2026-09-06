@@ -101,8 +101,8 @@
   <!-- 数据流标注 -->
   <text x="208" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">读</text>
   <text x="362" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
-  <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发布</text>
-  <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
+  <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发</text>
+  <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消</text>
 
   <!-- 底部结论 -->
   <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>

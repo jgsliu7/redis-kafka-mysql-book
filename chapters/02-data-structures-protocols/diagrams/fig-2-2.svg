@@ -11,10 +11,10 @@
 
 
   <!-- 层标签 -->
-  <text x="42" y="124" font-size="12" fill="#6B7280">第 3 层</text>
-  <text x="42" y="199" font-size="12" fill="#6B7280">第 2 层</text>
-  <text x="42" y="274" font-size="12" fill="#6B7280">第 1 层</text>
-  <text x="42" y="290" font-size="10" fill="#9CA3AF">完整链表</text>
+  <text x="30" y="124" font-size="12" fill="#6B7280">第 3 层</text>
+  <text x="30" y="199" font-size="12" fill="#6B7280">第 2 层</text>
+  <text x="30" y="274" font-size="12" fill="#6B7280">第 1 层</text>
+  <text x="30" y="290" font-size="10" fill="#9CA3AF">完整链表</text>
 
   <!-- ===== 竖向 tower 连线（同一节点跨层，浅灰）===== -->
   <g stroke="#9CA3AF" stroke-width="1" stroke-dasharray="2 2">

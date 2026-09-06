@@ -234,8 +234,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <text x="208" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">读</text>
   <text x="362" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
-  <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发布</text>
-  <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消费</text>
+  <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发</text>
+  <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消</text>
 
   
   <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
@@ -284,11 +284,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <div class="table-wrap"><table id="table-1-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而写</td><td>1995，MySQL AB，经 Sun 入 Oracle，长期主流的关系库</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>延迟让位于一致性</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
 <p>把这种"追求的东西不同"画成一张雷达图——低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度一摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致、数据容量与查询灵活三个维度领先，Kafka 在高吞吐维度领先。没有谁能占满五个角。<a class="xref" href="#fig-1-1">图 1-1</a> 里每家标的那行"舍弃"，说的就是这个。</p>
 <figure class="fig" id="fig-1-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 90 880 530" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-  <defs>
-    <marker id="fig_1_2_arrow-1-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
-    </marker>
-  </defs>
 
   
 

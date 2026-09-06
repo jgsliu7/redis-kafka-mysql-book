@@ -4,8 +4,8 @@
     <marker id="arr47" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
     </marker>
-    <marker id="arr47g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    <marker id="arr47a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
     </marker>
     <marker id="arr47r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
@@ -13,7 +13,7 @@
   </defs>
 
   <!-- ===== 左侧：消费者场景 ===== -->
-  <text x="180" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">场景 A：消费者拉历史数据</text>
+  <text x="180" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">场景 A：消费者按 offset 拉取</text>
 
   <rect x="60" y="100" width="120" height="38" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.3"/>
   <text x="120" y="124" text-anchor="middle" font-size="12" fill="#111827">Consumer</text>
@@ -63,7 +63,7 @@
   <text x="185" y="388" text-anchor="middle" font-size="10" fill="#6B7280">LogSegment + 稀疏索引</text>
 
   <rect x="300" y="352" width="190" height="44" rx="6" fill="#FFFFFF" stroke="#6EE7B7" stroke-width="1.3"/>
-  <text x="395" y="372" text-anchor="middle" font-size="12" fill="#111827">命中页缓存 page cache</text>
+  <text x="395" y="372" text-anchor="middle" font-size="12" fill="#111827">命中页缓存（PageCache）</text>
   <text x="395" y="388" text-anchor="middle" font-size="10" fill="#6B7280">消费多优先走内存</text>
 
   <rect x="510" y="352" width="260" height="44" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
@@ -71,12 +71,12 @@
   <text x="640" y="388" text-anchor="middle" font-size="10" fill="#374151">磁盘→页缓存→网卡，跳过用户态</text>
 
   <line x1="280" y1="374" x2="298" y2="374" stroke="#4B5563" stroke-width="1.3" marker-end="url(#arr47)"/>
-  <line x1="490" y1="374" x2="508" y2="374" stroke="#D97706" stroke-width="1.4" marker-end="url(#arr47)"/>
+  <line x1="490" y1="374" x2="508" y2="374" stroke="#D97706" stroke-width="1.4" marker-end="url(#arr47a)"/>
 
   <!-- 返回响应 -->
   <rect x="90" y="408" width="680" height="44" rx="6" fill="#FFFBEB" stroke="#EF4444" stroke-width="1.5"/>
   <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW + LEO（日志末尾）</text>
-  <text x="430" y="445" text-anchor="middle" font-size="11" fill="#6B7280">响应路径同样共享；Follower 用 HW 推进自己的副本位置</text>
+  <text x="430" y="445" text-anchor="middle" font-size="11" fill="#6B7280">响应路径同样共享</text>
 
   <!-- 响应箭头回到两侧 ReplicaManager（沿画布外侧绕行，箭头指回框侧边中点 y=260） -->
   <path d="M 90 420 L 40 420 L 40 260 L 58 260" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arr47r)"/>
