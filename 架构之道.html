@@ -5829,7 +5829,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 9-4　backlog 滑动窗口：主从各持一个字节位点，offset 在窗口内即可增量补差，否则全量。</figcaption></figure>
 <p>backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。窗口越大，能容忍越长时间的断线（典型场景：副本做一次短暂的 GC 或网络抖动），但主节点要常驻更多内存。这是个按业务调的参数：大流量实例把它调到几十 MB 甚至上百 MB 很常见，目的是让常见的短断线都走部分重同步，避免动辄全量。</p>
-<p>窗口盖住断线，不代表断点之后能立刻追平。设落后量为 B 字节，副本的有效处理速率为 C，主节点同期的写入速率为 W，只有 C 大于 W，副本才有净追赶能力，在速率恒定的假设下，追赶耗时粗略为 <code>B/(C-W)</code>：比如落后 120MB、每秒净追赶 2MB，约一分钟追完。C 小于 W 时，副本越落越远，调大 backlog 只能延后问题。前面关键数字框算的覆盖时长，管的是数据还在不在；这道减法管的是追不追得上，两个预算要分开算。</p>
+<p>窗口盖住断线，不代表断点之后能立刻追平。设落后量为 B 字节，副本的有效处理速率为 C，主节点同期的写入速率为 W，只有 C 大于 W，副本才有净追赶能力，在速率恒定的假设下，追赶耗时粗略为 <code>B/(C-W)</code>：比如落后 120MB、每秒净追赶 2MB，约一分钟追完。C 小于 W 时，副本越落越远，调大 backlog 只能延后问题。前面关键数字框算的覆盖时长，管的是数据还在不在；这里的追赶耗时，管的是追不追得上。两个预算要分开算。</p>
 <p>故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步。这放宽了老 PSYNC"主节点更换必然触发全量"的限制。PSYNC2 不只比较字节进度，也把"这段进度属于哪一任主节点"纳入判断。</p>
 <h3 id="s215">关键取舍：把同步强度做成可写门槛</h3>
 <p>Redis 默认偏 AP，但它给了一个弱保证参数：<code>min-replicas-to-write N</code> + <code>min-replicas-max-lag T</code>。这条规则的意思是：主节点接受写入的前提是至少有 N 个副本在线（连接存活），且这些副本在最近 T 秒内向主节点发过 REPLCONF ACK 心跳（主节点上对每个副本记录 <code>server.unixtime - repl_ack_time ≤ T</code>，即距离上次心跳的秒数）。<code>master_repl_offset - replica_offset</code> 是字节进度差，用于 INFO 监控，不是 <code>min-replicas-max-lag</code> 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。</p>
