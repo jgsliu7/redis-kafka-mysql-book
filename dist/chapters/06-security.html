@@ -130,7 +130,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我自己对安全的态度是被一次安全事件扭过来的。早年在测试环境跑 Redis 没设密码，某天发现 <code>KEYS *</code> 返回来一堆不认识的东西：一个爬虫脚本扫到了公网 IP 上的 6379 端口，把我们的实例当成了免费缓存。好在只是测试环境。真正该记住的是那个事实：一个不加认证的 6379 端口挂到公网，当天就会被扫到。</p>
 <h2 id="sec-6.1">6.1 问题的本质</h2>
 <p>在看三个软件的实现之前，先把"数据系统的安全"抽象成一个共性问题。任何一个面向多用户的数据系统，四个层面都要做防护。</p>
-<p>第一个是<strong>认证（Authentication）</strong>，确认"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。第二个是<strong>授权（Authorization）</strong>，界定"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。第三个是<strong>加密（Encryption）</strong>，分为传输加密和存储加密：传输加密保证机密性与完整性在路上不被破坏，存储加密保证数据落盘后即使磁盘被盗也无法直接读取。第四个是<strong>审计（Audit）</strong>，对应的问题是"事后能否查清谁在什么时候做了什么"，是合规取证和事后复盘的依据。这四个层面在一次"客户端发起请求到数据落盘"的链路上各覆盖一段。</p>
+<p>第一个是<strong>认证（Authentication）</strong>，确认"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。第二个是<strong>授权（Authorization）</strong>，界定"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。第三个是<strong>加密（Encryption）</strong>，分为传输加密和存储加密：传输加密保证机密性与完整性在路上不被破坏，存储加密保证数据落盘后即使磁盘被盗也无法直接读取。第四个是<strong>审计（Audit）</strong>，对应的问题是"事后能否查清谁在什么时候做了什么"，是合规取证和事后复盘的依据。这四个层面在一次"客户端发起请求到数据落盘"的链路上各覆盖一段，审计则贯穿全程。</p>
 <p><a class="xref" href="#fig-6-1">图 6-1</a> 把四维模型落在一次请求链路上，展示了各自的分工。</p>
 <figure class="fig" id="fig-6-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 108 880 352" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -228,12 +228,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <text x="225" y="138" text-anchor="middle" font-size="10" fill="#EF4444" font-weight="600">数据流方向 →</text>
 </svg>
-</div><figcaption>图 6-1　从客户端发起请求到数据落盘，认证、授权、加密、审计各覆盖链路中的一段。</figcaption></figure>
-<p>客户端的请求先穿过传输加密建立的 TLS 隧道，进入服务端后由认证确认身份，由授权界定这条命令或 SQL 能不能执行，执行结果写入磁盘时由存储加密保护，而整个过程的关键事件由审计留痕。四维在一条请求上依次衔接，任何一段缺位都构成漏洞。</p>
+</div><figcaption>图 6-1　从客户端发起请求到数据落盘，认证、授权、加密各覆盖链路中的一段，审计以旁路贯穿全程。</figcaption></figure>
+<p>客户端的请求先穿过传输加密建立的 TLS 隧道，进入服务端后由认证确认身份，由授权界定这条命令或 SQL 能不能执行，执行结果写入磁盘时由存储加密保护，而整个过程的关键事件由审计留痕。四维在一条请求上依次接力，缺了哪一段，攻击面就开在哪一段。</p>
 <p>数据系统和普通的 Web 应用在安全上有几个特殊约束。一是<strong>长连接加高频小操作</strong>。Redis 单条 GET、MySQL 单条主键查询的耗时在亚毫秒级，如果每条操作都走完整的认证握手，性能会被拖垮。于是它们都在"会话级认证一次、每操作级授权一次"的模型上做缓存与简化。二是<strong>多租户共享存储</strong>。同一个 Redis 实例、同一个 MySQL 实例、同一个 Kafka 集群往往承载多个应用的不同键、表、主题，授权必须做到细粒度的资源隔离。三是<strong>复制与分布式协调</strong>。主从之间、Broker 之间、Broker 与 KRaft 控制面之间也要互相认证，身份不止"客户端对服务端"这一种，节点对节点、控制面对数据面都要做身份认证。</p>
 <p>这三个软件因先天约束差异，走出了不同的安全路线。Redis 的内核追求极简和单核十万级 QPS（小包 GET/SET 场景），因为长期假设部署在内网，安全特性一直往后排。MySQL 面向企业市场，权限模型从第一天就追求列级、多层级、可审计。Kafka 天生分布式、多跳通信，安全设计必须可组合，于是它选了 SASL（Simple Authentication and Security Layer，简单认证与安全层）框架加监听器分层这条路。这些差异本章稍后会做系统对比。</p>
 <h2 id="sec-6.2">6.2 认证</h2>
-<p>认证是安全的第一步：在客户端执行任何操作之前，系统必须确认"你是谁"。Redis 内网里一个共享密码就够，MySQL 要按账号、来源、插件把认证做成体系，Kafka 则因为多跳，必须在每一跳都重新认证一次。</p>
+<p>认证是安全的第一步：在客户端执行任何操作之前，系统必须确认"你是谁"。Redis 内网里一个全局密码就够，MySQL 要按账号、来源、插件把认证做成体系，Kafka 则因为多跳，认证没法一次做完。</p>
 <h3 id="s124">Redis：从全局密码到 ACL 用户</h3>
 <p>Redis 的安全演进路径是安全让位于性能、之后再按需补回。它把性能和极简内核摆在第一位，直到 6.0 才一次性补上 ACL 和 TLS。这条演进路径本身就是选型时该记的。</p>
 <p>6.0 之前的 Redis 只有一个 <code>requirepass</code> 全局密码，所有客户端共享，无法区分身份。这是"安全让位给极简内核"的取舍：内核不知道调用者是谁，只校验一个共享口令。这种模型在内网可信环境里够用，但一旦 Redis 被错误地暴露到公网，攻击者拿到密码就等于拿到最高权限，历史上未授权 Redis 写 SSH 公钥、写定时任务导致远程代码执行（RCE）的案例非常多见。</p>
@@ -245,7 +245,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>凭证存储上，密码以 SHA-256 摘要形式存（通过 <code>ACL SAVE</code> 持久化到 <code>aclfile</code> 指定的文件，默认无 aclfile 需显式设置；运行时改完可用 <code>ACL LOAD</code> 重新加载），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。</p>
 <h3 id="s125">MySQL：可插拔认证插件是核心抽象</h3>
 <p>MySQL 面向企业市场，从早期就把安全纳入了核心设计：强密码、多层级权限、可审计、可插拔认证。它的安全设计绕不开两点：层级权限表和可插拔认证。</p>
-<p>MySQL 的用户身份由 <code>用户名@主机名</code> 两部分组成，主机名是身份的一部分。它让 MySQL 天生支持"同一个账号在不同来源有不同密码和权限"，这是企业级多来源接入（办公网、VPN、应用网段、跳板机）的现实需求。</p>
+<p>MySQL 的用户身份由 <code>用户名@主机名</code> 两部分组成，主机名是身份的一部分。这种两部分身份让 MySQL 天生支持"同一个账号在不同来源有不同密码和权限"，这是企业级多来源接入（办公网、VPN、应用网段、跳板机）的现实需求。</p>
 <p>MySQL 从 8.0.4 起把默认认证插件从老的 <code>mysql_native_password</code> 改成了 <code>caching_sha2_password</code>（8.0 系列中后段默认即此，老客户端常因不支持而需要显式回退）。新插件用 SHA-256 哈希，首次连接走完整的挑战—响应握手，之后服务端把哈希结果缓存在内存里，后续连接走快路径。缓存让长连接场景下的高频认证不再成为瓶颈，但缓存失效（改密码、重启）会触发重新走慢路径。MySQL 不像 Redis 那样把认证做成轻量模型，正是因为它的用户量和接入复杂度要求认证逻辑足够灵活。</p>
 <p>可插拔是更深的设计。认证逻辑与协议解耦，认证变成一个可替换的插件：<code>auth_socket</code> 让本机进程免密登录、<code>authentication_pam</code> 对接企业 PAM、<code>authentication_ldap_simple</code> 对接 LDAP 目录、<code>sha256_password</code> 提供无缓存的高安全选项。把身份验证外包给最合适的子系统，这与<a class="xref" href="05-layered-architecture.html">第 5 章</a>讲过的"可插拔存储引擎"是同一种思路：核心保留扩展点，把变化的部分留给插件。TLS 的协商嵌在握手包里，配合 <code>REQUIRE SSL</code>、<code>REQUIRE X509</code> 或指定证书主题字段，可以做到账号级强制加密。</p>
 <h3 id="s126">Kafka：SASL 框架加 JAAS 配置</h3>
@@ -254,7 +254,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制（RFC 5802）：客户端要持有密码本身，但密码从不上网——客户端用密码加上服务端下发的盐和双方的随机数算出证明，服务端用自己存的加盐迭代哈希派生密钥来验证，服务端被拖库也拿不到明文密码。相比 PLAIN 机制（密码本身要在网络上走一趟，SASL 之下靠 TLS 兜底），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。这是分布式"身份传递"问题的标准解。</p>
-<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密），对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）；受信内网若要省 CPU，也可以把某一档配成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让你按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
+<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：内部走 <code>SASL_SSL</code>（强制认证加加密），对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省）；受信内网若要省 CPU，也可以把某一档配成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让运维按网络域给不同端口配不同协议。这是"按网络域分级信任"的设计，<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
 <figure class="fig" id="fig-6-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -355,7 +355,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="30" y="515" width="820" height="52" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="440" y="535" text-anchor="middle" font-size="12" fill="#374151">设计要点：同一进程多监听器并存，每条路径独立配置协议、端口、证书与 advertised 域名 → 按网络域分级信任。</text>
-  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；但任何一段明文都是漏洞，故副本同步、控制面、客户端三跳都必须独立 TLS。</text>
+  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；副本同步、控制面、客户端三跳都必须独立 TLS。</text>
 </svg>
 </div><figcaption>图 6-2　内部 SASL_SSL、外部 SASL_SSL、控制面 KRaft 三条路径并行，按网络域分级信任。</figcaption></figure>
 <p>这套分层的代价是配置矩阵成倍增长：每个监听器都要独立配协议、端口、证书与 <code>advertised.listeners</code>，配置项随监听器数乘 Broker 数增长。生产环境最常见的故障也出在这里——客户端从 bootstrap 地址拿到的 advertised 主机名不属于自己所在的网络域，连接建不起来。应对是把每个域的监听器配置固化成模板、证书按域独立签发与轮转，让"哪个域用哪套配置"成为一份可审计的清单。这份复杂度换来的是：每段链路的认证与加密可以按它面对的网络域单独定级。</p>
@@ -445,7 +445,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="20" y="500" width="840" height="48" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">认证一次绑定到会话；之后每条命令都过"命令类别（@read/@write/@dangerous…）× 键模式（~keys:*）"二维检查。</text>
-  <text x="440" y="538" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 唯一的轻量审计来源。</text>
+  <text x="440" y="538" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 主要的轻量审计来源。</text>
 </svg>
 </div><figcaption>图 6-3　会话级认证一次，每条命令都走"命令类别加键模式"二维授权检查。</figcaption></figure>
 <p>连接建立时客户端先用 <code>AUTH alice &lt;密码&gt;</code> 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice。这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查：服务端根据当前用户绑定的规则，分别检查命令类别（GET 属于 @read）和键模式（<code>keys:1</code> 匹配 <code>~keys:*</code>）两个维度，两项都命中才放行。图中 alice 执行 <code>GET keys:1</code> 通过，但执行 <code>FLUSHALL</code> 会被拒绝：<code>FLUSHALL</code> 属于 @dangerous，alice 的规则里没有授予。</p>
@@ -557,7 +557,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，按"账号加库表"组织成权限 bitmap，命中即 O(1)。</text>
   <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>
-</div><figcaption>图 6-4　授权检查从全局到列逐层收窄，命中即停；细粒度优先于粗粒度。</figcaption></figure>
+</div><figcaption>图 6-4　五级权限逐层收窄的检查路径，命中即停。</figcaption></figure>
 <p>一条 <code>SELECT phone FROM db.users</code> 要先查全局权限表（是否对该账号授予了全库权限），未命中再查数据库级、表级，最后到列级（phone 这一列有没有 SELECT）。这种"逐层收窄、命中即停"的设计有一个直接代价：层级越细检查越慢。MySQL 的应对是在启动时把授权表整表载入内存，按"账号加库表"组织成位图（bitmap）化的权限结构，授权检查在绝大多数热路径上就变成一次内存查询。</p>
 <p>8.0 才补齐 RBAC 角色系统，支持 <code>CREATE ROLE</code>、<code>GRANT role TO user</code>、会话级 <code>SET ROLE</code>。MySQL 已有的权限矩阵很复杂，用户量级也大，引入角色必须兼顾"不破坏已有 GRANT 语义"，因此它的做法是"角色等于一组权限的命名集合加会话激活"。这是一种务实的兼容优先：新能力叠加在老模型上，老应用零迁移。</p>
 <p>权限语义按风险分四类：数据操作（DML，包括 SELECT、INSERT、UPDATE、DELETE）、结构变更（DDL，包括 CREATE、ALTER、DROP，更危险）、管理（SUPER、PROCESS、FILE、RELOAD，高度敏感）、复制（REPLICATION SLAVE、REPLICATION CLIENT，专用于复制拓扑）。这种按风险归类的命名本身就是安全设计：它让 DBA 一眼能看出哪些权限该谨慎授予。注意：FILE 权限能读写服务器文件系统，配合 SQL 注入可读任意文件，是高敏权限的典型。</p>
@@ -576,7 +576,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>存储加密让 MySQL 区别于另外两款。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS（注意这是发行版的边界：社区版自带的只有文件型 keyring_file 插件，能对接 Vault/KMS 的 keyring 插件均属企业版）。TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点：密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。</p>
 <p>redo log 与 undo log 的加密（<code>innodb_redo_log_encrypt</code> / <code>innodb_undo_log_encrypt</code>）自 8.0.1 起就支持，binlog 与 relay log（中继日志）的加密（<code>binlog_encryption</code>）自 8.0.14 起支持。表加密了，但日志明文写在磁盘上，攻击者仍能从日志里拼出敏感数据。日志加密补上了这个缺口。</p>
 <h3 id="s134">Kafka：TLS 覆盖所有通信路径</h3>
-<p>Kafka 的加密范围比单机系统广得多。客户端到 Broker、Broker 到 Broker（副本同步）、Broker 到控制面（KRaft 元数据）都要 TLS，任何一段明文都是漏洞。这是分布式纵深防御的硬要求，也是 Kafka 加密配置比 Redis、MySQL 复杂的根本原因：你要同时管好几条 TLS 通道。</p>
+<p>Kafka 的加密范围比单机系统广得多。客户端到 Broker、Broker 到 Broker（副本同步）、Broker 到控制面（KRaft 元数据）都要 TLS。这是分布式纵深防御的硬要求，也是 Kafka 加密配置比 Redis、MySQL 复杂的根本原因：你要同时管好几条 TLS 通道。</p>
 <p>性能代价也大。副本同步是大流量长连接，TLS 加解密对吞吐影响明显。要分清这笔开销的来源：长连接稳态下的吞吐损失几乎全部来自记录层的对称加解密（AES-GCM 等 AEAD 套件），和证书用 RSA 还是 ECDSA 无关；证书算法只影响握手阶段的签名运算，而长连接的握手一次摊薄，收益可以忽略。ECDSA 的价值在握手密集的场景（短连接、频繁建连）：握手更快、证书链更小。优化手段因此分别针对这些来源：用硬件指令（AES-NI）降低对称加解密成本、启用 TLS 会话恢复（session resumption，避免重复握手）、在专用硬件上做加密卸载。内部通信和外部通信还可以用不同监听器配不同证书，做到"内网互信证书加外网 CA 签发证书"分层，既省内部开销又保外部严格。</p>
 <h2 id="sec-6.5">6.5 审计</h2>
 <p>把认证、授权、加密、审计排个优先级，审计在三个软件里排在最后。审计的每一分细致都是用吞吐换的。</p>
@@ -600,10 +600,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我做安全评审先看两件事：默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。</p>
 <p><strong>原则</strong>：默认安全取决于部署环境。面向公网的服务应默认收紧，内部工具可以更开放。</p>
 <h3 id="s140">启示二：纵深防御，每层都有一点性能开销</h3>
-<p>把安全做成多层叠加：网络隔离、传输加密、认证、授权、审计、存储加密。任何一层单独突破都不致命，攻击者要拿走数据必须同时攻破多层。代价是每一层都有开销：TLS 握手多一到两个 RTT、授权检查每条操作都走一次、审计带来额外 I/O、存储加密吃 CPU。它们都接受这笔多层叠加的代价，而非只靠某一层（比如只靠网络隔离）。</p>
+<p>把安全做成多层叠加：网络隔离、传输加密、认证、授权、审计、存储加密。任何一层单独突破都不致命，攻击者要拿走数据必须同时攻破多层。代价是每一层都有开销：TLS 握手多一到两个 RTT、授权检查每条操作都走一次、审计带来额外 I/O、存储加密吃 CPU。三家都选了多层叠加，没有谁只押网络隔离一层。</p>
 <p>我评审一套系统的安全设计，先数它有几层：只押一层的方案，无论多厚，我都打回。</p>
 <h3 id="s141">启示三：最小权限原则可以落成可操作规则</h3>
-<p>它们都支持并推荐最小权限：每个应用独立账号、只授必要命令或操作、限定键或表或主题范围、定期审查。实现手段各不相同：Redis 用键模式隔离、MySQL 用角色加列权限、Kafka 用前缀授权，但原则一致。反模式也一致：用超级用户跑应用、授予 ALL 权限"以防万一"、密码硬编码、长期不轮换。在评审一个系统的安全时，"是否每个应用都有独立的最小权限账号"这个检查项花力气最少，也最见效果。</p>
+<p>三家都支持并推荐最小权限：每个应用独立账号、只授必要命令或操作、限定键或表或主题范围、定期审查。实现手段各不相同：Redis 用键模式隔离、MySQL 用角色加列权限、Kafka 用前缀授权，但原则一致。反模式也一致：用超级用户跑应用、授予 ALL 权限"以防万一"、密码硬编码、长期不轮换。对照这几条做检查，花力气最少，也最见效果。</p>
 <h3 id="s142">启示四：分布式身份传递是单机安全没有的新问题</h3>
 <p>单机系统的安全模型是"认证一次、授权每操作"，这个模型在分布式多跳下不够用。Kafka 的委托令牌、服务账户、代理传递三种方案各有取舍：委托令牌短期有效但需要刷新机制；服务账户丢弃了原始客户端身份；代理传递依赖服务之间的信任。任何分布式系统的安全设计，都要额外面对一个问题："身份如何在跳与跳之间安全传递且不被伪造"。这个问题在 Redis、MySQL 这种单进程系统里根本不存在，但在 Kafka、在微服务网格、在任何跨服务调用里都是头等难题。</p>
 <h3 id="s143">启示五：抽象层的厚度与协作复杂度成正比</h3>

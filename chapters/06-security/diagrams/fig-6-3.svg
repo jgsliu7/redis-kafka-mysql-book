@@ -79,5 +79,5 @@
   <!-- Footer note -->
   <rect x="20" y="500" width="840" height="48" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">认证一次绑定到会话；之后每条命令都过"命令类别（@read/@write/@dangerous…）× 键模式（~keys:*）"二维检查。</text>
-  <text x="440" y="538" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 唯一的轻量审计来源。</text>
+  <text x="440" y="538" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 主要的轻量审计来源。</text>
 </svg>

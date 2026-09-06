@@ -69,6 +69,6 @@
   <rect x="40" y="490" width="800" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="514" font-size="13" font-weight="700" fill="#111827">为什么 MySQL 启动比 Redis 慢</text>
   <text x="60" y="536" font-size="12" fill="#374151">崩溃恢复分两步：redo 重放（roll forward）先无差别补回所有页修改，恢复出崩溃瞬间的物理页状态；</text>
-  <text x="60" y="554" font-size="12" fill="#374151">undo 回滚（roll back）再根据提交状态撤掉未提交事务，恢复出严格的 ACID 中 A（原子性）与 D（持久性）。</text>
+  <text x="60" y="554" font-size="12" fill="#374151">undo 回滚（roll back）再根据提交状态撤掉未提交事务：redo 兑现 D（持久性），undo 兑现 A（原子性）。</text>
   <text x="60" y="572" font-size="12" fill="#374151">红色箭头 = 数据恢复 / 回滚的数据流方向。</text>
 </svg>

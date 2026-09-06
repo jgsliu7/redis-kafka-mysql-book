@@ -10,12 +10,12 @@
   <!-- Redis RESP -->
   <rect x="20" y="50" width="270" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="155" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis RESP</text>
-  <text x="155" y="97" text-anchor="middle" font-size="11" fill="#374151">文本协议 · 5 种前缀字符</text>
+  <text x="155" y="97" text-anchor="middle" font-size="11" fill="#374151">文本协议 · 5 种前缀字符（RESP2）</text>
 
   <rect x="20" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-  <text x="155" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求示例：SET key val</text>
+  <text x="155" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求示例：SET key value</text>
   <rect x="40" y="156" width="230" height="74" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
-  <text x="155" y="176" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF"><tspan x="155">*3</tspan><tspan x="155" dy="17">$3 SET</tspan><tspan x="155" dy="17">$3 key</tspan><tspan x="155" dy="17">$3 val</tspan></text>
+  <text x="155" y="176" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF"><tspan x="155">*3</tspan><tspan x="155" dy="17">$3 SET</tspan><tspan x="155" dy="17">$3 key</tspan><tspan x="155" dy="17">$5 value</tspan></text>
   <text x="155" y="246" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">响应示例：OK</text>
   <rect x="40" y="252" width="230" height="18" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
   <text x="155" y="265" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">+OK</text>
@@ -35,7 +35,7 @@
   <rect x="325" y="192" width="230" height="28" rx="4" fill="#FEF3C7" stroke="#FCD34D" stroke-width="0.8"/>
   <text x="440" y="212" text-anchor="middle" font-size="11" font-family="monospace" fill="#92400E">EXECUTE(id + params)</text>
   <rect x="325" y="226" width="230" height="28" rx="4" fill="#FEF3C7" stroke="#FCD34D" stroke-width="0.8"/>
-  <text x="440" y="246" text-anchor="middle" font-size="11" font-family="monospace" fill="#92400E">二进制列式结果集</text>
+  <text x="440" y="246" text-anchor="middle" font-size="11" font-family="monospace" fill="#92400E">二进制结果集</text>
 
   <rect x="315" y="285" width="250" height="20" rx="3" fill="#ECFDF5"/>
   <text x="440" y="300" text-anchor="middle" font-size="11" fill="#065F46">紧凑高效 · 人不可读 · 省带宽</text>
@@ -50,7 +50,7 @@
   <rect x="610" y="158" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>
   <text x="725" y="178" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">api_key=0 api_version=9</text>
   <rect x="610" y="192" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>
-  <text x="725" y="212" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">correlation_id=42</text>
+  <text x="725" y="212" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">correlation_id=42 client_id="p1"</text>
   <rect x="610" y="226" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>
   <text x="725" y="246" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">+ Request Body (RecordBatch)</text>
 
@@ -71,14 +71,14 @@
   <text x="420" y="408" font-size="11" fill="#374151">紧凑二进制（整数+长度前缀）</text>
   <text x="650" y="408" font-size="11" fill="#374151">二进制请求头 + 变长体</text>
 
-  <text x="60" y="430" font-size="11" fill="#374151">批量</text>
+  <text x="60" y="430" font-size="11" fill="#374151">批量/复用</text>
   <text x="200" y="430" font-size="11" fill="#374151">Pipeline（多条独立）</text>
   <text x="420" y="430" font-size="11" fill="#374151">预编译语句（解析复用）</text>
   <text x="650" y="430" font-size="11" fill="#374151">RecordBatch（单包批量）</text>
 
   <text x="60" y="452" font-size="11" fill="#374151">演进</text>
-  <text x="200" y="452" font-size="11" fill="#374151">手工约定</text>
-  <text x="420" y="452" font-size="11" fill="#374151">能力标志位（握手交换）</text>
+  <text x="200" y="452" font-size="11" fill="#374151">手工约定（6.0 前）→ HELLO</text>
+  <text x="420" y="452" font-size="11" fill="#374151">能力标志（握手交换）</text>
   <text x="650" y="452" font-size="11" fill="#374151">api_version（每种请求独立）</text>
 
   <text x="60" y="474" font-size="11" fill="#374151">人可读</text>

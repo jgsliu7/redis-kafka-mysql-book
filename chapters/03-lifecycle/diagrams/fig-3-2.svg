@@ -61,10 +61,10 @@
 
   <!-- bottom note -->
   <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">用信号触发优雅关闭（Unix 服务经典范式）</text>
+  <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">启动期注册的信号处理器（Unix 服务经典范式）</text>
   <text x="80" y="432" font-size="12.5" fill="#374151">SIGTERM / SIGINT　→　触发优雅关闭（不是立即终止）</text>
   <text x="80" y="452" font-size="12.5" fill="#374151">SIGPIPE　　　　　→　忽略（避免写已关闭连接导致进程被杀）</text>
-  <text x="80" y="472" font-size="12.5" fill="#374151">SIGCHLD　　　　　→　回收 RDB / AOF 子进程</text>
+  <text x="80" y="472" font-size="12.5" fill="#374151">子进程退出　　　→　不靠信号，serverCron 轮询 waitpid(WNOHANG) 回收</text>
   <text x="80" y="500" font-size="12.5" fill="#374151">Redis 把信号当作“操作系统请求我优雅退出”的协商，而非被暴力杀死。</text>
   <text x="80" y="524" font-size="12.5" fill="#374151">启动整体顺序：配置 → 基础设施 → 数据恢复 → 事件循环（依赖先行）。</text>
 </svg>

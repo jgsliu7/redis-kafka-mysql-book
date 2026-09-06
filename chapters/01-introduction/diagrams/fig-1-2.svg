@@ -22,7 +22,7 @@
     <line x1="300" y1="330" x2="490.2" y2="268.2"/>
     <line x1="300" y1="330" x2="417.6" y2="491.8"/>
     <line x1="300" y1="330" x2="182.4" y2="491.8"/>
-    <line x1="300" y1="330" x2="126.2" y2="273.5"/>
+    <line x1="300" y1="330" x2="109.8" y2="268.2"/>
   </g>
 
   <!-- 刻度数字（在顶部轴上标 1/3/5） -->
@@ -39,7 +39,7 @@
   <g font-size="13" font-weight="700" fill="#111827" text-anchor="middle">
     <text x="300.0" y="112">低延迟</text>
     <text x="528" y="265">高吞吐</text>
-    <text x="442" y="514">强一致性</text>
+    <text x="442" y="514">强一致</text>
     <text x="158" y="514">数据容量</text>
     <text x="72" y="265">查询灵活度</text>
   </g>
@@ -125,7 +125,7 @@
     <text x="788" y="288" text-anchor="middle">2</text>
     <text x="832" y="288" text-anchor="middle" font-weight="700" fill="#059669">5</text>
 
-    <text x="608" y="312">强一致性</text>
+    <text x="608" y="312">强一致</text>
     <text x="744" y="312" text-anchor="middle">2</text>
     <text x="788" y="312" text-anchor="middle" font-weight="700" fill="#D97706">5</text>
     <text x="832" y="312" text-anchor="middle">3</text>

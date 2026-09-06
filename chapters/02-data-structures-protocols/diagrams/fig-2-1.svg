@@ -43,7 +43,7 @@
   <rect x="144" y="258" width="84" height="46" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <rect x="228" y="258" width="84" height="46" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <text x="102" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">len=5</text>
-  <text x="186" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">alloc=8</text>
+  <text x="186" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">alloc=5</text>
   <text x="270" y="287" text-anchor="middle" font-size="13" font-family="ui-monospace, monospace" fill="#4F46E5">flags</text>
 
   <!-- buf 6 格 x=312 起，每格 46 宽 -->

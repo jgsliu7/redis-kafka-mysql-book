@@ -87,7 +87,7 @@
   <rect x="40" y="420" width="850" height="138" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="446" font-size="14" font-weight="700" fill="#111827">三层网络在启动链路中的位置（KRaft 模式）</text>
   <text x="60" y="472" font-size="12.5" fill="#374151">① 日志 / 配置初始化　→　② 元数据管理初始化（追上 Raft 元数据日志）</text>
-  <text x="60" y="492" font-size="12.5" fill="#374151">→　③ 日志管理器启动（恢复每个 TopicPartition，靠 num.recovery.threads 并行）</text>
-  <text x="60" y="512" font-size="12.5" fill="#374151">→　④ 三层网络架构启动（Acceptor / Processor / Handler）　→　⑤ 副本管理器 / Controller / 注册集群</text>
+  <text x="60" y="492" font-size="12.5" fill="#374151">→　③ 日志管理器启动（恢复每个 TopicPartition，靠 num.recovery.threads.per.data.dir 并行）</text>
+  <text x="60" y="512" font-size="12.5" fill="#374151">→　④ 三层网络架构启动（Acceptor / Processor / Handler）　→　⑤–⑧ 副本管理器 / Controller / 注册集群 / 后台线程</text>
   <text x="60" y="540" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
 </svg>

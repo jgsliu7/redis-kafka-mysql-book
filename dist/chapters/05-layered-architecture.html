@@ -227,9 +227,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="420" y1="392" x2="468" y2="392" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#fig_5_1_arrow4)"/>
 </svg>
 </div><figcaption>图 5-1　Redis 命令处理流水线：交互层与逻辑层用 client 结构体衔接，全程无序列化。</figcaption></figure>
-<p>图里右边那个贯穿全程的虚线框是 <code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针、当前 db 索引、输出缓冲区、用户与 ACL 标志。整个会话上下文都在这一个对象里。交互层往里写、逻辑层往外读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路（后面 <a class="xref" href="#sec-5.3">5.3 节</a>会细讲），区别只在 Redis 把交互层和逻辑层放在了同一线程，所以这个对象甚至不需要跨线程。</p>
+<p>图里右边那个贯穿全程的虚线框是 <code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针、当前 db 索引、输出缓冲区、用户与 ACL 标志。整个会话上下文都在这一个对象里。交互层往里写、逻辑层往外读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路，区别只在 Redis 把交互层和逻辑层放在了同一线程，所以这个对象甚至不需要跨线程。</p>
 <p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里注册新命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。加一个新标志位意味着要改遍所有命令的声明。</p>
-<p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 统一表示所有数据类型的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义：这个对象是字符串、列表、哈希、集合还是有序集合，决定了它能执行哪些命令；encoding 决定内存表示。同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。7.0 起 listpack 全面取代了旧版 ziplist，成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码。这是为了消除 ziplist 著名的"连锁更新"问题（<a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的 O(n²) 级联搬移）。</p>
+<p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 统一表示所有数据类型的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义：这个对象是字符串、列表、哈希、集合还是有序集合，决定了它能执行哪些命令；encoding 决定内存表示。同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。</p>
 <figure class="fig" id="fig-5-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 498" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_2_arrowL43" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
@@ -317,7 +317,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="80" y="544" font-size="11" fill="#374151">命令代码无需修改；集合膨胀时自动从 listpack 升级为 hashtable/skiplist，对逻辑层透明。</text>
 </svg>
 </div><figcaption>图 5-2　redisObject 的 type / encoding 解耦：逻辑层只看 type（语义），存储层只看 encoding（内存表示）。</figcaption></figure>
-<p><strong>逻辑层只看 type，存储层只看 encoding</strong>。命令代码里写的是"对这个列表做 LPUSH"，它不关心底层是 listpack 还是 quicklist；内存管理代码关心的是"这块 listpack 还能不能放进去"，它不关心这是列表还是哈希。换 encoding 不动 type，所以集合膨胀时升级编码，逻辑层完全不受影响，命令代码一行都不用改。7.0 起 listpack 全面取代了 ziplist 的内部用途（旧格式代码保留兼容），进一步省内存，但这个改动完全发生在 encoding 一侧，逻辑层无感。</p>
+<p><strong>逻辑层只看 type，存储层只看 encoding</strong>。命令代码里写的是"对这个列表做 LPUSH"，它不关心底层是 listpack 还是 quicklist；内存管理代码关心的是"这块 listpack 还能不能放进去"，它不关心这是列表还是哈希。换 encoding 不动 type，所以集合膨胀时升级编码，逻辑层完全不受影响，命令代码一行都不用改。7.0 起 listpack 全面取代了 ziplist 的内部用途（旧格式代码保留兼容），成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码，消除了 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的"连锁更新"（O(n²) 级联搬移），也进一步省内存；但这个改动完全发生在 encoding 一侧，逻辑层无感。</p>
 <h3 id="sec-5.2.3">5.2.3 存储层：内存管理 + 持久化双轨</h3>
 <p>Redis 的存储层走了一条和 MySQL 截然相反的路线：<strong>它不抽象出"可插拔引擎"</strong>。原因在于内存数据库的存储介质只有一种，就是内存。换不同的内存分配器（jemalloc / tcmalloc）是优化，不是抽象引擎；它不会像把 InnoDB 换成 MyISAM 那样改变语义、改变事务支持。</p>
 <p>存储层的实际职责有三块。第一是内存分配，Redis 默认用 jemalloc，配合引用计数管理对象生命周期。第二是淘汰策略，当内存达到 <code>maxmemory</code> 上限时，按配置的策略（<code>noeviction</code>、<code>allkeys-lru</code>、<code>volatile-lru</code>、<code>allkeys-lfu</code> 等）选出该被清理的键。LRU 用近似实现。每次随机采样若干个键，从中淘汰最久未用的，避免维护全局 LRU 链表的开销；LFU 用计数加衰减，让访问频率随时间淡化。第三是惰性删除（lazy free），4.0 引入：删除大对象（比如一个百万元素的集合）时不在主线程里同步释放内存，而是把它交给后台 BIO 线程异步释放，避免阻塞主线程。</p>
@@ -720,7 +720,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径，存储层与复制层共享一份代码。</figcaption></figure>
 <p>Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们走同一条 <code>KafkaApis.handleFetchRequest</code> → <code>ReplicaManager.fetchMessages</code> → Log 读取 → sendfile 路径，<strong>只是请求里的标志位不同</strong>（普通消费者 vs 副本同步）。也就是说，<strong>Follower 复制就是"一个特殊的消费者"</strong>。</p>
 <p><strong>存储层和复制层共享同一份代码</strong>。Kafka 不需要为副本同步单独写一套读路径、单独维护一套状态机。复用消费读路径意味着任何对读路径的优化（零拷贝、索引、缓存）都同时惠及复制。任何 bug 修复只改一处。对比一下：很多系统的"主从复制"是独立模块，复制代码和读写代码各写一份，长年累月就会漂移、出 bug。</p>
-<p><strong>Kafka 把存储做得极薄（就是追加写日志），索引、复制、压实的复杂度都在上层解决</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 正式 GA（3.6 起以早期版本引入）后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见<a class="xref" href="08-storage-format.html">第 8 章</a> <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。</p>
+<p><strong>Kafka 把存储做得极薄（就是追加写日志），索引、复制、压实的复杂度都在上层解决</strong>。代价是存储层几乎不可插拔。你不能换 Kafka 的"日志引擎"，因为整个系统对"Log 是顺序追加、按偏移量寻址"的假设贯穿各层。好处也很直接：存储快、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 正式 GA（3.6 起以早期版本引入）后，这一判断需要微调。Log 抽象让冷段可卸载到对象存储而无需改动上层读写路径，存储层从"极薄一层"变为"本地+远程两层"，但 Log 接口不变，上层无感（详见<a class="xref" href="08-storage-format.html">第 8 章</a>）。</p>
 <h3 id="sec-5.4.4">5.4.4 协调层：在 Log 之上的额外一层</h3>
 <p>Kafka 还有一个 Redis 和 MySQL 都没有的层：<strong>协调层</strong>。它包括 ReplicaManager（副本管理）、Partition（分区对象）、Controller（集群控制器），以及 KRaft（取代 ZooKeeper 的元数据管理），细节留给<a class="xref" href="07-cluster.html">第 7 章</a>。</p>
 <p>需要这一层，是因为 Kafka 是分布式系统。分区的 Leader 在哪台 Broker 上、ISR 里有谁、Controller 怎么协调全集群，这些不属于交互层、不属于 API 层、也不属于存储层。它要解决的是一个独立的问题：<strong>保证多个 Broker 上的副本数据一致</strong>。</p>
@@ -832,9 +832,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第一，存储介质决定能不能分层。</strong> Redis 的存储介质只有一种，就是内存，所以它没必要做引擎抽象，做了反而是负担。MySQL 的存储介质差异很大（事务型、内存型、归档型各有各的访问方式），所以它必须做可插拔，否则无法覆盖这些场景。Kafka 的存储高度专用（追加写日志），它的存储根本换不了，换了就不叫 Kafka 了，零拷贝、复制路径复用全建立在"Log 是顺序追加"的假设上。</p>
 <p><strong>第二，通信机制与部署形态绑定。</strong> 单机进程内的层用函数调用（Redis、MySQL 的服务层到引擎），跨网络部署的层用协议（Kafka 的跨 Broker）。这是物理约束。进程内调用的延迟是纳秒级，网络调用的延迟是毫秒级，差了六个数量级。任何"在进程内强行套网络协议"或"在跨机器间强行套函数调用"的尝试都会失败。所以 Redis 的薄分层适合单机，Kafka 的厚分层适合分布式，两者谈不上谁高谁低。</p>
 <p><strong>第三，可插拔的程度应由实现多样性的真实需求决定。</strong> MySQL 的可插拔带来生态（几十种引擎），也带来 vtable 开销。Kafka 的存储不可插拔，反而让零拷贝路径极简，没有"为了抽象而抽象"的负担。判断可插拔要不要做的标准只有一个：<strong>这层的实现多样性是否真实存在</strong>。如果存在（如 MySQL 的引擎），就值得抽象；如果不存在（如 Redis 的内存、Kafka 的日志），抽象就是负担。</p>
-<p>这张表把三个软件放在同一套维度下对比。维度是观察工具，不是评判标准。差异背后的规律，下一节逐条列出。</p>
+<p>这张表把三个软件放在同一套维度下对比。维度是观察工具，不是评判标准。</p>
 <h2 id="sec-5.6">5.6 架构启示</h2>
-<p>同一个分层问题，三个软件的方案完全不同。这五条启示，每条都能在前面某一节找到它对应的具体取舍。</p>
+<p>同一个分层问题，三个软件的方案完全不同。这五条启示，多数能在前面某一节找到对应的具体取舍。</p>
 <h3 id="s114">启示一：分层深度匹配性能目标，而非追求"标准层数"</h3>
 <p>为每次抽象付出的延迟是多少纳秒、多少毫秒，这是分层最硬的计量单位。Redis 的答案是"几乎为零"，所以它的层数少、跨层全是直接调用；MySQL 的答案介于中间：标准化接口值得，代价是每次行操作的虚函数开销；Kafka 的答案是"毫秒级可以接受，以换取吞吐"，所以它的层多而厚。</p>
 <h3 id="s115">启示二：接口稳定性优先于接口优雅性</h3>
