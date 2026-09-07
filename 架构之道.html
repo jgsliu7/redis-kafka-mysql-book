@@ -812,6 +812,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <marker id="fig_2_2_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
+    <marker id="fig_2_2_arrow-light" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
   </defs>
 
 
@@ -844,12 +847,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="527" y1="269" x2="571" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
   <line x1="627" y1="269" x2="671" y2="269" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_2_2_arrow)"/>
   
-  <line x1="173" y1="282" x2="129" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
-  <line x1="273" y1="282" x2="229" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
-  <line x1="373" y1="282" x2="329" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
-  <line x1="473" y1="282" x2="429" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
-  <line x1="573" y1="282" x2="529" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
-  <line x1="673" y1="282" x2="629" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow)"/>
+  <line x1="173" y1="282" x2="129" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
+  <line x1="273" y1="282" x2="229" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
+  <line x1="373" y1="282" x2="329" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
+  <line x1="473" y1="282" x2="429" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
+  <line x1="573" y1="282" x2="529" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
+  <line x1="673" y1="282" x2="629" y2="282" stroke="#9CA3AF" stroke-width="1.1" marker-end="url(#fig_2_2_arrow-light)"/>
 
   
   
@@ -3381,7 +3384,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="90" y="408" width="680" height="44" rx="6" fill="#FFFBEB" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW + LEO（日志末尾）</text>
+  <text x="430" y="428" text-anchor="middle" font-size="12" fill="#111827">返回：消息批次 + 高水位 HW</text>
   <text x="430" y="445" text-anchor="middle" font-size="11" fill="#6B7280">响应路径同样共享</text>
 
   
@@ -4242,7 +4245,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>此外，Redis Cluster 禁用了多数据库的 <code>SELECT</code> 命令（只有 0 号库），并要求多键命令（如 <code>MGET</code>、事务、Lua 脚本）涉及的所有 key 必须落在同一个槽。可以用哈希标签（hash tag）<code>{user:1001}.name</code>、<code>{user:1001}.email</code> 强制让带相同 <code>{...}</code> 的 key 落到同槽。</p>
 <p><strong>元数据完全去中心化，用 Gossip 传播。</strong> Redis Cluster 没有一个集中的协调者节点，所有节点对等，靠 Gossip 协议（PING/PONG/MEET/FAIL 消息）互相交换和传播集群状态：谁加入了、谁承载哪些槽、谁挂了。每个节点最终都会收敛到一致的集群视图，但"最终"意味着过程中可能短暂不一致。Gossip 的好处是无单点、自动发现、能容忍网络抖动；代价是收敛慢，故障感知到全集群达成共识可能要几秒到十几秒，期间部分客户端可能拿到过期视图。</p>
 <p><strong>容错靠从节点发起选举。</strong> 当某个主节点被多数主节点判定下线后，它的某个从节点会发起选举请求，向其他主节点拉票（用集群任期号 epoch 防止过期投票），拿到多数主节点票数后升级为新主，接管原主承载的槽，并通过 Gossip 广播新拓扑。这套机制保证新主是合法多数派选出来的，不会脑裂出两个主。但因为复制是异步的，新主未必有原主宕机前的全部数据。如果原主宕机前刚写入、还没来得及同步到从节点，这部分写就永久丢失了。这种容忍丢写但优先可用的策略，使 Redis Cluster 在生产中常被通俗地称为 AP。它在网络分区下的真实行为更微妙，下面马上细看。</p>
-<p><strong>Redis Cluster 在网络分区时优先保证可用</strong>。拥有多数槽的分区继续服务，少数派分区里的槽因为凑不齐多数派主节点无法完成选举，会短暂不可用但不会脑裂写脏数据。但这里有一个时间窗口：少数派分区里的主节点并不是立刻检测到自己被割出去了，在 <code>cluster-node-timeout</code>（默认 15 秒）之内它还会继续接受写入，超时后才停止，这实际上偏向 CP（一致性优先）行为，但窗口期内写到少数派老主上的数据，可能在故障转移后被丢弃。本章开头的库存超卖事故，利用的正是这个时间窗口。社区对此归类有争议（antirez 本人主张 CP），因为分区窗口内它会停写；但生产实践里，异步复制导致的丢写确实存在。标签不重要，重要的是它的行为边界。</p>
+<p><strong>Redis Cluster 在网络分区时优先保证可用</strong>。拥有多数主节点的分区继续服务，少数派分区里的槽因为凑不齐多数派主节点无法完成选举，会短暂不可用但不会脑裂写脏数据。但这里有一个时间窗口：少数派分区里的主节点并不是立刻检测到自己被割出去了，在 <code>cluster-node-timeout</code>（默认 15 秒）之内它还会继续接受写入，超时后才停止，这实际上偏向 CP（一致性优先）行为，但窗口期内写到少数派老主上的数据，可能在故障转移后被丢弃。本章开头的库存超卖事故，利用的正是这个时间窗口。社区对此归类有争议（antirez 本人主张 CP），因为分区窗口内它会停写；但生产实践里，异步复制导致的丢写确实存在。标签不重要，重要的是它的行为边界。</p>
 <p>最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
 <h2 id="sec-7.3">7.3 MySQL 的做法</h2>
 <p>理解 MySQL 的集群，得先看清它的基本拓扑。MySQL 集群最核心的组件是<strong>主从复制</strong>：一台主节点（Master，8.0.22/8.0.23 起官方改称 source，新增 START REPLICA、CHANGE REPLICATION SOURCE TO 等语句别名）处理所有写请求，把每一条数据变更记进 binlog（二进制日志）；一台或多台从节点（Slave，同期改称 replica）通过订阅主节点的 binlog 来保持数据同步。从节点内部有两个独立线程：I/O 线程从主节点拉取 binlog 事件并写入本地的中继日志，SQL 线程从中继日志里逐个回放事件。这种"拉取线程 + 回放线程"的分离设计，让网络拉取和本地回放互不阻塞：网络快了先拉取暂存，回放慢了就逐步追赶。</p>
