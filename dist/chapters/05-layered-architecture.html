@@ -126,7 +126,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="s94">本章导读</h2>
 <p>很多人接手过越改越乱的老项目：改一个小功能会牵连出三个模块的 bug，加一个新特性要在五六个地方重复改动，甚至想换底层存储时，调用方和实现已经耦合紧密、无法分离。这种痛，归根到底都指向同一件事：系统没有分好层。"对外收发消息、内部决定逻辑、底层存数据"这三件事混在一起写，系统就必然随着规模增长越来越难维护，修改风险越来越大。分层，就是把它们切开，让每一层只做自己的事。</p>
 <p>我接手过一个运营后台，需求只是加一个导出按钮。我改了 Controller 三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我动的那几行不小心改了 SQL 拼接的顺序。我只动了三行，但影响的边界根本不在这三行里。</p>
-<p>但分层是有代价的。每多一层，就多一笔层间开销、多一份接口要维护。分多深、层之间靠什么通信、谁可以替换，每一项都是实打实的取舍。Redis、MySQL、Kafka 在这些问题上各占一角，正好覆盖了分层设计的取舍：单机最低延迟、标准化生态、分布式水平扩展。</p>
+<p>但分层是有代价的。每多一层，就多一笔层间开销、多一个接口要维护。分多深、层之间靠什么通信、谁可以替换，每一项都是实打实的取舍。Redis、MySQL、Kafka 在这些问题上各占一角，正好覆盖了分层设计的取舍：单机最低延迟、标准化生态、分布式水平扩展。</p>
 <p>分层能做多薄，就看一件事：这次抽象带来的延迟，你愿不愿意付。我们用交互层、逻辑层、存储层三段式主线，把这三个软件放在一起对比。</p>
 <h2 id="sec-5.1">5.1 问题的本质：为什么必须分层</h2>
 <p>"分层"这个词被提得太多，以至于快要失去意义。要把它从口号还原成工程问题，得先看不分会出什么问题。</p>
@@ -420,7 +420,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>服务层内这三段切分，靠的是<strong>结构化中间表示（IR，解析树、执行计划）在子层之间传递</strong>。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这和 Redis 的"直接函数调用"是两种路子。</p>
 <h3 id="sec-5.3.3">5.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约。一套方法签名，规定了"引擎必须能做什么"。表级的方法（<code>open</code> / <code>close</code>）、行级的方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）、事务相关的方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>，后两者由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行）。</p>
-<p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池（Buffer Pool）、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一份数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
+<p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池（Buffer Pool）、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一个数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
 <figure class="fig" id="fig-5-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 840 492" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_4_arrow44" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
@@ -619,7 +619,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢、动一次影响面大，副本管理算法可能半年调一次，绑在一起改一处就得动两处。</p>
 <h3 id="sec-5.4.3">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
 <p>存储层是 Kafka 最具特色的一层。它的核心抽象是 <strong><code>Log</code></strong>，一个非常具体的对象，指一组顺序追加的日志段（LogSegment），不是泛指的"日志"。每个分区对应一个 Log，每个 Log 由多个 LogSegment 组成，每个 LogSegment 在磁盘上是三个文件：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>）。这套字节布局会在<a class="xref" href="08-storage-format.html">第 8 章</a>详讲，这里只看它作为"存储层抽象"的形态。</p>
-<p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。没有 B 树、没有索引重建、没有写放大。追加写是磁盘上最快的写法。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以完全不刷交给 OS 决定（依赖副本数保证持久性，单机丢页不丢数据）。</p>
+<p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。没有 B 树、没有索引重建、没有写放大。追加写是磁盘上最快的写法。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以完全不刷，交给 OS 决定（依赖副本数保证持久性，单机丢页不丢数据）。</p>
 <p><strong>读取路径</strong>有一个关键技巧：按偏移量二分定位日志段，再在段内用稀疏索引找具体位置。索引是稀疏的。每隔一段距离（默认 4KB）记一项，这把索引大小控制得很小，常驻内存。命中索引后，从消息文件里读出一段连续数据返回。如果数据已经在页缓存里（追得上生产者的消费者读近期数据时基本命中），读取就是一次内存拷贝，不需要真去磁盘。</p>
 <p>Kafka 高吞吐的另一个来源是<strong>零拷贝（sendfile）</strong>。传统路径要把数据拷贝四次。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉的正是两次拷贝和两次上下文切换。对追着日志尾部消费、数据还在页缓存里的场景，这点收益尤为明显。</p>
 <p>但零拷贝还有一个硬前提：<strong>数据必须是从文件到 socket 的纯转发，中间不能被修改</strong>。这个前提 Kafka 正好满足。消息是不可变的字节流，Broker 拿到什么就转发什么。正因为消息不可变，sendfile 这条快路径才能一直通到底。</p>
@@ -689,7 +689,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="300" y="352" width="190" height="44" rx="6" fill="#FFFFFF" stroke="#6EE7B7" stroke-width="1.3"/>
   <text x="395" y="372" text-anchor="middle" font-size="12" fill="#111827">命中页缓存（PageCache）</text>
-  <text x="395" y="388" text-anchor="middle" font-size="10" fill="#6B7280">消费多优先走内存</text>
+  <text x="395" y="388" text-anchor="middle" font-size="10" fill="#6B7280">消费大多优先走内存</text>
 
   <rect x="510" y="352" width="260" height="44" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
   <text x="640" y="372" text-anchor="middle" font-size="12" font-weight="600" fill="#D97706">sendfile 零拷贝</text>
@@ -712,7 +712,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计收益：Log 抽象让存储层与复制层共享同一份代码</text>
   <text x="60" y="534" font-size="11" fill="#374151">· Follower 复制 = 「一个特殊的消费者」，无需为复制单独写读路径；新增功能只改一处。</text>
   <text x="60" y="554" font-size="11" fill="#374151">· sendfile 零拷贝对两条路径都生效：省掉 2 次内核↔用户态拷贝和 2 次上下文切换。</text>
-  <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>
+  <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快的速度，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>
 </svg>
 </div><figcaption>图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径，存储层与复制层共享一份代码。</figcaption></figure>
 <p>Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们走同一条 <code>KafkaApis.handleFetchRequest</code> → <code>ReplicaManager.fetchMessages</code> → Log 读取 → sendfile 路径，<strong>只是请求里的标志位不同</strong>（普通消费者 vs 副本同步）。也就是说，<strong>Follower 复制就是"一个特殊的消费者"</strong>。</p>
@@ -820,9 +820,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="504" font-size="12" fill="#374151">· 目标：低延迟 ｜ 兼容性与生态 ｜ 水平扩展与高吞吐</text>
   <text x="60" y="534" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
 </svg>
-</div><figcaption>图 5-7　三个软件映射到“交互 / 逻辑 / 存储”统一视角。</figcaption></figure>
+</div><figcaption>图 5-7　三个软件映射到"交互 / 逻辑 / 存储"统一视角。</figcaption></figure>
 <p>同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 分层最粗也最薄，跨层全是函数调用；MySQL 粒度居中，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，分层最细，靠队列和网络协议衔接。</p>
-<p>接下来用一张三栏对比表把六个核心维度并排。层数的口径先说清：Redis 数出四层（RESP 解析、命令分派、robj 抽象、内存存储），MySQL 四层（连接、服务、Handler 接口、引擎），Kafka 五层（SocketServer、KafkaApis、Log、协调层、跨 Broker 协议）。</p>
+<p>接下来用一张三栏对比表把六个核心维度并排呈现。层数的口径先说清：Redis 数出四层（RESP 解析、命令分派、robj 抽象、内存存储），MySQL 四层（连接、服务、Handler 接口、引擎），Kafka 五层（SocketServer、KafkaApis、Log、协调层、跨 Broker 协议）。</p>
 <p class="tab-label"><strong>表 5-1　三个软件分层形态横向对比</strong></p>
 <div class="table-wrap"><table id="table-5-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心抽象</td><td><code>robj</code> 键值对象（type/encoding 分离）</td><td>关系表 + 索引</td><td>追加日志（Log / LogSegment）</td></tr><tr><td>主要存储介质</td><td>内存（持久化为辅）</td><td>磁盘（缓冲池做内存缓存）</td><td>磁盘（重度依赖页缓存）</td></tr><tr><td>层数与粒度</td><td>粗 4 层</td><td>中 4 层（服务层内含解析/优化/执行子层）</td><td>细 5 层（含 ReplicaManager/Controller 协调层）</td></tr><tr><td>层间通信机制</td><td>函数调用 + 对象指针（无序列化）</td><td>THD 对象 + handler 虚函数</td><td>RequestChannel 队列 + 跨网络协议</td></tr><tr><td>可插拔性</td><td>无引擎可换（仅内存）</td><td>Handler API 支持多引擎并存</td><td>存储不可换，但有 Connect/Streams 插件生态</td></tr><tr><td>分层的首要目标</td><td>低延迟（层数越少越好）</td><td>兼容性与生态（标准接口）</td><td>水平扩展与高吞吐（网络边界）</td></tr></tbody></table></div>
 <p>差异的根因有三条。</p>
@@ -850,7 +850,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我评审分层方案时必问一句：这一层挡住了什么变化？答不上来的层，就是我下一步要删的层；为"将来可能需要"预留的扩展点，我至今没见几个真用上的。</p>
 <h3 id="s118">启示五：移除失去价值的层，也是分层能力的一部分</h3>
 <p>分层应随系统演化持续审视和剪裁。<a class="xref" href="#sec-5.3">5.3 节</a>讲的查询缓存就是例子，8.0 就把它移除了。</p>
-<p>这个案例说明：<strong>当一层的价值不再抵得过它带来的协调成本，就该删</strong>。这种“曾经有用、现在只增加复杂度”的层，可能是早期的兼容层，可能是没人用的抽象接口，也可能是为了"将来可能需要"而预留的扩展点。识别并移除这些层，比"加新层"更难，也更值钱。</p>
+<p>这个案例说明：<strong>当一层的价值不再抵得过它带来的协调成本，就该删</strong>。这种"曾经有用、现在只增加复杂度"的层，可能是早期的兼容层，可能是没人用的抽象接口，也可能是为了"将来可能需要"而预留的扩展点。识别并移除这些层，比"加新层"更难，也更值钱。</p>
 <p>这五条合起来看，三个软件都没重写过架构。Redis 从一个缓存工具发展为支持多种数据结构、Function、Cluster 的多模数据库，核心层（robj、命令表）始终没动。MySQL 和 Kafka 走的是同一条路：核心接口（Handler API、Log 抽象）十几年不动，新功能都加在外围。</p>
 <h2 id="sec-5.7">5.7 小结</h2>
 <p>回到本章开头的问题：为什么必须分层？分多深？层间靠什么通信？谁可以替换？三个软件用各自不同的形态解决了同一个问题：怎么把交互、逻辑、存储分开，且分得划算。</p>

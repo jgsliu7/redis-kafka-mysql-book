@@ -310,9 +310,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="410" width="380" height="76" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="60" y="432" font-size="13" font-weight="700" fill="#111827">淘汰：采样池中空闲时间最大者</text>
+  <text x="60" y="432" font-size="13" font-weight="700" fill="#111827">淘汰：采样池中空闲时间最长者</text>
   <rect x="60" y="444" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.6"/>
-  <text x="120" y="463" text-anchor="middle" font-size="12" fill="#EF4444" font-weight="700">k11 (最久未用)</text>
+  <text x="120" y="463" text-anchor="middle" font-size="12" fill="#EF4444" font-weight="700">k11（最久未用）</text>
   <text x="195" y="463" font-size="11" fill="#374151">→ DEL 释放内存</text>
   <path d="M 187 380 L 120 406" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_2_arrowRed)"/>
 
@@ -430,7 +430,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="360" y1="288" x2="560" y2="288" stroke="#C7D2FE" stroke-width="1"/>
   <text x="360" y="308" font-size="12" fill="#374151">• 追加写命令日志</text>
   <text x="360" y="328" font-size="12" fill="#374151">• appendfsync 三档：</text>
-  <text x="360" y="346" font-size="11" fill="#374151">　always / everysec(默认档) / no</text>
+  <text x="360" y="346" font-size="11" fill="#374151">　always / everysec（默认档） / no</text>
   <text x="360" y="368" font-size="12" fill="#374151">• 重写：按当前内存重生成</text>
   <text x="360" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（7.x 多部分 AOF）</text>
 
@@ -488,7 +488,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>缓冲池（Buffer Pool）是 InnoDB 在内存里缓存磁盘页的地方。它由三条链表管理，不是简单的页数组：</p>
 <ul><li><strong>Free List</strong>：空闲页池。需要从磁盘读入新页时，从这里申请一个空闲页。</li><li><strong>LRU List</strong>：活跃页链表，按访问热度排序。这是缓冲池的主体。</li><li><strong>Flush List</strong>：脏页链表。被改过但还没刷盘的页按最早修改时间排队，后台线程依此做 checkpoint 刷盘。</li></ul>
 <p>LRU List 是缓冲池的核心，InnoDB 没有直接用朴素 LRU，而是把它改良成了"新老分区"。整个 LRU List 被一个叫 <code>midpoint</code> 的点分成两段：靠头的 <strong>New Sublist</strong> 占约 5/8，是热区；靠尾的 <strong>Old Sublist</strong> 占约 3/8，是冷区。一个从磁盘新读入的页不进热区头部，而是被插到 <code>midpoint</code>，也就是冷区的头部。它必须在冷区停留超过 <code>innodb_old_blocks_time</code>（默认 1000 毫秒）之后再次被访问，才能晋升进热区。</p>
-<p>这个改良专门为了对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们淘汰热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，根本晋升不到热区就被淘汰，真正的热数据不受影响，在全表扫描场景下能把热数据命中率维持在高位，代价只是冷区管理的一点额外开销。</p>
+<p>这个改良专门对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们淘汰热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，根本晋升不到热区就被淘汰，真正的热数据不受影响，在全表扫描场景下能把热数据命中率维持在高位，代价只是冷区管理的一点额外开销。</p>
 <p>下图把三分链表和 midpoint 的位置画出来。</p>
 <figure class="fig" id="fig-4-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 54 960 646" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -607,7 +607,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>midpoint 这道门槛挡住的是一次性的批量读，挡不住的是另一件事：真正的热数据总量超过热区容量（约 5/8）时，页照样在热区内互相替换，这时只能加大缓冲池。停留时间之外还有第二个可调参数 <code>innodb_old_blocks_pct</code>（冷区占比）。前面"核心假设"一节里"跑一次大报表，之后整体延迟上升"的现象，有了这道门槛会缓和，但不会消失：扫描占用的磁盘 I/O 带宽还在。</p>
 <h3 id="s76">WAL 与崩溃恢复</h3>
 <p>写一页之前，InnoDB 先把"这页要怎么改"写进<strong>redo log（重做日志）</strong>。redo log 是顺序追加写的。崩溃之后，InnoDB 用 redo log 重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL</strong> 的核心：先写日志，后改数据页。</p>
-<p>InnoDB 用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一条事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这条事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"降到了"顺序写一条日志"。</p>
+<p>InnoDB 用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一个事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这个事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"降到了"顺序写一条日志"。</p>
 <p>"持久"的程度由 <code>innodb_flush_log_at_trx_commit</code> 控制，三个档位对应三种可靠性选择。<strong>1（默认）</strong>：每次事务提交时 fsync 日志文件，事务返回 OK 意味着日志已落盘，单节点不丢数据，代价是每次提交等一次 fsync。<strong>2</strong>：每次提交时把日志写到 OS 的 PageCache，由后台线程每秒统一 fsync 一次，提交不卡 fsync 但 OS 崩溃会丢最近约 1 秒的事务。<strong>0</strong>：提交时不写日志，由后台每秒写一次并 fsync，MySQL 崩溃也丢约 1 秒事务，生产极少使用。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
 <figure class="fig" id="fig-4-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 682" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -725,7 +725,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><a class="xref" href="#fig-4-5">图 4-5</a> 的时序：事务提交时先把 redo log 写到日志文件并落盘（保证持久性）。脏页随后进入 Flush List。后台线程把脏页先写到双写缓冲再写到表空间。最后推进 checkpoint，标记之前的日志可以回收。</p>
 <h3 id="s77">三个辅助结构：双写、修改缓冲与自适应哈希</h3>
 <p>InnoDB 还有三个辅助结构，每一个都是为某个具体的故障或性能陷阱设计的。</p>
-<p><strong>双写缓冲（doublewrite buffer）</strong>：InnoDB 的页是 16KB，操作系统和磁盘的扇区通常是 4KB 或更小。如果写一个 16KB 页写到一半断电，这个页就损坏了，而且损坏的是数据本身、不是日志。redo log 也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写缓冲从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。如果写到一半断电，恢复时可以从双写缓冲拿回完整的页。多写一份顺序数据，换来的是断电时页不会撕裂。这笔代价不大，因为顺序写本身开销很低。</p>
+<p><strong>双写缓冲（doublewrite buffer）</strong>：InnoDB 的页是 16KB，操作系统和磁盘的扇区通常是 4KB 或更小。如果写一个 16KB 页写到一半断电，这个页就损坏了，而且损坏的是数据本身，不是日志。redo log 也救不回来，因为它记录的是"怎么改这个页"，前提是这个页本来是好的。双写缓冲的解法是：脏页刷到表空间之前，先顺序写到一块连续区域。MySQL 8.0.20 起把双写缓冲从共享表空间（<code>ibdata1</code>）里独立出来，改成独立的 doublewrite 文件。如果写到一半断电，恢复时可以从双写缓冲拿回完整的页。多写一份顺序数据，换来的是断电时页不会撕裂。这笔代价不大，因为顺序写本身开销很低。</p>
 <p><strong>修改缓冲（change buffer）</strong>：InnoDB 的二级索引是 B+ 树，更新一个二级索引项可能要修改一个当前不在缓冲池的页。如果每次都把这个页从磁盘读入，就是一次随机 I/O。修改缓冲的做法是：先把这次修改记下来（缓存），等这个页因为别的原因被读入缓冲池时，再把缓存的修改合并（merge）进去。这样就把"为改一个索引项触发一次随机读"延迟成了"等页自然读入时顺便合并"。修改缓冲只对二级索引的非唯一索引生效，因为唯一索引必须立刻检查约束。</p>
 <p><strong>自适应哈希索引（AHI）</strong>：InnoDB 监控热点访问模式，如果发现某些 B+ 树路径被频繁遍历，就自动给这些路径建哈希，把 3 到 4 次页访问减少到 1 次。它无需配置、对用户透明，但只在负载稳定、热点集中时才有收益；负载剧烈变化时它反而可能成为开销。这是"在通用引擎里嵌入专用优化"的取舍。</p>
 <h3 id="s78">取舍总结</h3>
@@ -890,7 +890,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>把层次拉开看：CPU 用 L1/L2 缓存内存的数据，MySQL 用缓冲池缓存磁盘的页，Kafka 借 OS 的 PageCache 缓存日志文件，Redis 直接把整份数据放进内存、反过来用磁盘兜底。介质快慢悬殊的地方，就会长出一层缓存，命中率决定整体速度。这条规律从处理器体系结构到存储系统是同一条：快的介质贵而小，慢的介质便宜而大，每一层都替下一层挡掉大部分访问。</p>
 <p>下次评估一个新的存储系统，我会先看它的数据落在快慢介质的哪一层、缓存建在哪一级。<a class="xref" href="10-summary.html">第 10 章</a>还会回到这条跨层的线索。</p>
 <h2 id="sec-4.7">4.7 小结</h2>
-<p>内存与磁盘的速度差距不会消失，存储软件的职责就是在这个差距之间做平衡。三个软件的答案落在三个不同位置：Redis 把数据放进内存换速度，容量上限受物理内存量约束；MySQL 把磁盘当主、内存当缓冲换稳定，要为通用性背上上百个调优参数；Kafka 走第三条路，数据直接写成顺序日志，加速交给操作系统内核，用吞吐换掉了随机访问。</p>
+<p>内存与磁盘的速度差距不会消失，存储软件的职责就是在这个差距上做平衡。三个软件的答案落在三个不同位置：Redis 把数据放进内存换速度，容量上限受物理内存量约束；MySQL 把磁盘当主、内存当缓冲换稳定，要为通用性背上上百个调优参数；Kafka 走第三条路，数据直接写成顺序日志，加速交给操作系统内核，用吞吐换掉了随机访问。</p>
 <p>内存-磁盘关系怎么选：看访问模式的形状——顺序追加、随机读写还是高频小数据，形状定了，范式就定了。三种范式的分界，是谁让热数据留在快介质上：Redis 自己决定（淘汰策略）、MySQL 自己决定（缓冲池链表）、Kafka 把这件事交给了操作系统内核。</p>
 <p>落到实操上，有三个要点。</p>
 <p>第一，避免用 Redis 存储全量业务数据。第二，Kafka 默认把刷盘交给操作系统、用异步刷盘换吞吐，不丢数据的兜底是副本机制（<code>acks=all</code> 配合 <code>min.insync.replicas</code>）而不是本地 fsync，所以通常无需开启 <code>log.flush.*</code>；只有合规等硬要求场景才考虑显式 fsync，开启前需要先实测吞吐跌幅。第三，缓冲池命中率和 PageCache 命中率是两个需要持续关注的核心指标。</p>

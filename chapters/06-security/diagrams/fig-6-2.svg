@@ -96,5 +96,5 @@
   <!-- Bottom note: design takeaway -->
   <rect x="30" y="515" width="820" height="52" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="440" y="535" text-anchor="middle" font-size="12" fill="#374151">设计要点：同一进程多监听器并存，每条路径独立配置协议、端口、证书与 advertised 域名 → 按网络域分级信任。</text>
-  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；副本同步、控制面、客户端三跳都必须独立 TLS。</text>
+  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；副本同步、控制面、客户端三跳都必须独立配置 TLS。</text>
 </svg>

@@ -11,7 +11,7 @@
 
   <!-- ============ partition ============ -->
   <rect x="40" y="90" width="180" height="100" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="130" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">分区 (Partition)</text>
+  <text x="130" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">分区（Partition）</text>
   <text x="130" y="138" text-anchor="middle" font-size="11" fill="#374151">topic-0</text>
   <text x="130" y="158" text-anchor="middle" font-size="11" fill="#374151">= 一串 Segment</text>
   <text x="130" y="178" text-anchor="middle" font-size="10" fill="#6B7280">按偏移量有序排列</text>

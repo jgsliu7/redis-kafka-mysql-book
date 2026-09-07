@@ -8,10 +8,10 @@
 
 
   <!-- ============ ziplist（上）============ -->
-  <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录「前一元素的长度」</text>
+  <text x="60" y="66" font-size="14" font-weight="700" fill="#92400E">ziplist：每个元素记录"前一元素的长度"</text>
 
   <!-- 元素结构说明标签 -->
-  <text x="60" y="90" font-size="11.5" fill="#6B7280">元素 = ［prevlen 前一元素长度］＋［encoding］＋［data］</text>
+  <text x="60" y="90" font-size="11.5" fill="#6B7280">元素 = [prevlen 前一元素长度] + [encoding] + [data]</text>
 
   <!-- 变更前 -->
   <text x="60" y="122" font-size="12.5" font-weight="700" fill="#374151">变更前：entry1 长度 = 60 字节（&lt; 254）</text>
@@ -56,11 +56,11 @@
   <line x1="60" y1="312" x2="820" y2="312" stroke="#E5E7EB" stroke-width="1.2"/>
 
   <!-- ============ listpack（下）============ -->
-  <text x="60" y="342" font-size="14" font-weight="700" fill="#4F46E5">listpack：每个元素只记录「自己的长度」</text>
+  <text x="60" y="342" font-size="14" font-weight="700" fill="#4F46E5">listpack：每个元素只记录"自己的长度"</text>
 
   <rect x="60"  y="356" width="180" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <text x="150" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry1（变长）</text>
-  <text x="150" y="392" text-anchor="middle" font-size="10.5" fill="#6B7280">len＝自己的长度</text>
+  <text x="150" y="392" text-anchor="middle" font-size="10.5" fill="#6B7280">len=自己的长度</text>
   <rect x="250" y="356" width="150" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <text x="325" y="376" text-anchor="middle" font-size="11.5" fill="#4F46E5">entry2 不受影响</text>
   <text x="325" y="392" text-anchor="middle" font-size="10.5" fill="#065F46">len 不变</text>
