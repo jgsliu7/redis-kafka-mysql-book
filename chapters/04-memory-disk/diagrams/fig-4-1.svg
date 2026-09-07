@@ -83,12 +83,6 @@
   <text x="764" y="263" text-anchor="middle" font-size="11" font-weight="700" fill="#EF4444">顺序 vs 随机：延迟同量级</text>
   <text x="764" y="277" text-anchor="middle" font-size="10" fill="#374151">差距在吞吐（带宽 vs IOPS）</text>
 
-  <!-- 红字结论（柱状图右侧空白处） -->
-  <rect x="540" y="358" width="290" height="64" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="376" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
-  <text x="685" y="394" text-anchor="middle" font-size="10.5" fill="#374151">机械盘：省寻道，延迟差两个数量级</text>
-  <text x="685" y="411" text-anchor="middle" font-size="10.5" fill="#374151">SSD：差距转向吞吐与写放大</text>
-
   <!-- ============ 内存 vs 机械盘 跨度标注 ============ -->
   <!-- 原左侧纵向括号线(x=225)穿过柱标签，删除；跨度结论由下方框 + 左侧「┃内存/磁盘」标记承担 -->
   <rect x="40" y="372" width="178" height="42" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
@@ -101,5 +95,5 @@
 
   <!-- 底部图注 -->
   <text x="440" y="500" text-anchor="middle" font-size="12" fill="#374151">数据为典型量级估值；实际值因硬件、负载、队列深度而异，但数量级关系稳定。</text>
-  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」，每一格都是 10 倍差距</text>
+  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上每一格等长，代表的都是 10 倍差距</text>
 </svg>

@@ -68,5 +68,5 @@
   <text x="685" y="370" font-size="12" fill="#374151">磁盘就是全部</text>
 
   <!-- footnote -->
-  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重；Redis 内存为主、MySQL 磁盘为主、Kafka 以日志为正本</text>
+  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重</text>
 </svg>

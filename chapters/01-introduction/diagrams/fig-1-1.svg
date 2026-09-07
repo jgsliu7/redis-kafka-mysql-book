@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 508" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 424" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -64,7 +64,7 @@
   <text x="40" y="328" font-size="13" font-weight="600" fill="#374151">三类能力互补而非替代，一个真实系统会同时用到三者：</text>
 
   <!-- ============ 第 3 行：电商订单系统（三者协同） ============ -->
-  <rect x="40" y="346" width="800" height="170" rx="8" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="40" y="346" width="800" height="118" rx="8" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
   <text x="440" y="368" text-anchor="middle" font-size="13.5" font-weight="600" fill="#374151">真实场景：电商下单链路</text>
 
   <!-- 用户下单 -->
@@ -103,8 +103,4 @@
   <text x="362" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
   <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发</text>
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消</text>
-
-  <!-- 底部结论 -->
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
-  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>

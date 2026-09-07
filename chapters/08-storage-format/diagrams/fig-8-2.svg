@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 88 900 452" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 88 900 426" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -23,14 +23,14 @@
   <text x="215" y="140" text-anchor="middle" font-size="10" fill="#6B7280">aux 字段</text>
 
   <!-- db selector -->
-  <rect x="260" y="100" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="300" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">db-select</text>
-  <text x="300" y="140" text-anchor="middle" font-size="10" fill="#6B7280">SELECT N</text>
+  <rect x="260" y="100" width="90" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="305" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">db-selector</text>
+  <text x="305" y="140" text-anchor="middle" font-size="10" fill="#6B7280">SELECT N</text>
 
   <!-- entries (main) -->
-  <rect x="340" y="100" width="360" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="520" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">entries（全量键值序列）</text>
-  <text x="520" y="142" text-anchor="middle" font-size="10" fill="#374151">变长整数长度 + 存储态编码（listpack/紧凑二进制）</text>
+  <rect x="350" y="100" width="350" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="525" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">entries（全量键值序列）</text>
+  <text x="525" y="142" text-anchor="middle" font-size="10" fill="#374151">变长整数长度 + 存储态编码（listpack/紧凑二进制）</text>
 
   <!-- EOF marker -->
   <rect x="700" y="100" width="40" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -90,7 +90,6 @@
   <text x="765" y="414" text-anchor="middle" font-size="11" fill="#6B7280">int8/16/32 · LZF 压缩串</text>
 
   <!-- key tradeoff callout -->
-  <rect x="40" y="460" width="820" height="60" rx="6" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="60" y="484" font-size="12" font-weight="700" fill="#EF4444">关键取舍</text>
-  <text x="60" y="504" font-size="12" fill="#374151">取“加载快、文件小”，舍“可随机访问”，RDB 必须整体加载，不支持按 key 定位。</text>
+  <rect x="40" y="460" width="820" height="42" rx="6" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="450" y="486" text-anchor="middle" font-size="12.5" font-weight="600" fill="#EF4444">整体加载 · 不支持按 key 随机定位</text>
 </svg>

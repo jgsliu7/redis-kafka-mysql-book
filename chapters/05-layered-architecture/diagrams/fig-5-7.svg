@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 502" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 413" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowDown" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -27,7 +27,7 @@
   <text x="300" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis</text>
   <rect x="210" y="92" width="180" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="300" y="116" text-anchor="middle" font-size="13" fill="#111827">RESP 解析</text>
-  <text x="300" y="136" text-anchor="middle" font-size="11" fill="#374151">单线程多路复用 / 多线程 IO</text>
+  <text x="300" y="136" text-anchor="middle" font-size="11" fill="#374151">单线程多路复用 / 多线程 I/O</text>
 
   <rect x="210" y="200" width="180" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="300" y="224" text-anchor="middle" font-size="13" fill="#111827">命令表 redisCommandTable</text>
@@ -85,8 +85,5 @@
   <line x1="40" y1="396" x2="860" y2="396" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4 4"/>
   <text x="440" y="424" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同样的三段职责，落进完全不同的层形态</text>
 
-  <text x="60" y="456" font-size="12" fill="#374151">· 层数：Redis 粗 4 层 ｜ MySQL 中 4 层（服务层内含子层）｜ Kafka 细 5 层（含协调层）</text>
-  <text x="60" y="480" font-size="12" fill="#374151">· 通信：函数调用 ｜ THD + 虚函数 ｜ 队列 + 网络协议</text>
-  <text x="60" y="504" font-size="12" fill="#374151">· 目标：低延迟 ｜ 兼容性与生态 ｜ 水平扩展与高吞吐</text>
-  <text x="60" y="534" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
+  <text x="60" y="456" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
 </svg>

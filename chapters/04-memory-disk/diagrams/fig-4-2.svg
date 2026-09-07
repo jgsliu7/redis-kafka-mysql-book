@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 453" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -115,12 +115,5 @@
   <text x="830" y="436" text-anchor="middle" font-size="11" fill="#374151">访问一次 → 计数小</text>
   <text x="830" y="452" text-anchor="middle" font-size="11" fill="#374151">优先被淘汰</text>
 
-  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU「扫描一次冷数据挤掉热数据」的问题</text>
-
-  <!-- bottom: essence comparison -->
-  <rect x="40" y="540" width="880" height="90" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="564" font-size="13" font-weight="700" fill="#111827">本质差异</text>
-  <text x="60" y="586" font-size="12" fill="#374151">LRU 看时间：谁最久没被访问就淘汰谁（采样近似实现）。</text>
-  <text x="60" y="606" font-size="12" fill="#374151">LFU 看频率：谁访问得少就淘汰谁（Morris 计数器 + 衰减实现）。</text>
-  <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
+  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU“扫描一次冷数据挤掉热数据”的问题</text>
 </svg>

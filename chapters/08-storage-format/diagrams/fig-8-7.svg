@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 372" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 344" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -54,7 +54,7 @@
 
   <!-- ===== Read path (bottom) ===== -->
   <rect x="40" y="250" width="810" height="32" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者请求 → 先查本地 → 未命中则回源远程（fetch-through） → 缓存到本地</text>
+  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者请求 → 先查本地 → 未命中则回源远程流式读取</text>
   <text x="445" y="298" text-anchor="middle" font-size="11" fill="#6B7280">副本同步不走此路径：Follower 拉取始终由 Leader 本地日志服务</text>
 
   <!-- Arrow from read path to local -->
@@ -66,9 +66,8 @@
   <text x="670" y="225" text-anchor="middle" font-size="10" fill="#10B981">远程回源</text>
 
   <!-- ===== Key insight box ===== -->
-  <rect x="40" y="310" width="810" height="90" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无需改动格式即可迁移</text>
-  <text x="445" y="380" text-anchor="middle" font-size="12" fill="#374151">Log 抽象封装了"数据在哪"，上层 API 层和复制层完全无感</text>
-  <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
+  <rect x="40" y="310" width="810" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <text x="445" y="336" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
+  <text x="445" y="358" text-anchor="middle" font-size="12" fill="#374151">格式不变 · 介质解耦 · 上层感知不到</text>
+  <text x="445" y="376" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
 </svg>

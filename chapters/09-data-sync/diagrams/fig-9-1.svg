@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 74 820 406" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 74 820 346" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -36,12 +36,12 @@
   <text x="327" y="271" text-anchor="middle" font-size="11" fill="#374151">主推送 / 副本拉取</text>
   <text x="327" y="289" text-anchor="middle" font-size="11" fill="#6B7280">Redis推 · MySQL拉 · Kafka拉</text>
 
-  <!-- 子问题3：传播到什么程度 -->
-  <rect x="418" y="206" width="150" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <!-- 子问题3：传播到什么程度（框 418/150 装不下三档词，加宽到 411/164，中心仍 493，与②④各留 9/10px 缝） -->
+  <rect x="411" y="206" width="164" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="493" y="230" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 到什么程度</text>
   <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">一致性强度</text>
-  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">最终一致 / 强一致 / 可调</text>
-  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性 = 延迟的函数</text>
+  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">异步可丢/档位递增/参数可调</text>
+  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性越强，写延迟越高</text>
 
   <!-- 子问题4：断了怎么办 -->
   <rect x="585" y="206" width="150" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -57,6 +57,4 @@
   <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">若每个副本按相同顺序执行相同输入序列</text>
   <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 差异只在"序列载体"与"执行方式"</text>
 
-  <!-- 底注 -->
-  <text x="410" y="438" text-anchor="middle" font-size="12" fill="#6B7280">这四个子问题构成本章全篇的分析框架</text>
 </svg>

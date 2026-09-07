@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 562" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 414" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -7,7 +7,7 @@
   </defs>
 
   <!-- Outer batch box -->
-  <rect x="40" y="70" width="800" height="420" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <rect x="40" y="70" width="800" height="390" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
 
   <!-- Batch-level header fields -->
@@ -71,16 +71,9 @@
   <text x="440" y="362" text-anchor="middle" font-size="11" fill="#374151">每条记录：length + attributes + timestampDelta + offsetDelta + key + value + headers</text>
 
   <!-- Key insight box -->
-  <rect x="60" y="395" width="760" height="80" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <rect x="60" y="395" width="760" height="50" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
   <text x="440" y="416" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="440" y="434" text-anchor="middle" font-size="12" fill="#374151">Batch 头部约 61 字节（固定开销）· 每条记录 timestamp/offset 只存差值（省空间）</text>
-  <text x="440" y="451" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 2–6×）</text>
-  <text x="440" y="466" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 用同一个格式承载批量、压缩、差分编码与幂等支持</text>
-
-  <!-- V0→V1→V2 evolution note -->
-  <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">V0→V1：引入时间戳（8B/条，元数据膨胀）| V1→V2：Batch 级元数据 + 差值编码（消除每条独立的 offset/ts/CRC 冗余）</text>
-  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代格式演进针对上一代最贵的操作</text>
+  <text x="440" y="436" text-anchor="middle" font-size="12" fill="#374151">Batch 级共享元数据 · 差值编码 · 整批 CRC</text>
 
   <!-- Producer/Consumer arrows -->
   <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>

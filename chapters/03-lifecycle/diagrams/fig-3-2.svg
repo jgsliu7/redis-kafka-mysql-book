@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 522" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 438" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -14,12 +14,13 @@
   <text x="76" y="138" font-size="12" fill="#374151">读配置文件 → 命令行覆盖</text>
   <text x="76" y="156" font-size="12" fill="#374151">取舍：先默认值再逐层覆盖</text>
 
-  <!-- Stage 2: 基础设施 -->
-  <rect x="330" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <!-- Stage 2: 基础设施（四件事，对应正文“第二段”） -->
+  <rect x="330" y="70" width="240" height="114" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="450" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">② 基础设施就位</text>
   <text x="346" y="120" font-size="12" fill="#374151">注册信号处理器</text>
   <text x="346" y="138" font-size="12" fill="#374151">创建事件循环 aeCreateEventLoop</text>
   <text x="346" y="156" font-size="12" fill="#374151">预分配数据库数组（不懒加载）</text>
+  <text x="346" y="174" font-size="12" fill="#374151">打开监听端口</text>
 
   <!-- Stage 3: 数据恢复 -->
   <rect x="600" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -43,11 +44,10 @@
   <path d="M720 166 C 720 210, 450 210, 450 240" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- left detail: 启动确定性（挨着 Stage 2 预分配） -->
-  <rect x="60" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="60" y="240" width="240" height="80" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="180" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动确定性取舍</text>
   <text x="76" y="290" font-size="12" fill="#374151">预分配换取运行期内存确定性</text>
   <text x="76" y="308" font-size="12" fill="#374151">代价：启动即占基线内存</text>
-  <text x="76" y="326" font-size="12" fill="#374151">Redis 选“确定”弃“零内存启动”</text>
 
   <!-- right detail: AOF/RDB 取舍（挨着 Stage 3 数据恢复） -->
   <rect x="600" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
@@ -56,12 +56,10 @@
   <text x="616" y="308" font-size="12" fill="#374151">RDB：单点快照，只到上次快照点</text>
   <text x="616" y="326" font-size="12" fill="#374151">优先级体现“完整 &gt; 快”</text>
 
-  <!-- bottom note -->
-  <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <!-- bottom note: 三行信号表 -->
+  <rect x="60" y="380" width="780" height="104" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">启动期注册的信号处理器（Unix 服务经典范式）</text>
   <text x="80" y="432" font-size="12.5" fill="#374151">SIGTERM / SIGINT　→　触发优雅关闭（不是立即终止）</text>
   <text x="80" y="452" font-size="12.5" fill="#374151">SIGPIPE　　　　　→　忽略（避免写已关闭连接导致进程被杀）</text>
   <text x="80" y="472" font-size="12.5" fill="#374151">子进程退出　　　→　不靠信号，serverCron 轮询 waitpid(WNOHANG) 回收</text>
-  <text x="80" y="500" font-size="12.5" fill="#374151">Redis 把信号当作“操作系统请求我优雅退出”的协商，而非被暴力杀死。</text>
-  <text x="80" y="524" font-size="12.5" fill="#374151">启动整体顺序：配置 → 基础设施 → 数据恢复 → 事件循环（依赖先行）。</text>
 </svg>

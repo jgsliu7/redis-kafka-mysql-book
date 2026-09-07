@@ -22,7 +22,7 @@
   <rect x="50" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="180" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 A（主）</text>
   <line x1="70" y1="180" x2="290" y2="180" stroke="#C7D2FE" stroke-width="1"/>
-  <text x="180" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：0 – 5460</text>
+  <text x="180" y="202" text-anchor="middle" font-size="13" fill="#111827">承载槽：0 – 5460</text>
   <!-- slot bar -->
   <rect x="70" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
   <rect x="70" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
@@ -32,7 +32,7 @@
   <rect x="340" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="470" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 B（主）</text>
   <line x1="360" y1="180" x2="580" y2="180" stroke="#C7D2FE" stroke-width="1"/>
-  <text x="470" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：5461 – 10922</text>
+  <text x="470" y="202" text-anchor="middle" font-size="13" fill="#111827">承载槽：5461 – 10922</text>
   <rect x="360" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
   <rect x="360" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
   <text x="470" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5462 个槽</text>
@@ -41,7 +41,7 @@
   <rect x="630" y="145" width="260" height="120" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="760" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">节点 C（主）</text>
   <line x1="650" y1="180" x2="870" y2="180" stroke="#C7D2FE" stroke-width="1"/>
-  <text x="760" y="202" text-anchor="middle" font-size="13" fill="#111827">负责槽：10923 – 16383</text>
+  <text x="760" y="202" text-anchor="middle" font-size="13" fill="#111827">承载槽：10923 – 16383</text>
   <rect x="650" y="215" width="220" height="14" rx="3" fill="#E0E7FF" stroke="#4F46E5"/>
   <rect x="650" y="215" width="74" height="14" rx="3" fill="#6366F1"/>
   <text x="760" y="248" text-anchor="middle" font-size="11" fill="#374151">共 5461 个槽</text>
@@ -75,7 +75,7 @@
 
   <text x="505" y="448" font-size="12" fill="#374151">① 客户端访问 key，算出槽 8000，发往节点 B</text>
   <line x1="510" y1="470" x2="510" y2="520" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-  <text x="525" y="478" font-size="12" fill="#374151">② 节点 B：此 key 未迁出，但槽在迁移，返回：</text>
+  <text x="525" y="478" font-size="12" fill="#374151">② 节点 B：此 key 已迁至节点 A，槽迁移未完成，返回：</text>
   <rect x="525" y="486" width="380" height="34" rx="4" fill="#F3F4F6" stroke="#6B7280"/>
   <text x="715" y="507" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#111827">-ASK 8000 节点A 地址:端口</text>
   <text x="525" y="540" font-size="12" fill="#374151">③ 客户端临时重定向，并带 ASKING 打开 A</text>

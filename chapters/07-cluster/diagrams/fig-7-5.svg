@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 940 622" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 58 940 591" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -46,7 +46,7 @@
 
   <rect x="55" y="372" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
   <text x="180" y="391" text-anchor="middle" font-size="12" fill="#374151">获多数派主节点票 → 当选</text>
-  <text x="180" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（按优先级 / offset / runid 排序）</text>
+  <text x="180" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（epoch 防过期投票）</text>
 
   <line x1="180" y1="416" x2="180" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
@@ -127,8 +127,7 @@
   <line x1="760" y1="354" x2="760" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="635" y="372" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="391" text-anchor="middle" font-size="12" fill="#374151">从 ISR 中选首位副本为新 Leader</text>
-  <text x="760" y="407" text-anchor="middle" font-size="11" fill="#6B7280">（已在 preferred 副本顺序靠前）</text>
+  <text x="760" y="398" text-anchor="middle" font-size="12" fill="#374151">从 ISR 中选首位副本为新 Leader</text>
 
   <line x1="760" y1="416" x2="760" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
@@ -144,9 +143,8 @@
 
   <!-- ===== Bottom summary ===== -->
   <line x1="40" y1="590" x2="900" y2="590" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="470" y="615" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同一问题，三种哲学：去中心化投票 · 共识协议 · 集中仲裁</text>
-  <text x="470" y="640" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
-    红色箭头标注的是「放弃可用性以保一致性」的取舍节点
+  <text x="470" y="615" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
+    红色箭头标注的是“放弃可用性以保一致性”的取舍节点
   </text>
-  <text x="470" y="662" text-anchor="middle" font-size="11" fill="#9CA3AF">注：Controller 自身的 Leader 选举（KRaft）与 Partition 的 Leader 选举是两套独立机制</text>
+  <text x="470" y="637" text-anchor="middle" font-size="11" fill="#9CA3AF">注：Controller 自身的 Leader 选举（KRaft）与 Partition 的 Leader 选举是两套独立机制</text>
 </svg>

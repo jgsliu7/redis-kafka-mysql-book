@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 530" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 486" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
@@ -72,8 +72,4 @@
   <line x1="866" y1="102" x2="866" y2="450" stroke="#6B7280" stroke-width="1.4" marker-start="url(#arrowGray)" marker-end="url(#arrowGray)"/>
   <text x="866" y="88" text-anchor="middle" font-size="11.5" fill="#374151">更快 · 更小</text>
   <text x="866" y="470" text-anchor="middle" font-size="11.5" fill="#374151">更慢 · 更大</text>
-
-  <!-- ============ 底部：一句话点题 ============ -->
-  <text x="460" y="492" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同一条思路：快而小、慢而大、逐层缓存</text>
-  <text x="460" y="512" text-anchor="middle" font-size="11.5" fill="#6B7280">每一层替下一层挡掉大部分访问</text>
 </svg>

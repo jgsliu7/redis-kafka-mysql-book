@@ -208,7 +208,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="60" y="386" width="760" height="42" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
-  <text x="440" y="412" text-anchor="middle" font-size="12.5" fill="#92400E">用一个头部换来 O(1) 取长、二进制安全与更少的 realloc，内存里这点头部开销远比反复遍历划算</text>
+  <text x="440" y="412" text-anchor="middle" font-size="12.5" fill="#92400E">一个头部 → O(1) 取长 ＋ 二进制安全</text>
 </svg>
 </div><figcaption>图 2-1　SDS 与 C 字符串的内存布局对比：同一个 hello 的两种存法，差别集中在 SDS 的头部。</figcaption></figure>
 <p>对照上下两行，开销的位置不同：C 字符串省了头部，代价摊在每次取长度的遍历里；SDS 多花一个头部，取长度变成读一个字段。Redis 选的是后一种：固定的小开销，换掉按次数累积的遍历。</p>
@@ -303,7 +303,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="538" y="334" font-size="12" fill="#374151">查找 17：顶层快速逼近，下沉到底层后沿链表命中</text>
 
   <rect x="60" y="352" width="760" height="34" rx="6" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.3"/>
-  <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">上层是抽稀的索引层，一次跳过多个节点：查找 / 插入 / 删除平均 O(log N)，范围扫描沿底层链表前进即可</text>
+  <text x="440" y="374" text-anchor="middle" font-size="12.5" fill="#92400E">平均 O(log N) · 范围扫描沿底层链表</text>
 </svg>
 </div><figcaption>图 2-2　跳表的多层索引与查找路径：以查找 17 为例。</figcaption></figure>
 <p><a class="xref" href="#fig-2-2">图 2-2</a> 中从 head 到 17 的路径：每一步要么前进、要么下沉，越往下一次跨过的节点越少，到底层逐个对齐。本章开头排行榜的例子同样分成两段：按分数定位起点走这条下沉路径，按名次拉一段沿底层链表前进。</p>
@@ -457,7 +457,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素：能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。编码只升不降：哪怕后来所有大值都被删了，编码仍然是宽的。这是因为升级是一次性的内存重分配，而降级意味着又一次全量重分配，在 Redis 的场景里"删掉大值"的概率太低，不值得为了降级多出一次开销。</p>
 <p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。这和 Hash 类型小数据编码 listpack → hashtable 的升级是同一套逻辑。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在<a class="xref" href="#fig-2-5">图 2-5</a>。</p>
-<figure class="fig" id="fig-2-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-2-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 369" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -476,7 +476,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="320" y="60" width="240" height="100" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4F46E5">字典（dict）</text>
   <text x="440" y="110" text-anchor="middle" font-size="11" fill="#374151">Hash 类型底层 · 整个键空间</text>
-  <text x="440" y="128" text-anchor="middle" font-size="11" fill="#6B7280">链式哈希 · SipHash（防 hash 洪泛）</text>
+  <text x="440" y="128" text-anchor="middle" font-size="11" fill="#6B7280">链式哈希 · SipHash（防哈希洪泛）</text>
   <text x="440" y="148" text-anchor="middle" font-size="11" fill="#6B7280">渐进式 rehash（摊还）</text>
 
   
@@ -507,12 +507,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="120" y="345" width="640" height="60" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
   <text x="440" y="370" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">数据膨胀 → 自动升级（对上层命令透明）</text>
   <text x="440" y="392" text-anchor="middle" font-size="12" fill="#374151">listpack → hashtable（Hash）| listpack → skiplist（ZSET）| intset → listpack → hashtable（Set）</text>
-
-  
-  <rect x="40" y="430" width="800" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="440" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="440" y="475" text-anchor="middle" font-size="12" fill="#374151">Redis 给每种类型都准备了"小数据紧凑编码 + 大数据复杂结构"两套方案，自动切换是省内存的关键手段</text>
-  <text x="440" y="493" text-anchor="middle" font-size="11" fill="#6B7280">统一目标：全内存 + 低延迟 → 数据结构要省内存、少 CPU、自动适配数据规模</text>
 </svg>
 </div><figcaption>图 2-5　Redis 五种底层结构与升级路径：五种结构各成卡片，底部三条切换链标出小数据编码的升级去向。</figcaption></figure>
 <p>前面几段把五个结构分开讲，这张图合在一处，忘了哪条升级去向时适合翻回来查。三条链的方向一致：起点都是紧凑编码，终点都是面向查询的结构。</p>
@@ -521,7 +515,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（一个 16KB 页就能容纳几百个键，树极矮），叶子节点存完整行数据（这是聚簇索引，InnoDB 的表本体按主键组织成树；二级索引的叶子只存索引键加主键值，查完还要拿主键回聚簇索引取整行），且叶子之间用双向链表串联。</p>
 <p>这套设计同时满足三个查询需求：点查（从根走到叶，O(log N)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序顺序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。<a class="xref" href="08-storage-format.html">第 8 章</a>会展开 InnoDB 页内七段布局和 Page Directory 的细节。</p>
 <p>B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只做局部的指针更新，没有页分裂；页分裂是磁盘 16KB 页约束下特有的代价，也是 MySQL 为通用查询能力付出的成本。<a class="xref" href="#fig-2-6">图 2-6</a> 画了一棵三层的示例树。</p>
-<figure class="fig" id="fig-2-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 587" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-2-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 569" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_6_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
@@ -602,7 +596,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="510" y="345" width="140" height="80" rx="8" fill="#D1FAE5" stroke="#059669" stroke-width="2.5"/>
-  <text x="580" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点 ★</text>
+  <text x="580" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
   <text x="580" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[72] [78]</text>
   <text x="580" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
   <text x="580" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
@@ -632,9 +626,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="660" y1="385" x2="652" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#fig_2_6_arrow-green)"/>
 
   
-  <rect x="120" y="440" width="650" height="42" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
-  <text x="445" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">叶子层双向链表 → 范围扫描：定位起始叶子后，顺着链表逐个读取，无需反复从根定位</text>
-  <text x="445" y="476" text-anchor="middle" font-size="10" fill="#6B7280">点查 O(log N) · 范围扫描 O(log N + M) · 叶子层天然有序（键序即排序）</text>
+  <rect x="120" y="440" width="650" height="34" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="445" y="461" text-anchor="middle" font-size="11.5" font-weight="600" fill="#065F46">点查 O(log N) · 范围扫描 O(log N + M) · 叶子层天然有序</text>
 
   
   <rect x="50" y="500" width="800" height="55" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
@@ -653,10 +646,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="646" y="544" font-size="10" fill="#4B5563">双向链表方向</text>
 
   
-  <rect x="50" y="570" width="800" height="65" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
+  <rect x="50" y="570" width="800" height="50" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
   <text x="450" y="592" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">核心取舍</text>
-  <text x="450" y="612" text-anchor="middle" font-size="11" fill="#7F1D1D">内部节点只存键 → 几百个键挤进 16KB → 树极矮（2-3 层）→ 点查 2-3 次 I/O</text>
-  <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
+  <text x="450" y="610" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）</text>
 </svg>
 </div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
 <p>这张图与<a class="xref" href="#fig-2-2">图 2-2</a> 的跳表对照：两者都为顺序访问准备了底层结构，差别是跳表的节点是内存里的单个节点，B+ 树的节点是一整个 16KB 磁盘页——节点的大小，对齐的是所在介质的访问单位。</p>
@@ -669,7 +661,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p class="tab-label"><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
 <div class="table-wrap"><table id="table-2-1"><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
-<figure class="fig" id="fig-2-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 562" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-2-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 414" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -677,7 +669,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   
-  <rect x="40" y="70" width="800" height="420" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <rect x="40" y="70" width="800" height="390" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
 
   
@@ -741,16 +733,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="362" text-anchor="middle" font-size="11" fill="#374151">每条记录：length + attributes + timestampDelta + offsetDelta + key + value + headers</text>
 
   
-  <rect x="60" y="395" width="760" height="80" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <rect x="60" y="395" width="760" height="50" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
   <text x="440" y="416" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="440" y="434" text-anchor="middle" font-size="12" fill="#374151">Batch 头部约 61 字节（固定开销）· 每条记录 timestamp/offset 只存差值（省空间）</text>
-  <text x="440" y="451" text-anchor="middle" font-size="12" fill="#374151">Batch 级 CRC 一条校验覆盖全批（省 CPU）· 压缩在 Batch 边界做（相似消息聚在一起，压缩比 2–6×）</text>
-  <text x="440" y="466" text-anchor="middle" font-size="11" fill="#6B7280">RecordBatch = 用同一个格式承载批量、压缩、差分编码与幂等支持</text>
-
-  
-  <rect x="60" y="500" width="760" height="45" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">V0→V1：引入时间戳（8B/条，元数据膨胀）| V1→V2：Batch 级元数据 + 差值编码（消除每条独立的 offset/ts/CRC 冗余）</text>
-  <text x="440" y="538" text-anchor="middle" font-size="11" fill="#6B7280">每一代格式演进针对上一代最贵的操作</text>
+  <text x="440" y="436" text-anchor="middle" font-size="12" fill="#374151">Batch 级共享元数据 · 差值编码 · 整批 CRC</text>
 
   
   <text x="40" y="320" font-size="11" fill="#4F46E5">生产者</text>
@@ -779,7 +764,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>所有请求共用同一个固定头部：<code>api_key</code>（2 字节，标识这是什么类型的请求，如 Produce = 0、Fetch = 1、Metadata = 3……）、<code>api_version</code>（2 字节，标识用哪个版本的 Schema）、<code>correlation_id</code>（4 字节，客户端自定义，服务端原样抄到响应里用来匹配请求和响应）、<code>client_id</code>（变长字符串，标识客户端身份）。这个四元组头部是 Kafka 协议的关键设计。<code>api_key</code> + <code>api_version</code> 让同一类请求可以同时存在多个版本，Broker 根据客户端声明的版本号调整解析方式和返回字段。这意味着不强制所有客户端同步升级。3.0 的 Broker 可以和 0.11 的客户端对话，双方用彼此都支持的最高版本号做协商。</p>
 <p><strong>批量优先</strong> 是 Kafka 协议区别于 Redis 和 MySQL 最根本的特征。Produce 请求把多条消息打成一个 RecordBatch 一起发给 Broker，Fetch 请求一次拉取指定 <code>(topic, partition, offset)</code> 起始的一段数据（<code>min_bytes</code> + <code>max_bytes</code> 控制拉取量），Broker 用零拷贝把一批消息直接从页缓存推到网卡。一切以 Batch 为单位。这和 RecordBatch 在存储层的设计是同一个思路：协议层不做单条操作，是 Kafka 把吞吐放在第一位的必然结果。</p>
 <p>三家的协议差异，放到同一张图上对照最直观。</p>
-<figure class="fig" id="fig-2-8"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 38 880 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-2-8"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 38 880 279" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
 
   
   <rect x="20" y="50" width="270" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
@@ -799,8 +784,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="305" y="50" width="270" height="60" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
-  <text x="440" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="#92400E">MySQL Binary</text>
-  <text x="440" y="97" text-anchor="middle" font-size="11" fill="#374151">紧凑二进制 · 预编译 · 类型安全</text>
+  <text x="440" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="#92400E">MySQL 二进制协议</text>
+  <text x="440" y="97" text-anchor="middle" font-size="11" fill="#374151">紧凑二进制 · 预编译 · 二进制结果集</text>
 
   <rect x="305" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
   <text x="440" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">预编译流程</text>
@@ -812,7 +797,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="246" text-anchor="middle" font-size="11" font-family="monospace" fill="#92400E">二进制结果集</text>
 
   <rect x="315" y="285" width="250" height="20" rx="3" fill="#ECFDF5"/>
-  <text x="440" y="300" text-anchor="middle" font-size="11" fill="#065F46">紧凑高效 · 人不可读 · 省带宽</text>
+  <text x="440" y="300" text-anchor="middle" font-size="11" fill="#065F46">紧凑 · 人不可读 · 省带宽</text>
 
   
   <rect x="590" y="50" width="270" height="60" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
@@ -830,35 +815,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="600" y="285" width="250" height="20" rx="3" fill="#ECFDF5"/>
   <text x="725" y="300" text-anchor="middle" font-size="11" fill="#065F46">独立演进 · Batch 为传输单位</text>
-
-  
-  <rect x="20" y="330" width="840" height="150" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="440" y="358" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">核心差异一览</text>
-
-  <text x="60" y="385" font-size="11" font-weight="600" fill="#4F46E5">维度</text>
-  <text x="200" y="385" font-size="11" font-weight="600" fill="#4F46E5">Redis RESP</text>
-  <text x="420" y="385" font-size="11" font-weight="600" fill="#92400E">MySQL Binary</text>
-  <text x="650" y="385" font-size="11" font-weight="600" fill="#065F46">Kafka Request/Response</text>
-
-  <text x="60" y="408" font-size="11" fill="#374151">编码</text>
-  <text x="200" y="408" font-size="11" fill="#374151">纯文本行</text>
-  <text x="420" y="408" font-size="11" fill="#374151">紧凑二进制（整数+长度前缀）</text>
-  <text x="650" y="408" font-size="11" fill="#374151">二进制请求头 + 变长体</text>
-
-  <text x="60" y="430" font-size="11" fill="#374151">批量/复用</text>
-  <text x="200" y="430" font-size="11" fill="#374151">Pipeline（多条独立）</text>
-  <text x="420" y="430" font-size="11" fill="#374151">预编译语句（解析复用）</text>
-  <text x="650" y="430" font-size="11" fill="#374151">RecordBatch（单包批量）</text>
-
-  <text x="60" y="452" font-size="11" fill="#374151">演进</text>
-  <text x="200" y="452" font-size="11" fill="#374151">手工约定（6.0 前）→ HELLO</text>
-  <text x="420" y="452" font-size="11" fill="#374151">能力标志（握手交换）</text>
-  <text x="650" y="452" font-size="11" fill="#374151">api_version（每种请求独立）</text>
-
-  <text x="60" y="474" font-size="11" fill="#374151">人可读</text>
-  <text x="200" y="474" font-size="11" fill="#065F46">✓</text>
-  <text x="420" y="474" font-size="11" fill="#EF4444">✗</text>
-  <text x="650" y="474" font-size="11" fill="#EF4444">✗</text>
 </svg>
 </div><figcaption>图 2-8　三个软件通信协议对比：文本行换的是人眼可读与实现简单，二进制省的是带宽与解析开销，版本化请求头保的是演进兼容。</figcaption></figure>
 <p>图里三家各带了一段实例：RESP 那段是 <code>SET key value</code> 实际发出去的字节，MySQL 那两步是预编译的两次往返，Kafka 那行请求头把 <code>api_key</code>、<code>api_version</code> 放在最前面，版本协商就发生在这几个字节上。三种协议的差异不用背结论，对着这三段实例就能认出来。</p>

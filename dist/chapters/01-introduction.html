@@ -132,7 +132,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第三类是<strong>异步解耦与流转</strong>。系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都需要一个中间介质把生产者和消费者解耦。这类能力的关键在吞吐和可扩展性。</p>
 <p>这三类能力是互补的，各管一块。一个典型的电商订单系统常常会同时用到三者，比如 Redis 来保存购物车与库存计数、MySQL 保存订单与账户、Kafka 把"订单已创建"这个事件广播给履约、推荐、风控等下游。</p>
 <p>我们给三类能力各指定一个代表：内存 → Redis；磁盘数据库 → MySQL；消息与流 → Kafka。下图把这种对应关系固定下来。</p>
-<figure class="fig" id="fig-1-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 508" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-1-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 424" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -197,7 +197,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="40" y="328" font-size="13" font-weight="600" fill="#374151">三类能力互补而非替代，一个真实系统会同时用到三者：</text>
 
   
-  <rect x="40" y="346" width="800" height="170" rx="8" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="40" y="346" width="800" height="118" rx="8" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
   <text x="440" y="368" text-anchor="middle" font-size="13.5" font-weight="600" fill="#374151">真实场景：电商下单链路</text>
 
   
@@ -236,10 +236,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="362" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">写</text>
   <text x="516" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">发</text>
   <text x="670" y="406" text-anchor="middle" font-size="10.5" fill="#EF4444">消</text>
-
-  
-  <text x="440" y="478" text-anchor="middle" font-size="12.5" fill="#374151">这三个软件覆盖了后端架构的"基本构件"</text>
-  <text x="440" y="500" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">（ Redis：快与简单 · MySQL：不丢不错 · Kafka：高吞吐 ）</text>
 </svg>
 </div><figcaption>图 1-1　后端基础设施的三种核心范式与代表软件：内存型 / 持久化型 / 流式型三类能力分别对应 Redis、MySQL、Kafka。</figcaption></figure>
 <p>图里每个软件还标了"追求"与"舍弃"两行：每一家舍弃的东西，恰好落在别家的强项里。</p>
@@ -283,7 +279,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p class="tab-label"><strong>表 1-1　三个软件设计概览对比</strong></p>
 <div class="table-wrap"><table id="table-1-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>出身</td><td>2009，antirez 个人项目，为解决真实访问统计问题而写</td><td>1995，MySQL AB，经 Sun 入 Oracle，长期主流的关系库</td><td>2010，LinkedIn 内部日志系统，2011 捐 Apache</td></tr><tr><td>核心抽象</td><td>数据结构服务器（结构化类型 + 原子命令）</td><td>关系 + SQL + 可插拔存储引擎（InnoDB 为默认）</td><td>追加写日志（分区 + 偏移量）</td></tr><tr><td>设计哲学 / 核心追求</td><td>快与简单（低延迟、实现极简）</td><td>不丢、不错（强一致与持久性）</td><td>吞吐与可扩展（线性扩容、高 TPS）</td></tr><tr><td>关键取舍 / 可舍弃</td><td>内存容量与复杂聚合</td><td>写性能</td><td>低延迟与灵活查询</td></tr><tr><td>性能取向</td><td>低延迟</td><td>延迟让位于一致性</td><td>高吞吐</td></tr><tr><td>典型场景</td><td>缓存、锁、计数器、排行榜、会话</td><td>交易、订单、账户、核心业务库</td><td>日志采集、异步解耦、流处理、CDC</td></tr></tbody></table></div>
 <p>把这种"追求的东西不同"画成一张雷达图——低延迟、高吞吐、强一致、数据容量、查询灵活度五个维度一摊开，三个软件的轮廓各不相同。Redis 在低延迟维度突出，MySQL 在强一致、数据容量与查询灵活三个维度领先，Kafka 在高吞吐维度领先。没有谁能占满五个角。<a class="xref" href="#fig-1-1">图 1-1</a> 里每家标的那行"舍弃"，说的就是这个。</p>
-<figure class="fig" id="fig-1-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 90 880 530" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-1-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 90 880 500" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
 
   
 
@@ -326,7 +322,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <g font-size="10.5" fill="#6B7280" text-anchor="middle">
     <text x="300.0" y="126">越小越快</text>
     <text x="528" y="280">每秒处理量</text>
-    <text x="442" y="528">不丢不重</text>
+    <text x="442" y="528">不丢不错</text>
     <text x="158" y="528">能存多少</text>
     <text x="72" y="280" font-size="10.5" text-anchor="middle">SQL/过滤/聚合</text>
   </g>
@@ -423,20 +419,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </g>
 
   
-  <rect x="40" y="540" width="256" height="62" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
-  <text x="56" y="562" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：得分集中在低延迟</text>
-  <text x="56" y="580" font-size="11" fill="#374151">低延迟 5 分领先，</text>
-  <text x="56" y="595" font-size="11" fill="#374151">容量与查询几乎让出。</text>
+  <rect x="40" y="540" width="256" height="38" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
+  <text x="56" y="564" font-size="12.5" font-weight="700" fill="#4F46E5">Redis：得分集中在低延迟</text>
 
-  <rect x="312" y="540" width="256" height="62" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
-  <text x="328" y="562" font-size="12.5" font-weight="700" fill="#D97706">MySQL：强在一致性</text>
-  <text x="328" y="580" font-size="11" fill="#374151">一致性、容量、查询三项都拿高分，</text>
-  <text x="328" y="595" font-size="11" fill="#374151">代价是延迟与吞吐普通。</text>
+  <rect x="312" y="540" width="256" height="38" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
+  <text x="328" y="564" font-size="12.5" font-weight="700" fill="#D97706">MySQL：强在一致性</text>
 
-  <rect x="584" y="540" width="256" height="62" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
-  <text x="600" y="562" font-size="12.5" font-weight="700" fill="#059669">Kafka：最高分给了高吞吐</text>
-  <text x="600" y="580" font-size="11" fill="#374151">高吞吐 5 分压满，</text>
-  <text x="600" y="595" font-size="11" fill="#374151">查询灵活度仅 1 分。</text>
+  <rect x="584" y="540" width="256" height="38" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
+  <text x="600" y="564" font-size="12.5" font-weight="700" fill="#059669">Kafka：最高分给了高吞吐</text>
 </svg>
 </div><figcaption>图 1-2　三个软件在五个维度上的定位雷达：低延迟、高吞吐、强一致、数据容量、查询灵活度。</figcaption></figure>
 <p>这张图值得留着来回翻。</p>
@@ -466,7 +456,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>本书采用<strong>主题式</strong>的组织：让三家软件对同一批问题各自给出方案。每一章围绕一个架构主题，先分别看 Redis、MySQL、Kafka 在该主题下的实现，再做横向对比与架构启示。我们<strong>没有</strong>采用"先把 Redis 整本讲完、再把 MySQL 整本讲完"的软件式组织。</p>
 <p>这个结构是我试出来的。起初我按软件逐个整理笔记，写完发现不行：共性讲不出来，Redis 的持久化和 Kafka 的持久化隔着好几章，看不出它们在对付同一个问题。改成按主题对比之后，同一个问题反复出现，三家的差异和背后的共性才同时浮出来。这样组织还有一个好处，就是训练对比分析能力，这是技术选型的核心能力。能说清"在 A 约束下选 Redis、在 B 约束下选 MySQL、在 C 约束下选 Kafka"的人，远比只会其中一款的人有价值。</p>
 <p>下面这张图给出全书的章节结构。</p>
-<figure class="fig" id="fig-1-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 60 960 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-1-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 60 960 630" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_1_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -483,7 +473,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <line x1="480" y1="128" x2="480" y2="158" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_1_3_arrow)"/>
-  <text x="492" y="148" font-size="11.5" fill="#6B7280">全书脉络由此展开</text>
 
   
   <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么不丢</text>
@@ -491,7 +480,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="56" y="218" font-size="14" font-weight="700" fill="#111827">第 2 章　数据结构与协议</text>
-  <text x="56" y="238" font-size="12" fill="#374151">核心问题：数据在内存里、在线上长什么样？</text>
+  <text x="56" y="238" font-size="12" fill="#374151">核心问题：数据在内存/磁盘/网络上长什么样？</text>
   <text x="56" y="258" font-size="11.5" fill="#6B7280">内部结构 · 编码升级 · 通信协议</text>
 
   
@@ -520,19 +509,19 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="40" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="56" y="360" font-size="14" font-weight="700" fill="#111827">第 5 章　分层架构</text>
   <text x="56" y="380" font-size="12" fill="#374151">核心问题：模块怎么切、层怎么叠？</text>
-  <text x="56" y="400" font-size="11.5" fill="#6B7280">接口 / 引擎 / 存储的层次划分</text>
+  <text x="56" y="400" font-size="11.5" fill="#6B7280">交互层 / 逻辑层 / 存储层的层次划分</text>
 
   
   <rect x="340" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全与权限</text>
+  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全机制</text>
   <text x="356" y="380" font-size="12" fill="#374151">核心问题：谁能访问、能做什么？</text>
   <text x="356" y="400" font-size="11.5" fill="#6B7280">认证 · ACL · 加密 · 审计</text>
 
   
   <rect x="640" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群与高可用</text>
+  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群架构</text>
   <text x="656" y="380" font-size="12" fill="#374151">核心问题：单点挂了怎么办？</text>
-  <text x="656" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障切换</text>
+  <text x="656" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障转移</text>
 
   
   <line x1="320" y1="374" x2="338" y2="374" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_1_3_arrow)"/>
@@ -570,17 +559,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
   
-  <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
-  <text x="40" y="658" font-size="11.5" fill="#374151">从"启动与关闭"出发，经内存磁盘、分层、</text>
-  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成共性规律</text>
-
-  
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
   <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 各自给方案 → 横向对比 → 启示</text>
-
-  
-  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>
 </div><figcaption>图 1-3　全书章节结构：第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
 <p>这张图的要点是：每一章解决的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。递进的依据就在图里的三个分组。第 2–4 章讲数据本身——用什么结构表示、怎么在崩溃后不丢。有了这个底子，第 5–7 章才谈系统的组织：层怎么切、容量怎么扩、谁能访问。第 8–9 章处理落盘与搬运：数据在磁盘上存成什么格式、副本之间怎么同步。分组顺序就是依赖顺序——前面的结论是后面讨论的输入。</p>

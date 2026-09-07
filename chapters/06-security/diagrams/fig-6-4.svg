@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 73 880 507" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 73 880 513" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -83,7 +83,7 @@
   <line x1="620" y1="383" x2="620" y2="408" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
   <rect x="470" y="412" width="300" height="42" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
   <text x="620" y="430" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">放行：返回 phone 列值</text>
-  <text x="620" y="446" text-anchor="middle" font-size="11" fill="#374151">（其余列即使表级无权，列级命中也允许）</text>
+  <text x="620" y="446" text-anchor="middle" font-size="11" fill="#374151">（即使表级无权，列级授权命中即可读该列）</text>
 
   <!-- connector arrows between right steps -->
   <line x1="620" y1="135" x2="620" y2="153" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -92,8 +92,9 @@
   <line x1="620" y1="323" x2="620" y2="333" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <!-- bottom note: 内存授权结构 -->
-  <rect x="60" y="478" width="760" height="80" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="60" y="478" width="760" height="96" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
-  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，按"账号加库表"组织成权限 bitmap，命中即 O(1)。</text>
-  <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，</text>
+  <text x="80" y="540" font-size="12" fill="#374151">按"账号加库表"组织成位图（bitmap）化权限结构，绝大多数热路径一次内存查询。</text>
+  <text x="80" y="560" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>

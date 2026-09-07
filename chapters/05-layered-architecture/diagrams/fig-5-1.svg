@@ -9,11 +9,11 @@
     </marker>
   </defs>
 
-  <!-- 三层背景带（左侧标注）-->
-  <rect x="36" y="76" width="4" height="170" rx="2" fill="#4F46E5" opacity="0.55"/>
+  <!-- 三层背景带（左侧标注）：以①框下缘 y=142 为界，交互层只盖①，逻辑层盖②—⑤ -->
+  <rect x="36" y="76" width="4" height="66" rx="2" fill="#4F46E5" opacity="0.55"/>
   <text x="28" y="100" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">交互层</text>
-  <rect x="36" y="256" width="4" height="260" rx="2" fill="#4F46E5"/>
-  <text x="28" y="300" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">逻辑层</text>
+  <rect x="36" y="152" width="4" height="364" rx="2" fill="#4F46E5"/>
+  <text x="28" y="188" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">逻辑层</text>
   <rect x="36" y="526" width="4" height="60" rx="2" fill="#4F46E5" opacity="0.7"/>
   <text x="28" y="560" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">存储层</text>
 

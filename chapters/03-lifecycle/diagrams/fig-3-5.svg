@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 456" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -72,7 +72,7 @@
   <path d="M238 280 C 180 280, 160 175, 162 162" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowR)"/>
 
   <!-- Right side: design intent -->
-  <rect x="720" y="100" width="170" height="270" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="720" y="100" width="170" height="186" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="805" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">设计意图</text>
   <text x="734" y="152" font-size="12" fill="#374151">I/O 密集（收发）</text>
   <text x="734" y="170" font-size="12" fill="#374151">与 CPU 密集（处理）</text>
@@ -80,14 +80,10 @@
   <text x="734" y="222" font-size="12" fill="#374151">避免互相拖累</text>
   <text x="734" y="256" font-size="12" fill="#374151">队列作为线程池</text>
   <text x="734" y="274" font-size="12" fill="#374151">之间的解耦点</text>
-  <text x="734" y="308" font-size="12" fill="#374151">这是 Kafka 高吞吐</text>
-  <text x="734" y="326" font-size="12" fill="#374151">的基本结构</text>
 
   <!-- Bottom annotation: startup order -->
-  <rect x="40" y="420" width="850" height="138" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="40" y="420" width="850" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="446" font-size="14" font-weight="700" fill="#111827">三层网络在启动链路中的位置（KRaft 模式）</text>
-  <text x="60" y="472" font-size="12.5" fill="#374151">① 日志 / 配置初始化　→　② 元数据管理初始化（追上 Raft 元数据日志）</text>
-  <text x="60" y="492" font-size="12.5" fill="#374151">→　③ 日志管理器启动（恢复每个 TopicPartition，靠 num.recovery.threads.per.data.dir 并行）</text>
-  <text x="60" y="512" font-size="12.5" fill="#374151">→　④ 三层网络架构启动（Acceptor / Processor / Handler）　→　⑤–⑧ 副本管理器 / Controller / 注册集群 / 后台线程</text>
-  <text x="60" y="540" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
+  <text x="60" y="472" font-size="12.5" fill="#374151">三层网络是启动八阶段的第 4 阶段</text>
+  <text x="60" y="500" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
 </svg>

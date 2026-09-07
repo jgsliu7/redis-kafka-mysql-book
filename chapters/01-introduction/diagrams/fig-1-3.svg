@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 60 960 660" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 60 960 630" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -16,7 +16,6 @@
 
   <!-- 引言 → 主体 起点 -->
   <line x1="480" y1="128" x2="480" y2="158" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
-  <text x="492" y="148" font-size="11.5" fill="#6B7280">全书脉络由此展开</text>
 
   <!-- ============ 第一组：第 2-4 章（数据结构 / 生命周期 / 内存磁盘） ============ -->
   <text x="40" y="182" font-size="13" font-weight="600" fill="#374151">第一组　基础：数据怎么表示、怎么不丢</text>
@@ -24,7 +23,7 @@
   <!-- 第 2 章 数据结构与协议 -->
   <rect x="40" y="194" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="56" y="218" font-size="14" font-weight="700" fill="#111827">第 2 章　数据结构与协议</text>
-  <text x="56" y="238" font-size="12" fill="#374151">核心问题：数据在内存里、在线上长什么样？</text>
+  <text x="56" y="238" font-size="12" fill="#374151">核心问题：数据在内存/磁盘/网络上长什么样？</text>
   <text x="56" y="258" font-size="11.5" fill="#6B7280">内部结构 · 编码升级 · 通信协议</text>
 
   <!-- 第 3 章 生命周期 -->
@@ -53,19 +52,19 @@
   <rect x="40" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="56" y="360" font-size="14" font-weight="700" fill="#111827">第 5 章　分层架构</text>
   <text x="56" y="380" font-size="12" fill="#374151">核心问题：模块怎么切、层怎么叠？</text>
-  <text x="56" y="400" font-size="11.5" fill="#6B7280">接口 / 引擎 / 存储的层次划分</text>
+  <text x="56" y="400" font-size="11.5" fill="#6B7280">交互层 / 逻辑层 / 存储层的层次划分</text>
 
-  <!-- 第 6 章 安全与权限 -->
+  <!-- 第 6 章 安全机制 -->
   <rect x="340" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全与权限</text>
+  <text x="356" y="360" font-size="14" font-weight="700" fill="#111827">第 6 章　安全机制</text>
   <text x="356" y="380" font-size="12" fill="#374151">核心问题：谁能访问、能做什么？</text>
   <text x="356" y="400" font-size="11.5" fill="#6B7280">认证 · ACL · 加密 · 审计</text>
 
-  <!-- 第 7 章 集群与高可用 -->
+  <!-- 第 7 章 集群架构 -->
   <rect x="640" y="336" width="280" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
-  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群与高可用</text>
+  <text x="656" y="360" font-size="14" font-weight="700" fill="#111827">第 7 章　集群架构</text>
   <text x="656" y="380" font-size="12" fill="#374151">核心问题：单点挂了怎么办？</text>
-  <text x="656" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障切换</text>
+  <text x="656" y="400" font-size="11.5" fill="#6B7280">主从 · 哨兵 · 共识 · 故障转移</text>
 
   <!-- 横向递进箭头（5 → 6 → 7） -->
   <line x1="320" y1="374" x2="338" y2="374" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -102,16 +101,8 @@
   <text x="480" y="640" text-anchor="middle" font-size="12" fill="#374151">前九章复盘 · 共性规律 · 权衡框架 · 给实践者的建议</text>
   <text x="480" y="656" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">把八章实现提炼成可复用的架构认知</text>
 
-  <!-- 左侧贯穿主线注释 -->
-  <text x="40" y="640" font-size="12" font-weight="600" fill="#EF4444">全书主线</text>
-  <text x="40" y="658" font-size="11.5" fill="#374151">从"启动与关闭"出发，经内存磁盘、分层、</text>
-  <text x="40" y="674" font-size="11.5" fill="#374151">安全、集群、存储、同步，汇成共性规律</text>
-
   <!-- 右侧三个软件同题注释 -->
   <text x="720" y="640" font-size="12" font-weight="600" fill="#4F46E5">每章结构</text>
   <text x="720" y="658" font-size="11.5" fill="#374151">问题本质 → Redis / MySQL /</text>
   <text x="720" y="674" font-size="11.5" fill="#374151">Kafka 各自给方案 → 横向对比 → 启示</text>
-
-  <!-- 底部图注 -->
-  <text x="480" y="704" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">主题式而非软件式：一个架构主题贯穿三个软件，对比出共性</text>
 </svg>

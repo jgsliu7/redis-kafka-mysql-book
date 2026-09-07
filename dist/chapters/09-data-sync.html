@@ -135,7 +135,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第二，怎么传播。</strong> 是主节点主动推，还是副本主动拉？推模式省一次往返但耦合主从，拉模式更解耦但副本自己掌握追赶节奏。</p>
 <p><strong>第三，传播到什么程度才算数。</strong> 主写完就告诉客户端"成功"，还是要等一个副本确认、多数派确认、所有副本确认？这也是一条渐变的取舍：确认往返越多，延迟越高、一致性越强。后面 Redis 的 <code>min-replicas</code>、MySQL 的半同步、Kafka 的 <code>acks</code> 参数，都是在这条取舍上选定的位置。</p>
 <p><strong>第四，传播断了或乱了怎么办。</strong> 网络中断、副本重启、主节点更换都是必然发生的。断了之后能不能不重头来，从哪里接着传？这要求系统记录同步位点，并能在重启时用它对齐。</p>
-<figure class="fig" id="fig-9-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 74 820 406" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-9-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 74 820 346" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -173,11 +173,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="327" y="289" text-anchor="middle" font-size="11" fill="#6B7280">Redis推 · MySQL拉 · Kafka拉</text>
 
   
-  <rect x="418" y="206" width="150" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <rect x="411" y="206" width="164" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="493" y="230" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 到什么程度</text>
   <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">一致性强度</text>
-  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">最终一致 / 强一致 / 可调</text>
-  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性 = 延迟的函数</text>
+  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">异步可丢/档位递增/参数可调</text>
+  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性越强，写延迟越高</text>
 
   
   <rect x="585" y="206" width="150" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -193,8 +193,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">若每个副本按相同顺序执行相同输入序列</text>
   <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 差异只在"序列载体"与"执行方式"</text>
 
-  
-  <text x="410" y="438" text-anchor="middle" font-size="12" fill="#6B7280">这四个子问题构成本章全篇的分析框架</text>
 </svg>
 </div><figcaption>图 9-1　数据同步的四个子问题：传播什么、怎么传播、到什么程度、断了怎么办。</figcaption></figure>
 <p>这四个子问题的底层，是同一个模型：<strong>状态机复制</strong>，所有副本按相同顺序执行相同输入序列，终态必然相同。Kleppmann《Designing Data-Intensive Applications》在"一致性与共识"一章对此已有展开。它们都在用这个模型，差异只在序列载体和执行方式：Redis 是命令流（副本直接执行），MySQL 的序列是 binlog event（副本回放事件），Kafka 是分区日志消息（副本按偏移量追加），三列对照见<a class="xref" href="#fig-9-2">图 9-2</a>。</p>
@@ -265,7 +263,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="600" y="182" width="240" height="240" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
   <text x="720" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">副本 C · Kafka</text>
-  <text x="720" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：消息日志</text>
+  <text x="720" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：分区日志消息</text>
 
   <text x="620" y="250" font-size="12" fill="#374151">初始状态 S0</text>
   <line x1="620" y1="258" x2="820" y2="258" stroke="#059669" stroke-width="0.8" stroke-dasharray="3 2"/>
@@ -469,7 +467,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="120" y="438" font-size="12.5" fill="#374151">① 若从 offset 落在 backlog 窗口内（280−520） → cmd B 之后的 cmd C、cmd D 仍在缓冲</text>
   <text x="120" y="458" font-size="12.5" font-weight="700" fill="#059669">     ⇒ 走部分重同步：只补发差额命令，主节点不 fork</text>
 
-  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外，如 &lt; 280） → 所需命令已被新命令挤出 backlog</text>
+  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外，如 &lt; 280） → 所需命令已被新命令覆盖</text>
   <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
 
   
@@ -499,7 +497,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的传统异步复制是<strong>两段式</strong>的，背后是两个独立的线程：</p>
 <ul><li><strong>I/O 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志。这一段是"网络拉取"。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
 <p>主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见<a class="xref" href="#fig-9-5">图 9-5</a>。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。这是推拉结合：从节点拉、relay log 缓冲、本地推。</p>
-<figure class="fig" id="fig-9-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 532" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-9-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 524" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -549,14 +547,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="790" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">从节点 Replica</text>
 
   <rect x="690" y="120" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">IO 线程（拉取）</text>
+  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（拉取）</text>
   <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，按 GTID 拉取</text>
 
   <line x1="790" y1="170" x2="790" y2="188" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_9_5_arrow)"/>
 
   <rect x="690" y="192" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="790" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">relay log（中继日志）</text>
-  <text x="790" y="230" text-anchor="middle" font-size="11" fill="#374151">落地本地的 binlog 副本</text>
+  <text x="790" y="230" text-anchor="middle" font-size="11" fill="#374151">写到本地的 binlog 副本</text>
 
   <line x1="790" y1="242" x2="790" y2="260" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_9_5_arrow)"/>
 
@@ -579,16 +577,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_9_5_arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 IO 线程主动拉取</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 I/O 线程主动拉取</text>
 
   
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#fig_9_5_arrowRed)"/>
   <text x="470" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">半同步 ACK 回路（从 → 主，仅半同步模式启用）</text>
 
   
-  <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="10.5" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（写 relay log 并落盘）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
+  <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
 </svg>
 </div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
 <h3 id="s221">异步复制：默认的 AP 形态</h3>
@@ -607,7 +604,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件（8.0.27 起 MTS 默认开启 4 个 worker，更早版本默认单线程），主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
 <p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘；主节点把每个事务的锁区间以 last_committed / sequence_number 标记写进 binlog，副本按这些标记划定可并行窗口）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
 <p>配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。但这个并行的上限是主库的组提交宽度：主库并发低、每次落盘成组的事务没几个时，从库能并行的也只有那几个——串行瓶颈没有消失，只是从从库转移到了主库的提交队列。低写入并发的库，MTS 的提升有限。并行复制与 MGR 共识的关系见<a class="xref" href="#fig-9-6">图 9-6</a>。</p>
-<figure class="fig" id="fig-9-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 597" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-9-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 517" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -711,24 +708,18 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="705" y="390" text-anchor="middle" font-size="11" fill="#6B7280">group_replication_consistency 可调读写等待强度</text>
 
   
-  <rect x="30" y="424" width="880" height="220" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="30" y="424" width="880" height="144" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">两种机制的位置与代价</text>
 
-  <rect x="60" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <rect x="60" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="260" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">多线程并行复制</text>
-  <text x="80" y="512" font-size="12" fill="#374151">定位：从库侧加速回放，缓解延迟</text>
-  <text x="80" y="532" font-size="12" fill="#374151">一致性：异步最终一致（AP）</text>
-  <text x="80" y="552" font-size="12" fill="#374151">前提：主库组提交粒度决定并行度上限</text>
-  <text x="80" y="572" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
-  <text x="80" y="600" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
+  <text x="80" y="516" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
+  <text x="80" y="544" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
 
-  <rect x="480" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <rect x="480" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="680" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">组复制 MGR</text>
-  <text x="500" y="512" font-size="12" fill="#374151">定位：把复制升级为共识协议</text>
-  <text x="500" y="532" font-size="12" fill="#374151">一致性：多数派强一致（CP）</text>
-  <text x="500" y="552" font-size="12" fill="#374151">机制：binlog event 即 log entry，Paxos 仲裁顺序</text>
-  <text x="500" y="572" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
-  <text x="500" y="600" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
+  <text x="500" y="516" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
+  <text x="500" y="544" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
 </svg>
 </div><figcaption>图 9-6　并行回放与 MGR：从节点按组提交边界并行回放，MGR 把 binlog event 当作共识 log entry，多数派确认才提交。</figcaption></figure>
 <h3 id="s225">组复制（MGR）：把复制升级为共识</h3>
@@ -832,28 +823,28 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   
   <rect x="70" y="488" width="260" height="80" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader L1）</text>
+  <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader A）</text>
   <text x="90" y="532" font-size="11" fill="#374151">日志：m0 m1 m2 m3 m4</text>
-  <text x="90" y="552" font-size="11" fill="#374151">L1 短暂失联，被仲裁下线</text>
+  <text x="90" y="552" font-size="11" fill="#374151">A 短暂失联，被仲裁下线</text>
 
   
   <rect x="340" y="488" width="260" height="80" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader L2）</text>
+  <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader B）</text>
   <text x="360" y="532" font-size="11" fill="#374151">新主只确认到 m2，新写 m2'</text>
   <text x="360" y="552" font-size="11" fill="#374151">权威日志：m0 m1 m2 m2'</text>
 
   
   <rect x="610" y="488" width="270" height="80" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">L1 复活，试图以 Follower 加入</text>
-  <text x="630" y="532" font-size="11" fill="#374151">L1 仍持 m3 m4（已被新主否决）</text>
+  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">A 复活，试图以 Follower 加入</text>
+  <text x="630" y="532" font-size="11" fill="#374151">A 仍持 m3 m4（已被新主否决）</text>
   <text x="630" y="552" font-size="11" fill="#374151">若不截断 → 数据分叉（脑裂）</text>
 
   
   <line x1="470" y1="568" x2="470" y2="588" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_9_7_arrowRed)"/>
   <rect x="120" y="592" width="700" height="74" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="470" y="614" text-anchor="middle" font-size="13" font-weight="700" fill="#EF4444">leader epoch 协议：副本恢复时按 epoch 比对</text>
-  <text x="140" y="636" font-size="12" fill="#374151">L1 携带 (epoch=1, lastOffset=4) FETCH；L2 回 EndOffsetForEpoch(epoch=1, endOffset=3)</text>
-  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">L1 自身 epoch=1 到 off=4，超过权威 endOffset=3 → 截断 m3 m4，对齐 off=3 后追赶 L2</text>
+  <text x="140" y="636" font-size="12" fill="#374151">A 携带 (epoch=1, lastOffset=4) FETCH；B 回 EndOffsetForEpoch(epoch=1, endOffset=3)</text>
+  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">A 自身 epoch=1 到 off=4，超过权威 endOffset=3 → 截断 m3 m4，对齐 off=3 后追赶 B</text>
 </svg>
 </div><figcaption>图 9-7　HW 与 leader epoch：HW = ISR 中最小 LEO，只有 HW 以下算已提交；leader epoch 用任期号界定权威日志段，截断老 Leader 的脑裂尾部。</figcaption></figure>
 <h3 id="s232">leader epoch：解决老 Leader 复活的脑裂</h3>

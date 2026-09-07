@@ -160,10 +160,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   </defs>
 
   
-  <rect x="36" y="76" width="4" height="170" rx="2" fill="#4F46E5" opacity="0.55"/>
+  <rect x="36" y="76" width="4" height="66" rx="2" fill="#4F46E5" opacity="0.55"/>
   <text x="28" y="100" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">交互层</text>
-  <rect x="36" y="256" width="4" height="260" rx="2" fill="#4F46E5"/>
-  <text x="28" y="300" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">逻辑层</text>
+  <rect x="36" y="152" width="4" height="364" rx="2" fill="#4F46E5"/>
+  <text x="28" y="188" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">逻辑层</text>
   <rect x="36" y="526" width="4" height="60" rx="2" fill="#4F46E5" opacity="0.7"/>
   <text x="28" y="560" text-anchor="end" font-size="12" font-weight="600" fill="#4F46E5">存储层</text>
 
@@ -230,7 +230,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>图里右边那个贯穿全程的虚线框是 <code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针等会话状态。整个会话上下文都在这一个对象里。交互层往里写、逻辑层往外读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路，区别只在 Redis 把交互层和逻辑层放在了同一线程，所以这个对象甚至不需要跨线程。</p>
 <p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里注册新命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。加一个新标志位意味着要改遍所有命令的声明。</p>
 <p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 统一表示所有数据类型的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义：这个对象是字符串、列表、哈希、集合还是有序集合，决定了它能执行哪些命令；encoding 决定内存表示。同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。</p>
-<figure class="fig" id="fig-5-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 498" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-5-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 488" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_2_arrowL43" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -268,7 +268,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="100" y="400" font-size="13" fill="#111827">OBJ_ZSET</text>
   <text x="312" y="400" text-anchor="end" font-size="11" fill="#6B7280">有序集合</text>
 
-  <text x="200" y="434" text-anchor="middle" font-size="11" fill="#4F46E5" font-weight="600">逻辑层（命令处理）只认它</text>
+  <text x="200" y="434" text-anchor="middle" font-size="11" fill="#4F46E5" font-weight="600">逻辑层（命令处理）只看它</text>
 
   
   <rect x="480" y="150" width="280" height="340" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -304,7 +304,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="520" y="442" font-size="12" fill="#111827">skiplist + dict</text>
   <text x="724" y="442" text-anchor="end" font-size="10" fill="#6B7280">有序集合</text>
 
-  <text x="620" y="476" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">存储层（内存管理）只认它</text>
+  <text x="620" y="476" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">存储层（内存管理）只看它</text>
 
   
   <line x1="340" y1="300" x2="500" y2="300" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_5_2_arrowL43)"/>
@@ -312,9 +312,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="420" y="316" text-anchor="middle" font-size="10" fill="#6B7280">一个 type 可指向任一 encoding</text>
 
   
-  <rect x="60" y="508" width="700" height="40" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
-  <text x="80" y="528" font-size="12" fill="#111827">关键决策：换 encoding 不动 type。</text>
-  <text x="80" y="544" font-size="11" fill="#374151">命令代码无需修改；集合膨胀时自动从 listpack 升级为 hashtable/skiplist，对逻辑层透明。</text>
+  <rect x="60" y="508" width="700" height="30" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="80" y="527" font-size="12" fill="#111827">关键决策：换 encoding 不动 type。</text>
 </svg>
 </div><figcaption>图 5-2　redisObject 的 type / encoding 解耦：逻辑层只看 type（语义），存储层只看 encoding（内存表示）。</figcaption></figure>
 <p><strong>逻辑层只看 type，存储层只看 encoding</strong>。命令代码里写的是"对这个列表做 LPUSH"，它不关心底层是 listpack 还是 quicklist；内存管理代码关心的是"这块 listpack 还能不能放进去"，它不关心这是列表还是哈希。换 encoding 不动 type，所以集合膨胀时升级编码，逻辑层完全不受影响，命令代码一行都不用改。7.0 起 listpack 全面取代了 ziplist 的内部用途（旧格式代码保留兼容），成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码，消除了 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的"连锁更新"（O(n²) 级联搬移），也进一步省内存；但这个改动完全发生在 encoding 一侧，逻辑层无感。</p>
@@ -332,7 +331,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>认证本身是可插拔的。MySQL 8.0 默认使用 <code>caching_sha2_password</code>（比旧的 <code>mysql_native_password</code> 更安全），SSL/TLS（传输层安全协议）可选启用。认证插件可对接 LDAP、Kerberos 等外部身份系统。</p>
 <p>线程模型有两种。默认 thread-per-connection：每个连接一个独立线程，隔离好但高并发下线程数爆炸。另一种是线程池（企业版/Percona/MariaDB）：固定线程服务所有连接，切换开销低但慢查询会队头阻塞（一条慢查询拖住队列里后面的所有请求）。两种模型的取舍是典型的隔离与吞吐之争。</p>
 <p>无论用哪种线程模型，MySQL 都有一个贯穿三层的对象：<strong><code>THD</code>（源码里通常理解为 thread descriptor / 线程描述符，MySQL 官方文档并未给出权威展开）</strong>。每个连接创建一个 THD，里面存着当前库、当前事务、会话变量、权限位图、错误栈、字符集、临时表列表……所有这条连接在生命周期内需要的状态。THD 会跟着请求穿过连接层、服务层、存储引擎层，每一层都从它里面读写各自需要的字段。下面这张时序图把 THD 如何贯穿三层画了出来。</p>
-<figure class="fig" id="fig-5-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-5-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_3_arr45" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -405,9 +404,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="395" y="450" text-anchor="middle" font-size="11" fill="#111827">8. 行结果沿原路返回，最终回写 THD 输出缓冲区</text>
 
   
-  <rect x="40" y="488" width="720" height="56" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
-  <text x="60" y="510" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
-  <text x="60" y="530" font-size="11" fill="#374151">边界靠对象，不靠拷贝。</text>
+  <rect x="40" y="488" width="720" height="30" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="60" y="507" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
 </svg>
 </div><figcaption>图 5-3　THD 贯穿 MySQL 三层的会话上下文：THD 是跨层共享的可变状态。</figcaption></figure>
 <p>THD 是一个横贯三层的状态容器。连接层新建它、服务层读它的变量和事务、引擎层取它的事务上下文去做加锁和 MVCC。更要紧的是，连接层和服务层之间没有真正的解耦点。它们共享 THD 这个可变对象。<strong>MySQL 顶上的分层边界是虚的</strong>。它用"一个贯穿全程的对象"替代了"层层复制参数"。边界靠对象，不靠拷贝。这与 Redis 的 <code>client</code> 结构体（<a class="xref" href="#sec-5.2.2">5.2.2 节</a>）是同一手法，但 MySQL 因为跨了线程、跨了引擎，THD 的复杂度要高得多。</p>
@@ -477,12 +475,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="490" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">MyISAM</text>
   <text x="490" y="346" text-anchor="middle" font-size="11" fill="#374151">无事务</text>
   <text x="490" y="366" text-anchor="middle" font-size="11" fill="#374151">表锁</text>
-  <text x="490" y="386" text-anchor="middle" font-size="11" fill="#374151">全文索引好</text>
+  <text x="490" y="386" text-anchor="middle" font-size="11" fill="#374151">全文索引曾更好</text>
 
   <rect x="580" y="296" width="140" height="110" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="650" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Memory</text>
   <text x="650" y="346" text-anchor="middle" font-size="11" fill="#374151">内存表</text>
-  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">Hash 索引</text>
+  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">哈希索引</text>
   <text x="650" y="386" text-anchor="middle" font-size="11" fill="#374151">重启即失</text>
 
   <rect x="580" y="416" width="140" height="48" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3"/>
@@ -493,7 +491,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="120" y="530" width="600" height="0" rx="6" fill="none"/>
 
   <text x="60" y="546" font-size="11" fill="#EF4444" font-weight="600">代价：</text>
-  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是「可插拔」带来的固有开销。</text>
+  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是“可插拔”带来的固有开销。</text>
 </svg>
 </div><figcaption>图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。</figcaption></figure>
 <p>这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下面的引擎们各自实现这套接口，互不干扰，可并存。InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池 → redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 <code>.ibd</code> 表空间存数据和索引、独立 redo log 文件存 redo log（8.0.30 前为 <code>ib_logfile*</code>，之后为 <code>#innodb_redo</code> 目录）、<code>undo_*</code> 存 undo log，再配合双写缓冲（doublewrite buffer）防止页撕裂。其中表空间的四层结构、redo log 的物理结构与双写，归<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
@@ -608,7 +606,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="476" width="800" height="44" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="502" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要扛多分区、多副本的并发 I/O。</text>
+  <text x="60" y="502" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要同时处理多分区、多副本的并发 I/O。</text>
 </svg>
 </div><figcaption>图 5-5　Kafka Reactor + RequestChannel 线程模型：网络线程与业务线程通过有界队列解耦，队列满时天然背压上游。</figcaption></figure>
 <p>Kafka 必须多线程，而 Redis 的并发最多停在 I/O 层（命令执行必须单线程），因为 Kafka 单机要同时处理多分区、多副本的并发 I/O。一个 Broker 可能挂几百个分区，来自生产者、消费者、Controller 的请求并发涌进来，单线程根本来不及。Redis 的负载模型是"短命令、低延迟"，Kafka 是"批量、大传输、高吞吐"，两者对并发的需求差出几个数量级。<strong>Kafka 的交互层是三者中最重的，以此利用多核、实现水平扩展，延迟比 Redis 高，但吞吐高出一整个量级</strong>。</p>
@@ -624,7 +622,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 高吞吐的另一个来源是<strong>零拷贝（sendfile）</strong>。传统路径要把数据拷贝四次。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉的正是两次拷贝和两次上下文切换。对追着日志尾部消费、数据还在页缓存里的场景，这点收益尤为明显。</p>
 <p>但零拷贝还有一个硬前提：<strong>数据必须是从文件到 socket 的纯转发，中间不能被修改</strong>。这个前提 Kafka 正好满足。消息是不可变的字节流，Broker 拿到什么就转发什么。正因为消息不可变，sendfile 这条快路径才能一直通到底。</p>
 <p>副本同步（Follower 从 Leader 拉日志）的机制详见<a class="xref" href="09-data-sync.html">第 9 章</a>，这里只看它在分层上的一个副作用。下面这张时序图展示了 Kafka 的一个标志性设计：<strong>消费者读路径和副本同步路径是同一条</strong>。</p>
-<figure class="fig" id="fig-5-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 65 860 535" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-5-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 65 860 419" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_6_arr47" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -706,13 +704,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <path d="M 90 420 L 40 420 L 40 260 L 58 260" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#fig_5_6_arr47r)"/>
   <path d="M 770 420 L 820 420 L 820 260 L 802 260" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#fig_5_6_arr47r)"/>
-
-  
-  <rect x="40" y="492" width="780" height="92" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="514" font-size="12" font-weight="600" fill="#111827">设计收益：Log 抽象让存储层与复制层共享同一份代码</text>
-  <text x="60" y="534" font-size="11" fill="#374151">· Follower 复制 = 「一个特殊的消费者」，无需为复制单独写读路径；新增功能只改一处。</text>
-  <text x="60" y="554" font-size="11" fill="#374151">· sendfile 零拷贝对两条路径都生效：省掉 2 次内核↔用户态拷贝和 2 次上下文切换。</text>
-  <text x="60" y="574" font-size="11" fill="#374151">· 代价：存储层做得「异常薄」（就是追加写日志），换来极快的速度，但存储几乎不可插拔，复杂度被推到上层（索引、复制、压实）。</text>
 </svg>
 </div><figcaption>图 5-6　Kafka Log 复用：消费读路径 = 副本同步路径，存储层与复制层共享一份代码。</figcaption></figure>
 <p>Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们走同一条 <code>KafkaApis.handleFetchRequest</code> → <code>ReplicaManager.fetchMessages</code> → Log 读取 → sendfile 路径，<strong>只是请求里的标志位不同</strong>（普通消费者 vs 副本同步）。也就是说，<strong>Follower 复制就是"一个特殊的消费者"</strong>。</p>
@@ -729,7 +720,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-5.5">5.5 横向对比</h2>
 <p>三个软件都分层，但 Redis 薄、MySQL 中、Kafka 厚。</p>
 <p>先用一张总览图把三段式视角到三个软件的映射画出来。</p>
-<figure class="fig" id="fig-5-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 502" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-5-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 413" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_7_arrowDown" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -757,7 +748,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="300" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis</text>
   <rect x="210" y="92" width="180" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="300" y="116" text-anchor="middle" font-size="13" fill="#111827">RESP 解析</text>
-  <text x="300" y="136" text-anchor="middle" font-size="11" fill="#374151">单线程多路复用 / 多线程 IO</text>
+  <text x="300" y="136" text-anchor="middle" font-size="11" fill="#374151">单线程多路复用 / 多线程 I/O</text>
 
   <rect x="210" y="200" width="180" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="300" y="224" text-anchor="middle" font-size="13" fill="#111827">命令表 redisCommandTable</text>
@@ -815,10 +806,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="40" y1="396" x2="860" y2="396" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4 4"/>
   <text x="440" y="424" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同样的三段职责，落进完全不同的层形态</text>
 
-  <text x="60" y="456" font-size="12" fill="#374151">· 层数：Redis 粗 4 层 ｜ MySQL 中 4 层（服务层内含子层）｜ Kafka 细 5 层（含协调层）</text>
-  <text x="60" y="480" font-size="12" fill="#374151">· 通信：函数调用 ｜ THD + 虚函数 ｜ 队列 + 网络协议</text>
-  <text x="60" y="504" font-size="12" fill="#374151">· 目标：低延迟 ｜ 兼容性与生态 ｜ 水平扩展与高吞吐</text>
-  <text x="60" y="534" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
+  <text x="60" y="456" font-size="11" fill="#6B7280" font-style="italic">注：源码目录命名各异，本章做语义映射，不要求字面对应。</text>
 </svg>
 </div><figcaption>图 5-7　三个软件映射到"交互 / 逻辑 / 存储"统一视角。</figcaption></figure>
 <p>同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 分层最粗也最薄，跨层全是函数调用；MySQL 粒度居中，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，分层最细，靠队列和网络协议衔接。</p>

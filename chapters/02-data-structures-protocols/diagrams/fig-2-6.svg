@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 587" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 569" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
@@ -80,7 +80,7 @@
 
   <!-- Leaf 4 (highlighted for range scan) -->
   <rect x="510" y="345" width="140" height="80" rx="8" fill="#D1FAE5" stroke="#059669" stroke-width="2.5"/>
-  <text x="580" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点 ★</text>
+  <text x="580" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">叶子节点</text>
   <text x="580" y="390" text-anchor="middle" font-size="9" fill="#4B5563">[72] [78]</text>
   <text x="580" y="405" text-anchor="middle" font-size="9" fill="#4B5563">+ 完整行数据</text>
   <text x="580" y="420" text-anchor="middle" font-size="9" fill="#6B7280">→ 下一页</text>
@@ -110,9 +110,8 @@
   <line x1="660" y1="385" x2="652" y2="385" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
 
   <!-- Range scan annotation -->
-  <rect x="120" y="440" width="650" height="42" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
-  <text x="445" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">叶子层双向链表 → 范围扫描：定位起始叶子后，顺着链表逐个读取，无需反复从根定位</text>
-  <text x="445" y="476" text-anchor="middle" font-size="10" fill="#6B7280">点查 O(log N) · 范围扫描 O(log N + M) · 叶子层天然有序（键序即排序）</text>
+  <rect x="120" y="440" width="650" height="34" rx="6" fill="#F0FDF4" stroke="#059669" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="445" y="461" text-anchor="middle" font-size="11.5" font-weight="600" fill="#065F46">点查 O(log N) · 范围扫描 O(log N + M) · 叶子层天然有序</text>
 
   <!-- ===== LEGEND ===== -->
   <rect x="50" y="500" width="800" height="55" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
@@ -131,8 +130,7 @@
   <text x="646" y="544" font-size="10" fill="#4B5563">双向链表方向</text>
 
   <!-- ===== KEY INSIGHT BOX ===== -->
-  <rect x="50" y="570" width="800" height="65" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
+  <rect x="50" y="570" width="800" height="50" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
   <text x="450" y="592" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">核心取舍</text>
-  <text x="450" y="612" text-anchor="middle" font-size="11" fill="#7F1D1D">内部节点只存键 → 几百个键挤进 16KB → 树极矮（2-3 层）→ 点查 2-3 次 I/O</text>
-  <text x="450" y="630" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）→ 每次分裂多一次磁盘写入</text>
+  <text x="450" y="610" text-anchor="middle" font-size="11" fill="#7F1D1D">写路径代价：页分裂（页满时一拆为二，级联向上）</text>
 </svg>

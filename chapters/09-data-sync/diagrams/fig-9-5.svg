@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 532" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 524" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -49,14 +49,14 @@
   <text x="790" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">从节点 Replica</text>
 
   <rect x="690" y="120" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">IO 线程（拉取）</text>
+  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（拉取）</text>
   <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，按 GTID 拉取</text>
 
   <line x1="790" y1="170" x2="790" y2="188" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="690" y="192" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="790" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">relay log（中继日志）</text>
-  <text x="790" y="230" text-anchor="middle" font-size="11" fill="#374151">落地本地的 binlog 副本</text>
+  <text x="790" y="230" text-anchor="middle" font-size="11" fill="#374151">写到本地的 binlog 副本</text>
 
   <line x1="790" y1="242" x2="790" y2="260" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
@@ -75,18 +75,17 @@
   <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 进度自动定位续传</text>
 
   <!-- ============ 中间链路连线 ============ -->
-  <!-- Dump 线程 → IO 线程：binlog 数据流（主 → 从） -->
+  <!-- Dump 线程 → I/O 线程：binlog 数据流（主 → 从） -->
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 IO 线程主动拉取</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 I/O 线程主动拉取</text>
 
   <!-- 半同步 ACK 回路：从 → 主 -->
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrowRed)"/>
   <text x="470" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">半同步 ACK 回路（从 → 主，仅半同步模式启用）</text>
 
-  <!-- 底部说明 -->
-  <rect x="30" y="548" width="880" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（IO 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
-  <text x="470" y="584" text-anchor="middle" font-size="10.5" fill="#6B7280">异步：主提交即返回；半同步（图示为 AFTER_COMMIT 档）：主提交后等从 ACK（写 relay log 并落盘）才返回，默认档 AFTER_SYNC 则先等 ACK 再提交；超时自动降级回异步</text>
+  <!-- 底部说明（AFTER 长句已删，单行居中：框高 42→32，文字基线居中于 568） -->
+  <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
 </svg>

@@ -99,5 +99,5 @@
 
   <!-- 底部注释 -->
   <rect x="40" y="476" width="800" height="44" rx="6" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="1"/>
-  <text x="60" y="502" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要扛多分区、多副本的并发 I/O。</text>
+  <text x="60" y="502" font-size="12" font-weight="600" fill="#111827">对照 Redis：Kafka 必须多线程，单机要同时处理多分区、多副本的并发 I/O。</text>
 </svg>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arr45" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -72,7 +72,6 @@
   <text x="395" y="450" text-anchor="middle" font-size="11" fill="#111827">8. 行结果沿原路返回，最终回写 THD 输出缓冲区</text>
 
   <!-- 底部注释 -->
-  <rect x="40" y="488" width="720" height="56" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
-  <text x="60" y="510" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
-  <text x="60" y="530" font-size="11" fill="#374151">边界靠对象，不靠拷贝。</text>
+  <rect x="40" y="488" width="720" height="30" rx="6" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1"/>
+  <text x="60" y="507" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
 </svg>

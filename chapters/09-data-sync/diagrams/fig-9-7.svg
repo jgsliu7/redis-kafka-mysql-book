@@ -80,26 +80,26 @@
   <!-- 老 Leader 复活场景，三栏：旧主 / 新主 / Follower恢复 -->
   <!-- Epoch 1 段 -->
   <rect x="70" y="488" width="260" height="80" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader L1）</text>
+  <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader A）</text>
   <text x="90" y="532" font-size="11" fill="#374151">日志：m0 m1 m2 m3 m4</text>
-  <text x="90" y="552" font-size="11" fill="#374151">L1 短暂失联，被仲裁下线</text>
+  <text x="90" y="552" font-size="11" fill="#374151">A 短暂失联，被仲裁下线</text>
 
   <!-- Epoch 2 段 -->
   <rect x="340" y="488" width="260" height="80" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader L2）</text>
+  <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader B）</text>
   <text x="360" y="532" font-size="11" fill="#374151">新主只确认到 m2，新写 m2'</text>
   <text x="360" y="552" font-size="11" fill="#374151">权威日志：m0 m1 m2 m2'</text>
 
-  <!-- L1 复活 -->
+  <!-- A 复活 -->
   <rect x="610" y="488" width="270" height="80" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">L1 复活，试图以 Follower 加入</text>
-  <text x="630" y="532" font-size="11" fill="#374151">L1 仍持 m3 m4（已被新主否决）</text>
+  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">A 复活，试图以 Follower 加入</text>
+  <text x="630" y="532" font-size="11" fill="#374151">A 仍持 m3 m4（已被新主否决）</text>
   <text x="630" y="552" font-size="11" fill="#374151">若不截断 → 数据分叉（脑裂）</text>
 
   <!-- 截断过程 -->
   <line x1="470" y1="568" x2="470" y2="588" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>
   <rect x="120" y="592" width="700" height="74" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="470" y="614" text-anchor="middle" font-size="13" font-weight="700" fill="#EF4444">leader epoch 协议：副本恢复时按 epoch 比对</text>
-  <text x="140" y="636" font-size="12" fill="#374151">L1 携带 (epoch=1, lastOffset=4) FETCH；L2 回 EndOffsetForEpoch(epoch=1, endOffset=3)</text>
-  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">L1 自身 epoch=1 到 off=4，超过权威 endOffset=3 → 截断 m3 m4，对齐 off=3 后追赶 L2</text>
+  <text x="140" y="636" font-size="12" fill="#374151">A 携带 (epoch=1, lastOffset=4) FETCH；B 回 EndOffsetForEpoch(epoch=1, endOffset=3)</text>
+  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">A 自身 epoch=1 到 off=4，超过权威 endOffset=3 → 截断 m3 m4，对齐 off=3 后追赶 B</text>
 </svg>

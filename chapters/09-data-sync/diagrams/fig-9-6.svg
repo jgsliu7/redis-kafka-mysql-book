@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 597" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 517" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -102,23 +102,17 @@
   <text x="705" y="376" text-anchor="middle" font-size="11" fill="#374151">状态机复制：相同顺序 → 相同最终状态</text>
   <text x="705" y="390" text-anchor="middle" font-size="11" fill="#6B7280">group_replication_consistency 可调读写等待强度</text>
 
-  <!-- 底部对比 -->
-  <rect x="30" y="424" width="880" height="220" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <!-- 底部对比（定位/一致性/前提/机制六行已删；留代价与要点两行，标题基线 488、行距 28，框高 158→88，带高 220→144） -->
+  <rect x="30" y="424" width="880" height="144" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">两种机制的位置与代价</text>
 
-  <rect x="60" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <rect x="60" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="260" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">多线程并行复制</text>
-  <text x="80" y="512" font-size="12" fill="#374151">定位：从库侧加速回放，缓解延迟</text>
-  <text x="80" y="532" font-size="12" fill="#374151">一致性：异步最终一致（AP）</text>
-  <text x="80" y="552" font-size="12" fill="#374151">前提：主库组提交粒度决定并行度上限</text>
-  <text x="80" y="572" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
-  <text x="80" y="600" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
+  <text x="80" y="516" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
+  <text x="80" y="544" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
 
-  <rect x="480" y="466" width="400" height="158" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
+  <rect x="480" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="680" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">组复制 MGR</text>
-  <text x="500" y="512" font-size="12" fill="#374151">定位：把复制升级为共识协议</text>
-  <text x="500" y="532" font-size="12" fill="#374151">一致性：多数派强一致（CP）</text>
-  <text x="500" y="552" font-size="12" fill="#374151">机制：binlog event 即 log entry，Paxos 仲裁顺序</text>
-  <text x="500" y="572" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
-  <text x="500" y="600" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
+  <text x="500" y="516" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
+  <text x="500" y="544" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
 </svg>

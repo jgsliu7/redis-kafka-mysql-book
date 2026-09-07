@@ -209,7 +209,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="685" y="370" font-size="12" fill="#374151">磁盘就是全部</text>
 
   
-  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重；Redis 内存为主、MySQL 磁盘为主、Kafka 以日志为正本</text>
+  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重</text>
 </svg>
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
 <p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存充当内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
@@ -223,7 +223,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>RDB（快照文件）是 Redis 的全量快照格式。它的设计目标是文件小、加载快，因此走的是紧凑二进制路线。</p>
 <p>文件以一段固定魔数 <code>REDIS</code> 开头，紧跟 4 字节 ASCII 版本号。RDB 版本号标识磁盘协议契约，与 Redis 版本号不一一对应：5.0 到 6.2 共用 v9，大版本 7 内部却从 v10 一路跳到 v12（7.0→v10、7.2→v11、7.4→v12；具体以 <code>src/rdb.h</code> 中的 <code>RDB_VERSION</code> 宏为准）。文件靠前缀自识别，不靠扩展名：任何一段字节流，只要开头是 <code>REDIS</code> 加合法版本号，加载器就认它。长度字段普遍采用变长整数编码（length-encoding），按实际大小自动选最省字节的表示。具体由类型字节的高两位做档位选择：<code>00</code> 走 6 位（0–63）、<code>01</code> 走 14 位（0–16383）、<code>10</code> 走 32 位定长、<code>11</code> 则是特殊编码（int8/int16/int32/LZF 压缩串等，把数值或压缩后的串直接放进这几个字节）。小长度（0–63）只需 1 个字节就完成，连额外长度字段都省了。每一处省下来的字节，乘以全量快照的规模，文件体积就能小很多。</p>
 <p>存储态编码与内存态编码是分离的。内存里 Hash 可能用 listpack 编码，也可能用 hashtable 编码，存盘时不照搬内存布局，改用统一的紧凑二进制序列化；加载后由加载器按当前阈值重新决定编码。这种分离让磁盘格式不绑死内存数据结构的演进：内存编码升级，磁盘格式不需要跟着变。这种格式落到文件层面的布局——整份文件的结构、一条 entry 的字节序列、长度编码的档位——<a class="xref" href="#fig-8-2">图 8-2</a> 一次画全。</p>
-<figure class="fig" id="fig-8-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 900 452" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-8-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 900 426" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -247,14 +247,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="215" y="140" text-anchor="middle" font-size="10" fill="#6B7280">aux 字段</text>
 
   
-  <rect x="260" y="100" width="80" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="300" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">db-select</text>
-  <text x="300" y="140" text-anchor="middle" font-size="10" fill="#6B7280">SELECT N</text>
+  <rect x="260" y="100" width="90" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="305" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">db-selector</text>
+  <text x="305" y="140" text-anchor="middle" font-size="10" fill="#6B7280">SELECT N</text>
 
   
-  <rect x="340" y="100" width="360" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="520" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">entries（全量键值序列）</text>
-  <text x="520" y="142" text-anchor="middle" font-size="10" fill="#374151">变长整数长度 + 存储态编码（listpack/紧凑二进制）</text>
+  <rect x="350" y="100" width="350" height="56" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="525" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">entries（全量键值序列）</text>
+  <text x="525" y="142" text-anchor="middle" font-size="10" fill="#374151">变长整数长度 + 存储态编码（listpack/紧凑二进制）</text>
 
   
   <rect x="700" y="100" width="40" height="56" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -314,9 +314,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="765" y="414" text-anchor="middle" font-size="11" fill="#6B7280">int8/16/32 · LZF 压缩串</text>
 
   
-  <rect x="40" y="460" width="820" height="60" rx="6" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="60" y="484" font-size="12" font-weight="700" fill="#EF4444">关键取舍</text>
-  <text x="60" y="504" font-size="12" fill="#374151">取“加载快、文件小”，舍“可随机访问”，RDB 必须整体加载，不支持按 key 定位。</text>
+  <rect x="40" y="460" width="820" height="42" rx="6" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="450" y="486" text-anchor="middle" font-size="12.5" font-weight="600" fill="#EF4444">整体加载 · 不支持按 key 随机定位</text>
 </svg>
 </div><figcaption>图 8-2　RDB 文件布局：magic / version / metadata / db-selector / entries / CRC64 footer。</figcaption></figure>
 <p>整个文件分成几个清晰段落：开头魔数与版本号做自识别，metadata 区存辅助字段（如 Redis 版本、创建时间、repl-stream-db 等元信息），db-selector 标记接下来的数据属于哪个 db，entries 段是一条条键值记录，结尾是 8 字节 CRC64 校验。CRC64 放尾部而非头部，是因为校验要覆盖从文件开头（含魔数和版本号）到末尾校验和之前的全部内容，写完才能算出来；加载时先校验，失败直接拒绝加载，避免把损坏数据载入内存。</p>
@@ -346,7 +345,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <line x1="160" y1="100" x2="160" y2="560" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4 3"/>
   <rect x="90" y="74" width="140" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="160" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">主进程</text>
+  <text x="160" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">父进程</text>
 
   
   <line x1="470" y1="100" x2="470" y2="560" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4 3"/>
@@ -365,12 +364,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="315" y="122" text-anchor="middle" font-size="12" fill="#111827">① BGREWRITEAOF 触发 fork（写时复制共享内存）</text>
 
   
-  <rect x="420" y="150" width="100" height="50" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <rect x="415" y="150" width="110" height="50" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="470" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#4F46E5">遍历内存</text>
-  <text x="470" y="190" text-anchor="middle" font-size="10" fill="#374151">生成全量命令</text>
+  <text x="470" y="190" text-anchor="middle" font-size="10" fill="#374151">生成 RDB 全量快照</text>
 
   <line x1="480" y1="200" x2="770" y2="200" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_3_arrow)"/>
-  <text x="625" y="192" text-anchor="middle" font-size="12" fill="#111827">② 写 temp-rewrite.aof（混合格式）</text>
+  <text x="625" y="192" text-anchor="middle" font-size="12" fill="#111827">② 写 temp-rewrite.aof</text>
 
   
   <rect x="100" y="225" width="120" height="44" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="1.5"/>
@@ -379,7 +378,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <line x1="220" y1="290" x2="770" y2="290" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_3_arrow)"/>
-  <text x="495" y="282" text-anchor="middle" font-size="12" fill="#374151">③ 同时追加到旧 AOF（保底）</text>
+  <text x="495" y="282" text-anchor="middle" font-size="12" fill="#374151">③ 同时追加到旧 AOF（兜底）</text>
 
   <rect x="100" y="305" width="120" height="44" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="160" y="324" text-anchor="middle" font-size="11" font-weight="600" fill="#4F46E5">aof_rewrite</text>
@@ -390,7 +389,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <line x1="470" y1="370" x2="170" y2="370" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_8_3_arrow)"/>
-  <text x="320" y="362" text-anchor="middle" font-size="12" fill="#111827">⑤ 子进程完成，发信号通知主进程</text>
+  <text x="320" y="362" text-anchor="middle" font-size="12" fill="#111827">⑤ 子进程完成，发信号通知父进程</text>
 
   
   <rect x="400" y="390" width="140" height="44" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -526,7 +525,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>原地改页最大的风险是断电导致的半写（partial write）。一个 16KB 页，操作系统可能只写了前 4KB 或前 8KB 就断电，剩下的没写：页结构损坏，Page Directory 与 User Records 对不上，校验和不过。更糟的是 redo log 假设页本身完整：redo log 记录的是"对完整页做的物理修改"，重做的前提是页已处于某个一致状态。半写的页连"完整"这一关都没过，redo log 救不了它。</p>
 <p>InnoDB 的解法是双写缓冲（doublewrite buffer）。脏页刷盘前，先顺序写到一段连续的双写缓冲，再写到正式位置；恢复时若某页校验和不对，从双写缓冲取回那个页的完整副本，再用 redo 重放到最新。双写缓冲早期放在共享表空间的连续区，后来改为独立 doublewrite 文件，但其"连续顺序写、多写一份"的本质不变。多写的代价是写放大：同一份脏页要刷两次盘，但因为双写缓冲是连续的顺序写，对性能影响有限。</p>
 <p>redo log 本身是循环日志，按 512 字节块对齐。512 字节匹配传统磁盘扇区的原子写粒度：一次 512 字节的写要么完整要么不发生，不会留下半个扇区的撕裂。先写 redo log（这就是 WAL），再改页；崩溃后用 redo log 把页重做到一致状态。8.0.30 之前 redo log 由固定数量、固定大小的文件循环写；8.0.30 起改为由 <code>innodb_redo_log_capacity</code> 统一管控的动态容量（默认 100MB），但"循环写 + 512B 块对齐"的物理结构没变。redo log 是物理到页、逻辑到操作的混合日志，记录的是"对哪个页偏移做了什么修改"，既不像纯物理日志那样体积大（每个字节改动都记一条），又不像纯逻辑日志那样难以幂等重做（重做同一个操作可能产生不同结果）。物理逻辑混合日志在"日志体积"与"恢复时能否幂等重做"之间取了折中。循环写的日志还要配一个 checkpoint（检查点）：InnoDB 定期把"脏页已经刷到哪个 LSN"记下来，这之前的 redo 日志就不再需要，崩溃恢复也从 checkpoint 起重放，重放量有界，循环空间才能复用。</p>
-<figure class="fig" id="fig-8-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 67 940 553" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-8-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 67 940 527" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -632,9 +631,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <path d="M 790 310 Q 790 360, 690 380" fill="none" stroke="#EF4444" stroke-width="1.5" marker-end="url(#fig_8_5_arrowR)"/>
 
   
-  <rect x="40" y="540" width="860" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="60" y="564" font-size="12" font-weight="700" fill="#111827">每层可靠性机制防的是哪类故障？</text>
-  <text x="60" y="584" font-size="10.5" fill="#374151">双写缓冲 → 页完整性（修半写）；redo log → 改动可重做（保事务）；CRC/校验和 → 损坏可检测。8.0 支持原子写设备时可关掉双写，硬件解决了那类故障，软件冗余即可撤。</text>
+  <rect x="40" y="540" width="860" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="470" y="566" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">双写防半写 · redo 保重放 · 校验和防损坏</text>
 </svg>
 </div><figcaption>图 8-5　脏页刷盘流程：双写缓冲 → 正式页，配合 redo log 的崩溃恢复路径。</figcaption></figure>
 <p>图中可见完整的双重保护机制：正常写路径上 redo log 先落盘（WAL），脏页先写双写缓冲再写正式位置；崩溃恢复路径上先扫描 redo log，对每条记录检查目标页 LSN，页未损坏且 LSN 落后则重做，页损坏则从双写缓冲取完整副本再重做。两条路径都指向同一个目标，即页完整性：双写缓冲保证页不撕裂，redo log 保证页内容最新。</p>
@@ -645,7 +643,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="sec-8.4.2">8.4.2 日志段（Log Segment）：一组三个文件</h3>
 <p>Kafka 的分区在磁盘上是一串日志段（segment）。每个日志段是一组三个文件：<code>.log</code> 存消息数据本体、<code>.index</code> 存偏移量索引、<code>.timeindex</code> 存时间戳索引。这三个文件是一组的：删日志段时一起删，压实（compaction）时一起重写，生命周期完全一致。</p>
 <p>文件名是该日志段的起始偏移量。比如 <code>00000000000000000000.log</code>、<code>00000000000000123456.log</code>，文件名本身就是这一段消息的最小偏移量。这个设计省了一层结构：文件系统目录就相当于一层稀疏索引。按偏移量定位一条消息时，先把目录里的文件名排序，二分找到起始偏移量不大于目标的最大那个日志段，再进 <code>.log</code> 内部细找。</p>
-<figure class="fig" id="fig-8-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 582" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-8-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 509" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -659,7 +657,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="40" y="90" width="180" height="100" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="130" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">分区（Partition）</text>
   <text x="130" y="138" text-anchor="middle" font-size="11" fill="#374151">topic-0</text>
-  <text x="130" y="158" text-anchor="middle" font-size="11" fill="#374151">= 一串 Segment</text>
+  <text x="130" y="158" text-anchor="middle" font-size="11" fill="#374151">= 一串日志段</text>
   <text x="130" y="178" text-anchor="middle" font-size="10" fill="#6B7280">按偏移量有序排列</text>
 
   
@@ -667,19 +665,19 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="260" y="95" width="130" height="90" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="325" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">Segment A</text>
+  <text x="325" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">日志段 A</text>
   <text x="325" y="138" text-anchor="middle" font-size="10" fill="#374151">文件名 00000</text>
   <text x="325" y="158" text-anchor="middle" font-size="10" fill="#6B7280">起始偏移量 = 0</text>
   <text x="325" y="174" text-anchor="middle" font-size="9" fill="#6B7280">（旧，可能被删）</text>
 
   <rect x="400" y="95" width="130" height="90" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="465" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">Segment B</text>
+  <text x="465" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">日志段 B</text>
   <text x="465" y="138" text-anchor="middle" font-size="10" fill="#374151">文件名 00150</text>
   <text x="465" y="158" text-anchor="middle" font-size="10" fill="#6B7280">起始偏移量 = 150</text>
-  <text x="465" y="174" text-anchor="middle" font-size="9" fill="#6B7280">（活跃中）</text>
+  <text x="465" y="174" text-anchor="middle" font-size="9" fill="#6B7280">（已关闭）</text>
 
   <rect x="540" y="95" width="130" height="90" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-  <text x="605" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">Segment C</text>
+  <text x="605" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">日志段 C</text>
   <text x="605" y="138" text-anchor="middle" font-size="10" fill="#374151">文件名 00320</text>
   <text x="605" y="158" text-anchor="middle" font-size="10" fill="#6B7280">起始偏移量 = 320</text>
   <text x="605" y="174" text-anchor="middle" font-size="9" fill="#6B7280">（当前写入）</text>
@@ -688,11 +686,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="530" y1="140" x2="540" y2="140" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
 
   
-  <line x1="605" y1="185" x2="605" y2="215" stroke="#059669" stroke-width="1.5" marker-end="url(#fig_8_6_arrowG)"/>
-  <text x="615" y="205" font-size="11" font-weight="700" fill="#059669">展开</text>
+  <line x1="465" y1="185" x2="465" y2="215" stroke="#059669" stroke-width="1.5" marker-end="url(#fig_8_6_arrowG)"/>
+  <text x="475" y="205" font-size="11" font-weight="700" fill="#059669">展开</text>
 
   
-  <text x="40" y="240" font-size="14" font-weight="700" fill="#111827">一个 Segment 的三个文件（以 Segment B = 00150 为例）</text>
+  <text x="40" y="240" font-size="14" font-weight="700" fill="#111827">一个日志段的三个文件（以日志段 B = 00150 为例）</text>
 
   
   <rect x="40" y="260" width="280" height="220" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
@@ -748,11 +746,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="780" y="462" text-anchor="middle" font-size="10" fill="#374151">先用 ts 找偏移量，再回 .index</text>
 
   
-  <text x="40" y="510" font-size="14" font-weight="700" fill="#111827">按偏移量查找的免费两层稀疏索引</text>
+  <text x="40" y="510" font-size="14" font-weight="700" fill="#111827">按偏移量查找的两层稀疏索引</text>
 
   <rect x="40" y="525" width="190" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="135" y="546" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">① 文件名二分</text>
-  <text x="135" y="564" text-anchor="middle" font-size="10" fill="#374151">定位到 Segment B</text>
+  <text x="135" y="564" text-anchor="middle" font-size="10" fill="#374151">定位到日志段 B</text>
 
   <rect x="260" y="525" width="190" height="50" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="355" y="546" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">② .index 二分</text>
@@ -769,8 +767,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="230" y1="550" x2="260" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
   <line x1="450" y1="550" x2="480" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
   <line x1="670" y1="550" x2="700" y2="550" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_8_6_arrow)"/>
-
-  <text x="480" y="620" text-anchor="middle" font-size="11" fill="#6B7280">“用文件系统目录结构免费做了一层稀疏索引”，文件名本身就是索引</text>
 </svg>
 </div><figcaption>图 8-6　分区 → 日志段 → 三个文件的目录与内部结构。</figcaption></figure>
 <p>一个分区在磁盘目录里展开成一串日志段，三个文件靠同一个起始偏移量对齐：文件名是它，<code>.index</code> 与 <code>.timeindex</code> 条目里的偏移量字段存的也是相对它的差值。用相对量有直接的好处：段的大小由 <code>log.segment.bytes</code> 封顶，条目要存的差值都有上界，4 字节足够表示，两种索引的条目因此都能保持定长，二分查找按固定步长移动即可。条目的具体构成与两套索引的查找步骤，<a class="xref" href="#sec-8.4.4">8.4.4 节</a>展开。</p>
@@ -798,7 +794,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段的上传、下载和删除。当一个日志段被关闭（达到大小或时间阈值）后，Kafka 异步把它上传到 S3、GCS 或 Azure Blob 等对象存储，本地可以保留也可以丢弃。消费者读取时，先尝试本地磁盘，未命中则从远程存储流式读取，不把远程段重新物化成本地日志段。</p>
 <p>副本同步不走这条路径——Follower 的 FETCH 一律由 Leader 的本地日志服务，Leader 不会把远程段回源给副本。副本的拉取位点落到 Leader 本地起点之前时，Leader 返回 OFFSET_MOVED_TO_TIERED_STORAGE 错误，副本转而启动 tier state machine：从远程存储重建 leader epoch 缓存和 producer snapshot 这些辅助状态，把本地日志起点直接抬到 Leader 的本地起点，再切回正常 FETCH。这条远程追赶路径要访问对象存储、要重建状态，比本地 FETCH 慢；远程存储不可用或元数据缺失时副本只能反复重试，拖过 <code>replica.lag.time.max.ms</code>（默认 30 秒）仍会被移出 ISR。所以本地保留窗口（local retention）依然要盖住最慢 ISR 副本的落后量，为的是让副本留在本地快路径上，不必动辄走远程追赶。这里的设计要点是：<strong>日志段格式完全不变</strong>。<code>.log</code>、<code>.index</code>、<code>.timeindex</code> 这三个文件在远程和本地是同一套结构，存储格式与存储介质解耦。上层 API 和复制层感知不到这层变化：Log 抽象把"数据在哪"这个细节封装在存储层内部，<a class="xref" href="05-layered-architecture.html">第 5 章</a>讲的"让'可替换'出现在最值得替换的地方"在这里正好是一个现成的例子。</p>
 <p>这一变化带来三方面影响。第一，"日志数据必须在本地磁盘"的假设需要修正：正本仍是日志段，但它的物理位置从"必须在本地"变成了"在本地或远程，格式一致"。第二，PageCache 假设被改写：冷数据不经过 PageCache（甚至不在本地磁盘），读远程段的延迟从毫秒级变为数十毫秒级（对象存储 GET 的网络往返）。第三，"存储格式反映访问模式"这条规律多了一个新证据：Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。日志段在本地与远程之间的完整生命周期，画在<a class="xref" href="#fig-8-7">图 8-7</a> 里。</p>
-<figure class="fig" id="fig-8-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 372" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-8-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 344" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_8_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -853,7 +849,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="250" width="810" height="32" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
-  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者请求 → 先查本地 → 未命中则回源远程（fetch-through） → 缓存到本地</text>
+  <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者请求 → 先查本地 → 未命中则回源远程流式读取</text>
   <text x="445" y="298" text-anchor="middle" font-size="11" fill="#6B7280">副本同步不走此路径：Follower 拉取始终由 Leader 本地日志服务</text>
 
   
@@ -865,13 +861,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="670" y="225" text-anchor="middle" font-size="10" fill="#10B981">远程回源</text>
 
   
-  <rect x="40" y="310" width="810" height="90" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
-  <text x="445" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="445" y="360" text-anchor="middle" font-size="12" fill="#374151">存储格式与存储介质解耦，同一套 .log/.index/.timeindex 文件结构，在本地磁盘和远程对象存储之间无需改动格式即可迁移</text>
-  <text x="445" y="380" text-anchor="middle" font-size="12" fill="#374151">Log 抽象封装了"数据在哪"，上层 API 层和复制层完全无感</text>
-  <text x="445" y="396" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
+  <rect x="40" y="310" width="810" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
+  <text x="445" y="336" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
+  <text x="445" y="358" text-anchor="middle" font-size="12" fill="#374151">格式不变 · 介质解耦 · 上层感知不到</text>
+  <text x="445" y="376" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
 </svg>
-</div><figcaption>图 8-7　Kafka Tiered Storage 日志段生命周期：本地热段关闭后异步上传到远程对象存储，消费者读取时先尝试本地、未命中则回源远程；Follower 的副本拉取始终由 Leader 本地日志服务。</figcaption></figure>
+</div><figcaption>图 8-7　Kafka Tiered Storage 日志段生命周期：本地热段关闭后异步上传到远程对象存储，消费者读取时先尝试本地、未命中则回源远程。</figcaption></figure>
 <p><a class="xref" href="#fig-8-7">图 8-7</a> 把生命周期拆成三步：追加写只发生在本地的活跃段，段关闭后才触发异步上传，远程那份是只读的冷段。读取路径分成两条，本地命中和远程回源的延迟差着一个量级，对应前文说的第二点影响。</p>
 <h2 id="sec-8.5">8.5 横向对比</h2>
 <p>把三个软件的具体做法放进同一张表，对比每种范式各为谁优化、各自又付了什么代价。</p>

@@ -188,7 +188,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第一段：先设默认值，再逐层覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数，逐层覆盖。好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这一类 bug。很多线上事故就出在某个配置项忘了初始化。</p>
 <p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器、创建事件循环、分配数据库数组、打开监听端口。信号处理器里，SIGTERM/SIGINT 触发优雅关闭，SIGPIPE 则忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收。这里有一个关键的取舍：<strong>核心基线结构在启动期就一次性预分配，不做懒加载</strong>。启动段就把数据库数组、共享对象（shared objects，例如预创建 0–9999 这 10000 个整数对象供复用）等基线结构分配到位，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
 <p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。<a class="xref" href="#fig-3-2">图 3-2</a> 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF），AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令——这种"RDB 打底、增量重放"的混合格式 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多。</p>
-<figure class="fig" id="fig-3-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 522" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-3-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 438" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -204,11 +204,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="76" y="156" font-size="12" fill="#374151">取舍：先默认值再逐层覆盖</text>
 
   
-  <rect x="330" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <rect x="330" y="70" width="240" height="114" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="450" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">② 基础设施就位</text>
   <text x="346" y="120" font-size="12" fill="#374151">注册信号处理器</text>
   <text x="346" y="138" font-size="12" fill="#374151">创建事件循环 aeCreateEventLoop</text>
   <text x="346" y="156" font-size="12" fill="#374151">预分配数据库数组（不懒加载）</text>
+  <text x="346" y="174" font-size="12" fill="#374151">打开监听端口</text>
 
   
   <rect x="600" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -232,11 +233,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <path d="M720 166 C 720 210, 450 210, 450 240" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#fig_3_2_arrow)"/>
 
   
-  <rect x="60" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="60" y="240" width="240" height="80" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="180" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动确定性取舍</text>
   <text x="76" y="290" font-size="12" fill="#374151">预分配换取运行期内存确定性</text>
   <text x="76" y="308" font-size="12" fill="#374151">代价：启动即占基线内存</text>
-  <text x="76" y="326" font-size="12" fill="#374151">Redis 选“确定”弃“零内存启动”</text>
 
   
   <rect x="600" y="240" width="240" height="96" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
@@ -246,13 +246,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="616" y="326" font-size="12" fill="#374151">优先级体现“完整 &gt; 快”</text>
 
   
-  <rect x="60" y="380" width="780" height="170" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="60" y="380" width="780" height="104" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="80" y="408" font-size="14" font-weight="700" fill="#111827">启动期注册的信号处理器（Unix 服务经典范式）</text>
   <text x="80" y="432" font-size="12.5" fill="#374151">SIGTERM / SIGINT　→　触发优雅关闭（不是立即终止）</text>
   <text x="80" y="452" font-size="12.5" fill="#374151">SIGPIPE　　　　　→　忽略（避免写已关闭连接导致进程被杀）</text>
   <text x="80" y="472" font-size="12.5" fill="#374151">子进程退出　　　→　不靠信号，serverCron 轮询 waitpid(WNOHANG) 回收</text>
-  <text x="80" y="500" font-size="12.5" fill="#374151">Redis 把信号当作“操作系统请求我优雅退出”的协商，而非被暴力杀死。</text>
-  <text x="80" y="524" font-size="12.5" fill="#374151">启动整体顺序：配置 → 基础设施 → 数据恢复 → 事件循环（依赖先行）。</text>
 </svg>
 </div><figcaption>图 3-2　Redis 启动四段式：配置 → 基础设施 → 数据恢复 → 事件循环，数据恢复段含 AOF/RDB 分支。</figcaption></figure>
 <p>AOF 优先是因为它携带的信息严格多于单独的 RDB。即便 7.0 之后 base 文件默认是 RDB 格式，AOF 目录里还多了一份记录"上次重写之后所有写命令"的 incr 文件。加载 base 只能恢复到重写点，再重放 incr 才能恢复到最近一次刷盘。RDB 单独存在时则只有那一个时点。完整优先于快。RDB 在做全量备份、副本同步、快速重启这些场景里仍然是主力。</p>
@@ -333,15 +331,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="50" y="476" font-size="12" fill="#374151">不替你假设</text>
   <text x="50" y="494" font-size="12" fill="#374151">缓存还是主存</text>
 
-  <rect x="740" y="366" width="100" height="262" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="790" y="392" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">履约顺序</text>
-  <text x="752" y="420" font-size="12" fill="#374151">先清子进程</text>
-  <text x="752" y="448" font-size="12" fill="#374151">刷缓冲</text>
-  <text x="752" y="476" font-size="12" fill="#374151">再决定落盘</text>
-  <text x="752" y="504" font-size="12" fill="#374151">关连接</text>
-  <text x="752" y="532" font-size="12" fill="#374151">释放退出</text>
-  <text x="752" y="568" font-size="12" fill="#EF4444">数据先于</text>
-  <text x="752" y="586" font-size="12" fill="#EF4444">连接先于身份</text>
+  <rect x="740" y="366" width="100" height="84" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="790" y="392" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">兑现顺序</text>
+  <text x="752" y="420" font-size="12" fill="#EF4444">数据先于</text>
+  <text x="752" y="438" font-size="12" fill="#EF4444">连接先于身份</text>
 </svg>
 </div><figcaption>图 3-3　Redis 关闭流程：先处理 RDB/AOF 重写子进程，刷 AOF 缓冲，再按 SAVE/NOSAVE 决定 RDB 落盘与否。</figcaption></figure>
 <p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，直接杀掉，不等它完成——优雅关闭把缩短关闭耗时排在抢救半成品快照前面。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上；这不会破坏正确性（rename 不会发生，正本不受影响），留下的垃圾随后会被清理。</p>
@@ -358,7 +351,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
 <ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。MySQL 必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理，最终恢复出严格的事务一致性：已提交的全部保留，未提交的全部回滚。<a class="xref" href="#fig-3-4">图 3-4</a> 把崩溃恢复画成时序图。</p>
-<figure class="fig" id="fig-3-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 548" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-3-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 490" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -384,10 +377,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="750" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">undo log</text>
 
   
-  <line x1="130" y1="104" x2="130" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="340" y1="104" x2="340" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="540" y1="104" x2="540" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="750" y1="104" x2="750" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="130" y1="104" x2="130" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="340" y1="104" x2="340" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="540" y1="104" x2="540" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="750" y1="104" x2="750" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
 
   
   <rect x="40" y="124" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
@@ -420,16 +413,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <path d="M540 404 L135 404" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_4_arrow)"/>
 
   
-  <rect x="40" y="424" width="180" height="40" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
+  <rect x="40" y="424" width="180" height="56" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
   <text x="130" y="442" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">⑥ mysqld ready</text>
   <text x="130" y="458" text-anchor="middle" font-size="11" fill="#374151">ready for connections</text>
+  <text x="130" y="474" text-anchor="middle" font-size="10.5" fill="#6B7280">（逐条回滚可留后台线程）</text>
 
   
-  <rect x="40" y="490" width="800" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="514" font-size="13" font-weight="700" fill="#111827">为什么 MySQL 启动比 Redis 慢</text>
-  <text x="60" y="536" font-size="12" fill="#374151">崩溃恢复分两步：redo 重放（roll forward）先无差别补回所有页修改，恢复出崩溃瞬间的物理页状态；</text>
-  <text x="60" y="554" font-size="12" fill="#374151">undo 回滚（roll back）再根据提交状态撤掉未提交事务：redo 兑现 D（持久性），undo 兑现 A（原子性）。</text>
-  <text x="60" y="572" font-size="12" fill="#374151">红色箭头 = 数据恢复 / 回滚的数据流方向。</text>
+  <rect x="40" y="490" width="800" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="514" font-size="12" fill="#374151">红色箭头 = 数据恢复 / 回滚的数据流方向。</text>
 </svg>
 </div><figcaption>图 3-4　InnoDB 崩溃恢复：从 checkpoint LSN 扫描 redo 无差别重放所有页修改，再用 undo 回滚未提交事务。</figcaption></figure>
 <p>redo 重放和 undo 回滚是两个方向相反的动作，分工也不同。redo 重放是"往前补"，把已经写入 redo 但还没刷到数据页的修改无差别补回去，恢复出崩溃瞬间的物理页状态（这一步不区分事务是否提交，redo 本身只记录页级物理修改）；undo 回滚是"往后撤"，它根据事务提交状态，把尚未 commit 的事务对数据做的修改撤销掉。一进一退之后，缓冲池里的数据页状态正好停在事务一致点上。MySQL 启动慢，但启动后的状态可信。</p>
@@ -452,7 +443,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s54">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段最要紧。</p>
 <ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft 是什么，<a class="xref" href="07-cluster.html">第 7 章</a>有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志存放在同一处、用同一套机制管理。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构。</strong> <a class="xref" href="#fig-3-5">图 3-5</a> 画出了它的布局。</li></ol>
-<figure class="fig" id="fig-3-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-3-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 456" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -525,7 +516,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <path d="M238 280 C 180 280, 160 175, 162 162" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_3_5_arrowR)"/>
 
   
-  <rect x="720" y="100" width="170" height="270" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="720" y="100" width="170" height="186" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="805" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">设计意图</text>
   <text x="734" y="152" font-size="12" fill="#374151">I/O 密集（收发）</text>
   <text x="734" y="170" font-size="12" fill="#374151">与 CPU 密集（处理）</text>
@@ -533,16 +524,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="734" y="222" font-size="12" fill="#374151">避免互相拖累</text>
   <text x="734" y="256" font-size="12" fill="#374151">队列作为线程池</text>
   <text x="734" y="274" font-size="12" fill="#374151">之间的解耦点</text>
-  <text x="734" y="308" font-size="12" fill="#374151">这是 Kafka 高吞吐</text>
-  <text x="734" y="326" font-size="12" fill="#374151">的基本结构</text>
 
   
-  <rect x="40" y="420" width="850" height="138" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="40" y="420" width="850" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="446" font-size="14" font-weight="700" fill="#111827">三层网络在启动链路中的位置（KRaft 模式）</text>
-  <text x="60" y="472" font-size="12.5" fill="#374151">① 日志 / 配置初始化　→　② 元数据管理初始化（追上 Raft 元数据日志）</text>
-  <text x="60" y="492" font-size="12.5" fill="#374151">→　③ 日志管理器启动（恢复每个 TopicPartition，靠 num.recovery.threads.per.data.dir 并行）</text>
-  <text x="60" y="512" font-size="12.5" fill="#374151">→　④ 三层网络架构启动（Acceptor / Processor / Handler）　→　⑤–⑧ 副本管理器 / Controller / 注册集群 / 后台线程</text>
-  <text x="60" y="540" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
+  <text x="60" y="472" font-size="12.5" fill="#374151">三层网络是启动八阶段的第 4 阶段</text>
+  <text x="60" y="500" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
 </svg>
 </div><figcaption>图 3-5　Kafka 三层网络架构：Acceptor 接连接、Processor 解析协议、Handler 线程池执行，请求与响应走队列。</figcaption></figure>
 <p>三层网络的设计意图是把 I/O 密集（收发包）和 CPU 密集（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 <code>num.network.threads</code>）解析协议帧，把请求放入共享的请求队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取请求执行真正的业务（读写日志、副本同步），把响应放回所属 Processor 的响应队列——每个 Processor 一个——再由它发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。处理慢不会阻塞收发，收发慢也不会饿死处理线程。<a class="xref" href="05-layered-architecture.html">第 5 章</a>会从分层架构的角度再次回到这个设计。</p>
@@ -553,7 +540,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用——即 <code>controlled.shutdown.enable=false</code>——或受控关闭失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。</p>
 <p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 角色迁移到 ISR（同步副本集合）里还活着的其他副本上</strong>。它把新的 Leader 任免传达给这些副本——ZK 模式下向副本发 LeaderAndIsr 请求，KRaft 模式下写进元数据日志由各 Broker 应用——让它们接任 Leader。等所有 Leader 都迁移完，Controller 回复"你可以走了"，Broker 才走完整的刷盘退出流程。<a class="xref" href="#fig-3-6">图 3-6</a> 把这条时序和普通关闭画在一起做对照。</p>
-<figure class="fig" id="fig-3-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 940 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-3-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 940 536" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -641,11 +628,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="800" y="486" text-anchor="middle" font-size="11" fill="#6B7280">抖动窗口</text>
 
   
-  <rect x="40" y="510" width="860" height="112" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <rect x="40" y="510" width="860" height="66" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="536" font-size="14" font-weight="700" fill="#111827">取舍本质</text>
-  <text x="60" y="560" font-size="12.5" fill="#374151">普通关闭：代价是分区在 Leader 重选期间短暂不可用（客户端可见抖动）。</text>
-  <text x="60" y="580" font-size="12.5" fill="#374151">受控关闭：代价是关闭耗时更长（要等 Leader 迁移完成）。</text>
-  <text x="60" y="602" font-size="12.5" fill="#111827" font-weight="600">Kafka 选了“用更长的关闭时间换更小的集群可用性影响”，这是单机可用性 vs 集群可用性的取舍。</text>
+  <text x="60" y="560" font-size="12.5" fill="#111827" font-weight="600">Kafka 默认受控关闭：拿关闭速度换集群稳定。</text>
 </svg>
 </div><figcaption>图 3-6　受控关闭：Broker 先告知 Controller，Controller 提前迁移 Leader 后才放行；对照普通关闭的抖动窗口。</figcaption></figure>
 <p>两条路径的差别在客户端感受：普通关闭快，代价是选举期间的分区抖动；受控关闭慢，要等 Leader 迁移完成，但抖动窗口小得多。Kafka 默认走的是后者，拿关闭速度换集群稳定。Broker 退出前多做一段协调工作，换来的是上游业务少经历一次突兀的 Leader 重选。Kafka 是面向高可用的中间件，这个交换是划算的。</p>

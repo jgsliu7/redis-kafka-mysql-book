@@ -146,7 +146,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 的管道（pipeline）与 MULTI/EXEC 把 N 次网络往返合并成 1 次 RTT，AOF 重写把碎片化的历史命令重新合并成一份快照。MySQL 的修改缓冲把对二级索引的随机写合并成批量，组提交把多个事务的 redo log 一次 fsync，预读把随机页请求变成顺序预取。Kafka 的 RecordBatch 把多条消息打包成一个存储单元，生产者攒批 + 副本 FETCH 也批量拉，零拷贝（sendfile）让一批数据跳过用户态直接从页缓存到网卡。</p>
 <p>这条规律这么普适，是因为底层硬件（机械臂、闪存页、网卡包、CPU 缓存行）几乎都对"顺序 + 批量"友好、对"随机 + 单条"不友好。对软件架构师来说，这条规律的第一落点，往往是改写访问模式以适应硬件。靠堆 CPU 收益有限。性能优化先问"这里能不能批、能不能顺序"，再去想换更快的硬件。当我发现自己在一个循环里反复单条调用，就该想想规律三：把单条合并成批。</p>
 <p>这条规律的根，在更底层的存储层次结构里。CPU 的寄存器、L1/L2 缓存、内存、磁盘，本身就是一套"快而小"与"慢而大"交替的分层，每一层替下一层挡掉大部分访问，顺序和批量因此在所有层级上都占便宜。<a class="xref" href="04-memory-disk.html">第 4 章</a>启示五讲的是同一件事在软件层的对应：缓冲池、PageCache、Redis 的内存主存储，都是这条老规律在另一个刻度上的版本。<a class="xref" href="#fig-10-1">图 10-1</a> 把这两个刻度画在了一起。我们在架构上反复遇到的存储取舍，计算机组成里几十年前就给过答案，这也是观察三个软件时最让我在意的一条线索。</p>
-<figure class="fig" id="fig-10-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 530" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-10-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 486" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_10_1_arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
@@ -219,10 +219,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="866" y1="102" x2="866" y2="450" stroke="#6B7280" stroke-width="1.4" marker-start="url(#fig_10_1_arrowGray)" marker-end="url(#fig_10_1_arrowGray)"/>
   <text x="866" y="88" text-anchor="middle" font-size="11.5" fill="#374151">更快 · 更小</text>
   <text x="866" y="470" text-anchor="middle" font-size="11.5" fill="#374151">更慢 · 更大</text>
-
-  
-  <text x="460" y="492" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">同一条思路：快而小、慢而大、逐层缓存</text>
-  <text x="460" y="512" text-anchor="middle" font-size="11.5" fill="#6B7280">每一层替下一层挡掉大部分访问</text>
 </svg>
 </div><figcaption>图 10-1　存储层次的对照：左侧是处理器的存储层次（寄存器→L1/L2 缓存→内存→磁盘），右侧是 Redis、MySQL、Kafka 在"内存-磁盘"之间的对应分层；两侧是同一条"快而小、慢而大、逐层缓存"的思路。</figcaption></figure>
 <p>存储层次由上到下，挡不住的访问才落到更慢的一层。三个软件的差异，只是各自主要服务的层级不同。</p>
@@ -319,7 +315,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区时继续提供服务</text>
   <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
-  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
+  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽分片</text>
 
   
   <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_10_2_arrow)"/>
@@ -382,12 +378,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 可插拔引擎</text>
 
   
-  <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
-  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型方向随之清楚</text>
   <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">起决定作用的是约束条件</text>
 
   
-  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
 </svg>
 </div><figcaption>图 10-2　实践者选型决策树：四个问题依次收窄，每个叶子对应可借鉴的设计。</figcaption></figure>
 <p>这棵树的根节点是"我要建一个有状态的系统"，然后依次问四个问题：① 数据能丢吗（决定速度/持久性档位）。② 一致性要求多强（决定 CP/AP 倾向）。③ 读写模式是什么（决定空间换时间还是时间换空间）。④ 是否需要长期演进（决定简单/灵活）。每个叶子节点都指向"这种约束组合下，三个软件里谁的设计可借鉴"。用这棵树时，<strong>先回答清楚自己的约束</strong>，再去它们的设计里理解，在那个约束组合下保护机制为什么被设计成那个样子。比如你做一个秒杀库存系统，按决策树会走到"持久性优先 + CP 倾向 + 热点读"的叶子，对应 MySQL 的双 1 与 MGR：强一致场景下，断电不丢、多数派确认这两层保护缺一不可。</p>
@@ -405,7 +399,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>借它们的答案校准你自己系统的尺度。比如"RPO 是多少"这个问题，它们的默认值差异巨大：这是业务问题，得让业务方拍板。12 个问题答完，选型往往就自然确定了。</p>
 <h3 id="sec-10.4.2">10.4.2 从使用者到设计者的四个阶段</h3>
 <p>读这本书的过程，是换一套看问题的方式。这套方式的养成分四个阶段。</p>
-<figure class="fig" id="fig-10-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 100 900 460" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-10-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 158 900 388" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_10_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
@@ -462,15 +456,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="635" y="515" text-anchor="middle" font-size="11.5" font-weight="600" fill="#D97706">第 10 章（本章）</text>
   <text x="635" y="529" text-anchor="middle" font-size="11" fill="#374151">推动从理解者到设计者的转变</text>
   <line x1="610" y1="498" x2="580" y2="335" stroke="#D97706" stroke-width="1.2" marker-end="url(#fig_10_3_arrowGray)"/>
-
-  
-  <rect x="80" y="112" width="560" height="62" rx="6" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="90" y="132" font-size="12" font-weight="700" fill="#111827">设计者的三项核心能力：</text>
-  <text x="90" y="150" font-size="11.5" fill="#374151">① 抽象：看见 B+树/跳表/稀疏索引背后的"索引"本质</text>
-  <text x="90" y="168" font-size="11.5" fill="#374151">② 权衡：理解每个选项的机会成本　　③ 直觉：快速识别瓶颈、预判规模放大后的表现</text>
-
-  
-  <text x="450" y="548" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个阶段的差距在提问方式，从"是什么、怎么配"到"为什么"再到"换我怎么做"逐级变化；设计者阶段是分界线。</text>
 </svg>
 </div><figcaption>图 10-3　从使用者到设计者的四个阶段：四级台阶自下而上，两个虚线标注框标出本书各部分覆盖的阶段。</figcaption></figure>
 <p>四个阶段的差距不在掌握的名词多少，在能独立产出什么：使用者交出一份能跑的配置；理解者能写出机制解释，能判断一次慢查询慢在哪一层；设计者能给出自己系统的结构与取舍方案；创新者定义新的范式。常见的问题有两种。一种是产出停在使用者一级，却借用理解者的词汇：配置照抄别人的结论，说不出适用约束。另一种是机制没吃透就自建系统：往往只复刻了表面结构，原设计要避开的难点照样撞上。每上一级，检验标准都一样：能不能独立产出这一级的东西。</p>

@@ -55,12 +55,12 @@
   <text x="490" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">MyISAM</text>
   <text x="490" y="346" text-anchor="middle" font-size="11" fill="#374151">无事务</text>
   <text x="490" y="366" text-anchor="middle" font-size="11" fill="#374151">表锁</text>
-  <text x="490" y="386" text-anchor="middle" font-size="11" fill="#374151">全文索引好</text>
+  <text x="490" y="386" text-anchor="middle" font-size="11" fill="#374151">全文索引曾更好</text>
 
   <rect x="580" y="296" width="140" height="110" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="650" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Memory</text>
   <text x="650" y="346" text-anchor="middle" font-size="11" fill="#374151">内存表</text>
-  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">Hash 索引</text>
+  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">哈希索引</text>
   <text x="650" y="386" text-anchor="middle" font-size="11" fill="#374151">重启即失</text>
 
   <rect x="580" y="416" width="140" height="48" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3"/>
@@ -71,5 +71,5 @@
   <rect x="120" y="530" width="600" height="0" rx="6" fill="none"/>
 
   <text x="60" y="546" font-size="11" fill="#EF4444" font-weight="600">代价：</text>
-  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是「可插拔」带来的固有开销。</text>
+  <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是“可插拔”带来的固有开销。</text>
 </svg>

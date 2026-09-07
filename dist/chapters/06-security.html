@@ -222,7 +222,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="300" y="12" font-size="11" fill="#374151">审计（旁路记录，贯穿全程）</text>
 
     <rect x="520" y="0" width="14" height="14" rx="2" fill="#F3F4F6" stroke="#6B7280"/>
-    <text x="540" y="12" font-size="11" fill="#374151">中性节点（客户端 / 执行 / 磁盘）</text>
+    <text x="540" y="12" font-size="11" fill="#374151">非安全环节（客户端 / 执行 / 磁盘）</text>
   </g>
 
   
@@ -255,7 +255,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。</p>
 <p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省），内部默认也是 <code>SASL_SSL</code>（强制认证加加密）；受信内网若要省 CPU，才把某一档降成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让运维按网络域给不同端口配不同协议。<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
-<figure class="fig" id="fig-6-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 512" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-6-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 444" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -317,7 +317,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   
   <rect x="650" y="135" width="200" height="355" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="750" y="160" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">共享安全内核</text>
+  <text x="750" y="160" text-anchor="middle" font-size="14" font-weight="700" fill="#065F46">监听器之后的共享部分</text>
   <line x1="670" y1="172" x2="830" y2="172" stroke="#059669" stroke-width="1"/>
 
   
@@ -333,26 +333,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="750" y="312" text-anchor="middle" font-size="11" fill="#374151">前缀授权（app-a.）</text>
 
   
-  <rect x="670" y="330" width="160" height="58" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
+  <rect x="670" y="330" width="160" height="48" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
   <text x="750" y="352" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">审计日志</text>
-  <text x="750" y="370" text-anchor="middle" font-size="11" fill="#374151">Authorizer 决策</text>
-  <text x="750" y="384" text-anchor="middle" font-size="11" fill="#374151">+ 请求拦截器</text>
+  <text x="750" y="370" text-anchor="middle" font-size="11" fill="#374151">Authorizer 决策日志</text>
 
   
-  <rect x="670" y="402" width="160" height="68" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
-  <text x="750" y="424" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">主题分区</text>
-  <text x="750" y="442" text-anchor="middle" font-size="11" fill="#374151">日志段读写</text>
-  <text x="750" y="458" text-anchor="middle" font-size="11" fill="#374151">副本同步（亦 TLS）</text>
+  <rect x="670" y="392" width="160" height="68" rx="6" fill="#FFFFFF" stroke="#059669" stroke-width="1.3"/>
+  <text x="750" y="414" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">主题分区</text>
+  <text x="750" y="432" text-anchor="middle" font-size="11" fill="#374151">日志段读写</text>
+  <text x="750" y="448" text-anchor="middle" font-size="11" fill="#374151">副本同步（也走 TLS）</text>
 
   
   <line x1="590" y1="185" x2="646" y2="215" stroke="#059669" stroke-width="1.6" marker-end="url(#fig_6_2_arrow-green)"/>
   <line x1="590" y1="355" x2="646" y2="240" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_6_2_arrow)"/>
   <line x1="590" y1="460" x2="646" y2="265" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_6_2_arrow)"/>
-
-  
-  <rect x="30" y="515" width="820" height="52" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="440" y="535" text-anchor="middle" font-size="12" fill="#374151">设计要点：同一进程多监听器并存，每条路径独立配置协议、端口、证书与 advertised 域名 → 按网络域分级信任。</text>
-  <text x="440" y="554" text-anchor="middle" font-size="12" fill="#374151">代价：配置矩阵复杂；副本同步、控制面、客户端三跳都必须独立配置 TLS。</text>
 </svg>
 </div><figcaption>图 6-2　内部 SASL_SSL、外部 SASL_SSL、控制面 KRaft 三条路径并行，按网络域分级信任。</figcaption></figure>
 <p>这套分层的代价是配置矩阵成倍增长：每个监听器都要独立配协议、端口、证书与 <code>advertised.listeners</code>，配置项随监听器数乘 Broker 数增长。生产环境最常见的故障也出在这里——客户端从 bootstrap 地址拿到的 advertised 主机名不属于自己所在的网络域，连接建不起来。应对是把每个域的监听器配置固化成模板、证书按域独立签发与轮转，让"哪个域用哪套配置"成为一份可审计的清单。这份复杂度换来的是：每段链路的认证与加密可以按它面对的网络域单独定级。</p>
@@ -363,7 +357,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>命令类别是关键抽象。Redis 把上百条命令归成二十来个类别：既有 <code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code> 这类语义组，也有 <code>@fast</code>、<code>@slow</code> 这类性能分桶。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分桶"的命名让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
 <p>键模式控制作用范围。<code>~keys:*</code> 限定用户只能访问匹配该模式的键，这让多租户场景下不同应用可以按前缀隔离。</p>
 <p><a class="xref" href="#fig-6-3">图 6-3</a> 展示了一次完整连接里 Redis ACL 的工作流程。</p>
-<figure class="fig" id="fig-6-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 497" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-6-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 479" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -382,7 +376,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="600" y="75" width="160" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="680" y="94" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">Redis 服务端</text>
-  <text x="680" y="110" text-anchor="middle" font-size="11" fill="#374151">ACL 规则引擎</text>
+  <text x="680" y="110" text-anchor="middle" font-size="11" fill="#374151">ACL 检查</text>
 
   
   <line x1="200" y1="119" x2="200" y2="480" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
@@ -441,9 +435,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="468" text-anchor="middle" font-size="12" fill="#111827">⑥ 返回 NOPERM（无权限）</text>
 
   
-  <rect x="20" y="500" width="840" height="48" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
-  <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">认证一次绑定到会话；之后每条命令都过"命令类别（@read/@write/@dangerous…）× 键模式（~keys:*）"二维检查。</text>
-  <text x="440" y="538" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 主要的轻量审计来源。</text>
+  <rect x="20" y="500" width="840" height="30" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="440" y="520" text-anchor="middle" font-size="12" fill="#374151">拒绝会写入 <tspan font-weight="600" fill="#EF4444">ACL LOG</tspan>，构成 Redis 主要的轻量审计来源。</text>
 </svg>
 </div><figcaption>图 6-3　会话级认证一次，每条命令都走"命令类别加键模式"二维授权检查。</figcaption></figure>
 <p>连接建立时客户端先用 <code>AUTH alice &lt;密码&gt;</code> 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice。这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查：服务端根据当前用户绑定的规则，分别检查命令类别（GET 属于 @read）和键模式（<code>keys:1</code> 匹配 <code>~keys:*</code>）两个维度，两项都命中才放行。图中 alice 执行 <code>GET keys:1</code> 通过，但执行 <code>FLUSHALL</code> 会被拒绝：<code>FLUSHALL</code> 属于 @dangerous，alice 的规则里没有授予。</p>
@@ -452,7 +445,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 的默认策略其实长期没有收紧到"默认安全"。7.x 里 <code>default</code> 用户的内置规则仍是 <code>user default on nopass ~* &amp;* +@all</code>：启用、无密码、全键、全通道、全命令，即无认证状态，靠的是向后兼容，不能指望它替你兜底。真正起作用的是 <code>protected-mode</code>（保护模式，3.2.0 起，默认开启）：当 Redis 绑定全部网卡且没有配置任何密码、<code>AUTH</code> 等认证手段时，它只接受本地回环连接，对外网连接直接拒绝。换句话说，protected-mode 拦的是"裸监听被外网命中"，不替代认证本身。要真正加固，还得运维自己动手：显式给 <code>default</code> 用户设密码或直接禁用（例如 <code>ACL SETUSER default off</code> 禁用用户，或 <code>ACL SETUSER default resetpass</code> 清空密码并同时移除 nopass 标记——此后没有密码就再也没法认证成 default）。</p>
 <h3 id="s129">MySQL：多层级权限表加 8.0 RBAC</h3>
 <p>MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分五层：全局、数据库、表、列、存储程序。这套层级对应 <code>mysql.user</code>、<code>mysql.db</code>、<code>mysql.tables_priv</code>、<code>mysql.columns_priv</code>、<code>mysql.procs_priv</code> 多张权限表。授权检查时，从全局到列逐层收窄，命中即停。</p>
-<figure class="fig" id="fig-6-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 73 880 507" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-6-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 73 880 513" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -536,7 +529,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="620" y1="383" x2="620" y2="408" stroke="#059669" stroke-width="2" marker-end="url(#fig_6_4_arrow-green)"/>
   <rect x="470" y="412" width="300" height="42" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
   <text x="620" y="430" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">放行：返回 phone 列值</text>
-  <text x="620" y="446" text-anchor="middle" font-size="11" fill="#374151">（其余列即使表级无权，列级命中也允许）</text>
+  <text x="620" y="446" text-anchor="middle" font-size="11" fill="#374151">（即使表级无权，列级授权命中即可读该列）</text>
 
   
   <line x1="620" y1="135" x2="620" y2="153" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
@@ -545,10 +538,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="620" y1="323" x2="620" y2="333" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_6_4_arrow)"/>
 
   
-  <rect x="60" y="478" width="760" height="80" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="60" y="478" width="760" height="96" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
-  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，按"账号加库表"组织成权限 bitmap，命中即 O(1)。</text>
-  <text x="80" y="540" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，</text>
+  <text x="80" y="540" font-size="12" fill="#374151">按"账号加库表"组织成位图（bitmap）化权限结构，绝大多数热路径一次内存查询。</text>
+  <text x="80" y="560" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>
 </div><figcaption>图 6-4　权限从全局到列逐层收窄的检查路径，命中即停。</figcaption></figure>
 <p>一条 <code>SELECT phone FROM db.users</code> 要先查全局权限表（是否对该账号授予了全局权限），未命中再查数据库级、表级，最后到列级（phone 这一列有没有 SELECT）。这种"逐层收窄、命中即停"的设计有一个直接代价：层级越细检查越慢。MySQL 的应对是在启动时把授权表整表载入内存，按"账号加库表"组织成位图（bitmap）化的权限结构，授权检查在绝大多数热路径上就变成一次内存查询。</p>

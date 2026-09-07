@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 548" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 490" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -25,10 +25,10 @@
   <text x="750" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">undo log</text>
 
   <!-- Lifelines (dashed vertical) -->
-  <line x1="130" y1="104" x2="130" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="340" y1="104" x2="340" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="540" y1="104" x2="540" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
-  <line x1="750" y1="104" x2="750" y2="540" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="130" y1="104" x2="130" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="340" y1="104" x2="340" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="540" y1="104" x2="540" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="750" y1="104" x2="750" y2="490" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4 4"/>
 
   <!-- Step 1: 读 checkpoint LSN -->
   <rect x="40" y="124" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
@@ -60,15 +60,13 @@
   <text x="540" y="398" text-anchor="middle" font-size="11" fill="#374151">已提交保留 · 未提交回滚</text>
   <path d="M540 404 L135 404" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
 
-  <!-- Step 6: 可服务 -->
-  <rect x="40" y="424" width="180" height="40" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
+  <!-- Step 6: 可服务（逐条回滚可留后台线程，不阻塞 ready） -->
+  <rect x="40" y="424" width="180" height="56" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width="1.2"/>
   <text x="130" y="442" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">⑥ mysqld ready</text>
   <text x="130" y="458" text-anchor="middle" font-size="11" fill="#374151">ready for connections</text>
+  <text x="130" y="474" text-anchor="middle" font-size="10.5" fill="#6B7280">（逐条回滚可留后台线程）</text>
 
-  <!-- Legend / takeaway -->
-  <rect x="40" y="490" width="800" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="514" font-size="13" font-weight="700" fill="#111827">为什么 MySQL 启动比 Redis 慢</text>
-  <text x="60" y="536" font-size="12" fill="#374151">崩溃恢复分两步：redo 重放（roll forward）先无差别补回所有页修改，恢复出崩溃瞬间的物理页状态；</text>
-  <text x="60" y="554" font-size="12" fill="#374151">undo 回滚（roll back）再根据提交状态撤掉未提交事务：redo 兑现 D（持久性），undo 兑现 A（原子性）。</text>
-  <text x="60" y="572" font-size="12" fill="#374151">红色箭头 = 数据恢复 / 回滚的数据流方向。</text>
+  <!-- Legend -->
+  <rect x="40" y="490" width="800" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="514" font-size="12" fill="#374151">红色箭头 = 数据恢复 / 回滚的数据流方向。</text>
 </svg>

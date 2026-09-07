@@ -209,12 +209,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="764" y="277" text-anchor="middle" font-size="10" fill="#374151">差距在吞吐（带宽 vs IOPS）</text>
 
   
-  <rect x="540" y="358" width="290" height="64" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
-  <text x="685" y="376" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EF4444">Kafka 采用顺序写的根因</text>
-  <text x="685" y="394" text-anchor="middle" font-size="10.5" fill="#374151">机械盘：省寻道，延迟差两个数量级</text>
-  <text x="685" y="411" text-anchor="middle" font-size="10.5" fill="#374151">SSD：差距转向吞吐与写放大</text>
-
-  
   
   <rect x="40" y="372" width="178" height="42" rx="5" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="129" y="389" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111827">内存比机械盘快</text>
@@ -226,7 +220,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <text x="440" y="500" text-anchor="middle" font-size="12" fill="#374151">数据为典型量级估值；实际值因硬件、负载、队列深度而异，但数量级关系稳定。</text>
-  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上「等长」不等于「等比」，每一格都是 10 倍差距</text>
+  <text x="440" y="520" text-anchor="middle" font-size="11.5" font-style="italic" fill="#6B7280">对数轴上每一格等长，代表的都是 10 倍差距</text>
 </svg>
 </div><figcaption>图 4-1　存储层次访问延迟的数量级（对数轴）：内存到机械盘横跨五个数量级。</figcaption></figure>
 <p>这张图重点看两处标注。第一，内存柱与机械盘柱的长度差，直接说明了为什么要有缓冲池、为什么 Redis 把数据放进内存。第二，SSD 顺序读与随机读两条柱的对比——单次延迟在同一量级，差距不在延迟在吞吐：顺序读吃满盘的顺序带宽，随机读被 IOPS 上限压住。这个差距要分介质说：机械盘上顺序与随机的单次延迟才差着两个数量级（毫秒级寻道代价）；SSD 上差距移到了吞吐与写放大。Kafka 采用顺序写，InnoDB 用 WAL 把随机写改造成顺序写，这套设计诞生于机械盘时代，到 SSD 上收益变成了高吞吐与低写放大。</p>
@@ -249,7 +243,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>LFU 看频率、LRU 看时间，这是两者的本质差异。举个具体场景：你跑一次全表扫描把一批冷数据读进 Redis，过几秒又来一波真正的热点查询。LRU 下，刚被扫到的冷数据"最新"，会淘汰前面的热数据；LFU 下，冷数据的计数器还是低值，热数据因为高频访问计数器已经爬高，被淘汰的会是冷数据。所以全表扫描后再来热点查询，LFU 能保住热数据不被冷数据淘汰。</p>
 <p>Redis 把淘汰策略做成八种，可以归成三组。<code>noeviction</code> 是内存满了直接报错、不淘汰，适合"数据不能丢"的场景。<code>allkeys-lru</code> / <code>allkeys-lfu</code> / <code>allkeys-random</code> 在全部键里挑淘汰对象。<code>volatile-lru</code> / <code>volatile-lfu</code> / <code>volatile-random</code> / <code>volatile-ttl</code> 只在设置了过期时间（TTL）的键里挑淘汰对象。第三组的存在是为了混合场景：同一份 Redis 既当缓存（带 TTL，可淘汰）又当小型持久存储（不带 TTL，永不淘汰）。</p>
 <p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
-<figure class="fig" id="fig-4-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 588" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-4-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 453" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -365,14 +359,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="830" y="436" text-anchor="middle" font-size="11" fill="#374151">访问一次 → 计数小</text>
   <text x="830" y="452" text-anchor="middle" font-size="11" fill="#374151">优先被淘汰</text>
 
-  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU「扫描一次冷数据挤掉热数据」的问题</text>
-
-  
-  <rect x="40" y="540" width="880" height="90" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="564" font-size="13" font-weight="700" fill="#111827">本质差异</text>
-  <text x="60" y="586" font-size="12" fill="#374151">LRU 看时间：谁最久没被访问就淘汰谁（采样近似实现）。</text>
-  <text x="60" y="606" font-size="12" fill="#374151">LFU 看频率：谁访问得少就淘汰谁（Morris 计数器 + 衰减实现）。</text>
-  <text x="60" y="624" font-size="11" fill="#6B7280">二者都通过「放弃精确、换回性能」达成 O(1) 淘汰决策。</text>
+  <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU“扫描一次冷数据挤掉热数据”的问题</text>
 </svg>
 </div><figcaption>图 4-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
 <p>LRU 一侧，淘汰逻辑从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰机制，只是比较维度从时间换成了频率。</p>
@@ -403,7 +390,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="320" y="92" width="200" height="72" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
-  <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 主进程</text>
+  <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 父进程</text>
   <text x="420" y="138" text-anchor="middle" font-size="12" fill="#374151">内存数据结构</text>
   <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / listpack）</text>
 
@@ -411,7 +398,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_4_3_arrow)"/>
 
   
-  <text x="545" y="156" font-size="12" fill="#374151">同时触发持久化 ↓</text>
+  <text x="545" y="156" font-size="12" fill="#374151">写命令分别进入两条持久化路径 ↓</text>
 
   
   
@@ -490,7 +477,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>LRU List 是缓冲池的核心，InnoDB 没有直接用朴素 LRU，而是把它改良成了"新老分区"。整个 LRU List 被一个叫 <code>midpoint</code> 的点分成两段：靠头的 <strong>New Sublist</strong> 占约 5/8，是热区；靠尾的 <strong>Old Sublist</strong> 占约 3/8，是冷区。一个从磁盘新读入的页不进热区头部，而是被插到 <code>midpoint</code>，也就是冷区的头部。它必须在冷区停留超过 <code>innodb_old_blocks_time</code>（默认 1000 毫秒）之后再次被访问，才能晋升进热区。</p>
 <p>这个改良专门对付<strong>全表扫描污染缓冲池</strong>。一次大扫描会把成千上万个页读进来，这些页大多只被访问一次，之后再也不碰。朴素 LRU 会让它们淘汰热数据，造成"扫描过后性能反而变差"。改良版下，这些一次性页先进冷区，如果一秒内没有被再次访问，根本晋升不到热区就被淘汰，真正的热数据不受影响，在全表扫描场景下能把热数据命中率维持在高位，代价只是冷区管理的一点额外开销。</p>
 <p>下图把三分链表和 midpoint 的位置画出来。</p>
-<figure class="fig" id="fig-4-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 54 960 646" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-4-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 54 960 538" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_4_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -596,12 +583,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <path d="M 920 170 L 936 170 L 936 80 L 160 80 L 160 88" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#fig_4_4_arrow)"/>
   <text x="548" y="74" text-anchor="middle" font-size="10" fill="#6B7280">淘汰页归还 Free List（Old 区尾部）</text>
-
-  
-  <rect x="40" y="600" width="880" height="80" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="624" font-size="13" font-weight="700" fill="#111827">设计要点</text>
-  <text x="60" y="646" font-size="12" fill="#374151">1）三分链表各司其职：Free 管空闲、LRU 管命中、Flush 管刷盘；同一页可同时位于 LRU 与 Flush。</text>
-  <text x="60" y="666" font-size="12" fill="#374151">2）老区分流 + 停留时间门槛，专门对付「全表扫描污染缓冲池」这一陷阱。</text>
 </svg>
 </div><figcaption>图 4-4　InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
 <p>midpoint 这道门槛挡住的是一次性的批量读，挡不住的是另一件事：真正的热数据总量超过热区容量（约 5/8）时，页照样在热区内互相替换，这时只能加大缓冲池。停留时间之外还有第二个可调参数 <code>innodb_old_blocks_pct</code>（冷区占比）。前面"核心假设"一节里"跑一次大报表，之后整体延迟上升"的现象，有了这道门槛会缓和，但不会消失：扫描占用的磁盘 I/O 带宽还在。</p>
@@ -610,7 +591,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>InnoDB 用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一个事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志写完后这个事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"降到了"顺序写一条日志"。</p>
 <p>"持久"的程度由 <code>innodb_flush_log_at_trx_commit</code> 控制，三个档位对应三种可靠性选择。<strong>1（默认）</strong>：每次事务提交时 fsync 日志文件，事务返回 OK 意味着日志已落盘，单节点不丢数据，代价是每次提交等一次 fsync。<strong>2</strong>：每次提交时把日志写到 OS 的 PageCache，由后台线程每秒统一 fsync 一次，提交不卡 fsync 但 OS 崩溃会丢最近约 1 秒的事务。<strong>0</strong>：提交时不写日志，由后台每秒写一次并 fsync，MySQL 崩溃也丢约 1 秒事务，生产极少使用。</p>
 <p>下图展示一次写操作在时间轴上的全链路。</p>
-<figure class="fig" id="fig-4-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 682" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-4-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 78 960 617" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -627,31 +608,31 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="40" y="90" width="120" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="100" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">客户端</text>
-  <line x1="100" y1="130" x2="100" y2="700" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="100" y1="130" x2="100" y2="656" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
 
   
   <rect x="220" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="290" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">InnoDB 引擎</text>
   <text x="290" y="124" text-anchor="middle" font-size="10" fill="#374151">事务执行</text>
-  <line x1="290" y1="130" x2="290" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="290" y1="130" x2="290" y2="656" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
 
   
   <rect x="420" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="490" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">缓冲池</text>
   <text x="490" y="124" text-anchor="middle" font-size="10" fill="#374151">Buffer Pool</text>
-  <line x1="490" y1="130" x2="490" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="490" y1="130" x2="490" y2="656" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
 
   
   <rect x="620" y="90" width="140" height="40" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="690" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">redo log</text>
   <text x="690" y="124" text-anchor="middle" font-size="10" fill="#374151">（顺序写）</text>
-  <line x1="690" y1="130" x2="690" y2="700" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="690" y1="130" x2="690" y2="656" stroke="#D97706" stroke-width="1" stroke-dasharray="3,3"/>
 
   
   <rect x="820" y="90" width="120" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="880" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">磁盘</text>
   <text x="880" y="124" text-anchor="middle" font-size="10" fill="#374151">表空间文件</text>
-  <line x1="880" y1="130" x2="880" y2="700" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="880" y1="130" x2="880" y2="656" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"/>
 
   
   
@@ -661,7 +642,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <line x1="290" y1="200" x2="684" y2="200" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_4_5_arrowRed)"/>
   <text x="487" y="193" text-anchor="middle" font-size="11" fill="#EF4444" font-weight="700">② 先写 redo log（WAL，顺序写）</text>
-  <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">「这页要怎么改」先落盘，崩溃后可重放</text>
+  <text x="487" y="216" text-anchor="middle" font-size="10" fill="#374151">“这页要怎么改”先落盘，崩溃后可重放</text>
 
   
   <line x1="290" y1="250" x2="484" y2="250" stroke="#D97706" stroke-width="1.6" marker-end="url(#fig_4_5_arrowInd)"/>
@@ -697,20 +678,18 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="420" y="510" width="460" height="50" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
   <text x="650" y="532" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">⑥ Checkpoint：按 Flush List 顺序刷脏页</text>
-  <text x="650" y="550" text-anchor="middle" font-size="11" fill="#374151">后台线程依「最早修改时间」排队，批量顺序写回</text>
+  <text x="650" y="550" text-anchor="middle" font-size="11" fill="#374151">后台线程依“最早修改时间”排队，批量顺序写回</text>
 
   
   <line x1="876" y1="560" x2="880" y2="592" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_4_5_arrowRed)"/>
   <text x="918" y="580" font-size="10" fill="#EF4444">刷盘</text>
 
   
-  <rect x="40" y="612" width="880" height="76" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="634" font-size="13" font-weight="700" fill="#111827">崩溃恢复（重启时）</text>
-  <text x="60" y="656" font-size="12" fill="#374151">redo log 已落盘的修改，重放补回未刷盘的脏页；半页损坏从双写缓冲区还原。</text>
-  <text x="60" y="676" font-size="11" fill="#6B7280">核心：随机写数据页慢且易损坏 → 用顺序日志保住可靠与速度。</text>
+  <rect x="40" y="612" width="880" height="44" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="60" y="638" font-size="12" fill="#374151">核心：随机写慢 → WAL 先写顺序日志；页撕裂由双写缓冲兜底</text>
 
   
-  <g transform="translate(40,705)">
+  <g transform="translate(40,668)">
     <line x1="0" y1="8" x2="28" y2="8" stroke="#4B5563" stroke-width="1.8" marker-end="url(#fig_4_5_arrow)"/>
     <text x="36" y="12" font-size="10" fill="#374151">控制流</text>
     <line x1="110" y1="8" x2="138" y2="8" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_4_5_arrowRed)"/>
@@ -745,7 +724,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第二，自己管内存会和 PageCache 形成"双份缓存"。如果 Kafka 在用户态也缓存一份数据，那同一份数据就在内核 PageCache 和用户态各占一份内存，白白浪费一倍。</p>
 <p>第三，进程重启后 PageCache 仍在。这是把内存交给 OS 才有的好处。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动（MySQL 有个小例外：默认缓冲 I/O 下数据文件也过 PageCache，进程重启后页若还在，缓冲池回温会快些；配了 <code>O_DIRECT</code> 则连这层便利也没有）；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好。升级 Kafka 不等于让读性能掉回冷启动水平。</p>
 <p>下图把 Kafka 生产-存储-消费的零拷贝数据流画出来，对比传统拷贝路径。</p>
-<figure class="fig" id="fig-4-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 960 672" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-4-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 960 594" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -761,7 +740,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="40" y="80" width="880" height="290" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="6,4"/>
   <text x="60" y="104" font-size="14" font-weight="700" fill="#D97706">传统 read() + write()：4 次拷贝 · 4 次上下文切换</text>
-  <text x="60" y="122" font-size="11" fill="#374151">数据必须经过用户空间，Kafka（或应用）才能「看到」并转交 Socket</text>
+  <text x="60" y="122" font-size="11" fill="#374151">数据必须经过用户空间，Kafka（或应用）才能读取并转交 Socket</text>
 
   
   <g font-size="11" fill="#111827">
@@ -797,17 +776,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="815" y1="194" x2="815" y2="218" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_6_arrowRed)"/>
 
   
-  <text x="60" y="240" font-size="11" fill="#374151">read()：内核态→用户态（切换1）</text>
+  <text x="60" y="240" font-size="11" fill="#374151">read()：用户态→内核态（切换1）</text>
   <text x="60" y="258" font-size="11" fill="#374151">　　　DMA 把数据搬进 PageCache（①）</text>
-  <text x="60" y="276" font-size="11" fill="#374151">　　　CPU 拷到用户缓冲（②），用户态→内核态（切换2）</text>
-  <text x="60" y="294" font-size="11" fill="#374151">write()：CPU 拷到 Socket 缓冲（③），内核态→用户态（切换3）</text>
-  <text x="60" y="312" font-size="11" fill="#374151">　　　DMA 拷到网卡（④），用户态→内核态（切换4）</text>
+  <text x="60" y="276" font-size="11" fill="#374151">　　　CPU 拷到用户缓冲（②），内核态→用户态（切换2）</text>
+  <text x="60" y="294" font-size="11" fill="#374151">write()：CPU 拷到 Socket 缓冲（③），用户态→内核态（切换3）</text>
+  <text x="60" y="312" font-size="11" fill="#374151">　　　DMA 拷到网卡（④），内核态→用户态（切换4）</text>
   <text x="60" y="338" font-size="11" font-weight="700" fill="#EF4444">代价：4 次拷贝（2 CPU + 2 DMA）· 4 次上下文切换 · 2 份内存冗余</text>
 
   
   <rect x="40" y="390" width="880" height="260" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.4"/>
   <text x="60" y="414" font-size="14" font-weight="700" fill="#059669">零拷贝 sendfile() / Java NIO transferTo：2 次 DMA 拷贝 · 2 次上下文切换</text>
-  <text x="60" y="432" font-size="11" fill="#374151">数据不进用户空间，Kafka 只向内核「指」一段文件范围，由内核直接发给网卡</text>
+  <text x="60" y="432" font-size="11" fill="#374151">数据不进用户空间，Kafka 只向内核传一段文件范围，由内核直接发给网卡</text>
 
   
   <g font-size="11" fill="#111827">
@@ -840,11 +819,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="574" font-size="11" fill="#374151">　　　DMA 把数据读入 PageCache（①）</text>
   <text x="60" y="592" font-size="11" fill="#374151">　　　DMA 带 gather 直接发到网卡（②），内核态→用户态（切换2）</text>
   <text x="60" y="618" font-size="11" font-weight="700" fill="#059669">收益：拷贝数减半 · 切换数减半 · 内存冗余为零 · 消费者按内存速度读已缓存数据</text>
-
-  
-  <rect x="40" y="664" width="880" height="60" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="60" y="686" font-size="13" font-weight="700" fill="#111827">关键前提与边界</text>
-  <text x="60" y="706" font-size="12" fill="#374151">零拷贝只在「消费者读已缓存在 PageCache 的数据」时生效；冷数据仍需磁盘 IO。这正是 Kafka 不自建缓冲池、依赖 OS 的核心好处。</text>
 </svg>
 </div><figcaption>图 4-6　Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
 <p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</p>

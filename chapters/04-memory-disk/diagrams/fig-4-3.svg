@@ -16,7 +16,7 @@
 
   <!-- Redis Main Process (Memory) -->
   <rect x="320" y="92" width="200" height="72" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
-  <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 主进程</text>
+  <text x="420" y="118" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">Redis 父进程</text>
   <text x="420" y="138" text-anchor="middle" font-size="12" fill="#374151">内存数据结构</text>
   <text x="420" y="154" text-anchor="middle" font-size="11" fill="#374151">（哈希表 / 跳表 / listpack）</text>
 
@@ -24,7 +24,7 @@
   <line x1="180" y1="128" x2="316" y2="128" stroke="#4B5563" stroke-width="1.8" marker-end="url(#arrow)"/>
 
   <!-- Branch label -->
-  <text x="545" y="156" font-size="12" fill="#374151">同时触发持久化 ↓</text>
+  <text x="545" y="156" font-size="12" fill="#374151">写命令分别进入两条持久化路径 ↓</text>
 
   <!-- Three paths: RDB / AOF / 混合 -->
   <!-- RDB -->

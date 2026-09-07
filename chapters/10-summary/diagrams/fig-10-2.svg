@@ -70,7 +70,7 @@
   <rect x="610" y="414" width="220" height="58" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.4"/>
   <text x="720" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111827">分区时继续提供服务</text>
   <text x="720" y="453" text-anchor="middle" font-size="11" fill="#374151">社交 feed / 可修冲突</text>
-  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽位分片</text>
+  <text x="720" y="466" text-anchor="middle" font-size="11" fill="#6B7280">→ Redis Cluster 槽分片</text>
 
   <!-- ============ 问题三：读写模式 ============ -->
   <line x1="460" y1="396" x2="460" y2="426" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
@@ -132,11 +132,9 @@
   <text x="720" y="688" text-anchor="middle" font-size="11" fill="#374151">需求多变、长期演进</text>
   <text x="720" y="700" text-anchor="middle" font-size="11" fill="#6B7280">→ MySQL 可插拔引擎</text>
 
-  <!-- 中间收束提示 -->
-  <text x="460" y="668" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">四个问题答完</text>
-  <text x="460" y="684" text-anchor="middle" font-size="11.5" font-weight="600" fill="#EF4444">选型方向随之清楚</text>
+  <!-- 中间收束提示（两行点题句已删，保留约束条件行） -->
   <text x="460" y="702" text-anchor="middle" font-size="10.5" fill="#9CA3AF">起决定作用的是约束条件</text>
 
   <!-- 底注 -->
-  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">读图：四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
+  <text x="460" y="738" text-anchor="middle" font-size="11" fill="#9CA3AF">四个菱形是必答的约束问题，叶子方框是"该借鉴哪家设计"；借鉴的是设计思路，而不是照搬某一家。</text>
 </svg>
