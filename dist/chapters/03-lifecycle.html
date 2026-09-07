@@ -347,9 +347,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的生命周期复杂度明显高于另外两者。原因在于它必须保住事务语义（ACID），这是 Redis 不需要处理、Kafka 也不严格保证的东西。这迫使 MySQL 在启动期多做一件 Redis 没有的事：崩溃恢复。在关闭期则多出一个 Redis 没有的取舍：同一批数据清理工作，要么关机时做完，要么留到下次开机再补。</p>
 <h3 id="s50">启动链路：多了"恢复"这一关键环节</h3>
 <p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层与权限系统、服务循环。第二段最耗时，也是 MySQL 与 Redis 的本质区别所在。</p>
-<p><strong>配置加载段</strong>按固定顺序读取多个 my.cnf 路径（Unix 上从 <code>/etc/my.cnf</code> 读到 <code>~/.my.cnf</code>，同名选项后读的覆盖先读的），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是改的配置后面还有一层在覆盖：<code>~/.my.cnf</code> 里的旧值、SET PERSIST 写进 <code>mysqld-auto.cnf</code> 的持久化值，或启动命令行参数。</p>
+<p><strong>配置加载段</strong>按固定顺序读取多个 my.cnf 路径（Unix 上从 <code>/etc/my.cnf</code> 读到 <code>~/.my.cnf</code>，同名选项后读的覆盖先读的），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是改的配置后面还有一层在覆盖：<code>~/.my.cnf</code> 里的旧值、SET PERSIST（8.0 起把参数改动持久化写进配置文件的命令）写进 <code>mysqld-auto.cnf</code> 的持久化值，或启动命令行参数。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
-<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
+<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（库表列等系统元数据的集合）。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
 <p>第三步是 MySQL 启动比 Redis 慢的根本原因。MySQL 必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理，最终恢复出严格的事务一致性：已提交的全部保留，未提交的全部回滚。<a class="xref" href="#fig-3-4">图 3-4</a> 把崩溃恢复画成时序图。</p>
 <figure class="fig" id="fig-3-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 490" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -430,9 +430,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>服务循环段</strong>进入"每连接一线程"（或线程池）的连接处理模式。至此 MySQL 才对外打印 <code>ready for connections</code>。</p>
 <h3 id="s51">innodb_fast_shutdown：把清理工作在关机与开机之间分摊</h3>
 <p>MySQL 把"关闭时做多少清理"做成一个可配置参数 <code>innodb_fast_shutdown</code>，取 0、1、2 三档。三档之间要权衡的就是一致性和可用性：多清理一步，关闭更安全，但停服时间更长。<a class="xref" href="#table-3-1">表 3-1</a> 把三档的取舍并排放出来。</p>
-<p class="tab-label"><strong>表 3-1　innodb_fast_shutdown 三档对比</strong>（这是 MySQL 专属参数，Redis 与 Kafka 无对应概念）</p>
+<p class="tab-label"><strong>表 3-1　innodb_fast_shutdown 三档对比</strong></p>
 <div class="table-wrap"><table id="table-3-1"><thead><tr><th>维度</th><th>0 = 完全关闭</th><th>1 = 快速关闭（默认）</th><th>2 = 模拟崩溃</th></tr></thead><tbody><tr><td>关闭时做什么</td><td>刷所有脏页 + 完整 purge（清理已无用的 undo 记录）+ 修改缓冲合并 + 完整 checkpoint</td><td>刷脏页但跳过完整 purge 与修改缓冲合并，留给下次启动或后台线程处理</td><td>只刷 redo 不刷数据页，近乎 <code>kill -9</code></td></tr><tr><td>启动时做什么</td><td>几乎不需要崩溃恢复，启动快</td><td>少量恢复工作（清理上一次关闭遗留项）</td><td>完整崩溃恢复，启动慢</td></tr><tr><td>适用场景</td><td>升级、大版本切换前，确保下次启动不出问题</td><td>日常关闭重启</td><td>仅紧急停服，能接受较长启动恢复</td></tr><tr><td>关闭速度</td><td>慢</td><td>中等</td><td>快</td></tr><tr><td>启动速度</td><td>快</td><td>中等</td><td>慢</td></tr></tbody></table></div>
-<p>三档对比下来，规律只有一条：<strong>每种"快"的做法，都是把一部分工作推迟到别的时刻完成</strong>。</p>
+<p>这是 MySQL 专属参数，另外两家没有对应概念。三档对比下来，规律只有一条：<strong>每种"快"的做法，都是把一部分工作推迟到别的时刻完成</strong>。</p>
 <p>默认设为 1 而不是 0：档位 0 要求的完整 purge 和修改缓冲合并，在繁忙库上可能耗时几十分钟甚至更久（修改缓冲把对二级索引页的修改先缓存在内存，等页读入时再补写回去，<a class="xref" href="04-memory-disk.html">第 4 章</a>详述）。这些工作对正确性没有任何贡献，启动后由后台线程在日常运行中逐步完成即可。用"关闭时间不可控"去换"零正确性收益的清理工作"显然不划算，所以默认档把这些工作推迟到运行期，让关闭耗时有个可预期的上界。只有升级、大版本切换这类希望下次启动干干净净的场景，才值得提前用档位 0 关一次。</p>
 <h3 id="s52">关闭慢的常见根因</h3>
 <p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：</p>
@@ -442,7 +442,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 的生命周期是分布式追加写日志的范式。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 关闭设计的核心是"怎么把自己的离开对集群的冲击降到最小"，刷自己的盘只是最基础的一步。</p>
 <h3 id="s54">启动链路：八阶段</h3>
 <p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段最要紧。</p>
-<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft 是什么，<a class="xref" href="07-cluster.html">第 7 章</a>有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志存放在同一处、用同一套机制管理。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构。</strong> <a class="xref" href="#fig-3-5">图 3-5</a> 画出了它的布局。</li></ol>
+<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft：一种多数派共识算法，<a class="xref" href="07-cluster.html">第 7 章</a>有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群的 Controller 是哪个 Broker。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据和数据日志存放在同一处、用同一套机制管理。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构</strong>：Acceptor/Processor/Handler 三层线程模型，把收发包与业务处理分开（下面单独展开）。</li><li><strong>副本管理器启动</strong>，开始拉取数据，或等待副本同步。</li><li><strong>控制器启动</strong>（如果该节点是 Controller 候选），接管集群元数据的协调。</li><li><strong>注册到集群</strong>，对外宣告"我在线了"。</li><li><strong>后台线程启动</strong>，进入服务态。</li></ol>
+<p>八个阶段全部走完，Kafka 才对外打印 <code>[KafkaServer id=0] started</code> 这条就绪日志，和 Redis 的 <code>Ready to accept connections</code>、MySQL 的 <code>ready for connections</code> 是同一类信号。</p>
+<p>第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——对新集群自 3.3 起生产可用，4.0 起彻底移除 ZooKeeper（完整编年史见<a class="xref" href="07-cluster.html">第 7 章</a> 7.4.4）。</p>
 <figure class="fig" id="fig-3-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 456" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -533,9 +535,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 3-5　Kafka 三层网络架构：Acceptor 接连接、Processor 解析协议、Handler 线程池执行，请求与响应走队列。</figcaption></figure>
 <p>三层网络的设计意图是把 I/O 密集（收发包）和 CPU 密集（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 <code>num.network.threads</code>）解析协议帧，把请求放入共享的请求队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取请求执行真正的业务（读写日志、副本同步），把响应放回所属 Processor 的响应队列——每个 Processor 一个——再由它发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。处理慢不会阻塞收发，收发慢也不会饿死处理线程。<a class="xref" href="05-layered-architecture.html">第 5 章</a>会从分层架构的角度再次回到这个设计。</p>
-<ol><li><strong>副本管理器启动</strong>，开始拉取数据，或等待副本同步。</li><li><strong>控制器启动</strong>（如果该节点是 Controller 候选），接管集群元数据的协调。</li><li><strong>注册到集群</strong>，对外宣告"我在线了"。</li><li><strong>后台线程启动</strong>，进入服务态。</li></ol>
-<p>八个阶段全部走完，Kafka 才对外打印 <code>[KafkaServer id=0] started</code> 这条就绪日志，和 Redis 的 <code>Ready to accept connections</code>、MySQL 的 <code>ready for connections</code> 是同一类信号。</p>
-<p>第 2 阶段的 KRaft 不是从来就有：Kafka 的元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用（KIP-833），3.5 起 ZK 模式被标记弃用，ZK→KRaft 迁移工具在 3.4 以 Early Access 引入、3.5 为 preview、3.6 起达到生产可用；3.9 是最后一个支持 ZK 模式的 bridge release，4.0 彻底移除 ZooKeeper。</p>
 <h3 id="s55">关闭：普通关闭 vs 受控关闭</h3>
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p><strong>普通关闭</strong>（受控关闭被禁用——即 <code>controlled.shutdown.enable=false</code>——或受控关闭失败时）的步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。</p>

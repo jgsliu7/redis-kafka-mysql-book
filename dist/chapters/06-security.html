@@ -242,7 +242,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <pre><code class="lang-redis">ACL SETUSER alice on &gt;pwd ~keys:* +get +set</code></pre>
 <p>（<code>&gt;pwd</code> 中的 <code>&gt;</code> 是 ACL 密码前缀，非 shell 重定向符。）</p>
 <p>这条语句创建用户 alice，启用状态、设置密码、允许访问匹配 <code>keys:*</code> 的键、授予 <code>GET</code> 和 <code>SET</code>。每一项都体现同一个取舍：只保留最小可表达单元。Redis 不做 RBAC（基于角色的访问控制），因为内核要轻。Redis 实例上的用户数通常很少，几台应用机器各对应一个用户就够，引入"角色—用户"两层语义会让内核背上不必要的复杂度。把组角色这类复杂语义留给外部的身份管理系统（IAM），是 Redis 一贯划分边界的做法。</p>
-<p>凭证存储上，密码以 SHA-256 摘要形式存（通过 <code>ACL SAVE</code> 持久化到 <code>aclfile</code> 指定的文件，默认无 aclfile，需显式设置；运行时改完可用 <code>ACL LOAD</code> 重新加载），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码的摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。</p>
+<p>凭证存储上，密码以 SHA-256 摘要形式存（通过 <code>ACL SAVE</code> 持久化到 <code>aclfile</code> 指定的文件，默认无 aclfile，需显式设置；在外部编辑过 aclfile 后，用 <code>ACL LOAD</code> 让服务端重读——内存中的运行时改动会被文件覆盖），不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码的摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。</p>
 <h3 id="s125">MySQL：可插拔认证插件是核心抽象</h3>
 <p>MySQL 面向企业市场，从早期就把安全纳入了核心设计：强密码、多层级权限、可审计、可插拔认证。它的安全设计有两个关键点：层级权限表和可插拔认证。</p>
 <p>MySQL 的用户身份由 <code>用户名@主机名</code> 两部分组成，主机名是身份的一部分。这种两部分身份让 MySQL 天生支持"同一个账号在不同来源有不同密码和权限"，这是企业级多来源接入（办公网、VPN、应用网段、跳板机）的现实需求。</p>
@@ -254,7 +254,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>生产环境推荐 SCRAM，尤其是 SCRAM-SHA-512。SCRAM 是挑战—响应机制（RFC 5802）：客户端要持有密码本身，但密码从不上网——客户端用密码加上服务端下发的盐和双方的随机数算出证明，服务端用自己存的加盐迭代哈希派生密钥来验证，服务端被拖库也拿不到明文密码。相比 PLAIN 机制（密码本身要在网络上走一趟，SASL 之下靠 TLS 兜底），它安全得多。SCRAM 的一个关键取舍是凭证存放在元数据存储里：在 3.x 去 ZooKeeper 之后，SCRAM 凭证存在 KRaft 的元数据日志里。这意味着元数据存储本身成了新的信任根：谁能写元数据，谁就能改 SCRAM 凭证。这是分布式系统把信任根从"单点数据库"转移到"共识日志"的典型例子，相应的元数据存储也要严格认证和加密。</p>
 <p>Kafka 还有一个绕不开的循环依赖：KRaft 控制面的节点间共识通信（quorum）不能用 SCRAM 认证，因为 SCRAM 凭证就存在这条共识日志里，要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。所以控制面监听器通常配成预共享证书的 SSL，而把 SCRAM 留给客户端到 Broker 这一层。监听器分层在这里不只是便利，而是机制上的硬性约束。</p>
 <p>委托令牌（Delegation Token）是 Kafka 处理"身份在跳之间频繁传递"的另一招。长期凭证（SCRAM 密码、Kerberos 票据）在客户端和 Broker 之间反复传会有泄露风险，委托令牌是短期有效的令牌，由已认证的客户端向 Broker 申请，之后用令牌做认证，到期自动失效。</p>
-<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省），内部默认也是 <code>SASL_SSL</code>（强制认证加加密）；受信内网若要省 CPU，才把某一档降成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让运维按网络域给不同端口配不同协议。<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
+<p>监听器分层是 Kafka 区别于单机系统的能力。同一个 Broker 进程可以同时开多个监听器：对外一律走 <code>SASL_SSL</code>（外部网络最不可信，认证不能省），内部基线同样建议 <code>SASL_SSL</code>（注意 Kafka 出厂默认 inter-broker 是 PLAINTEXT，必须显式配置）；受信内网若要省 CPU，才把某一档降成 <code>SASL_PLAINTEXT</code>（认证但不加密）。配置项 <code>listeners</code> 和 <code>listener.security.protocol.map</code> 让运维按网络域给不同端口配不同协议。<a class="xref" href="#fig-6-2">图 6-2</a> 画的是其中一种常见布局。</p>
 <figure class="fig" id="fig-6-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 444" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_6_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -576,16 +576,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p class="tab-label"><strong>表 6-1　安全机制四维横向对比</strong></p>
 <div class="table-wrap"><table id="table-6-1"><thead><tr><th>对比维度</th><th>Redis（7.x）</th><th>MySQL（8.0）</th><th>Kafka（3.x）</th></tr></thead><tbody><tr><td>默认是否认证</td><td>否（仅可选密码）</td><td>是（强 root 密码）</td><td>否（明文监听器可选）</td></tr><tr><td>认证抽象</td><td>ACL 用户加多密码</td><td>可插拔认证插件</td><td>SASL 框架加 JAAS</td></tr><tr><td>推荐生产认证</td><td>ACL 加 TLS 客户端证书</td><td>caching_sha2_password</td><td>SCRAM-SHA-512</td></tr><tr><td>凭证存储</td><td>内存加 aclfile（ACL SAVE/LOAD）（SHA-256）</td><td>mysql.user（SHA-256 缓存）</td><td>KRaft/ZK（SCRAM 哈希）</td></tr><tr><td>授权模型</td><td>ACL（用户直绑）</td><td>RBAC 加五级层级</td><td>ACL（资源三元组）</td></tr><tr><td>最细粒度</td><td>键模式加命令</td><td>列级</td><td>资源类型级</td></tr><tr><td>角色继承</td><td>无</td><td>8.0 RBAC</td><td>无（外接 Ranger）</td></tr><tr><td>默认策略</td><td>default 用户默认全开，靠 protected-mode 拦外网</td><td>默认安全（强密码、可删匿名）</td><td>AclAuthorizer 无 ACL 默认放行；StandardAuthorizer 默认拒绝</td></tr><tr><td>传输加密</td><td>6.0+ TLS，可选</td><td>TLS（账号级 REQUIRE）</td><td>TLS 全路径（多监听器）</td></tr><tr><td>存储加密</td><td>无原生</td><td>TDE 表空间加日志加密</td><td>无原生（靠磁盘加密）</td></tr><tr><td>审计能力</td><td>ACL LOG 加 SLOWLOG（弱）</td><td>企业审计插件加 General Log</td><td>Authorizer 日志加拦截器（弱）</td></tr><tr><td>性能取向</td><td>性能优先，安全可选</td><td>安全与功能并重</td><td>模块化可组合</td></tr><tr><td>典型部署假设</td><td>可信内网</td><td>企业网络</td><td>混合或云原生多跳</td></tr></tbody></table></div>
 <p>姿态差异的来源是数据模型与请求要跨的跳数。姿态没有高下，错配才有事故——把内网姿态放到公网，就是本章开头那个爬虫事件的根因。</p>
-<h3 id="s137">三个软件的安全姿态与生产底线</h3>
-<p>Redis 的安全取向是"内网优先、按需叠加"。实用底线：开启 ACL 并为每个应用建独立用户、关闭 default 用户、开启 protected-mode、按需开 TLS、用 ACL LOG 加外接采集补审计，补完这套，Redis 才算从"能用"进入"敢上生产"。</p>
+<h3 id="s137">从姿态对比到生产底线</h3>
+<p>对比之后是底线：三家的姿态落到部署上各有一套最小动作。Redis 的安全取向是"内网优先、按需叠加"。实用底线：开启 ACL 并为每个应用建独立用户、关闭 default 用户、开启 protected-mode、按需开 TLS、用 ACL LOG 加外接采集补审计，补完这套，Redis 才算从"能用"进入"敢上生产"。</p>
 <p>MySQL 走企业级默认安全路线：装好就要求强 root 密码、提供删匿名用户的脚本、可启用 <code>connection_control</code> 插件做连接失败锁定。代价是配置项多、学习曲线陡，但学完之后它能胜任金融、电信这类对合规要求严苛的场景。</p>
 <p>Kafka 把 SASL、TLS、ACL 做成三套可独立启用的模块，让运维按网络域自由组合。代价是配置矩阵复杂，生产化通常需要 Ranger 这类统一管控层来统一管理。评审 Kafka 集群安全时抓住三个重点：监听器分层是否合理、SASL 机制选型、ACL 是否覆盖全部资源。这三个看清了，几十个配置项就容易梳理了。</p>
 <h2 id="sec-6.7">6.7 架构启示</h2>
 <p>安全设计的重心在默认值。这五条启示，选型和评审时能直接拿去对照。</p>
 <h3 id="s139">启示一：默认安全策略要与典型部署环境匹配</h3>
 <p>Redis 默认开放（假设内网）、MySQL 默认收紧（假设企业网络暴露）、Kafka 的默认是中性（假设混合云）。这三个软件的默认值对应各自对"最可能被怎么部署"的预判。配错默认值等于把攻击面留给了运维者的记性：Redis 历史上那些公网无认证被攻陷的案例，本质都是默认值与实际部署环境错配。</p>
-<p>我做安全评审先看两件事：默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。</p>
-<p><strong>原则</strong>：默认安全取决于部署环境。面向公网的服务应默认收紧，内部工具可以更开放。</p>
+<p>我做安全评审先看两件事：默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。一句话：默认安全取决于部署环境——面向公网的服务应默认收紧，内部工具可以更开放。</p>
 <h3 id="s140">启示二：纵深防御，每层都有一点性能开销</h3>
 <p>把安全做成多层叠加：网络隔离、传输加密、认证、授权、审计、存储加密。任何一层单独突破都不致命，攻击者要拿走数据必须同时攻破多层。代价是每一层都有开销：TLS 握手多一到两个 RTT、授权检查每条操作都走一次、审计带来额外 I/O、存储加密吃 CPU。三家都选了多层叠加，没有谁只押网络隔离一层。</p>
 <p>我评审一套系统的安全设计，先数它有几层：只押一层的方案，无论多厚，我都打回。</p>

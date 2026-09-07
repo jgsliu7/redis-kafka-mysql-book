@@ -15,7 +15,7 @@ Left column - Redis RESP:
 - Trade-off: 体积大, 无 Batch
 
 Middle column - MySQL Binary Protocol:
-- Title: "MySQL（紧凑二进制）"
+- Title: "MySQL（二进制封帧）"
 - Three phases: 握手 → 命令 → 响应
 - Pre-compiled statements: COM_STMT_PREPARE → statement_id → COM_STMT_EXECUTE
 - Binary result set: 列元数据前置 + 行数据紧凑编码

@@ -20,7 +20,7 @@
   <!-- MySQL 二进制协议 -->
   <rect x="305" y="50" width="270" height="60" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
   <text x="440" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="#92400E">MySQL 二进制协议</text>
-  <text x="440" y="97" text-anchor="middle" font-size="11" fill="#374151">紧凑二进制 · 预编译 · 二进制结果集</text>
+  <text x="440" y="97" text-anchor="middle" font-size="11" fill="#374151">二进制封帧 · 预编译 · 二进制结果集</text>
 
   <rect x="305" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
   <text x="440" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">预编译流程</text>

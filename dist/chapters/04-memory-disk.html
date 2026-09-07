@@ -132,8 +132,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>任何存储软件都处在同一组物理约束之下。先把这组约束量化。</p>
 <p>表中数字用于建立数量级，不是硬件基准；真实值会随 CPU、磁盘、文件系统、队列深度与负载模型变化。</p>
 <p class="tab-label"><strong>表 4-1　存储介质的访问延迟数量级</strong></p>
-<div class="table-wrap"><table id="table-4-1"><thead><tr><th>存储介质</th><th>典型访问延迟</th><th>相对内存（以内存为 1）</th><th>是否持久</th></tr></thead><tbody><tr><td>CPU L1 缓存</td><td>~1ns</td><td>0.01×</td><td>否</td></tr><tr><td>内存（DRAM）</td><td>~100ns</td><td>1×</td><td>否</td></tr><tr><td>SSD（随机读）</td><td>~100μs（基准值；生产负载下 NVMe 典型在 100–500μs，受 I/O 深度与队列效应影响）</td><td>~1000×</td><td>是</td></tr><tr><td>SSD（顺序写吞吐）</td><td>~300–500MB/s（SATA）；~2–14GB/s（NVMe，随 PCIe 代际递增，Gen3 约 3GB/s、Gen4 约 5–7GB/s、Gen5 可达 10+GB/s）</td><td>吞吐可追平内存随机访问</td><td>是</td></tr><tr><td>机械盘（随机寻道）</td><td>~10ms</td><td>~100000×</td><td>是</td></tr><tr><td>机械盘（顺序写吞吐）</td><td>~100–280MB/s</td><td>顺序吞吐高出随机寻道约两个数量级</td><td>是</td></tr></tbody></table></div>
-<p>这张表里有三个事实。内存比任何持久介质都至少快一个数量级；顺序 I/O 的吞吐能逼近内存随机访问；而持久性，总是要拿延迟或复杂度去换。把这套数量级换算成直观的时间：如果内存访问算 1 秒，SSD 一次随机访问就是 17 分钟，机械盘一次随机寻道是 28 小时。纳秒、微秒、毫秒之间相差三到五个数量级，存储软件要在内存的纳秒和磁盘的毫秒之间跨过这个数量级差距，所有"内存-磁盘"设计都从这里起步。</p>
+<div class="table-wrap"><table id="table-4-1"><thead><tr><th>存储介质</th><th>典型访问延迟</th><th>相对内存（以内存为 1）</th><th>是否持久</th></tr></thead><tbody><tr><td>CPU L1 缓存</td><td>~1ns</td><td>0.01×</td><td>否</td></tr><tr><td>内存（DRAM）</td><td>~100ns</td><td>1×</td><td>否</td></tr><tr><td>SSD（随机读）</td><td>~100μs（基准值；生产负载下 NVMe 典型在 100–500μs，受 I/O 深度与队列效应影响）</td><td>~1000×</td><td>是</td></tr><tr><td>SSD（顺序写吞吐）</td><td>~300–500MB/s（SATA）；~2–14GB/s（NVMe，随 PCIe 代际递增，Gen3 约 3GB/s、Gen4 约 5–7GB/s、Gen5 可达 10+GB/s）</td><td>SATA 档约相当于单线程内存随机读（几百 MB/s 量级），高代际 NVMe 已进入内存带宽的一个数量级以内</td><td>是</td></tr><tr><td>机械盘（随机寻道）</td><td>~10ms</td><td>~100000×</td><td>是</td></tr><tr><td>机械盘（顺序写吞吐）</td><td>~100–280MB/s</td><td>顺序吞吐进入单线程内存随机读的一个数量级以内</td><td>是</td></tr></tbody></table></div>
+<p>这张表里有三个事实。内存比任何持久介质都至少快一个数量级；顺序 I/O 的吞吐能进入内存带宽的一个数量级以内；而持久性，总是要拿延迟或复杂度去换。把这套数量级换算成直观的时间：如果内存访问算 1 秒，SSD 一次随机访问就是 17 分钟，机械盘一次随机寻道是 28 小时。纳秒、微秒、毫秒之间相差三到五个数量级，存储软件要在内存的纳秒和磁盘的毫秒之间跨过这个数量级差距，所有"内存-磁盘"设计都从这里起步。</p>
 <blockquote><strong>关键数字</strong>  <strong>Redis fork 开销：随实例内存增长</strong>。fork 要拷贝页表，阻塞时间随实例内存线性上升，小实例几十毫秒，大实例（几十 GB 以上）可达数百毫秒，还受页表大小和是否开启透明大页（THP）影响。fork 期间主线程停等，客户端可见超时。  <strong>InnoDB 缓冲池：生产典型 8–128GB</strong>。命中率在工作集（频繁访问的数据集合）接近或超过缓冲池大小时急剧下降；1TB 数据库用 64GB 缓冲池，一次未命中 ≈ 一次磁盘随机 I/O，延迟比命中慢三个数量级。  <strong>Kafka PageCache：Linux 默认 <code>vm.dirty_background_ratio</code>=10%、<code>vm.dirty_ratio</code>=20%</strong>。前者达到时内核 flush 线程<strong>异步</strong>后台刷盘、写进程不阻塞；后者达到时写进程被<strong>同步阻塞</strong>强制刷盘。这个百分比的分母是可用内存（free 页加可回收页，不是总内存），64GB 机器内存空闲时异步写缓冲区约 6.4GB（按 10% 计），内存吃紧时随可用内存一起缩小，写满前内核批量刷盘。这是 Kafka 不强制 fsync 仍能达到磁盘吞吐上限的物理基础。</blockquote>
 <p>这套数量级差距，用一张对数坐标图看会更直观。</p>
 <figure class="fig" id="fig-4-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 880 472" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -361,17 +361,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <text x="720" y="486" text-anchor="middle" font-size="11" fill="#6B7280">解决 LRU“扫描一次冷数据挤掉热数据”的问题</text>
 </svg>
-</div><figcaption>图 4-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制</figcaption></figure>
+</div><figcaption>图 4-2　Redis 近似 LRU 采样淘汰与 LFU 计数器衰减机制：LRU 比最近访问时间，LFU 比带衰减的对数频次，采样与比较机制共用</figcaption></figure>
 <p>LRU 一侧，淘汰逻辑从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰机制，只是比较维度从时间换成了频率。</p>
 <h3 id="s71">持久化的两种方式</h3>
 <p>内存淘汰解决的是"满了怎么办"，持久化解决的是"断电了还在不在"。Redis 给了两种方式：RDB 和 AOF。</p>
 <p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程专心写快照，父子进程通过 COW 隔离，互不干扰。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了。生产环境里这种卡顿通常表现为一波客户端超时告警，排查时若发现告警间隔正好等于 <code>save</code> 规则的触发周期，基本就能确定根因是 fork。这就是大实例要控制容量的核心原因之一。</p>
 <p><strong>AOF（仅追加文件）</strong> 走另一条路：它不存数据本身，而是把每一条写命令追加到日志末尾。恢复时按顺序重放这些命令重建内存状态。AOF 的核心参数是 <code>appendfsync</code>，它决定了日志什么时候真正落到磁盘：</p>
-<ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把 PageCache 写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
+<ul><li><code>always</code>：每条命令都执行一次 <code>fsync</code>（落盘），最安全，但每条写都要等磁盘，性能最差。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡（若上一轮 fsync 尚未返回，后台线程会推迟本轮再刷，最坏丢失窗口约 2 秒）。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把 PageCache 写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
 <p>这三档本质上是同一个取舍的三个落点：可靠性 vs 性能。很多生产环境会选择 <code>everysec</code>，代价只是每秒一次的 <code>fsync</code>。<code>appendfsync</code> 的默认值确实是 <code>everysec</code>，但 Redis 7.x 出厂默认并不开启 AOF（<code>appendonly no</code>，即 RDB-only）；只有显式打开 AOF 后，<code>appendfsync</code> 才以 <code>everysec</code> 为默认档（详见<a class="xref" href="08-storage-format.html">第 8 章</a>）。</p>
 <p>AOF 有一个绕不开的问题：日志只会越写越长。一个键被反复 <code>INCR</code> 一万次，AOF 里就有一万条 <code>INCR</code>。<strong>AOF 重写</strong> 解决这个问题。重写是按内存当前状态重新生成一份最小的命令集（把那一万条 <code>INCR</code> 合并成一条 <code>SET key 10000</code>）。7.0 之前的单文件 AOF 里，重写期间新来的写命令会同时写旧日志和内存里的重写缓冲区，重写完成后用缓冲区补齐增量，再原子替换旧 AOF 文件。这套老机制保证了重写过程不丢数据；7.0 起重写期间的新写改为直写新增量文件。</p>
-<p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再重放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>；7.0 Multi-Part AOF 改造后该配置项仍存在（默认 yes），语义是控制 base 文件是否使用 RDB 格式。</p>
-<p><strong>7.0 的多部分 AOF（Multi-Part AOF）改造</strong>做了几件事。7.0 之前 AOF 是一个单文件（RDB 前导与增量命令混在一起）；7.0 把它拆成了一个目录（<code>appendonlydir/</code>），里面由清单文件（manifest）统一管理三类文件：至多一个<strong>基础文件（base，默认 RDB 格式）</strong>、零或多个<strong>增量文件（incr，AOF 命令）</strong>，以及重写后被标记为历史（history）待删的旧文件。这套改造解决了"重写期间旧文件与重写缓冲区持续膨胀、中断后残留需人工清理的临时文件"的老问题，也让"混合持久化"从"一个文件两段拼接"变成了"base + incr 多文件 + manifest 编排"。下面<a class="xref" href="#fig-4-3">图 4-3</a> 混合持久化一栏里的"incr = AOF 增量命令"，对应的就是 7.x 的 incr 文件；本章关心的是 base / incr / history 三类角色和 manifest 编排关系，不依赖具体文件名。7.0 多部分 AOF 的文件组织与重写机制详见<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
+<p>Redis 4.0 又推出了<strong>混合持久化</strong>：AOF 重写时先按 RDB 格式生成一份全量快照作为基底，再把重写期间的新增命令以 AOF 格式接在后面。恢复时先加载 RDB 基底（快），再重放增量（少），兼得 RDB 的恢复速度和 AOF 的低丢失率。<code>aof-use-rdb-preamble</code> 在 5.x–6.x 中默认即为 <code>yes</code>。</p>
+<p><strong>7.0 的多部分 AOF（Multi-Part AOF）改造</strong>：7.0 把 AOF 拆成 <code>appendonlydir/</code> 目录，由 manifest 统一编排 base/incr/history 三类文件，文件组织与重写机制详见<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
 <p>下图把一条写命令通往内存与两类持久化产物的数据流画出来，呈现 Redis"内存为主、磁盘为辅"的根本定位。</p>
 <figure class="fig" id="fig-4-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 80 920 560" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -461,7 +461,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <text x="320" y="14" font-size="11" fill="#374151">Redis 相关</text>
   </g>
 </svg>
-</div><figcaption>图 4-3　Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）</figcaption></figure>
+</div><figcaption>图 4-3　Redis 持久化数据流（RDB 快照 / AOF 含混合持久化）：两条路径独立，混合持久化只是文件层拼接</figcaption></figure>
 <p>两条路径互相独立：RDB 记录某一时刻的全量状态，AOF 记录每一条写命令，关掉任何一条，另一条照常工作；混合持久化也没有产生第三条路径，只是把两者在文件层拼接起来。快照期间写命令不被阻塞，靠的是 fork 之后的写时复制（COW）：子进程按 fork 那一刻的内存视图生成快照，父进程继续处理写请求，哪一页被改到才复制哪一页，代价是写密集时内核要复制大量页。这两条路径的产物都只是内存状态的备份，Redis 从不靠磁盘响应读写请求。</p>
 <h3 id="s72">取舍总结</h3>
 <p>Redis 的取舍可以一句话概括：它付出内存成本、接受秒级的持久化窗口，换来读写低延迟和原生的多种数据结构。这套取舍在缓存和快速键值场景成立：访问频繁、对延迟敏感、数据可重建或可容忍少量丢失。代价是容量受物理内存约束。生产实践中通常会主动控制单实例内存规模，主要原因是控制 fork 阻塞时间与 RDB 加载时间。继续增长时，要么上 Redis Cluster 分片（详见<a class="xref" href="07-cluster.html">第 7 章</a>），要么改用基于磁盘的系统（如 MySQL 或 Kafka）。</p>
@@ -716,7 +716,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 假设自己的访问模式是"追加写 + 顺序读"，且数据量天然远超内存。在这种模式下，操作系统内核的预读（readahead）和回写（writeback）机制已经能把磁盘的顺序 I/O 调度得很好，Kafka 再在用户态造一个缓冲池意义不大。</p>
 <p>这个假设下，Kafka 的设计不支持随机访问，换来几乎零成本的内存管理。这也是 Kafka 不能当数据库查的根本原因：它只能按偏移量区间顺序消费，不能像 MySQL 那样按主键随机点查。</p>
 <h3 id="s81">顺序写为什么够快</h3>
-<p>SATA SSD 顺序写吞吐约 300–500MB/s，NVMe SSD 可达 2–14GB/s（各代际明细见<a class="xref" href="#table-4-1">表 4-1</a>），机械盘顺序写约 100–280MB/s（消费级偏下限，企业级近上限）。作为参照，内存随机读在单线程条件下约几百 MB/s、多通道下可达 GB/s 量级（取决于访问模式与并发）。这是不同操作类型（写 vs 读）和不同介质（磁盘 vs 内存）之间的量级参照，不是同口径对比。真正的取舍在于：顺序写盘用吞吐换掉随机查找能力，Kafka 走的就是这条路线。</p>
+<p>各介质顺序吞吐的量级见<a class="xref" href="#table-4-1">表 4-1</a>。作为参照，内存随机读单线程约几百 MB/s。这个跨口径的参照背后，真正的取舍在于：顺序写盘用吞吐换掉随机查找能力，Kafka 走的就是这条路线。</p>
 <p>Kafka 的存储单位是<strong>日志段（segment）</strong>。一个分区（partition）的日志被切成多个段，每个段默认 1GB（可配）。生产者写入的消息被追加到当前活跃段的末尾，绝不原地修改；段写满就滚动开新段。整个写路径天然顺序。删除是把整个旧段文件丢弃（按保留策略清理），不是原地删。由于文件只追加、不修改、按段清理，磁盘始终在做顺序写，随机 I/O 在写路径上基本不存在。</p>
 <h3 id="s82">为什么不做自己的缓冲池</h3>
 <p>Kafka 不在用户态造缓冲池，有三个理由。</p>
@@ -821,15 +821,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="618" font-size="11" font-weight="700" fill="#059669">收益：拷贝数减半 · 切换数减半 · 内存冗余为零 · 消费者按内存速度读已缓存数据</text>
 </svg>
 </div><figcaption>图 4-6　Kafka 生产-存储-消费的零拷贝数据流</figcaption></figure>
-<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</p>
+<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；在支持 scatter-gather DMA 的现代网卡上（生产环境基本默认满足），剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</p>
 <h3 id="s83">可靠性参数</h3>
 <p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（积累多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后吞吐会大幅下跌（强 fsync 下常掉到原来的几分之一），通常只在特殊合规要求下使用。</p>
-<p>更常用的可靠性参数是生产者端的 <code>acks</code>：</p>
-<ul><li><code>acks=0</code>：生产者发出去就不管，不等任何确认。吞吐最高，可能丢消息。</li><li><code>acks=1</code>：只要 Leader 把消息写到本地日志就确认。Leader 崩溃且未同步到 Follower 时，这条消息可能丢。</li><li><code>acks=all</code>（也叫 <code>acks=-1</code>）：消息必须被 ISR 里的全部副本确认才算成功。配合合理的副本数和 <code>min.insync.replicas</code>，这是最强的"不丢"保证，吞吐也会下降。</li></ul>
-<p>这三档是"吞吐 vs 不丢"这同一个取舍的三种档位，和 Redis 的 <code>appendfsync</code>、MySQL 的 <code>innodb_flush_log_at_trx_commit</code> 同构。只是场景换到了分布式。<code>acks</code> 三档的完整语义与 3.0 的默认值调整（KIP-679）见<a class="xref" href="07-cluster.html">第 7 章</a>，与 <code>min.insync.replicas</code> 的精确交互见<a class="xref" href="09-data-sync.html">第 9 章</a> acks 参数一节。</p>
+<p>更常用的可靠性参数是生产者端的 <code>acks</code>（0/1/all 三档），它与 <code>appendfsync</code>、<code>innodb_flush_log_at_trx_commit</code> 同构，都是"丢多少 vs 多慢"的档位，只是场景换到了分布式——完整语义与 3.0 默认值调整（KIP-679）见<a class="xref" href="07-cluster.html">第 7 章</a>，与 <code>min.insync.replicas</code> 的精确交互见<a class="xref" href="09-data-sync.html">第 9 章</a> acks 参数一节。</p>
 <p>下表把一个 Kafka 日志段相关的几类文件列出来，看清它们的职责。</p>
 <p class="tab-label"><strong>表 4-2　Kafka 日志段（segment）与索引文件布局</strong></p>
-<div class="table-wrap"><table id="table-4-2"><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>偏移量索引，记录"偏移量 → 物理偏移"的稀疏映射</td><td>每写入 <code>log.index.interval.bytes</code>（默认 4KB）追加一条索引项</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 偏移量"的稀疏映射</td><td>与 <code>.index</code> 同步追加，支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>事务与幂等生产者周期性落盘</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-4-2"><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>偏移量索引，记录"偏移量 → 物理偏移"的稀疏映射</td><td>每写入 <code>log.index.interval.bytes</code>（默认 4KB）追加一条索引项</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 偏移量"的稀疏映射</td><td>与 <code>.index</code> 同步追加，支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>日志段滚动时及 Broker 干净关闭时写入，记录快照位点之前各生产者的序列号状态；段被删除/压实时，对应的旧快照一并清理</td></tr></tbody></table></div>
 <p>这张表说明了 Kafka 的存储是"数据 + 两套稀疏索引"的组合。索引是稀疏的（不是每条消息都建索引项），是为了让索引文件本身也保持紧凑、能放进 PageCache；消费者按偏移量定位消息时，先用索引二分找到最近的索引项，再在 <code>.log</code> 里顺序扫描到目标偏移量。</p>
 <h3 id="s84">取舍总结</h3>
 <p>Kafka 的取舍：它用"放弃随机访问 + 接受默认不强制落盘"换来"高吞吐与简单的内存管理"。没有按主键点查、没有复杂过滤，只能按偏移量区间顺序消费。这是流式日志与通用数据库的边界。一旦你的场景从"流式搬运"变成了"随机查询"，就该换 MySQL 或别的检索系统了。</p>
@@ -839,7 +837,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p class="tab-label"><strong>表 4-3　三个软件"内存-磁盘"哲学横向对比</strong></p>
 <div class="table-wrap"><table id="table-4-3"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据存放在哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>redo log + 脏页刷盘 + 双写缓冲</td><td>OS 异步刷盘 + 生产者 <code>acks</code> + 副本</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持（O(1) 到 O(log N)）</td><td>原生支持（B+ 树）</td><td>不支持（只能按偏移量顺序消费）</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 重放 AOF（大实例数分钟）</td><td>重放 redo log + 恢复脏页</td><td>进程重启极快（数据在磁盘，无重放；上万分区时例外），但 PageCache 冷热影响读性能</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 I/O 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
 <p>按维度解读，要点都在"为什么不同"。</p>
-<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是"物理到页、逻辑到操作"的混合日志（记到页号与物理偏移，页内记的操作语义），Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1 秒量级的数据窗口（出厂默认不开 AOF），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是"物理到页、逻辑到操作"的混合日志（记到页号与物理偏移，页内记的操作语义），Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1–2 秒量级的数据窗口（出厂默认不开 AOF），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
 <p><strong>内存管理主体</strong>。这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 运维的重心在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。这条最好记：需要按主键查一行数据，Kafka 直接出局。</p>
 <p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或重放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 进程本身几乎不需要恢复，因为数据在磁盘、缓存归 OS 管，重启后立刻能服务；例外是分区数巨大时（如上万分区）的日志段校验与索引重建要数分钟。抛开这个例外，日常受影响的主要是 PageCache 是否还热。</p>
