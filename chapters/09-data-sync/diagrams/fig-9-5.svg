@@ -49,8 +49,8 @@
   <text x="790" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">从节点 Replica</text>
 
   <rect x="690" y="120" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（拉取）</text>
-  <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，按 GTID 拉取</text>
+  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（收流）</text>
+  <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，订阅 binlog 流</text>
 
   <line x1="790" y1="170" x2="790" y2="188" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
@@ -79,7 +79,7 @@
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 I/O 线程主动拉取</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，I/O 线程收流写入</text>
 
   <!-- 半同步 ACK 回路：从 → 主 -->
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrowRed)"/>
@@ -87,5 +87,5 @@
 
   <!-- 底部说明（AFTER 长句已删，单行居中：框高 42→32，文字基线居中于 568） -->
   <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：收流（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
 </svg>

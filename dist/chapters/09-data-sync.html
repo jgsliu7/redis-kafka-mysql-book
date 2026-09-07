@@ -493,10 +493,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 把<strong>行变更的逻辑日志</strong>作为传播单元。当一条 SQL 改动了行，主节点把它转换成 binlog event：现代主流是 ROW 格式，记录的是"行 k 从值 v1 变成了 v2"这样的行级事件。</p>
 <p>选 ROW 而非语句，是因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，绕开了所有歧义。这和 Redis 处理非确定性命令是同一类思路：在源头把歧义消掉。</p>
 <p>代价是日志更重：一条 <code>UPDATE ... WHERE id&lt;100</code> 影响一百行，ROW 格式会产生一百条事件。但副本拿到的是确定性，对复制正确性来说，这个代价值得付。</p>
-<h3 id="s220">传统复制：两段式的拉取 + 回放</h3>
+<h3 id="s220">传统复制：两段式的收流 + 回放</h3>
 <p>MySQL 的传统异步复制是<strong>两段式</strong>的，背后是两个独立的线程：</p>
-<ul><li><strong>I/O 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志。这一段是"网络拉取"。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
-<p>主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见<a class="xref" href="#fig-9-5">图 9-5</a>。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让网络拉取可以快（先行把事件拉到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞，relay log 是它们之间的缓冲。这是收流与回放的解耦：副本发起后主端持续把事件流推进来，relay log 是流的本地缓冲，回放按本地引擎速度走。</p>
+<ul><li><strong>I/O 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志。这一段是"收流"：副本发起后，主端 dump 线程把事件流持续推过来。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
+<p>主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见<a class="xref" href="#fig-9-5">图 9-5</a>。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让收流可以快（先行把事件流接到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞。这是收流与回放的解耦：副本发起后主端持续把事件流推进来，relay log 是流的本地缓冲，回放按本地引擎速度走。</p>
 <figure class="fig" id="fig-9-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 524" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -547,8 +547,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="790" y="106" text-anchor="middle" font-size="15" font-weight="700" fill="#111827">从节点 Replica</text>
 
   <rect x="690" y="120" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（拉取）</text>
-  <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，按 GTID 拉取</text>
+  <text x="790" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">I/O 线程（收流）</text>
+  <text x="790" y="158" text-anchor="middle" font-size="11" fill="#374151">主动连接主，订阅 binlog 流</text>
 
   <line x1="790" y1="170" x2="790" y2="188" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_9_5_arrow)"/>
 
@@ -577,7 +577,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_9_5_arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，从 I/O 线程主动拉取</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，I/O 线程收流写入</text>
 
   
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#fig_9_5_arrowRed)"/>
@@ -585,7 +585,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：网络拉取（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：收流（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
 </svg>
 </div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
 <h3 id="s221">异步复制：默认的 AP 形态</h3>
@@ -870,7 +870,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-9.5">9.5 横向对比</h2>
 <p>把这三个软件的同步机制并到同一张表里，以本章澄清的六个维度为行。</p>
 <p class="tab-label"><strong>表 9-1　三个软件数据同步机制横向对比</strong></p>
-<div class="table-wrap"><table id="table-9-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区偏移量有序）</td></tr><tr><td>传播方式</td><td>副本发起后持续流推（推入内存缓冲）</td><td>副本发起后持续流推（relay log 持久化缓冲，拉取与回放分离）</td><td>周期性 FETCH 请求-响应（副本自掌节奏）</td></tr><tr><td>一致性模型</td><td>默认偏 AP（异步可丢写，分区时偏 CP）</td><td>异步 / 半同步 / 多数派强一致（逐档增强）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务标识）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-9-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区偏移量有序）</td></tr><tr><td>传播方式</td><td>副本发起后持续流推（推入内存缓冲）</td><td>副本发起后持续流推（relay log 持久化缓冲，收流与回放分离）</td><td>周期性 FETCH 请求-响应（副本自掌节奏）</td></tr><tr><td>一致性模型</td><td>默认偏 AP（异步可丢写，分区时偏 CP）</td><td>异步 / 半同步 / 多数派强一致（逐档增强）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务标识）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
 <h3 id="s239">解读一：传播单元的选择决定下游设计</h3>
 <p>传播单元是多数下游设计的起点。</p>
 <p>Redis 走命令流这条路，看重的是轻：序列化小、副本直接复用命令处理路径，但非确定性命令得在源头改写。MySQL 走 ROW 格式则换确定性：下发行级事实，副本算不出第二种结果，代价是日志更重。Kafka 最简单，日志本身就是序列，复制天然有序无需额外排序，只是更新和删除都要靠追加 tombstone（墓碑消息，标记删除的特殊消息）或新版本去表达。</p>
