@@ -42,7 +42,7 @@
   <!-- dump 线程 -->
   <rect x="50" y="394" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="150" y="414" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Binlog Dump 线程</text>
-  <text x="150" y="432" text-anchor="middle" font-size="11" fill="#374151">按 GTID 推送未同步事件</text>
+  <text x="150" y="432" text-anchor="middle" font-size="11" fill="#374151">按 GTID 集合补发所缺事务</text>
 
   <!-- ============ 从节点 Replica ============ -->
   <rect x="670" y="80" width="240" height="380" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
@@ -61,10 +61,11 @@
   <line x1="790" y1="242" x2="790" y2="260" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="690" y="264" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">SQL 线程（回放）</text>
+  <text x="790" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">SQL 线程（图示单线程）</text>
   <text x="790" y="302" text-anchor="middle" font-size="11" fill="#374151">读 relay log → 本地重放事务</text>
 
-  <line x1="790" y1="314" x2="790" y2="332" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrowRed)"/>
+  <path d="M 890 217 L 900 217 L 900 361 L 893 361" fill="none" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrowRed)"/>
+  <path d="M 690 289 L 680 289 L 680 421 L 687 421" fill="none" stroke="#059669" stroke-width="1.2" marker-end="url(#arrowGreen)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
@@ -72,14 +73,14 @@
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="790" y="416" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">本地数据追平</text>
-  <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 进度自动定位续传</text>
+  <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 集合定位所缺事务</text>
 
   <!-- ============ 中间链路连线 ============ -->
   <!-- Dump 线程 → I/O 线程：binlog 数据流（主 → 从） -->
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，I/O 线程收流写入</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">I/O 线程接收所缺事务的 binlog</text>
 
   <!-- 半同步 ACK 回路：从 → 主 -->
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrowRed)"/>
@@ -87,5 +88,5 @@
 
   <!-- 底部说明（AFTER 长句已删，单行居中：框高 42→32，文字基线居中于 568） -->
   <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：收流（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">接收与应用分离；GTID 标识来源和事务序号，按集合定位需要补发的事务</text>
 </svg>

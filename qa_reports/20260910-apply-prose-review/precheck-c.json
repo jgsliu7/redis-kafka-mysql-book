@@ -1,0 +1,1144 @@
+{
+  "checks": [
+    {
+      "id": "001",
+      "file": "chapters/00-preface.md",
+      "line": 3,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "002",
+      "file": "chapters/00-preface.md",
+      "line": 5,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "003",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 25,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "004",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 34,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "005",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 66,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "006",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 96,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "007",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 130,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "008",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 192,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 22,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "010",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "011",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 43,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "012",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "013",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 78,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "014",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 100,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "015",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 134,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "016",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 160,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "017",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 193,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "018",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 201,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "019",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 225,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "020",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 41,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "021",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "022",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 61,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "023",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 137,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "024",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 167,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "025",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 227,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "026",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 243,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "027",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 17,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "028",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 45,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "029",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 184,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "030",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 204,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "031",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 264,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "032",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 274,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "033",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "034",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 306,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "035",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 9,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "036",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 31,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "037",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 102,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "038",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 110,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "039",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 116,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "040",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 137,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "041",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 147,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "042",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 162,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "043",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 271,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "044",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 277,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "045",
+      "file": "chapters/06-security/chapter.md",
+      "line": 7,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "046",
+      "file": "chapters/06-security/chapter.md",
+      "line": 19,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "047",
+      "file": "chapters/06-security/chapter.md",
+      "line": 46,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "048",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "049",
+      "file": "chapters/06-security/chapter.md",
+      "line": 87,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "050",
+      "file": "chapters/06-security/chapter.md",
+      "line": 91,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "051",
+      "file": "chapters/06-security/chapter.md",
+      "line": 97,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "052",
+      "file": "chapters/06-security/chapter.md",
+      "line": 133,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "053",
+      "file": "chapters/06-security/chapter.md",
+      "line": 163,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "054",
+      "file": "chapters/06-security/chapter.md",
+      "line": 167,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "055",
+      "file": "chapters/06-security/chapter.md",
+      "line": 195,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "056",
+      "file": "chapters/06-security/chapter.md",
+      "line": 211,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "057",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 84,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "058",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 111,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "059",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "060",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 180,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "061",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 207,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "062",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 218,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "063",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 7,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "064",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 35,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "065",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 73,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "066",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "067",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 224,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "068",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "069",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 340,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "070",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 344,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "071",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 13,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "072",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 23,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "073",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 27,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "074",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 103,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "075",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 200,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "076",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 241,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "077",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 264,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "078",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 11,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "079",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 53,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "080",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "081",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 86,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "082",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "083",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 173,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "084",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 197,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "085",
+      "file": "chapters/10-epilogue.md",
+      "line": 29,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "086",
+      "file": "chapters/10-epilogue.md",
+      "line": 51,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    },
+    {
+      "id": "087",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "matchCount": 1,
+      "status": "pending-exact",
+      "approved": true,
+      "notes": "当前完整原文唯一精确匹配；当前 JSON 与上轮最终验收稿整文件哈希一致，revised 未变化；对应正式稿整文件也与上轮已审语境一致，复用已通过的技术信息、条件与判断力度结论。"
+    }
+  ],
+  "summary": {
+    "approved": true,
+    "total": 87,
+    "pendingExact": 87,
+    "uniqueOriginalMatches": 87,
+    "overlapPairs": [],
+    "alreadyApplied": [],
+    "changedOrAmbiguous": [],
+    "reviewedReportUnchanged": true,
+    "reviewedReportSha256": "1cf4ece8cfc0ce7ee1f849170f09bd13db3c93ec3621799dbd3ff91706bd25f9",
+    "chaptersUnchangedSinceReview": [
+      {
+        "file": "chapters/00-preface.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/01-introduction/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/03-lifecycle/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/04-memory-disk/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/05-layered-architecture/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/06-security/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/07-cluster/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/08-storage-format/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/09-data-sync/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/10-epilogue.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/10-summary/chapter.md",
+        "matchesPriorReviewedChapter": true
+      },
+      {
+        "file": "chapters/11-references.md",
+        "matchesPriorReviewedChapter": true
+      }
+    ],
+    "levels": {
+      "可选润色": 40,
+      "建议修改": 47
+    },
+    "authorization": "用户整体授权应用最终87条，包含40条可选润色；本席不重复请求授权。",
+    "preExistingDirtyEntries": 213,
+    "preExistingDirtyOnApplyFiles": [
+      {
+        "status": " M",
+        "path": "chapters/00-preface.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/01-introduction/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/02-data-structures-protocols/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/03-lifecycle/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/04-memory-disk/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/05-layered-architecture/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/06-security/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/07-cluster/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/08-storage-format/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/09-data-sync/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/10-epilogue.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/10-summary/chapter.md"
+      },
+      {
+        "status": " M",
+        "path": "chapters/11-references.md"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/00-preface.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/01-introduction.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/02-data-structures-protocols.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/03-lifecycle.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/04-memory-disk.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/05-layered-architecture.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/06-security.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/07-cluster.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/08-storage-format.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/09-data-sync.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/10-epilogue.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/10-summary.html"
+      },
+      {
+        "status": "M ",
+        "path": "dist/chapters/11-references.html"
+      },
+      {
+        "status": "M ",
+        "path": "架构之道.html"
+      }
+    ],
+    "snapshotFiles": 28,
+    "snapshotRoot": "/tmp/book-prose-apply-20260910/snapshots-c",
+    "baselineFile": "/tmp/book-prose-apply-20260910/baseline-c.json",
+    "expectedExactResultHashesIncluded": true,
+    "scope": "独立改前核查，仅指定87项及已审语境，不做新全书扫描；未读取 A 本轮结论。版本和正文与上轮相同，因此沿用上一轮逐段保真核验，不把本轮机械匹配夸大为新语义全审。",
+    "repositoryFilesModified": false
+  },
+  "sourceHashes": {
+    "chapters/00-preface.md": {
+      "sha256": "b988edb3e21fb3c2e4a7797625d31d3f916a68df7897724d324e4f4f679ccc00",
+      "bytes": 5400,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/00-preface.md",
+      "role": "manuscript"
+    },
+    "chapters/01-introduction/chapter.md": {
+      "sha256": "dd718d66edfa35b0a8fba25dcb09d323cea7d40f055a30f67134343361d4d9da",
+      "bytes": 28713,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/01-introduction/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/02-data-structures-protocols/chapter.md": {
+      "sha256": "9a26440e845a2473c74ede49e8af09a756d5200c9097fa8ffaaeccbd23adcff9",
+      "bytes": 32875,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/02-data-structures-protocols/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/03-lifecycle/chapter.md": {
+      "sha256": "5c72bc3b6020956514673b45deecc35ad5f18f0a39a3821d450d37d106620df3",
+      "bytes": 34645,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/03-lifecycle/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/04-memory-disk/chapter.md": {
+      "sha256": "033ec520cfe1375a9272b0c1048ec148e3b7bc5b8f9e4f105a34f999de5fd9b8",
+      "bytes": 42559,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/04-memory-disk/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/05-layered-architecture/chapter.md": {
+      "sha256": "ea8ef5b26ba3344961f0532ae693cf1b765cd2211c817725ded4000351a05636",
+      "bytes": 43317,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/05-layered-architecture/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/06-security/chapter.md": {
+      "sha256": "70f97a75072284d8c0f80b328eab5d8df28fb7c4140b531da4e1708dd57cc15e",
+      "bytes": 32529,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/06-security/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/07-cluster/chapter.md": {
+      "sha256": "7be05ce10a07168293e54cffca0c58eeaaa82053ae5e8bec1868913cf942f558",
+      "bytes": 43656,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/07-cluster/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/08-storage-format/chapter.md": {
+      "sha256": "50423558b70a6b33a922759bde8718dd068810e210537e4f3e7709458f185bc0",
+      "bytes": 50473,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/08-storage-format/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/09-data-sync/chapter.md": {
+      "sha256": "557631376284031b875d7c1d01719baf6c8f7c4a535de3511dd7884bc750242c",
+      "bytes": 43898,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/09-data-sync/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/10-epilogue.md": {
+      "sha256": "e52c6f310e4eb427b1015a897f9efa5a0c15ca5008211f281a9b89d5bac2e552",
+      "bytes": 5696,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/10-epilogue.md",
+      "role": "manuscript"
+    },
+    "chapters/10-summary/chapter.md": {
+      "sha256": "49a04319eb2be3e8662b16cd3e856b352e02d9b33b444b74516ee9fc70a9e3df",
+      "bytes": 29718,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/10-summary/chapter.md",
+      "role": "manuscript"
+    },
+    "chapters/11-references.md": {
+      "sha256": "99d3262c0fec3e559e0747afeaa64dbf3a12df4ee21daa91b75faa4dc8eb76c3",
+      "bytes": 12324,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/chapters/11-references.md",
+      "role": "manuscript"
+    },
+    "架构之道.html": {
+      "sha256": "c18c97aef6f1bc01556c256eee7cda21fe4cd766b305d709390d5a593c00d35a",
+      "bytes": 807222,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/架构之道.html",
+      "role": "build-output"
+    },
+    "dist/chapters/00-preface.html": {
+      "sha256": "ae08fda06cbb6a8efd690f6cbc4cd92fa3f3ab35b8fb89181474e5085352d534",
+      "bytes": 13336,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/00-preface.html",
+      "role": "build-output"
+    },
+    "dist/chapters/01-introduction.html": {
+      "sha256": "21a14073a737b50074566cad67b57731307d62a83013435f10a2a473e0829b5e",
+      "bytes": 60582,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/01-introduction.html",
+      "role": "build-output"
+    },
+    "dist/chapters/02-data-structures-protocols.html": {
+      "sha256": "58a240090a1f5546eeb5850359e3001469d1cdc91f9a01e23f142be135314158",
+      "bytes": 93724,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/02-data-structures-protocols.html",
+      "role": "build-output"
+    },
+    "dist/chapters/03-lifecycle.html": {
+      "sha256": "a0fc36cffa02d8b03d1dab7f0e30838706e60fe9bad9018a3d93260a6e416442",
+      "bytes": 75879,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/03-lifecycle.html",
+      "role": "build-output"
+    },
+    "dist/chapters/04-memory-disk.html": {
+      "sha256": "89c73bc030583fad9a2ea8ae4d3ded9db236c7ad449e4d7d5411c48ad66e365c",
+      "bytes": 99206,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/04-memory-disk.html",
+      "role": "build-output"
+    },
+    "dist/chapters/05-layered-architecture.html": {
+      "sha256": "887644868fe2396f041b8b9118419ccae6d323998084bb3e337c4d343314e401",
+      "bytes": 97052,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/05-layered-architecture.html",
+      "role": "build-output"
+    },
+    "dist/chapters/06-security.html": {
+      "sha256": "d4343331ecf2ea136b6ee04bd807fd06a4421689cb505c72240c23bc09d41f24",
+      "bytes": 67658,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/06-security.html",
+      "role": "build-output"
+    },
+    "dist/chapters/07-cluster.html": {
+      "sha256": "3750cff152bd1e71254f586053444cf4e72cf22ab93aaaa86bc67288382d8464",
+      "bytes": 86817,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/07-cluster.html",
+      "role": "build-output"
+    },
+    "dist/chapters/08-storage-format.html": {
+      "sha256": "86267040bed2fcb5e58bf1671f6650eba0627382d8cfc197c3e60a5cdc03d7c7",
+      "bytes": 112234,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/08-storage-format.html",
+      "role": "build-output"
+    },
+    "dist/chapters/09-data-sync.html": {
+      "sha256": "f7a4725b4b85fa18e1929b6bc0a37c9245ef4bd3853e5330a4fd32c754496903",
+      "bytes": 101438,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/09-data-sync.html",
+      "role": "build-output"
+    },
+    "dist/chapters/10-epilogue.html": {
+      "sha256": "b8246986af460b7ec1670def41d5b389d2741745eb8224f9e0aa0f8733528e74",
+      "bytes": 14251,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/10-epilogue.html",
+      "role": "build-output"
+    },
+    "dist/chapters/10-summary.html": {
+      "sha256": "697776655ea927533b726eaf314271bb5b095e7bafc4996f3547ae6aad5591e8",
+      "bytes": 59720,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/10-summary.html",
+      "role": "build-output"
+    },
+    "dist/chapters/11-references.html": {
+      "sha256": "c4e789e068ef4faff9e3a3ba89013fb97ce7b475f6087df149a338bd5f7060d6",
+      "bytes": 22228,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/chapters/11-references.html",
+      "role": "build-output"
+    },
+    "dist/index.html": {
+      "sha256": "9bcaca110934dc4dada176068e2bf6d3044cfbae71c7aa7e5d2ea2fd4fdf3d8e",
+      "bytes": 10058,
+      "snapshot": "/tmp/book-prose-apply-20260910/snapshots-c/dist/index.html",
+      "role": "build-output"
+    }
+  }
+}

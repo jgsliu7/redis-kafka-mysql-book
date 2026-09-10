@@ -39,9 +39,9 @@
   <!-- 子问题3：传播到什么程度（框 418/150 装不下三档词，加宽到 411/164，中心仍 493，与②④各留 9/10px 缝） -->
   <rect x="411" y="206" width="164" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="493" y="230" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 到什么程度</text>
-  <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">一致性强度</text>
-  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">异步可丢/档位递增/参数可调</text>
-  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性越强，写延迟越高</text>
+  <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">确认与可见性要求</text>
+  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">接收 / 落盘 / 应用</text>
+  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">等待条件影响写入延迟</text>
 
   <!-- 子问题4：断了怎么办 -->
   <rect x="585" y="206" width="150" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -50,11 +50,11 @@
   <text x="660" y="271" text-anchor="middle" font-size="11" fill="#374151">位点对齐 · 增量补差</text>
   <text x="660" y="289" text-anchor="middle" font-size="11" fill="#6B7280">兜底：全量同步</text>
 
-  <!-- 底层主线：状态机复制 -->
+  <!-- 理解模型：状态机复制 -->
   <line x1="410" y1="298" x2="410" y2="328" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
   <rect x="210" y="332" width="400" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="410" y="356" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">底层主线：状态机复制</text>
-  <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">若每个副本按相同顺序执行相同输入序列</text>
-  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 差异只在"序列载体"与"执行方式"</text>
+  <text x="410" y="356" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">理解模型：状态机复制</text>
+  <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">相同初态 + 相同输入顺序 + 确定执行</text>
+  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">处理完相同输入后，各副本状态一致</text>
 
 </svg>

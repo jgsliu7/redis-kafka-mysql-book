@@ -8,13 +8,13 @@
 
   <!-- Column headers -->
   <rect x="40"  y="70" width="270" height="34" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="175" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis（偏 AP · 缓存优先）</text>
+  <text x="175" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">Redis：复制、容错与分片</text>
 
   <rect x="325" y="70" width="270" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL（CP · 不丢数据）</text>
+  <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#D97706">MySQL：副本确认与组内协调</text>
 
   <rect x="610" y="70" width="270" height="34" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="745" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#059669">Kafka（可调 · 流管道）</text>
+  <text x="745" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#059669">Kafka：分区、副本与元数据</text>
 
   <!-- ===== Redis column ===== -->
   <rect x="50" y="135" width="250" height="70" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
@@ -38,8 +38,8 @@
   <text x="175" y="400" text-anchor="middle" font-size="12" fill="#374151">16384 槽分片 + Gossip</text>
   <text x="175" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：扩展 + 自动容错</text>
 
-  <text x="175" y="449" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：异步复制偏 AP，</text>
-  <text x="175" y="467" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">分区时少数派停写偏 CP（见 7.2.3 节）</text>
+  <text x="175" y="449" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">异步复制仍有丢写窗口，</text>
+  <text x="175" y="467" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">少数派超时后停写（见 7.2.3 节）</text>
 
   <!-- ===== MySQL column ===== -->
   <rect x="335" y="135" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
@@ -53,17 +53,17 @@
   <rect x="335" y="245" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="460" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② 半同步复制</text>
   <text x="460" y="290" text-anchor="middle" font-size="12" fill="#374151">主等 ≥1 个从 ACK 才返回</text>
-  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：多数情况不丢（超时降级回异步）</text>
+  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">副本日志落盘确认；超时可降级</text>
 
   <line x1="460" y1="315" x2="460" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-  <text x="470" y="340" font-size="11" fill="#EF4444">仍无共识 · 脑裂风险</text>
+  <text x="470" y="340" font-size="11" fill="#EF4444">故障转移仍需另行协调</text>
 
   <rect x="335" y="355" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
   <text x="460" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ Group Replication (MGR)</text>
-  <text x="460" y="400" text-anchor="middle" font-size="12" fill="#374151">Paxos 多数派确认 · 不分片</text>
-  <text x="460" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：强一致 + 自动 View Change</text>
+  <text x="460" y="400" text-anchor="middle" font-size="12" fill="#374151">组内排序与认证 · 不分片</text>
+  <text x="460" y="416" text-anchor="middle" font-size="12" fill="#374151">组内协调 + 自动 View Change</text>
 
-  <text x="460" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：偏 CP（少数派分区停服）</text>
+  <text x="460" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">无多数派时不能继续确认组内写入</text>
 
   <!-- ===== Kafka column ===== -->
   <rect x="620" y="135" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669"/>
@@ -72,12 +72,12 @@
   <text x="745" y="196" text-anchor="middle" font-size="12" fill="#374151">解决：并行度与吞吐</text>
 
   <line x1="745" y1="205" x2="745" y2="245" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-  <text x="755" y="230" font-size="11" fill="#EF4444">单分区无容错</text>
+  <text x="755" y="230" font-size="11" fill="#EF4444">单副本无容错</text>
 
   <rect x="620" y="245" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669"/>
   <text x="745" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② Replica + ISR</text>
   <text x="745" y="290" text-anchor="middle" font-size="12" fill="#374151">Leader/Follower · 动态门槛</text>
-  <text x="745" y="306" text-anchor="middle" font-size="12" fill="#374151">解决：可用 + 不丢（ISR 内选主）</text>
+  <text x="745" y="306" text-anchor="middle" font-size="12" fill="#374151">维护同步副本与故障转移候选</text>
 
   <line x1="745" y1="315" x2="745" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
   <text x="755" y="340" font-size="11" fill="#EF4444">元数据外挂 ZK</text>
@@ -85,9 +85,9 @@
   <rect x="620" y="355" width="250" height="70" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="745" y="380" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ KRaft 元数据</text>
   <text x="745" y="400" text-anchor="middle" font-size="12" fill="#374151">内嵌 Raft · 控制器组多数派强一致</text>
-  <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">解决：百万分区 + 快速恢复</text>
+  <text x="745" y="416" text-anchor="middle" font-size="12" fill="#374151">元数据日志 + 热备 Controller</text>
 
-  <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">CAP 立场：可调（acks=all 默认偏安全，可下调）</text>
+  <text x="745" y="455" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">确认与选主条件分别可配</text>
 
   <!-- Bottom legend -->
   <line x1="50" y1="495" x2="870" y2="495" stroke="#E5E7EB" stroke-width="1"/>

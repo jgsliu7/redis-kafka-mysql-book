@@ -1,56 +1,56 @@
 {
   "chapters": {
     "chapters/00-preface.md": {
-      "hanzi_md": 1226,
-      "hanzi_html": 1226
+      "hanzi_md": 1595,
+      "hanzi_html": 1595
     },
     "chapters/01-introduction/chapter.md": {
-      "hanzi_md": 7621,
-      "hanzi_html": 7621
+      "hanzi_md": 7465,
+      "hanzi_html": 7465
     },
     "chapters/02-data-structures-protocols/chapter.md": {
-      "hanzi_md": 7722,
-      "hanzi_html": 7722
+      "hanzi_md": 8180,
+      "hanzi_html": 8180
     },
     "chapters/03-lifecycle/chapter.md": {
-      "hanzi_md": 8776,
-      "hanzi_html": 8776
+      "hanzi_md": 8610,
+      "hanzi_html": 8610
     },
     "chapters/04-memory-disk/chapter.md": {
-      "hanzi_md": 10824,
-      "hanzi_html": 10824
+      "hanzi_md": 10777,
+      "hanzi_html": 10777
     },
     "chapters/05-layered-architecture/chapter.md": {
-      "hanzi_md": 10486,
-      "hanzi_html": 10486
+      "hanzi_md": 10691,
+      "hanzi_html": 10691
     },
     "chapters/06-security/chapter.md": {
-      "hanzi_md": 7983,
-      "hanzi_html": 7983
+      "hanzi_md": 8121,
+      "hanzi_html": 8121
     },
     "chapters/07-cluster/chapter.md": {
-      "hanzi_md": 11271,
-      "hanzi_html": 11271
+      "hanzi_md": 11218,
+      "hanzi_html": 11218
     },
     "chapters/08-storage-format/chapter.md": {
-      "hanzi_md": 12820,
-      "hanzi_html": 12820
+      "hanzi_md": 13113,
+      "hanzi_html": 13113
     },
     "chapters/09-data-sync/chapter.md": {
-      "hanzi_md": 10615,
-      "hanzi_html": 10615
+      "hanzi_md": 11303,
+      "hanzi_html": 11303
     },
     "chapters/10-summary/chapter.md": {
-      "hanzi_md": 7165,
-      "hanzi_html": 7165
+      "hanzi_md": 7826,
+      "hanzi_html": 7826
     },
     "chapters/10-epilogue.md": {
-      "hanzi_md": 1631,
-      "hanzi_html": 1631
+      "hanzi_md": 1574,
+      "hanzi_html": 1574
     },
     "chapters/11-references.md": {
-      "hanzi_md": 1746,
-      "hanzi_html": 1746
+      "hanzi_md": 1909,
+      "hanzi_html": 1909
     }
   },
   "unreferenced_svgs": [],

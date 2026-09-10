@@ -50,7 +50,7 @@
 
     <!-- 环形回绕弧线：写指针越过右端后回绕覆盖最老命令（左端被覆盖） -->
     <path d="M 670 60 Q 720 60 720 20 Q 720 0 40 0 Q 0 0 0 30" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="300" y="20" text-anchor="middle" font-size="10" fill="#6B7280">回绕（覆盖最老）</text>
+    <text x="300" y="20" text-anchor="middle" font-size="10" fill="#6B7280">滑动窗口（回收旧块）</text>
 
     <!-- 左端：窗口下界=最老存活字节 -->
     <line x1="40" y1="100" x2="40" y2="120" stroke="#6B7280" stroke-width="1.5"/>
@@ -73,15 +73,15 @@
   <!-- ============ 比对与结论 ============ -->
   <line x1="430" y1="352" x2="430" y2="380" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrowRed)"/>
 
-  <rect x="100" y="386" width="660" height="120" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">重连时比对：主 offset 520 − 从 offset 330 = 差额 190 字节</text>
+  <rect x="100" y="386" width="660" height="126" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">历史匹配后比对：520 − 330 = 190 字节，请求从 331 开始</text>
 
-  <text x="120" y="438" font-size="12.5" fill="#374151">① 若从 offset 落在 backlog 窗口内（280−520） → cmd B 之后的 cmd C、cmd D 仍在缓冲</text>
+  <text x="120" y="438" font-size="12.5" fill="#374151">① 请求从 331 续传，所需字节仍在窗口（280–520）中</text>
   <text x="120" y="458" font-size="12.5" font-weight="700" fill="#059669">     ⇒ 走部分重同步：只补发差额命令，主节点不 fork</text>
 
-  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外，如 &lt; 280） → 所需命令已被新命令覆盖</text>
+  <text x="120" y="484" font-size="12.5" fill="#374151">② 请求位置早于 280，或复制历史不匹配 → 无法继续这段复制流</text>
   <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
 
   <!-- 底注 -->
-  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节位点，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
+  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 按字节计数；续传还要核对复制 ID、有效范围和日志是否保留</text>
 </svg>

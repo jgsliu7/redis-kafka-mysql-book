@@ -1,0 +1,2356 @@
+{
+  "summary": {
+    "candidateCount": 137,
+    "independentCandidates": 124,
+    "repairCandidates": 13,
+    "selectedCount": 87,
+    "excludedCount": 50,
+    "levels": {
+      "可选润色": 40,
+      "建议修改": 47
+    },
+    "chapterCounts": {
+      "序言": 2,
+      "第 1 章": 6,
+      "第 2 章": 11,
+      "第 3 章": 7,
+      "第 4 章": 8,
+      "第 5 章": 10,
+      "第 6 章": 12,
+      "第 7 章": 6,
+      "第 8 章": 8,
+      "第 9 章": 7,
+      "第 10 章": 7,
+      "后记": 2,
+      "参考文献": 1
+    },
+    "coverageFiles": 13,
+    "coverageLines": 2868,
+    "sourceUrls": 10,
+    "manuscriptModified": false,
+    "allManuscriptHashesMatchBaseline": true,
+    "selectionRule": "候选先独立冻结，再分别核原文、诊断与具体改法；C 对 AB 追加对抗复核。所有改文均原样选择，不拼接；同范围只留一稿，分级取相关审核较保守的意见。",
+    "unresolvedMaterial": [
+      {
+        "id": "A004",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 29,
+        "reason": "被否建议把原句的更敏感改成更值得关注，改变判断类型；没有获票的保真替代稿，本轮保留书稿原文。"
+      }
+    ],
+    "repairedMaterial": [
+      "A023/B019 候选中的三者层次互异暗示已由 R006 消除。",
+      "保证/保护强度差异已由 R010 修复。",
+      "作者通常实践顺序与可行性建议的差异已由 R011 修复，保留往往先与就该。",
+      "安全姿态的改法由 C012 保留原有才会条件，不采用削弱判断的 B030。"
+    ],
+    "pending": "交由 A/C 对最终数据及网页成品作末次校验。"
+  },
+  "abStage": {
+    "summary": {
+      "candidateCount": 101,
+      "eligibleBeforeDedup": 83,
+      "selectedCount": 72,
+      "excludedCount": 29,
+      "levels": {
+        "可选润色": 32,
+        "建议修改": 40
+      },
+      "chapterCounts": {
+        "序言": 1,
+        "第 1 章": 4,
+        "第 2 章": 10,
+        "第 3 章": 7,
+        "第 4 章": 6,
+        "第 5 章": 7,
+        "第 6 章": 9,
+        "第 7 章": 6,
+        "第 8 章": 8,
+        "第 9 章": 6,
+        "第 10 章": 6,
+        "后记": 1,
+        "参考文献": 1
+      },
+      "coverageFiles": 13,
+      "coverageLines": 2868,
+      "sourceUrls": 7,
+      "independentFrozenThenCrossReviewed": true,
+      "manuscriptModified": false,
+      "selectionRule": "只纳入原文逐字准确且提出席与复核席均接受诊断及这份具体改文的原样候选；排除后续主动撤回项。同一范围选一稿，不拼改文，分级取两席较保守者。",
+      "pending": "修订稿与 C 席独立复检尚未合并；这是 A/B 阶段可交付候选。"
+    },
+    "selectedIds": [
+      "A001",
+      "B001",
+      "A002",
+      "A003",
+      "B004",
+      "B005",
+      "A004",
+      "A005",
+      "A006",
+      "A007",
+      "A008",
+      "A010",
+      "A011",
+      "A012",
+      "A013",
+      "A014",
+      "B010",
+      "A016",
+      "B011",
+      "B012",
+      "A019",
+      "B014",
+      "A020",
+      "B015",
+      "B016",
+      "B017",
+      "B018",
+      "A022",
+      "B020",
+      "B021",
+      "A025",
+      "B023",
+      "A026",
+      "A027",
+      "B025",
+      "B026",
+      "B027",
+      "B028",
+      "A031",
+      "A032",
+      "A033",
+      "B029",
+      "A035",
+      "A036",
+      "A037",
+      "B031",
+      "A038",
+      "A039",
+      "A040",
+      "B033",
+      "A041",
+      "B034",
+      "A042",
+      "B035",
+      "A044",
+      "B036",
+      "B037",
+      "A046",
+      "B038",
+      "A047",
+      "A048",
+      "A049",
+      "A050",
+      "B040",
+      "B041",
+      "A051",
+      "A052",
+      "A053",
+      "A054",
+      "B044",
+      "B045",
+      "A055"
+    ],
+    "excluded": [
+      {
+        "id": "B002",
+        "file": "chapters/01-introduction/chapter.md",
+        "line": 96,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "可同意把“推到工业级”说具体些；但“让追加写日志用于生产环境”搭配仍生硬，还容易被理解为追加写日志此前不能用于生产。原意是把该抽象实现成有吞吐与可靠性保障的系统，当前改文尚未准确交代。"
+      },
+      {
+        "id": "B003",
+        "file": "chapters/01-introduction/chapter.md",
+        "line": 119,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": false,
+        "rewriteAccepted": false,
+        "reason": "原段紧邻真实雷达图，“轮廓”“五个角”是图形的字面属性，并非读者必须猜解的生造比喻。“没有谁能占满五个角”也有前句五维比较支撑。改成“设计取向由此显现”更书面，未显示足够阅读收益，建议保留原文。"
+      },
+      {
+        "id": "B006",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 41,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "末句确实应明确头部开销与取长度遍历。重读保留下来的存量句后，“SDS 多花一个头部”仍把头部放进花费的宾语槽，与本条要修的开销对象问题相连；改文首句“两种字符串把开销放在了不同环节”也偏抽象。建议合并 A 中对该完整段的处理后再审，不原样交付 B。"
+      },
+      {
+        "id": "B007",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 43,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": false,
+        "rewriteAccepted": false,
+        "reason": "前句已明确 dict 和跳表、各自的访问方式，末句“单一结构顾不全，就并联两个，各管一条访问路径”的省略有清楚先行项，保留口语不妨碍理解。改文末尾“分别处理”同样省对象，且重述结构名，无明确收益。段中“按序拉段”是另一问题，不应借它为本诊断加票。"
+      },
+      {
+        "id": "B008",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 58,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "“用摊还替换集中”两端不对称的问题成立。但上文 SDS 的预分配/惰性释放与 rehash 的分次搬迁，并不能不加区分地统称“把集中处理改为分次处理”；新说法更明确地给 SDS 归入分次处理。需保留摊还成本与分散搬迁的差别，不宜原样交付。"
+      },
+      {
+        "id": "A009",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 100,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "诊断成立，但改文仅留下节点位于内存，删去了单个节点与整页之间的粒度对比；末句仍讲节点大小与介质访问单位，论据更弱，不能原样交付。"
+      },
+      {
+        "id": "B009",
+        "file": "chapters/02-data-structures-protocols/chapter.md",
+        "line": 201,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "客户端与“所有人”的对象切换可修。但原文“最容易被低估”限定在这张表所列维度之中，改文“协议的版本兼容最容易被低估”取消了这一比较范围，变成无范围的最高级判断。改法需保留表内范围。"
+      },
+      {
+        "id": "A015",
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 50,
+        "reasonType": "同范围去重",
+        "selectedId": "B010",
+        "reason": "B010 直接解释可服务状态，不再让状态机作为未展开的抽象主体；两稿的日志与运维信息相同。"
+      },
+      {
+        "id": "A017",
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 137,
+        "reasonType": "同范围去重",
+        "selectedId": "B011",
+        "reason": "B011 保留冲击的原有力度，明确 Broker 下线与关闭刷盘；两稿修改同一处。"
+      },
+      {
+        "id": "A018",
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 167,
+        "reasonType": "同范围去重",
+        "selectedId": "B012",
+        "reason": "B012 明确 Leader 分配结果及返回响应，并保留两种控制面方式；两稿修复同一组角色对话。"
+      },
+      {
+        "id": "B013",
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 227,
+        "reasonType": "同范围去重",
+        "selectedId": "A019",
+        "reason": "A019 以恢复后状态的确定性承接上一段的已知状态，保留就要和保证的要求力度。"
+      },
+      {
+        "id": "A021",
+        "file": "chapters/04-memory-disk/chapter.md",
+        "line": 204,
+        "reasonType": "同范围去重",
+        "selectedId": "B017",
+        "reason": "B017 直接删去已由两处各缓存一份充分表达的重复结尾；A021 仍复述多占一份空间。"
+      },
+      {
+        "id": "A023",
+        "file": "chapters/04-memory-disk/chapter.md",
+        "line": 278,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "缓存建层选择搭配需要修，但三个软件选择的缓存层级不同容易读成三者各不相同，紧接着 Redis/MySQL 都在进程内，新增总起与枚举不严密，具体改法暂不通过。"
+      },
+      {
+        "id": "B019",
+        "file": "chapters/04-memory-disk/chapter.md",
+        "line": 278,
+        "reasonType": "作者席撤回",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "B 席冻结后主动撤回：三者层次不同可能误成三者互异，且 A 复核具体改文亦不通过。"
+      },
+      {
+        "id": "A024",
+        "file": "chapters/04-memory-disk/chapter.md",
+        "line": 306,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "形状可选地改为访问模式本身，但新句连续使用两个冒号，仍有标点层次和起句不顺的问题；不能不更动就交付。"
+      },
+      {
+        "id": "B022",
+        "file": "chapters/05-layered-architecture/chapter.md",
+        "line": 102,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "“边界靠对象”确实接不上前面的未解耦判断。但保留的前一句已说“贯穿全程的对象替代层层复制参数”，新句再说“共享对象传递上下文，不逐层拷贝参数”，两句成为近乎同义复述。需要与存量句一起合并后再审；不能只因目标短句变清楚就原样放行。"
+      },
+      {
+        "id": "B024",
+        "file": "chapters/05-layered-architecture/chapter.md",
+        "line": 147,
+        "reasonType": "同范围去重",
+        "selectedId": "A026",
+        "reason": "两稿只差一个也字；A026 用重复系词合并残句，改动更少，整段信息相同。"
+      },
+      {
+        "id": "A028",
+        "file": "chapters/05-layered-architecture/chapter.md",
+        "line": 277,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "诊断成立，分层是被审视对象；但剪裁改为调整把明确裁减层的动作泛化了。本节标题和后句都以移除为重点，宜保留裁减力度，这份具体改文暂不通过。"
+      },
+      {
+        "id": "A029",
+        "file": "chapters/06-security/chapter.md",
+        "line": 19,
+        "reasonType": "作者席撤回",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": true,
+        "reason": "A 席冻结后主动撤回：保证改为保护可能减弱原断言，等待另拟保真改文。"
+      },
+      {
+        "id": "A030",
+        "file": "chapters/06-security/chapter.md",
+        "line": 76,
+        "reasonType": "同范围去重",
+        "selectedId": "B028",
+        "reason": "B028 明确凭证管理对元数据存储安全的依赖，关系比必须保护的部分更直接；技术事实均一致。"
+      },
+      {
+        "id": "A034",
+        "file": "chapters/06-security/chapter.md",
+        "line": 163,
+        "reasonType": "同范围去重",
+        "selectedId": "B029",
+        "reason": "B029 直接说记录细度与吞吐代价，避免牺牲这一附加修辞；两稿含义一致。"
+      },
+      {
+        "id": "B030",
+        "file": "chapters/06-security/chapter.md",
+        "line": 195,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "“内网姿态放到公网”可以展开为部署配置错配；但原句还断言“姿态没有高下，错配才有事故”，改文删去了“才有”的必要条件判断，并把前半改成带新条件的“脱离部署环境”。这些可能更严谨，却超出本轮只改表达的权限，需作为内容取舍另审。"
+      },
+      {
+        "id": "B032",
+        "file": "chapters/07-cluster/chapter.md",
+        "line": 119,
+        "reasonType": "同范围去重",
+        "selectedId": "A038",
+        "reason": "A038 直接问确认的是哪一步，少一层确认完成的搭配；两稿均完整保留 ACK 与回放区别。"
+      },
+      {
+        "id": "A043",
+        "file": "chapters/08-storage-format/chapter.md",
+        "line": 95,
+        "reasonType": "同范围去重",
+        "selectedId": "B035",
+        "reason": "B035 同时把已述改为介绍、增量改为变化，完整范围中措辞更平实；两稿无不同技术改点。"
+      },
+      {
+        "id": "A045",
+        "file": "chapters/08-storage-format/chapter.md",
+        "line": 327,
+        "reasonType": "同范围去重",
+        "selectedId": "B036",
+        "reason": "B036 采用章首已有的作者经历说法，修复一周修饰脚本的问题。A045 另把迁移债改为迁移工作，属于未并入的次要平实化，避免自行拼稿。"
+      },
+      {
+        "id": "B039",
+        "file": "chapters/09-data-sync/chapter.md",
+        "line": 146,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": false,
+        "rewriteAccepted": false,
+        "reason": "后面紧接接收与回放分离、relay log 缓冲速度差的具体解释，“微妙的设计点”在这里有内容支撑，也承担从线程分工转向设计判断的过渡。不能因为评价先于解释就当冗余模板，建议保留作者观察口吻。"
+      },
+      {
+        "id": "B042",
+        "file": "chapters/10-summary/chapter.md",
+        "line": 63,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "“第一落点”可改得直接；但末句把“就该想想”（作者对自己的提醒/规范）改为“就会考虑”（作者惯常会做的行为），两者不是等值第一人称证据。应保留自我提醒的语气，不能原样交付。"
+      },
+      {
+        "id": "B043",
+        "file": "chapters/10-summary/chapter.md",
+        "line": 125,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "框架“往约束上压”确缺乏自然搭配。但“检验……怎样应用”仍把检验的对象与方式问句硬接；通常是检验是否适用/有效，或说明怎样应用，当前改句没有分清二者。需改法再次打磨。"
+      },
+      {
+        "id": "B046",
+        "file": "chapters/11-references.md",
+        "line": 37,
+        "reasonType": "未获双席通过",
+        "quoteExact": true,
+        "diagnosisAccepted": true,
+        "rewriteAccepted": false,
+        "reason": "retrofit 应用自然中文解释；但“性能优先”是相对优先级，“先保证性能”变成先后顺序加保证，并不等值。可用“在性能优先的既有架构中补充安全能力”这一方向另拟后复核，当前 B 改文不原样通过。"
+      }
+    ],
+    "deduplicatedGroups": [
+      {
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 50,
+        "candidateIds": [
+          "A015",
+          "B010"
+        ],
+        "selectedId": "B010",
+        "reason": "B010 直接解释可服务状态，不再让状态机作为未展开的抽象主体；两稿的日志与运维信息相同。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 137,
+        "candidateIds": [
+          "A017",
+          "B011"
+        ],
+        "selectedId": "B011",
+        "reason": "B011 保留冲击的原有力度，明确 Broker 下线与关闭刷盘；两稿修改同一处。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 167,
+        "candidateIds": [
+          "A018",
+          "B012"
+        ],
+        "selectedId": "B012",
+        "reason": "B012 明确 Leader 分配结果及返回响应，并保留两种控制面方式；两稿修复同一组角色对话。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/03-lifecycle/chapter.md",
+        "line": 227,
+        "candidateIds": [
+          "A019",
+          "B013"
+        ],
+        "selectedId": "A019",
+        "reason": "A019 以恢复后状态的确定性承接上一段的已知状态，保留就要和保证的要求力度。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/04-memory-disk/chapter.md",
+        "line": 204,
+        "candidateIds": [
+          "A021",
+          "B017"
+        ],
+        "selectedId": "B017",
+        "reason": "B017 直接删去已由两处各缓存一份充分表达的重复结尾；A021 仍复述多占一份空间。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/05-layered-architecture/chapter.md",
+        "line": 147,
+        "candidateIds": [
+          "A026",
+          "B024"
+        ],
+        "selectedId": "A026",
+        "reason": "两稿只差一个也字；A026 用重复系词合并残句，改动更少，整段信息相同。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/06-security/chapter.md",
+        "line": 76,
+        "candidateIds": [
+          "A030",
+          "B028"
+        ],
+        "selectedId": "B028",
+        "reason": "B028 明确凭证管理对元数据存储安全的依赖，关系比必须保护的部分更直接；技术事实均一致。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/06-security/chapter.md",
+        "line": 163,
+        "candidateIds": [
+          "A034",
+          "B029"
+        ],
+        "selectedId": "B029",
+        "reason": "B029 直接说记录细度与吞吐代价，避免牺牲这一附加修辞；两稿含义一致。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/07-cluster/chapter.md",
+        "line": 119,
+        "candidateIds": [
+          "A038",
+          "B032"
+        ],
+        "selectedId": "A038",
+        "reason": "A038 直接问确认的是哪一步，少一层确认完成的搭配；两稿均完整保留 ACK 与回放区别。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/08-storage-format/chapter.md",
+        "line": 95,
+        "candidateIds": [
+          "A043",
+          "B035"
+        ],
+        "selectedId": "B035",
+        "reason": "B035 同时把已述改为介绍、增量改为变化，完整范围中措辞更平实；两稿无不同技术改点。",
+        "omittedDistinctChange": null
+      },
+      {
+        "file": "chapters/08-storage-format/chapter.md",
+        "line": 327,
+        "candidateIds": [
+          "A045",
+          "B036"
+        ],
+        "selectedId": "B036",
+        "reason": "B036 采用章首已有的作者经历说法，修复一周修饰脚本的问题。A045 另把迁移债改为迁移工作，属于未并入的次要平实化，避免自行拼稿。",
+        "omittedDistinctChange": "A045 对迁移债的另一个词级润色未并入。"
+      }
+    ],
+    "overlapUnincorporated": [
+      {
+        "ids": [
+          "A005",
+          "B006"
+        ],
+        "selectedId": "A005",
+        "note": "B006 另去掉图表阅读引导未并入；B006 具体改文未通过。"
+      },
+      {
+        "ids": [
+          "A006",
+          "B007"
+        ],
+        "selectedId": "A006",
+        "note": "A006 修按序拉段；B007 改段末口语被诊断及改法同时拒绝，保留段末。"
+      },
+      {
+        "ids": [
+          "A007",
+          "B008"
+        ],
+        "selectedId": "A007",
+        "note": "A007 明确定时搬迁暂停；B008 摊还/集中关系改法未过，首轮交付暂只解决 A007。"
+      },
+      {
+        "ids": [
+          "A045",
+          "B036"
+        ],
+        "selectedId": "B036",
+        "note": "A045 另改迁移债未合并；B036 已完整修复时长错搭并保留作者话语。"
+      }
+    ],
+    "notes": [
+      "所有 selected 的 original/revised 均完整复制冻结候选，未另写或拼接建议改文。",
+      "sources 按 URL 去重；同 URL 的两席方法保留在 sourceMethods，页面可使用统一主条目。",
+      "sourceIds 仅列同范围已通过候选，未通过或主动撤回的 id 只进入排除日志，避免误示双票。"
+    ]
+  },
+  "selectedIds": [
+    "A001",
+    "C001",
+    "B001",
+    "A002",
+    "C002",
+    "R001",
+    "A003",
+    "B004",
+    "B005",
+    "A005",
+    "A006",
+    "R003",
+    "A008",
+    "R004",
+    "A010",
+    "A011",
+    "A012",
+    "R005",
+    "A013",
+    "A014",
+    "B010",
+    "A016",
+    "B011",
+    "B012",
+    "A019",
+    "B014",
+    "A020",
+    "B015",
+    "B016",
+    "B017",
+    "B018",
+    "A022",
+    "R006",
+    "R007",
+    "B020",
+    "B021",
+    "R008",
+    "A025",
+    "B023",
+    "C009",
+    "A026",
+    "A027",
+    "B025",
+    "R009",
+    "B026",
+    "R010",
+    "B027",
+    "B028",
+    "A031",
+    "A032",
+    "A033",
+    "C011",
+    "B029",
+    "A035",
+    "C012",
+    "A036",
+    "A037",
+    "B031",
+    "A038",
+    "A039",
+    "A040",
+    "B033",
+    "A041",
+    "B034",
+    "A042",
+    "B035",
+    "A044",
+    "B036",
+    "B037",
+    "A046",
+    "B038",
+    "C018",
+    "A047",
+    "A048",
+    "A049",
+    "A050",
+    "B040",
+    "B041",
+    "A051",
+    "R011",
+    "C020",
+    "A053",
+    "A054",
+    "B044",
+    "C022",
+    "B045",
+    "A055"
+  ],
+  "candidateOutcomes": [
+    {
+      "id": "A001",
+      "file": "chapters/00-preface.md",
+      "line": 3,
+      "status": "selected",
+      "finalIdAtSameLocation": "A001",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C001",
+      "file": "chapters/00-preface.md",
+      "line": 5,
+      "status": "selected",
+      "finalIdAtSameLocation": "C001",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B001",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 25,
+      "status": "selected",
+      "finalIdAtSameLocation": "B001",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A002",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 34,
+      "status": "selected",
+      "finalIdAtSameLocation": "A002",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C002",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 66,
+      "status": "selected",
+      "finalIdAtSameLocation": "C002",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B002",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 96,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R001",
+      "reason": "可同意把“推到工业级”说具体些；但“让追加写日志用于生产环境”搭配仍生硬，还容易被理解为追加写日志此前不能用于生产。原意是把该抽象实现成有吞吐与可靠性保障的系统，当前改文尚未准确交代。"
+    },
+    {
+      "id": "R001",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 96,
+      "status": "selected",
+      "finalIdAtSameLocation": "R001",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B003",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 119,
+      "status": "rejected",
+      "finalIdAtSameLocation": null,
+      "reason": "原段紧邻真实雷达图，“轮廓”“五个角”是图形的字面属性，并非读者必须猜解的生造比喻。“没有谁能占满五个角”也有前句五维比较支撑。改成“设计取向由此显现”更书面，未显示足够阅读收益，建议保留原文。"
+    },
+    {
+      "id": "A003",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 130,
+      "status": "selected",
+      "finalIdAtSameLocation": "A003",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B004",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 192,
+      "status": "selected",
+      "finalIdAtSameLocation": "B004",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B005",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 22,
+      "status": "selected",
+      "finalIdAtSameLocation": "B005",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A004",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 29,
+      "status": "rejected_after_adversarial_review",
+      "finalIdAtSameLocation": null,
+      "reason": "否决当前具体改文。“对 CPU 开销比对 I/O 更敏感”陈述运行性能对两类开销的敏感程度；“CPU 开销比 I/O 开销更值得关注”改成了设计者的关注建议。主语补全与“减少 CPU 操作”的诊断成立，但应仍直接保留“更敏感”的关系，不能用“值得关注”替换。"
+    },
+    {
+      "id": "A005",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "selected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B006",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "末句确实应明确头部开销与取长度遍历。重读保留下来的存量句后，“SDS 多花一个头部”仍把头部放进花费的宾语槽，与本条要修的开销对象问题相连；改文首句“两种字符串把开销放在了不同环节”也偏抽象。建议合并 A 中对该完整段的处理后再审，不原样交付 B。"
+    },
+    {
+      "id": "C003",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "A005 已同时修复头部对象与逐次遍历，表达比 R002 的头部小开销更自然；C003 只修前一处。R002 去掉图表读法的次要改点未并入。"
+    },
+    {
+      "id": "R002",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "A005 已同时修复头部对象与逐次遍历，表达比 R002 的头部小开销更自然；C003 只修前一处。R002 去掉图表读法的次要改点未并入。"
+    },
+    {
+      "id": "A006",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 43,
+      "status": "selected",
+      "finalIdAtSameLocation": "A006",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B007",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 43,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A006",
+      "reason": "前句已明确 dict 和跳表、各自的访问方式，末句“单一结构顾不全，就并联两个，各管一条访问路径”的省略有清楚先行项，保留口语不妨碍理解。改文末尾“分别处理”同样省对象，且重述结构名，无明确收益。段中“按序拉段”是另一问题，不应借它为本诊断加票。"
+    },
+    {
+      "id": "A007",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "R003",
+      "reason": "修订稿保住 A007 明确定时搬迁暂停的改点，再删除与后半句重复的摊还/集中短语，不将 SDS 改称实际分次处理。"
+    },
+    {
+      "id": "B008",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R003",
+      "reason": "“用摊还替换集中”两端不对称的问题成立。但上文 SDS 的预分配/惰性释放与 rehash 的分次搬迁，并不能不加区分地统称“把集中处理改为分次处理”；新说法更明确地给 SDS 归入分次处理。需保留摊还成本与分散搬迁的差别，不宜原样交付。"
+    },
+    {
+      "id": "R003",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "status": "selected",
+      "finalIdAtSameLocation": "R003",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A008",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 78,
+      "status": "selected",
+      "finalIdAtSameLocation": "A008",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 100,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R004",
+      "reason": "诊断成立，但改文仅留下节点位于内存，删去了单个节点与整页之间的粒度对比；末句仍讲节点大小与介质访问单位，论据更弱，不能原样交付。"
+    },
+    {
+      "id": "R004",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 100,
+      "status": "selected",
+      "finalIdAtSameLocation": "R004",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A010",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 134,
+      "status": "selected",
+      "finalIdAtSameLocation": "A010",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A011",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 160,
+      "status": "selected",
+      "finalIdAtSameLocation": "A011",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A012",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 193,
+      "status": "selected",
+      "finalIdAtSameLocation": "A012",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C004",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 193,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A012",
+      "reason": "两稿修复同一词界，A012 明确结果行按文本传输，保留已通过完整表格行。"
+    },
+    {
+      "id": "B009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 201,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R005",
+      "reason": "客户端与“所有人”的对象切换可修。但原文“最容易被低估”限定在这张表所列维度之中，改文“协议的版本兼容最容易被低估”取消了这一比较范围，变成无范围的最高级判断。改法需保留表内范围。"
+    },
+    {
+      "id": "R005",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 201,
+      "status": "selected",
+      "finalIdAtSameLocation": "R005",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A013",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 225,
+      "status": "selected",
+      "finalIdAtSameLocation": "A013",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A014",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 41,
+      "status": "selected",
+      "finalIdAtSameLocation": "A014",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A015",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B010",
+      "reason": "B010 直接解释进程进入可服务状态，完整保留日志供 grep 判定的用途；两稿无不同实质改点。"
+    },
+    {
+      "id": "B010",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "status": "selected",
+      "finalIdAtSameLocation": "B010",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C005",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B010",
+      "reason": "B010 直接解释进程进入可服务状态，完整保留日志供 grep 判定的用途；两稿无不同实质改点。"
+    },
+    {
+      "id": "A016",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 61,
+      "status": "selected",
+      "finalIdAtSameLocation": "A016",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A017",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 137,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B011",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B011",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 137,
+      "status": "selected",
+      "finalIdAtSameLocation": "B011",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A018",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 167,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B012",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B012",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 167,
+      "status": "selected",
+      "finalIdAtSameLocation": "B012",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A019",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 227,
+      "status": "selected",
+      "finalIdAtSameLocation": "A019",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B013",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 227,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A019",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B014",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 243,
+      "status": "selected",
+      "finalIdAtSameLocation": "B014",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A020",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 17,
+      "status": "selected",
+      "finalIdAtSameLocation": "A020",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B015",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 45,
+      "status": "selected",
+      "finalIdAtSameLocation": "B015",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B016",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 184,
+      "status": "selected",
+      "finalIdAtSameLocation": "B016",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A021",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 204,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B017",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B017",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 204,
+      "status": "selected",
+      "finalIdAtSameLocation": "B017",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B018",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 264,
+      "status": "selected",
+      "finalIdAtSameLocation": "B018",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A022",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 274,
+      "status": "selected",
+      "finalIdAtSameLocation": "A022",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C006",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 274,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A022",
+      "reason": "两稿都把判断对象改回系统与访问模式匹配，保留已三席检查的 A022。"
+    },
+    {
+      "id": "A023",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "缓存建层选择搭配需要修，但三个软件选择的缓存层级不同容易读成三者各不相同，紧接着 Redis/MySQL 都在进程内，新增总起与枚举不严密，具体改法暂不通过。"
+    },
+    {
+      "id": "B019",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "“缓存建层选择”确是连续名词压缩，诊断成立。但完整重读后面三项，Redis 与 MySQL 都是进程内，不能以“三者选择的缓存层次不同”概括而让读者误以为三家各有不同层次。作者席自撤后再独立复读也确认这一范围问题；宜用不含三者互异断言的中性引导句。A023 的近似改法亦不宜采信。"
+    },
+    {
+      "id": "C007",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "R006 以缓存层级如下中性引出列表，明确避免三者互异断言；与 C007 修复同一处。"
+    },
+    {
+      "id": "R006",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "selected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A024",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 306,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R007",
+      "reason": "形状可选地改为访问模式本身，但新句连续使用两个冒号，仍有标点层次和起句不顺的问题；不能不更动就交付。"
+    },
+    {
+      "id": "R007",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 306,
+      "status": "selected",
+      "finalIdAtSameLocation": "R007",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B020",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 9,
+      "status": "selected",
+      "finalIdAtSameLocation": "B020",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B021",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 31,
+      "status": "selected",
+      "finalIdAtSameLocation": "B021",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B022",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 102,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R008",
+      "reason": "“边界靠对象”确实接不上前面的未解耦判断。但保留的前一句已说“贯穿全程的对象替代层层复制参数”，新句再说“共享对象传递上下文，不逐层拷贝参数”，两句成为近乎同义复述。需要与存量句一起合并后再审；不能只因目标短句变清楚就原样放行。"
+    },
+    {
+      "id": "R008",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 102,
+      "status": "selected",
+      "finalIdAtSameLocation": "R008",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A025",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 110,
+      "status": "selected",
+      "finalIdAtSameLocation": "A025",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C008",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 110,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A025",
+      "reason": "A025 已完整包含 C008 的直方图单句，改点相同；保留完整段落建议。"
+    },
+    {
+      "id": "B023",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 116,
+      "status": "selected",
+      "finalIdAtSameLocation": "B023",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C009",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 137,
+      "status": "selected",
+      "finalIdAtSameLocation": "C009",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A026",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 147,
+      "status": "selected",
+      "finalIdAtSameLocation": "A026",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B024",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 147,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A026",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "A027",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 162,
+      "status": "selected",
+      "finalIdAtSameLocation": "A027",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B025",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 271,
+      "status": "selected",
+      "finalIdAtSameLocation": "B025",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A028",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 277,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R009",
+      "reason": "诊断成立，分层是被审视对象；但剪裁改为调整把明确裁减层的动作泛化了。本节标题和后句都以移除为重点，宜保留裁减力度，这份具体改文暂不通过。"
+    },
+    {
+      "id": "R009",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 277,
+      "status": "selected",
+      "finalIdAtSameLocation": "R009",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B026",
+      "file": "chapters/06-security/chapter.md",
+      "line": 7,
+      "status": "selected",
+      "finalIdAtSameLocation": "B026",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A029",
+      "file": "chapters/06-security/chapter.md",
+      "line": 19,
+      "status": "withdrawn",
+      "finalIdAtSameLocation": "R010",
+      "reason": "A 主动撤回保证改保护的弱化风险，已由通过的 R010 保留保证强度。"
+    },
+    {
+      "id": "R010",
+      "file": "chapters/06-security/chapter.md",
+      "line": 19,
+      "status": "selected",
+      "finalIdAtSameLocation": "R010",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B027",
+      "file": "chapters/06-security/chapter.md",
+      "line": 46,
+      "status": "selected",
+      "finalIdAtSameLocation": "B027",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A030",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B028",
+      "reason": "两份改文逐字相同，合并来源且保留已过三席的 B028。"
+    },
+    {
+      "id": "B028",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "status": "selected",
+      "finalIdAtSameLocation": "B028",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C010",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B028",
+      "reason": "两份改文逐字相同，合并来源且保留已过三席的 B028。"
+    },
+    {
+      "id": "A031",
+      "file": "chapters/06-security/chapter.md",
+      "line": 87,
+      "status": "selected",
+      "finalIdAtSameLocation": "A031",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A032",
+      "file": "chapters/06-security/chapter.md",
+      "line": 91,
+      "status": "selected",
+      "finalIdAtSameLocation": "A032",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A033",
+      "file": "chapters/06-security/chapter.md",
+      "line": 97,
+      "status": "selected",
+      "finalIdAtSameLocation": "A033",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C011",
+      "file": "chapters/06-security/chapter.md",
+      "line": 133,
+      "status": "selected",
+      "finalIdAtSameLocation": "C011",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A034",
+      "file": "chapters/06-security/chapter.md",
+      "line": 163,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B029",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B029",
+      "file": "chapters/06-security/chapter.md",
+      "line": 163,
+      "status": "selected",
+      "finalIdAtSameLocation": "B029",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A035",
+      "file": "chapters/06-security/chapter.md",
+      "line": 167,
+      "status": "selected",
+      "finalIdAtSameLocation": "A035",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B030",
+      "file": "chapters/06-security/chapter.md",
+      "line": 195,
+      "status": "rejected",
+      "finalIdAtSameLocation": "C012",
+      "reason": "“内网姿态放到公网”可以展开为部署配置错配；但原句还断言“姿态没有高下，错配才有事故”，改文删去了“才有”的必要条件判断，并把前半改成带新条件的“脱离部署环境”。这些可能更严谨，却超出本轮只改表达的权限，需作为内容取舍另审。"
+    },
+    {
+      "id": "C012",
+      "file": "chapters/06-security/chapter.md",
+      "line": 195,
+      "status": "selected",
+      "finalIdAtSameLocation": "C012",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A036",
+      "file": "chapters/06-security/chapter.md",
+      "line": 211,
+      "status": "selected",
+      "finalIdAtSameLocation": "A036",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A037",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 84,
+      "status": "selected",
+      "finalIdAtSameLocation": "A037",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C013",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 84,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A037",
+      "reason": "A037 明确另一节点负责，更新映射与以后走新地址仍表达持续路由；C013 修同一主客体，不再新增第二版本。"
+    },
+    {
+      "id": "B031",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 111,
+      "status": "selected",
+      "finalIdAtSameLocation": "B031",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A038",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "status": "selected",
+      "finalIdAtSameLocation": "A038",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B032",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A038",
+      "reason": "两稿都直接问确认的阶段，保留 A038 并依 C 对作者口语的判断降为可选。"
+    },
+    {
+      "id": "C014",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A038",
+      "reason": "两稿都直接问确认的阶段，保留 A038 并依 C 对作者口语的判断降为可选。"
+    },
+    {
+      "id": "A039",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 180,
+      "status": "selected",
+      "finalIdAtSameLocation": "A039",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A040",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 207,
+      "status": "selected",
+      "finalIdAtSameLocation": "A040",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B033",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 218,
+      "status": "selected",
+      "finalIdAtSameLocation": "B033",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A041",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 7,
+      "status": "selected",
+      "finalIdAtSameLocation": "A041",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B034",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 35,
+      "status": "selected",
+      "finalIdAtSameLocation": "B034",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A042",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 73,
+      "status": "selected",
+      "finalIdAtSameLocation": "A042",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C015",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 73,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A042",
+      "reason": "两稿只在部分/区段上不同，选择更常用且已通过的 A042；均按可选。"
+    },
+    {
+      "id": "A043",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B035",
+      "reason": "B035 保留这里只讨论的范围划分，C016 接着说明略弱化范围；其余改点相同。"
+    },
+    {
+      "id": "B035",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "status": "selected",
+      "finalIdAtSameLocation": "B035",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C016",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B035",
+      "reason": "B035 保留这里只讨论的范围划分，C016 接着说明略弱化范围；其余改点相同。"
+    },
+    {
+      "id": "A044",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 224,
+      "status": "selected",
+      "finalIdAtSameLocation": "A044",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A045",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B036",
+      "reason": "B036 完整段包含 C017 单句，并直接采用章首作者原有经历措辞；不拼接另一份单句。"
+    },
+    {
+      "id": "B036",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "status": "selected",
+      "finalIdAtSameLocation": "B036",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C017",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B036",
+      "reason": "B036 完整段包含 C017 单句，并直接采用章首作者原有经历措辞；不拼接另一份单句。"
+    },
+    {
+      "id": "B037",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 340,
+      "status": "selected",
+      "finalIdAtSameLocation": "B037",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A046",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 344,
+      "status": "selected",
+      "finalIdAtSameLocation": "A046",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B038",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 13,
+      "status": "selected",
+      "finalIdAtSameLocation": "B038",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C018",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 23,
+      "status": "selected",
+      "finalIdAtSameLocation": "C018",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A047",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 27,
+      "status": "selected",
+      "finalIdAtSameLocation": "A047",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A048",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 103,
+      "status": "selected",
+      "finalIdAtSameLocation": "A048",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B039",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 146,
+      "status": "rejected",
+      "finalIdAtSameLocation": null,
+      "reason": "后面紧接接收与回放分离、relay log 缓冲速度差的具体解释，“微妙的设计点”在这里有内容支撑，也承担从线程分工转向设计判断的过渡。不能因为评价先于解释就当冗余模板，建议保留作者观察口吻。"
+    },
+    {
+      "id": "A049",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 200,
+      "status": "selected",
+      "finalIdAtSameLocation": "A049",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C019",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 200,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A049",
+      "reason": "两稿 WAIT 的范围相同，A049 还把限制写入的参数改为谓语，完整解开连续长定语。"
+    },
+    {
+      "id": "A050",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 241,
+      "status": "selected",
+      "finalIdAtSameLocation": "A050",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B040",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 264,
+      "status": "selected",
+      "finalIdAtSameLocation": "B040",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B041",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 11,
+      "status": "selected",
+      "finalIdAtSameLocation": "B041",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A051",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 53,
+      "status": "selected",
+      "finalIdAtSameLocation": "A051",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A052",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "status": "rejected_after_adversarial_review",
+      "finalIdAtSameLocation": "R011",
+      "reason": "否决当前具体改文。原“第一落点，往往是改写访问模式”是在陈述作者对常见实践顺序的判断；改成“往往可以先……用于”后变为可行性建议，弱化了“通常首先调整访问模式”的判断。去掉空间化措辞的方向可选，但应保留原判断类型与强度。"
+    },
+    {
+      "id": "B042",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R011",
+      "reason": "“第一落点”可改得直接；但末句把“就该想想”（作者对自己的提醒/规范）改为“就会考虑”（作者惯常会做的行为），两者不是等值第一人称证据。应保留自我提醒的语气，不能原样交付。"
+    },
+    {
+      "id": "R011",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "status": "selected",
+      "finalIdAtSameLocation": "R011",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C020",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 86,
+      "status": "selected",
+      "finalIdAtSameLocation": "C020",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A053",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "status": "selected",
+      "finalIdAtSameLocation": "A053",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B043",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A053",
+      "reason": "框架“往约束上压”确缺乏自然搭配。但“检验……怎样应用”仍把检验的对象与方式问句硬接；通常是检验是否适用/有效，或说明怎样应用，当前改句没有分清二者。需改法再次打磨。"
+    },
+    {
+      "id": "R012",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A053",
+      "reason": "修订稿与 A053 改文完全相同，保留原 id 并沿用 C 提出的可选分级。"
+    },
+    {
+      "id": "A054",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 173,
+      "status": "selected",
+      "finalIdAtSameLocation": "A054",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C021",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 173,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A054",
+      "reason": "同一语序修复，A054 在单线程中执行更完整，保留已三席核验稿。"
+    },
+    {
+      "id": "B044",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 197,
+      "status": "selected",
+      "finalIdAtSameLocation": "B044",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "C022",
+      "file": "chapters/10-epilogue.md",
+      "line": 29,
+      "status": "selected",
+      "finalIdAtSameLocation": "C022",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B045",
+      "file": "chapters/10-epilogue.md",
+      "line": 51,
+      "status": "selected",
+      "finalIdAtSameLocation": "B045",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "A055",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "selected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "原样候选通过核验并入选。"
+    },
+    {
+      "id": "B046",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "retrofit 应用自然中文解释；但“性能优先”是相对优先级，“先保证性能”变成先后顺序加保证，并不等值。可用“在性能优先的既有架构中补充安全能力”这一方向另拟后复核，当前 B 改文不原样通过。"
+    },
+    {
+      "id": "C023",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "retrofit 可中文化，诊断成立；但先追求性能、再补充安全能力仍把性能优先的相对优先级改成先后顺序，正是 B046 的保真风险，不原样通过。"
+    },
+    {
+      "id": "R013",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "改文完全相同，保留原 id 与较保守可选分级。"
+    }
+  ],
+  "excluded": [
+    {
+      "id": "A004",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 29,
+      "status": "rejected_after_adversarial_review",
+      "finalIdAtSameLocation": null,
+      "reason": "否决当前具体改文。“对 CPU 开销比对 I/O 更敏感”陈述运行性能对两类开销的敏感程度；“CPU 开销比 I/O 开销更值得关注”改成了设计者的关注建议。主语补全与“减少 CPU 操作”的诊断成立，但应仍直接保留“更敏感”的关系，不能用“值得关注”替换。"
+    },
+    {
+      "id": "A007",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "R003",
+      "reason": "修订稿保住 A007 明确定时搬迁暂停的改点，再删除与后半句重复的摊还/集中短语，不将 SDS 改称实际分次处理。"
+    },
+    {
+      "id": "A009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 100,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R004",
+      "reason": "诊断成立，但改文仅留下节点位于内存，删去了单个节点与整页之间的粒度对比；末句仍讲节点大小与介质访问单位，论据更弱，不能原样交付。"
+    },
+    {
+      "id": "A015",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B010",
+      "reason": "B010 直接解释进程进入可服务状态，完整保留日志供 grep 判定的用途；两稿无不同实质改点。"
+    },
+    {
+      "id": "A017",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 137,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B011",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "A018",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 167,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B012",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "A021",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 204,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B017",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "A023",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "缓存建层选择搭配需要修，但三个软件选择的缓存层级不同容易读成三者各不相同，紧接着 Redis/MySQL 都在进程内，新增总起与枚举不严密，具体改法暂不通过。"
+    },
+    {
+      "id": "A024",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 306,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R007",
+      "reason": "形状可选地改为访问模式本身，但新句连续使用两个冒号，仍有标点层次和起句不顺的问题；不能不更动就交付。"
+    },
+    {
+      "id": "A028",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 277,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R009",
+      "reason": "诊断成立，分层是被审视对象；但剪裁改为调整把明确裁减层的动作泛化了。本节标题和后句都以移除为重点，宜保留裁减力度，这份具体改文暂不通过。"
+    },
+    {
+      "id": "A029",
+      "file": "chapters/06-security/chapter.md",
+      "line": 19,
+      "status": "withdrawn",
+      "finalIdAtSameLocation": "R010",
+      "reason": "A 主动撤回保证改保护的弱化风险，已由通过的 R010 保留保证强度。"
+    },
+    {
+      "id": "A030",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B028",
+      "reason": "两份改文逐字相同，合并来源且保留已过三席的 B028。"
+    },
+    {
+      "id": "A034",
+      "file": "chapters/06-security/chapter.md",
+      "line": 163,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B029",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "A043",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B035",
+      "reason": "B035 保留这里只讨论的范围划分，C016 接着说明略弱化范围；其余改点相同。"
+    },
+    {
+      "id": "A045",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B036",
+      "reason": "B036 完整段包含 C017 单句，并直接采用章首作者原有经历措辞；不拼接另一份单句。"
+    },
+    {
+      "id": "A052",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "status": "rejected_after_adversarial_review",
+      "finalIdAtSameLocation": "R011",
+      "reason": "否决当前具体改文。原“第一落点，往往是改写访问模式”是在陈述作者对常见实践顺序的判断；改成“往往可以先……用于”后变为可行性建议，弱化了“通常首先调整访问模式”的判断。去掉空间化措辞的方向可选，但应保留原判断类型与强度。"
+    },
+    {
+      "id": "B002",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 96,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R001",
+      "reason": "可同意把“推到工业级”说具体些；但“让追加写日志用于生产环境”搭配仍生硬，还容易被理解为追加写日志此前不能用于生产。原意是把该抽象实现成有吞吐与可靠性保障的系统，当前改文尚未准确交代。"
+    },
+    {
+      "id": "B003",
+      "file": "chapters/01-introduction/chapter.md",
+      "line": 119,
+      "status": "rejected",
+      "finalIdAtSameLocation": null,
+      "reason": "原段紧邻真实雷达图，“轮廓”“五个角”是图形的字面属性，并非读者必须猜解的生造比喻。“没有谁能占满五个角”也有前句五维比较支撑。改成“设计取向由此显现”更书面，未显示足够阅读收益，建议保留原文。"
+    },
+    {
+      "id": "B006",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "末句确实应明确头部开销与取长度遍历。重读保留下来的存量句后，“SDS 多花一个头部”仍把头部放进花费的宾语槽，与本条要修的开销对象问题相连；改文首句“两种字符串把开销放在了不同环节”也偏抽象。建议合并 A 中对该完整段的处理后再审，不原样交付 B。"
+    },
+    {
+      "id": "B007",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 43,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A006",
+      "reason": "前句已明确 dict 和跳表、各自的访问方式，末句“单一结构顾不全，就并联两个，各管一条访问路径”的省略有清楚先行项，保留口语不妨碍理解。改文末尾“分别处理”同样省对象，且重述结构名，无明确收益。段中“按序拉段”是另一问题，不应借它为本诊断加票。"
+    },
+    {
+      "id": "B008",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R003",
+      "reason": "“用摊还替换集中”两端不对称的问题成立。但上文 SDS 的预分配/惰性释放与 rehash 的分次搬迁，并不能不加区分地统称“把集中处理改为分次处理”；新说法更明确地给 SDS 归入分次处理。需保留摊还成本与分散搬迁的差别，不宜原样交付。"
+    },
+    {
+      "id": "B009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 201,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R005",
+      "reason": "客户端与“所有人”的对象切换可修。但原文“最容易被低估”限定在这张表所列维度之中，改文“协议的版本兼容最容易被低估”取消了这一比较范围，变成无范围的最高级判断。改法需保留表内范围。"
+    },
+    {
+      "id": "B013",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 227,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A019",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B019",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "“缓存建层选择”确是连续名词压缩，诊断成立。但完整重读后面三项，Redis 与 MySQL 都是进程内，不能以“三者选择的缓存层次不同”概括而让读者误以为三家各有不同层次。作者席自撤后再独立复读也确认这一范围问题；宜用不含三者互异断言的中性引导句。A023 的近似改法亦不宜采信。"
+    },
+    {
+      "id": "B022",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 102,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R008",
+      "reason": "“边界靠对象”确实接不上前面的未解耦判断。但保留的前一句已说“贯穿全程的对象替代层层复制参数”，新句再说“共享对象传递上下文，不逐层拷贝参数”，两句成为近乎同义复述。需要与存量句一起合并后再审；不能只因目标短句变清楚就原样放行。"
+    },
+    {
+      "id": "B024",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 147,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A026",
+      "reason": "该范围只有一个在当前全部审核下可入选的候选。"
+    },
+    {
+      "id": "B030",
+      "file": "chapters/06-security/chapter.md",
+      "line": 195,
+      "status": "rejected",
+      "finalIdAtSameLocation": "C012",
+      "reason": "“内网姿态放到公网”可以展开为部署配置错配；但原句还断言“姿态没有高下，错配才有事故”，改文删去了“才有”的必要条件判断，并把前半改成带新条件的“脱离部署环境”。这些可能更严谨，却超出本轮只改表达的权限，需作为内容取舍另审。"
+    },
+    {
+      "id": "B032",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A038",
+      "reason": "两稿都直接问确认的阶段，保留 A038 并依 C 对作者口语的判断降为可选。"
+    },
+    {
+      "id": "B039",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 146,
+      "status": "rejected",
+      "finalIdAtSameLocation": null,
+      "reason": "后面紧接接收与回放分离、relay log 缓冲速度差的具体解释，“微妙的设计点”在这里有内容支撑，也承担从线程分工转向设计判断的过渡。不能因为评价先于解释就当冗余模板，建议保留作者观察口吻。"
+    },
+    {
+      "id": "B042",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 63,
+      "status": "rejected",
+      "finalIdAtSameLocation": "R011",
+      "reason": "“第一落点”可改得直接；但末句把“就该想想”（作者对自己的提醒/规范）改为“就会考虑”（作者惯常会做的行为），两者不是等值第一人称证据。应保留自我提醒的语气，不能原样交付。"
+    },
+    {
+      "id": "B043",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A053",
+      "reason": "框架“往约束上压”确缺乏自然搭配。但“检验……怎样应用”仍把检验的对象与方式问句硬接；通常是检验是否适用/有效，或说明怎样应用，当前改句没有分清二者。需改法再次打磨。"
+    },
+    {
+      "id": "B046",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "retrofit 应用自然中文解释；但“性能优先”是相对优先级，“先保证性能”变成先后顺序加保证，并不等值。可用“在性能优先的既有架构中补充安全能力”这一方向另拟后复核，当前 B 改文不原样通过。"
+    },
+    {
+      "id": "C003",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "A005 已同时修复头部对象与逐次遍历，表达比 R002 的头部小开销更自然；C003 只修前一处。R002 去掉图表读法的次要改点未并入。"
+    },
+    {
+      "id": "C004",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 193,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A012",
+      "reason": "两稿修复同一词界，A012 明确结果行按文本传输，保留已通过完整表格行。"
+    },
+    {
+      "id": "C005",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B010",
+      "reason": "B010 直接解释进程进入可服务状态，完整保留日志供 grep 判定的用途；两稿无不同实质改点。"
+    },
+    {
+      "id": "C006",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 274,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A022",
+      "reason": "两稿都把判断对象改回系统与访问模式匹配，保留已三席检查的 A022。"
+    },
+    {
+      "id": "C007",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "R006",
+      "reason": "R006 以缓存层级如下中性引出列表，明确避免三者互异断言；与 C007 修复同一处。"
+    },
+    {
+      "id": "C008",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 110,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A025",
+      "reason": "A025 已完整包含 C008 的直方图单句，改点相同；保留完整段落建议。"
+    },
+    {
+      "id": "C010",
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B028",
+      "reason": "两份改文逐字相同，合并来源且保留已过三席的 B028。"
+    },
+    {
+      "id": "C013",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 84,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A037",
+      "reason": "A037 明确另一节点负责，更新映射与以后走新地址仍表达持续路由；C013 修同一主客体，不再新增第二版本。"
+    },
+    {
+      "id": "C014",
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A038",
+      "reason": "两稿都直接问确认的阶段，保留 A038 并依 C 对作者口语的判断降为可选。"
+    },
+    {
+      "id": "C015",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 73,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A042",
+      "reason": "两稿只在部分/区段上不同，选择更常用且已通过的 A042；均按可选。"
+    },
+    {
+      "id": "C016",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B035",
+      "reason": "B035 保留这里只讨论的范围划分，C016 接着说明略弱化范围；其余改点相同。"
+    },
+    {
+      "id": "C017",
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "B036",
+      "reason": "B036 完整段包含 C017 单句，并直接采用章首作者原有经历措辞；不拼接另一份单句。"
+    },
+    {
+      "id": "C019",
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 200,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A049",
+      "reason": "两稿 WAIT 的范围相同，A049 还把限制写入的参数改为谓语，完整解开连续长定语。"
+    },
+    {
+      "id": "C021",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 173,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A054",
+      "reason": "同一语序修复，A054 在单线程中执行更完整，保留已三席核验稿。"
+    },
+    {
+      "id": "C023",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "rejected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "retrofit 可中文化，诊断成立；但先追求性能、再补充安全能力仍把性能优先的相对优先级改成先后顺序，正是 B046 的保真风险，不原样通过。"
+    },
+    {
+      "id": "R002",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A005",
+      "reason": "A005 已同时修复头部对象与逐次遍历，表达比 R002 的头部小开销更自然；C003 只修前一处。R002 去掉图表读法的次要改点未并入。"
+    },
+    {
+      "id": "R012",
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A053",
+      "reason": "修订稿与 A053 改文完全相同，保留原 id 并沿用 C 提出的可选分级。"
+    },
+    {
+      "id": "R013",
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "status": "overlap_not_selected",
+      "finalIdAtSameLocation": "A055",
+      "reason": "改文完全相同，保留原 id 与较保守可选分级。"
+    }
+  ],
+  "finalDeduplicatedGroups": [
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 41,
+      "candidateIds": [
+        "A005",
+        "C003",
+        "R002"
+      ],
+      "selectedId": "A005",
+      "reason": "A005 已同时修复头部对象与逐次遍历，表达比 R002 的头部小开销更自然；C003 只修前一处。R002 去掉图表读法的次要改点未并入。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 58,
+      "candidateIds": [
+        "A007",
+        "R003"
+      ],
+      "selectedId": "R003",
+      "reason": "修订稿保住 A007 明确定时搬迁暂停的改点，再删除与后半句重复的摊还/集中短语，不将 SDS 改称实际分次处理。"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "line": 193,
+      "candidateIds": [
+        "A012",
+        "C004"
+      ],
+      "selectedId": "A012",
+      "reason": "两稿修复同一词界，A012 明确结果行按文本传输，保留已通过完整表格行。"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "line": 50,
+      "candidateIds": [
+        "B010",
+        "C005"
+      ],
+      "selectedId": "B010",
+      "reason": "B010 直接解释进程进入可服务状态，完整保留日志供 grep 判定的用途；两稿无不同实质改点。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 274,
+      "candidateIds": [
+        "A022",
+        "C006"
+      ],
+      "selectedId": "A022",
+      "reason": "两稿都把判断对象改回系统与访问模式匹配，保留已三席检查的 A022。"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "line": 110,
+      "candidateIds": [
+        "A025",
+        "C008"
+      ],
+      "selectedId": "A025",
+      "reason": "A025 已完整包含 C008 的直方图单句，改点相同；保留完整段落建议。"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "line": 76,
+      "candidateIds": [
+        "B028",
+        "C010"
+      ],
+      "selectedId": "B028",
+      "reason": "两份改文逐字相同，合并来源且保留已过三席的 B028。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 84,
+      "candidateIds": [
+        "A037",
+        "C013"
+      ],
+      "selectedId": "A037",
+      "reason": "A037 明确另一节点负责，更新映射与以后走新地址仍表达持续路由；C013 修同一主客体，不再新增第二版本。"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "line": 119,
+      "candidateIds": [
+        "A038",
+        "C014"
+      ],
+      "selectedId": "A038",
+      "reason": "两稿都直接问确认的阶段，保留 A038 并依 C 对作者口语的判断降为可选。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 73,
+      "candidateIds": [
+        "A042",
+        "C015"
+      ],
+      "selectedId": "A042",
+      "reason": "两稿只在部分/区段上不同，选择更常用且已通过的 A042；均按可选。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 95,
+      "candidateIds": [
+        "B035",
+        "C016"
+      ],
+      "selectedId": "B035",
+      "reason": "B035 保留这里只讨论的范围划分，C016 接着说明略弱化范围；其余改点相同。"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "line": 327,
+      "candidateIds": [
+        "B036",
+        "C017"
+      ],
+      "selectedId": "B036",
+      "reason": "B036 完整段包含 C017 单句，并直接采用章首作者原有经历措辞；不拼接另一份单句。"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "line": 200,
+      "candidateIds": [
+        "A049",
+        "C019"
+      ],
+      "selectedId": "A049",
+      "reason": "两稿 WAIT 的范围相同，A049 还把限制写入的参数改为谓语，完整解开连续长定语。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 125,
+      "candidateIds": [
+        "A053",
+        "R012"
+      ],
+      "selectedId": "A053",
+      "reason": "修订稿与 A053 改文完全相同，保留原 id 并沿用 C 提出的可选分级。"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "line": 173,
+      "candidateIds": [
+        "A054",
+        "C021"
+      ],
+      "selectedId": "A054",
+      "reason": "同一语序修复，A054 在单线程中执行更完整，保留已三席核验稿。"
+    },
+    {
+      "file": "chapters/11-references.md",
+      "line": 37,
+      "candidateIds": [
+        "A055",
+        "R013"
+      ],
+      "selectedId": "A055",
+      "reason": "改文完全相同，保留原 id 与较保守可选分级。"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "line": 278,
+      "candidateIds": [
+        "C007",
+        "R006"
+      ],
+      "selectedId": "R006",
+      "reason": "R006 以缓存层级如下中性引出列表，明确避免三者互异断言；与 C007 修复同一处。"
+    }
+  ],
+  "notes": [
+    "sourceIds 用于追溯重叠候选与修订来源，可能包含此前被否前稿；仅 selected 的 id 表示该具体改文入选，核验记录单列。",
+    "original/revised 均与对应冻结候选逐字一致，display 字段仅解释书稿原句，不描述被否初稿的错误。",
+    "未合并的次要改点包括 R002 的图表引导简化、A045 的迁移债词级润色；不为了合并而拼接未获票的新改文。"
+  ]
+}

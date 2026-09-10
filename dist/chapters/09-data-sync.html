@@ -125,16 +125,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <article class="chapter"><h1 id="s206">第 9 章 数据同步机制 — 集群一致性的实现</h1>
 <h2 id="s207">本章导读</h2>
 <p>当系统扩展到多副本时，开始有了"多份数据"：主节点带几个从节点、多机房多活、甚至只是 Redis 缓存配着 MySQL 数据库。一旦数据不止一份，一个关键问题随之而来：主节点刚写入的那条记录，从节点什么时候能看到。缓存和数据库不一致时该以谁为准，中间网络断了重连之后又怎么把漏掉的部分补上而不重复。处理不好，轻则用户看到旧数据，重则库存超卖、重复转账。</p>
-<p>数据同步本质上就是一件事：把一处状态变化可靠地传给其他副本，而且延迟有上限。三个软件表面各做各的：Redis 传命令流、MySQL 传 binlog event、Kafka 传有序消息。底下是同一条主线：状态机复制。<a class="xref" href="07-cluster.html">第 7 章</a>讨论了集群拓扑与选主，本章聚焦主的数据怎么传到副本。三个软件用三套不同的机制（PSYNC2、GTID、leader epoch）在做同一件事：用可比较的位点对齐两个状态机。</p>
+<p>数据同步要把一处的状态变化传给其他副本，并处理传播延迟和中断。三个软件表面各做各的：Redis 传命令流、MySQL 传 binlog event、Kafka 传有序消息。它们都需要记录变化的顺序、同步进度和所属历史；状态机复制提供了理解这种对齐方式的模型。<a class="xref" href="07-cluster.html">第 7 章</a>讨论了集群拓扑与选主，本章聚焦主的数据怎么传到副本。PSYNC2、GTID、leader epoch 各自携带不同的进度或历史信息，帮助副本判断从哪里续传、是否需要重新建立数据基线。</p>
 <p>我排查过不止一次缓存和数据库不一致的问题。印象最深的一次，用户改了资料，刷新页面看到的还是旧值：写库成功了，缓存没失效。查到最后，是删缓存和写数据库的先后顺序在不同代码路径里不一致。现在涉及多份数据的写路径，我先把"以谁为准、怎么对齐"画清楚再动手。这一章讲的就是这三个软件各自怎么解决这两个问题。</p>
 <h2 id="sec-9.1">9.1 问题的本质</h2>
-<p>单机迟早达到容量、可用性或读扩展的上限，加副本势在必行。副本之间的同步强度是一档一档的取舍：异步最快，但主挂了可能丢已提交的写；同步（全等）不丢，但任何一个慢副本都会拖垮写；中间是多数派确认：要多少一致性，就付多少延迟。本书不在此重复这条权衡的全谱推导，直接说工程问题：数据同步到底在同步什么。先把导读里那个问题归位：缓存和数据库谁为准，不是多副本之间的一致性问题——那是正本与派生数据的关系，本章小结与<a class="xref" href="10-summary.html">第 10 章</a>会回收这个答案。本章先讲清楚副本之间怎么对齐。</p>
+<p>需要提高可用性或分担读请求时，可以增加副本。副本复制需要决定何时向客户端返回成功：异步方式不等待副本，故障转移时可能缺少已提交的写；等待副本确认会延后响应，慢副本或失联也可能使写入失败。数据能否保留、读取能否立即看到新值，还取决于确认的含义、选主和应用规则。</p>
+<p>导读里“缓存和数据库谁为准”的问题，讨论的是正本与派生数据的关系，本章小结与<a class="xref" href="10-summary.html">第 10 章</a>会给出答案。本章先讲清楚副本之间怎么对齐，不重复上述机制的完整推导，而是从一个工程问题说起：数据同步到底在同步什么？</p>
 <h3 id="s209">数据同步的四个子问题</h3>
 <p>把"数据同步"这个大词拆开，背后是四个独立但彼此关联的子问题。</p>
 <p><strong>第一，传播什么。</strong> 一次状态变化，到底把什么东西传给副本？是命令本身（"执行 <code>SET k v</code>"）、是事件（"行 k 的值变成了 v"）还是消息（"编号 7 的记录内容是 v"）？传播单元的粒度，决定了下游几乎所有机制。</p>
-<p><strong>第二，怎么传播。</strong> 是一次请求后主端持续推流（Redis、MySQL），还是副本周期性拉取（Kafka）？流推省往返但主从耦合；周期拉取让副本自掌节奏、天然合批。</p>
-<p><strong>第三，传播到什么程度才算数。</strong> 主写完就告诉客户端"成功"，还是要等一个副本确认、多数派确认、所有副本确认？这也是一条渐变的取舍：确认往返越多，延迟越高、一致性越强。后面 Redis 的 <code>min-replicas</code>、MySQL 的半同步、Kafka 的 <code>acks</code> 参数，都是在这条取舍上选定的位置。</p>
-<p><strong>第四，传播断了或乱了怎么办。</strong> 网络中断、副本重启、主节点更换都是必然发生的。断了之后能不能不重头来，从哪里接着传？这要求系统记录同步位点，并能在重启时用它对齐。</p>
+<p><strong>第二，怎么传播。</strong> 是一次请求后主端持续推流（Redis、MySQL），还是由副本发起一轮轮拉取（Kafka）？持续推流需要管理发送缓冲与慢副本；主动拉取让副本控制请求节奏，便于按当前需求取一批数据。两种方式都可以批量传输。</p>
+<p><strong>第三，传播到什么程度才算数。</strong> 主节点完成本地操作就向客户端返回，还是要等待副本收到、刷盘或应用？这些确认代表不同的保证。Redis 的 <code>min-replicas</code> 根据副本近期的状态限制是否接受写入；MySQL 半同步和 Kafka 的 <code>acks</code> 则规定本次写入等待什么确认。确认条件、失败处理与读取规则需要一起看。</p>
+<p><strong>第四，传播断了或乱了怎么办。</strong> 网络中断、副本重启、主节点更换都是必然发生的。中断后能不能不从头再来，从哪里接着传？这要求系统记录同步位点，并能在重启时用它对齐。</p>
 <figure class="fig" id="fig-9-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 74 820 346" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_1_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -175,9 +176,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="411" y="206" width="164" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="493" y="230" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 到什么程度</text>
-  <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">一致性强度</text>
-  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">异步可丢/档位递增/参数可调</text>
-  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">一致性越强，写延迟越高</text>
+  <text x="493" y="252" text-anchor="middle" font-size="12" fill="#374151">确认与可见性要求</text>
+  <text x="493" y="271" text-anchor="middle" font-size="11" fill="#374151">接收 / 落盘 / 应用</text>
+  <text x="493" y="289" text-anchor="middle" font-size="11" fill="#6B7280">等待条件影响写入延迟</text>
 
   
   <rect x="585" y="206" width="150" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
@@ -189,13 +190,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <line x1="410" y1="298" x2="410" y2="328" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_9_1_arrowRed)"/>
   <rect x="210" y="332" width="400" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="410" y="356" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">底层主线：状态机复制</text>
-  <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">若每个副本按相同顺序执行相同输入序列</text>
-  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">最终状态必然相同 — 差异只在"序列载体"与"执行方式"</text>
+  <text x="410" y="356" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">理解模型：状态机复制</text>
+  <text x="410" y="378" text-anchor="middle" font-size="12" fill="#374151">相同初态 + 相同输入顺序 + 确定执行</text>
+  <text x="410" y="396" text-anchor="middle" font-size="12" fill="#374151">处理完相同输入后，各副本状态一致</text>
 
 </svg>
 </div><figcaption>图 9-1　数据同步的四个子问题：传播什么、怎么传播、到什么程度、断了怎么办。</figcaption></figure>
-<p>这四个子问题的底层，是同一个模型：<strong>状态机复制</strong>，所有副本按相同顺序执行相同输入序列，终态必然相同。Kleppmann《Designing Data-Intensive Applications》在"一致性与共识"一章对此已有展开。它们都在用这个模型，差异只在序列载体和执行方式：Redis 是命令流（副本直接执行），MySQL 的序列是 binlog event（副本回放事件），Kafka 是分区日志消息（副本按偏移量追加），三列对照见<a class="xref" href="#fig-9-2">图 9-2</a>。</p>
+<p>这四个子问题可以借助<strong>状态机复制</strong>来理解：从相同的初始状态出发，按相同顺序执行相同输入，并且执行是确定性的，副本才会得到相同状态。Kleppmann《Designing Data-Intensive Applications》在"一致性与共识"一章对此已有展开。三个软件都用日志或命令序列记录变化：Redis 的副本执行命令流，MySQL 的副本回放 binlog event，Kafka 的副本按偏移量复制分区日志。Kafka 提供的复制日志还可以作为上层状态机的输入，三列对照见<a class="xref" href="#fig-9-2">图 9-2</a>。</p>
 <figure class="fig" id="fig-9-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 880 448" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -208,7 +209,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="120" y="80" width="640" height="62" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="440" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">同一个有序输入序列（log / 日志 / 命令流）</text>
+  <text x="440" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">有序输入序列（各系统内部复制的对象）</text>
   <text x="180" y="124" font-size="12" fill="#374151">op1</text>
   <text x="220" y="124" font-size="12" fill="#6B7280">→</text>
   <text x="260" y="124" font-size="12" fill="#374151">op2</text>
@@ -228,7 +229,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="182" width="240" height="240" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.8"/>
-  <text x="160" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">副本 A · Redis</text>
+  <text x="160" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">Redis 示例</text>
   <text x="160" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：命令流</text>
 
   <text x="60" y="250" font-size="12" fill="#374151">初始状态 S0</text>
@@ -245,7 +246,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="320" y="182" width="240" height="240" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
-  <text x="440" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">副本 B · MySQL</text>
+  <text x="440" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">MySQL 示例</text>
   <text x="440" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：binlog event</text>
 
   <text x="340" y="250" font-size="12" fill="#374151">初始状态 S0</text>
@@ -262,7 +263,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="600" y="182" width="240" height="240" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
-  <text x="720" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">副本 C · Kafka</text>
+  <text x="720" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Kafka 示例</text>
   <text x="720" y="224" text-anchor="middle" font-size="11" fill="#374151">序列载体：分区日志消息</text>
 
   <text x="620" y="250" font-size="12" fill="#374151">初始状态 S0</text>
@@ -283,27 +284,27 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="720" y1="422" x2="500" y2="448" stroke="#EF4444" stroke-width="1.5" marker-end="url(#fig_9_2_arrowRed)"/>
 
   <rect x="270" y="452" width="340" height="44" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="440" y="472" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">三个副本最终状态必然相同</text>
-  <text x="440" y="489" text-anchor="middle" font-size="11" fill="#374151">差异只在序列的载体与执行的方式</text>
+  <text x="440" y="472" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">各系统内的副本按相同历史追赶</text>
+  <text x="440" y="489" text-anchor="middle" font-size="11" fill="#374151">相同初态 + 相同输入顺序 + 确定执行</text>
 </svg>
-</div><figcaption>图 9-2　状态机复制模型：顶部同一个输入序列分发到三个副本，对照三列逐步执行后的汇合结果。</figcaption></figure>
-<p>模型成立有一个前提：同一条输入在每个副本上必须产生相同的状态变化，执行必须是确定性的。带随机性或依赖本地时间的命令会让三列到不了同一个终态——Redis 为此在复制链路上改写了哪些命令，见 <a class="xref" href="#sec-9.2">9.2 节</a>。</p>
-<blockquote><strong>关键数字</strong>  <strong>Redis 复制积压缓冲区（backlog）：默认 1MB</strong>。1 万次写/秒、每条约 100 字节的负载下，约覆盖 <strong>1 秒</strong> 的断线窗口（覆盖时长 = backlog 大小 ÷ 写入字节速率；大实例或高写入场景需调大 <code>repl-backlog-size</code>）；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。  <strong>MySQL 半同步超时：<code>rpl_semi_sync_source_timeout</code> 默认 10 秒</strong>。超时自动降级回异步，一致性保障消失。降级是可观测的，但需配合告警。  <strong>Kafka ISR 剔除阈值：<code>replica.lag.time.max.ms</code> 默认 30 秒</strong>。副本落后超过 30 秒即移出 ISR，不再参与 Leader 选举，以此保证新主不丢已确认消息。</blockquote>
-<p>我遇到过一次线上告警，用户反馈下单后查不到订单。排查发现是主从延迟导致的：主节点写入新订单，从节点还没同步到，用户的查询恰好落在了从节点上。"数据已写入"和"用户能看到"之间有一个时间窗口，事务型和缓存型系统对这个窗口的取舍截然不同。后来我们加了一个写后读一致的路由层，但前提是必须先知道这道窗口的存在。</p>
+</div><figcaption>图 9-2　状态机复制模型：以三个软件为例，对照输入载体与副本处理方式；各系统内的副本按相同历史追赶。</figcaption></figure>
+<p>模型成立的前提是初始状态相同，执行也是确定性的。带随机性或依赖本地时间的操作，需要把确定的结果或有效时间传给副本，才能避免重放时产生差异。Redis 为此在复制链路上改写了哪些命令，见 <a class="xref" href="#sec-9.2">9.2 节</a>。</p>
+<blockquote><strong>关键数字</strong>  <strong>Redis 复制积压缓冲区（backlog）：默认 1MB</strong>。1 万次写/秒、每条约 100 字节的负载下，约覆盖 <strong>1 秒</strong> 的断线窗口（覆盖时长 = backlog 大小 ÷ 写入字节速率；大实例或高写入场景需调大 <code>repl-backlog-size</code>）；窗口外断线退回全量同步，代价即 fork 阻塞与内存风险。  <strong>MySQL 半同步超时：<code>rpl_semi_sync_source_timeout</code> 默认 10 秒</strong>。超时后降级为异步，不再等待这项副本确认。降级是可观测的，但需配合告警。  <strong>Kafka ISR 剔除阈值：<code>replica.lag.time.max.ms</code> 默认 30 秒</strong>。副本持续未能追上 Leader，达到相应条件后会被移出 ISR。禁止 unclean 选举时，新主从 ISR 中选择；保留已提交消息还要求始终有同步副本存活。</blockquote>
+<p>我遇到过一次线上告警，用户反馈下单后查不到订单。排查发现是主从延迟导致的：主节点写入新订单，从节点还没同步到，用户的查询恰好落在了从节点上。"数据已写入"和"用户能看到"之间有一个时间窗口，事务型和缓存型系统对这个窗口的取舍截然不同。后来我们加了一个写后读一致的路由层，但前提是必须先知道这个窗口的存在。</p>
 <h2 id="sec-9.2">9.2 Redis 的做法</h2>
 <p>Redis 的同步设计目标是：主节点延迟尽量低，同时把命令流可靠地推送给副本。后续三个设计由此确定：异步、单向、以命令流为日志。</p>
 <h3 id="s211">传播单元：命令本身</h3>
-<p>Redis 把命令本身作为传播单元。主节点执行完一条写命令后，把这条命令（用 Redis 序列化协议 RESP 重写后）原样发送给所有副本；副本收到后本地执行一次，状态就对齐了。</p>
-<p>这个做法呼应了<a class="xref" href="08-storage-format.html">第 8 章</a>"AOF 持久化文件复用协议格式"的设计：AOF 持久化记录的就是同一种命令流。于是 Redis 把持久化和复制<strong>复用同一种载体</strong>：一份命令流既写给磁盘（AOF）也写给网络（副本），二者天然一致。能用一种日志说清的事，就不引入第二种。</p>
-<p>命令流的好处是轻：序列化开销小、副本侧执行就是原本就有的命令处理路径，几乎不用新增代码。代价是它处理不了<strong>语义歧义</strong>：比如非确定性命令（<code>SPOP</code>、<code>EXPIRE</code>、依赖时间的 Lua 脚本），不同副本执行结果可能不同。Redis 的处理是在复制链路上对这些命令做特殊改写：把 <code>EXPIRE</code>/<code>EXPIREAT</code> 改写为绝对时间戳 <code>PEXPIREAT</code>，把分歧在源头消除。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：只把脚本执行产生的写命令效果传给副本，确定性由此保证。早期版本默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
-<h3 id="s212">单向异步：把一致性换成低延迟</h3>
-<p>Redis 复制是<strong>单向异步</strong>的。主节点写完后立即给客户端返回 OK，<strong>不等任何副本确认</strong>；副本通过一条长连接异步地接收命令流并追赶。副本只能有一个主（一个数据集的权威来源），形成树状的复制拓扑。</p>
-<p>这是默认偏 AP（高可用优先）的取向；分区时少数派停写则偏 CP（归类讨论见 <a class="xref" href="07-cluster.html#sec-7.2.3">7.2.3 节</a>）。主节点的延迟几乎不受副本数量和副本健康度影响，而低延迟正是 Redis 作为缓存/在线存储最看重的特性。代价同样明确：主节点故障时，已经返回给客户端但还没来得及传到副本的写，会永久丢失。Redis 用"可能丢失少量写"换来主节点不受副本拖累：副本再慢再断，主的写入路径都不等它。</p>
+<p>Redis 把传播命令作为复制单元。主节点执行写命令后，把需要传播的命令按 RESP 编码发送给副本；这份命令可能已根据实际执行结果改写，并非总是客户端的原文。副本在相同的起始数据上按顺序执行传播命令，追赶主节点的状态。</p>
+<p>这个做法呼应了<a class="xref" href="08-storage-format.html">第 8 章</a>"AOF 持久化文件复用协议格式"的设计：AOF 持久化也记录传播命令。于是 Redis 在持久化和复制中<strong>复用同一种载体</strong>：命令按 RESP 编码后，分别进入 AOF 和复制路径，两条路径可以复用传播逻辑。能用一种日志说清的事，就不引入第二种。</p>
+<p>命令流的好处是能复用原有接口：副本侧执行走的就是已有的命令处理路径。代价是需要处理<strong>语义歧义</strong>：比如 <code>SPOP</code> 的随机选取、<code>EXPIRE</code> 的相对时间，以及依赖时间的 Lua 脚本，直接重放原输入可能产生不同结果。Redis 会按主节点上的执行结果改写传播命令：例如把选中的集合元素转成 <code>SREM</code>，把 <code>EXPIRE</code>/<code>EXPIREAT</code> 的有效过期时间改写为绝对毫秒时间戳 <code>PEXPIREAT</code>。Lua 脚本默认采用效果复制（effects replication，5.0 起默认）：传播脚本产生的写命令效果，不让副本重新运行脚本中的非确定性计算。早期默认的逐字复制（verbatim，把脚本源码原样传播）已在 7.0 彻底移除。</p>
+<h3 id="s212">单向异步：减少写入的确认等待</h3>
+<p>Redis 复制是<strong>单向异步</strong>的。主节点通常在本地执行写命令后向客户端返回结果，<strong>不等待副本确认</strong>；副本通过长连接接收命令流并追赶。每个副本只有一个上游主节点，也可以继续向下游副本传播，形成树状复制拓扑。</p>
+<p>这减少了写入等待副本确认的延迟，但复制仍消耗主节点的 CPU、网络与缓冲空间，慢副本也可能因输出缓冲超限而被断开。代价同样明确：故障转移时，新主可能尚未收到老主已向客户端确认的写，因而丢失这些写。Redis 把副本追赶放在异步路径上，以数据丢失风险换取较少的确认等待；具体风险还受持久化、可写门槛和故障转移条件影响。</p>
 <h3 id="s213">全量同步：fork 出 RDB，传完补增量</h3>
 <p>副本第一次连上来，或者增量同步无法进行时，就要做全量同步。流程是：</p>
-<ol><li>主节点收到副本的 <code>PSYNC ? -1</code>（<code>?</code> 与 <code>-1</code> 分别表示"未知 run_id"与"无偏移量"，这是 Redis 副本首次连接时发的内部协议命令，不是能在 redis-cli 里直接敲的命令），触发 <code>BGSAVE</code>，fork 出一个子进程把当前内存快照写成 RDB 文件。</li><li>在 RDB 生成和传输的整段时间里，主节点继续服务新写入命令，同时把这些命令<strong>暂存进这条复制连接专属的输出缓冲区</strong>（不是 replication backlog——那是常驻的环形缓冲，职责是服务断线重连后的部分重同步）。</li><li>RDB 文件传给副本，副本加载后，状态回到了"主节点 fork 那一刻"。</li><li>主节点把副本专属缓冲里 RDB 生成期间累积的命令补发给副本，副本追上"当前"。</li></ol>
-<p>这里的关键在第二步：fork 是一个时间点快照，但同步过程是连续的时间，期间产生的新写不能丢。这个副本专属缓冲就用来补上"过去那一刻"到"当前"之间的这段空缺。</p>
-<p>另一类代价在两处：<code>BGSAVE</code> 的 fork 在大实例上会有一瞬间的内存翻倍风险（写时复制）和短暂的停顿；RDB 文件在网络上的传输要消耗主节点的出口带宽。全量同步越频繁，这两项代价越痛，所以 Redis 才会重点设计增量同步，把全量降级为"最后手段"。Redis 全量同步与部分重同步的完整分支见<a class="xref" href="#fig-9-3">图 9-3</a>。</p>
+<ol><li>副本首次连接时发送内部复制协议请求 <code>PSYNC ? -1</code>，表示没有可用于续传的复制 ID 与偏移量。主节点安排后台保存，fork 子进程生成 RDB。采用有盘同步时，先生成 RDB 文件再传输；采用无盘同步时，子进程直接向副本连接写出 RDB 数据。Redis 7.0 默认启用 <code>repl-diskless-sync</code>。</li><li>在 RDB 生成和传输期间，主节点继续处理写入，并保留此后产生的复制流。Redis 7.0 让副本输出和 backlog 引用<strong>同一组共享复制缓冲块</strong>，各副本保留自己的发送进度；两者职责不同，底层字节却不必各存一份。</li><li>副本加载 RDB 后，得到主节点 fork 时的数据快照。</li><li>主节点继续发送快照之后保留的复制流，副本执行这些增量，逐步追赶。</li></ol>
+<p>这里的关键在第二步：fork 是一个时间点，同步过程却会持续一段时间，期间产生的新写也需要传给副本。缓冲保留的是快照之后的复制流，直到副本完成相应的接收。</p>
+<p>全量同步还有两项代价：fork 要复制页表，可能造成短暂停顿；子进程运行期间，父进程修改内存页会触发写时复制（COW），额外内存随被修改的页增加，并非 fork 瞬间就复制全部数据。RDB 的网络传输还会消耗主节点出口带宽。全量同步越频繁，这些开销越明显，所以 Redis 重点设计增量同步，减少反复全量。Redis 全量同步与部分重同步的完整分支见<a class="xref" href="#fig-9-3">图 9-3</a>。</p>
 <figure class="fig" id="fig-9-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 66 880 554" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -335,20 +336,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="440" y="178" width="220" height="92" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="550" y="202" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">② 主节点比对</text>
-  <text x="550" y="222" text-anchor="middle" font-size="12" fill="#374151">replid 一致？</text>
-  <text x="550" y="240" text-anchor="middle" font-size="12" fill="#374151">offset 是否在 backlog 窗口内？</text>
+  <text x="550" y="222" text-anchor="middle" font-size="12" fill="#374151">复制 ID 及有效范围匹配？</text>
+  <text x="550" y="240" text-anchor="middle" font-size="12" fill="#374151">请求字节仍在 backlog 中？</text>
   <text x="550" y="260" text-anchor="middle" font-size="11" fill="#6B7280">backlog 默认约 1MB</text>
   <line x1="550" y1="178" x2="550" y2="150" stroke="#4B5563" stroke-width="1" stroke-dasharray="3 3"/>
 
   
-  <text x="300" y="296" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（窗口内）</text>
-  <text x="760" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（窗口外）</text>
+  <text x="300" y="296" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">是（两项均满足）</text>
+  <text x="774" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">否（任一不满足）</text>
 
   
   <rect x="60" y="320" width="320" height="158" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="220" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">部分重同步（Partial Resync）</text>
   <text x="80" y="368" font-size="12" fill="#374151">③ 主节点：+CONTINUE</text>
-  <text x="80" y="388" font-size="12" fill="#374151">④ 从 backlog 中取出 offset 之后</text>
+  <text x="80" y="388" font-size="12" fill="#374151">④ 从 backlog 中取出请求 offset 起</text>
   <text x="92" y="406" font-size="12" fill="#374151">的差额命令，增量补发</text>
   <text x="80" y="430" font-size="12" fill="#374151">⑤ 从节点回放差额命令，offset 追平</text>
   <text x="80" y="458" font-size="11" font-weight="600" fill="#059669">代价低：只补差额，主节点不 fork</text>
@@ -360,8 +361,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="500" y="320" width="340" height="158" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="670" y="344" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">全量同步（Full Resync）</text>
   <text x="520" y="368" font-size="12" fill="#374151">③ 主节点：+FULLRESYNC &lt;replid&gt; &lt;offset&gt;</text>
-  <text x="520" y="388" font-size="12" fill="#374151">④ 主节点 BGSAVE，fork 子进程生成 RDB</text>
-  <text x="520" y="408" font-size="12" fill="#374151">⑤ 传 RDB 期间，新写命令进入连接专属复制缓冲</text>
+  <text x="520" y="388" font-size="12" fill="#374151">④ 后台 fork 生成 RDB，可直接传输</text>
+  <text x="520" y="408" font-size="12" fill="#374151">⑤ 新写入进入共享复制缓冲（7.0）</text>
   <text x="520" y="428" font-size="12" fill="#374151">⑥ RDB 传完后，补发缓冲的命令</text>
   <text x="520" y="458" font-size="11" font-weight="600" fill="#EF4444">代价高：fork 阻塞 + 全量网络传输</text>
 
@@ -379,13 +380,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <text x="440" y="602" text-anchor="middle" font-size="12" fill="#6B7280">取舍：backlog 是"断线容忍窗口"与"内存占用"的折中 — 窗口越大越能救回部分重同步</text>
 </svg>
-</div><figcaption>图 9-3　PSYNC2 的核心是 offset 比对：断线后 offset 仍在 backlog 窗口内则部分重同步，否则退回全量。</figcaption></figure>
+</div><figcaption>图 9-3　PSYNC2 同时核对复制历史与续传位置：复制 ID 有效且所需字节仍在 backlog 中，才能部分重同步，否则退回全量。</figcaption></figure>
 <h3 id="s214">增量同步：PSYNC2 与复制积压缓冲区</h3>
 <p>PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线重连能不能不重头"的问题。它靠两个东西：</p>
-<p><strong>第一是 replication offset。</strong> 主节点维护一个 <code>master_repl_offset</code>，表示"我已经把多少字节的命令流写进复制流了"；副本也维护自己的 <code>replica_offset</code>，表示"我已经从复制流里消费到第几字节了"。两者都是字节级别的位点，随写入单调递增。</p>
-<p><strong>第二是复制积压缓冲区（backlog）。</strong> 主节点维护一个固定大小（默认约 1MB，可调 <code>repl-backlog-size</code>）的环形缓冲区，存"最近 N 字节的复制流"。这是一个滑动窗口：新命令进来，老命令被覆盖。</p>
-<p>副本断线重连时，把自己的 <code>replica_offset</code> 通过 <code>PSYNC &lt;replid&gt; &lt;offset&gt;</code> 报给主节点（<code>replid</code> 是主节点的复制 ID，PSYNC2 之前这个角色由上文提到的 <code>run_id</code> 担任）。主节点检查这个 offset 是否仍在 backlog 窗口内。</p>
-<ul><li>在 → <strong>部分重同步（partial resync）</strong>：只把 offset 到当前之间的差额命令发给副本，几乎瞬间追上。</li><li>不在 → 退回全量同步，从头来过。</li></ul>
+<p><strong>第一是 replication offset。</strong> 主节点用 <code>master_repl_offset</code> 记录复制流推进到的字节位置；副本用自己的已处理偏移量记录执行进度，<code>INFO replication</code> 中对应 <code>slave_repl_offset</code>。位点按复制流的字节计数，需要与复制 ID 一起解释，不能只比较不同复制历史下的数字大小。</p>
+<p><strong>第二是复制积压缓冲区（backlog）。</strong> 主节点为断线续传保留最近一段复制流，保留规模由 <code>repl-backlog-size</code> 控制，默认约 1MB。Redis 7.0 用共享缓冲块维护这段历史，并逐步回收不再需要的旧块。逻辑上它仍是滑动窗口，实际保留内存还会受到副本引用和块粒度的影响。</p>
+<p>副本断线重连时，通过 <code>PSYNC &lt;replid&gt; &lt;offset&gt;</code> 发送已知的复制 ID 和希望接收的下一个字节位置。主节点先验证复制历史是否匹配，再检查所需字节是否仍在 backlog 中。</p>
+<ul><li>条件满足 → <strong>部分重同步（partial resync）</strong>：从请求的位置继续发送保留的复制流，追赶时间取决于落后量和净处理速率。</li><li>历史不匹配或所需字节已不可得 → 退回全量同步。</li></ul>
 <p>backlog 窗口与主从 offset 的位置关系，见<a class="xref" href="#fig-9-4">图 9-4</a>。</p>
 <figure class="fig" id="fig-9-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 65 860 475" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -438,7 +439,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
     
     <path d="M 670 60 Q 720 60 720 20 Q 720 0 40 0 Q 0 0 0 30" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="300" y="20" text-anchor="middle" font-size="10" fill="#6B7280">回绕（覆盖最老）</text>
+    <text x="300" y="20" text-anchor="middle" font-size="10" fill="#6B7280">滑动窗口（回收旧块）</text>
 
     
     <line x1="40" y1="100" x2="40" y2="120" stroke="#6B7280" stroke-width="1.5"/>
@@ -461,42 +462,42 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <line x1="430" y1="352" x2="430" y2="380" stroke="#EF4444" stroke-width="1.8" marker-end="url(#fig_9_4_arrowRed)"/>
 
-  <rect x="100" y="386" width="660" height="120" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">重连时比对：主 offset 520 − 从 offset 330 = 差额 190 字节</text>
+  <rect x="100" y="386" width="660" height="126" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <text x="430" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">历史匹配后比对：520 − 330 = 190 字节，请求从 331 开始</text>
 
-  <text x="120" y="438" font-size="12.5" fill="#374151">① 若从 offset 落在 backlog 窗口内（280−520） → cmd B 之后的 cmd C、cmd D 仍在缓冲</text>
+  <text x="120" y="438" font-size="12.5" fill="#374151">① 请求从 331 续传，所需字节仍在窗口（280–520）中</text>
   <text x="120" y="458" font-size="12.5" font-weight="700" fill="#059669">     ⇒ 走部分重同步：只补发差额命令，主节点不 fork</text>
 
-  <text x="120" y="484" font-size="12.5" fill="#374151">② 若从 offset 已被环形覆盖（落在窗口外，如 &lt; 280） → 所需命令已被新命令覆盖</text>
+  <text x="120" y="484" font-size="12.5" fill="#374151">② 请求位置早于 280，或复制历史不匹配 → 无法继续这段复制流</text>
   <text x="120" y="504" font-size="12.5" font-weight="700" fill="#EF4444">     ⇒ 退回全量同步：fork RDB + 全量传输</text>
 
   
-  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 是字节位点，而非命令序号 — 这让比对只依赖"窗口长度"，与具体命令大小无关</text>
+  <text x="430" y="528" text-anchor="middle" font-size="11.5" fill="#6B7280">offset 按字节计数；续传还要核对复制 ID、有效范围和日志是否保留</text>
 </svg>
-</div><figcaption>图 9-4　backlog 滑动窗口：主从各持一个字节位点，offset 在窗口内即可增量补差，否则全量。</figcaption></figure>
-<p>backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。窗口越大，能容忍越长时间的断线（典型场景：副本做一次短暂的 GC 或网络抖动），但主节点要常驻更多内存。这是个按业务调的参数：大流量实例把它调到几十 MB 甚至上百 MB 很常见，目的是让常见的短断线都走部分重同步，避免动辄全量。</p>
-<p>窗口盖住断线，不代表断点之后能立刻追平。设落后量为 B 字节，副本的有效处理速率为 C，主节点同期的写入速率为 W，只有 C 大于 W，副本才有净追赶能力，在速率恒定的假设下，追赶耗时粗略为 <code>B/(C-W)</code>：比如落后 120MB、每秒净追赶 2MB，约一分钟追完。C 小于 W 时，副本越落越远，调大 backlog 只能延后问题。前面关键数字框算的覆盖时长，管的是数据还在不在；这里的追赶耗时，管的是追不追得上。两个预算要分开算。</p>
-<p>故障转移后，新主会生成新的 replid，同时把老 replid 作为 <code>replid2</code> 连同老 offset 一起保留。副本重连时即便面对的是换了 replid 的新主，仍可拿老 replid 与新主的 <code>replid2</code> 比对，若 offset 仍在 backlog 窗口内，照样走部分重同步。这放宽了老 PSYNC"主节点更换必然触发全量"的限制。PSYNC2 不只比较字节进度，也把"这段进度属于哪一任主节点"纳入判断。</p>
+</div><figcaption>图 9-4　backlog 滑动窗口：在复制历史匹配的前提下，所需字节仍保留时可增量补差；否则需要全量同步。</figcaption></figure>
+<p>backlog 默认约 1MB，是"断线容忍窗口"与"内存占用"之间的折中。写入速率相同时，窗口越大，能覆盖越长的网络抖动或副本停顿，但主节点也需要保留更多内存。大流量实例可以结合写入字节速率和常见断线时长，评估是否需要几十 MB 甚至上百 MB 的窗口，目的是减少短断线后的全量同步。</p>
+<p>保留窗口覆盖了断线时长，不代表恢复连接后就能立刻追平。设落后量为 B 字节，副本的有效处理速率为 C，主节点同期的写入速率为 W，只有 C 大于 W，副本才有净追赶能力，在速率恒定的假设下，追赶耗时粗略为 <code>B/(C-W)</code>：比如落后 120MB、每秒净追赶 2MB，约一分钟追完。C 小于 W 时，副本越落越远，调大 backlog 只能延后问题。前面关键数字框算的覆盖时长，管的是数据还在不在；这里的追赶耗时，管的是追不追得上。两个预算要分开算。</p>
+<p>故障转移后，新主会生成新的 replid，把老 replid 保存为 <code>replid2</code>，并记录旧复制历史的有效偏移上限。副本拿老 ID 续传时，既要满足这个上限，也要满足 backlog 仍保留所需字节，才能走部分重同步。这放宽了更换主节点后续传的限制。PSYNC2 不只比较字节进度，也把"这段进度属于哪段复制历史"纳入判断。</p>
 <h3 id="s215">关键取舍：把同步强度做成可写门槛</h3>
-<p>Redis 默认偏 AP，但它给了一个弱保证参数：<code>min-replicas-to-write N</code> + <code>min-replicas-max-lag T</code>。这条规则的意思是：主节点接受写入的前提是至少有 N 个副本在线（连接存活），且这些副本在最近 T 秒内向主节点发过 REPLCONF ACK 心跳（主节点上对每个副本记录 <code>server.unixtime - repl_ack_time ≤ T</code>，即距离上次心跳的秒数）。<code>master_repl_offset - replica_offset</code> 是字节进度差，用于 INFO 监控，不是 <code>min-replicas-max-lag</code> 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。</p>
-<p>它只是把"主可以完全单点"约束成"主至少有 N 个跟得上的副本"，否则拒绝写入。这是一个事实上的门槛：达不到门槛的写会被拒绝，但已通过的写仍然可能丢失（因为副本是异步追赶）。这背后是 Redis 的取舍：不追求理论上的强一致，但在关键路径上设一道可观测、可配置的弱保证，避免数据在没人察觉时丢失。</p>
-<p>同一取舍上还有一档更逐条的可调参数：<code>WAIT N T</code>（3.0 引入）。它让本客户端阻塞，等刚才的写被至少 N 个副本确认收到为止，T 毫秒超时则返回实际已确认的副本数。<code>min-replicas-to-write</code> 是全局准入门槛，<code>WAIT</code> 是按写生效的同步请求，二者互补；代价是延迟随副本往返上升，且等到的确认也不等于副本已落盘，复制的异步本质并未改变。</p>
+<p>Redis 提供了一组可写门槛：<code>min-replicas-to-write N</code> + <code>min-replicas-max-lag T</code>。启用后，主节点接受写入前，要求至少有 N 个处于在线复制状态的副本，而且距离这些副本上次 REPLCONF ACK 的时间不超过 T 秒（主节点按 <code>server.unixtime - repl_ack_time ≤ T</code> 判断）。主从复制偏移量之差是字节进度差，可用于监控，但不是 <code>min-replicas-max-lag</code> 的判定依据。"字节进度差"和"确认消息的时间"是两套不同度量。</p>
+<p>它把"主可以在没有健康副本时继续写"约束成"写入前要有足够多、最近仍在确认的在线副本"。达不到门槛时拒绝写入；通过门槛的写仍以异步方式传播，可能在故障转移时丢失。这是 Redis 在写入路径上增加的一道可观测、可配置的风险控制，不能替代对某次写入的复制确认。</p>
+<p>还可以对本连接的先前写入使用 <code>WAIT N T</code> 命令（3.0 引入）。在可阻塞的执行上下文中，它等待至少 N 个副本确认本连接此前写入所对应的复制偏移量；T 毫秒超时后返回实际确认数，T 为 0 则不设超时。客户端需要检查返回值。<code>min-replicas-to-write</code> 是写入准入门槛，<code>WAIT</code> 是对已发出写入追加的确认等待。等待会增加延迟，返回确认也不等于副本已落盘，更不能保证所有故障转移下都不丢数据。</p>
 <h3 id="s216">级联复制与延迟累积</h3>
-<p>副本也可以作为下一级副本的主，形成链式（tree）复制拓扑。常见动机是分担主节点的出口带宽：主只推给少数几个一级副本，一级副本再推给二级副本。</p>
+<p>副本也可以作为下一级副本的主，形成树状（tree）复制拓扑。常见动机是分担主节点的出口带宽：主只推给少数几个一级副本，一级副本再推给二级副本。</p>
 <p>代价是延迟随链路深度累积：一级副本落后主一拍，二级副本落后一级一拍，依此类推。对于读副本来说这点延迟通常可接受，但链路深度过大，末端副本读到的状态可能和主差好几个版本，造成用户可感知的"读到了旧数据"问题。</p>
 <h3 id="s217">故障转移的数据语义</h3>
 <p>Sentinel 或 Cluster 选出新主后，新主未必拥有老主的全部数据，这是异步复制的必然结果。老主在故障前已经确认给客户端的某些写，可能还没传到新主；老主恢复后以副本身份重新加入，新主会用自己的数据覆盖它。</p>
 <p>这就是经典的"已确认的写丢失"：主节点故障时，客户端收到的成功应答可能不再有效。</p>
 <h2 id="sec-9.3">9.3 MySQL 的做法</h2>
-<p>MySQL 在"完全异步可丢"和"多数派强一致"之间提供了一整排连续的档位，让使用者按业务选位。MySQL 的同步以 binlog event 为传播单元，串起了从主从复制到组复制（MGR）的一整套机制。</p>
+<p>MySQL 提供异步复制、半同步复制和组复制（MGR），让使用者按业务选择副本确认与事务协调方式。MySQL 的同步以 binlog event 为传播单元，串起了从主从复制到组复制的一整套机制。</p>
 <h3 id="s219">传播单元：binlog event</h3>
 <p>MySQL 把<strong>行变更的逻辑日志</strong>作为传播单元。当一条 SQL 改动了行，主节点把它转换成 binlog event：现代主流是 ROW 格式，记录的是"行 k 从值 v1 变成了 v2"这样的行级事件。</p>
-<p>选 ROW 而非语句，是因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，绕开了所有歧义。这和 Redis 处理非确定性命令是同一类思路：在源头把歧义消掉。</p>
-<p>代价是日志更重：一条 <code>UPDATE ... WHERE id&lt;100</code> 影响一百行，ROW 格式会产生一百条事件。但副本拿到的是确定性，对复制正确性来说，这个代价值得付。</p>
+<p>选 ROW 而非语句，是因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，避免副本重新执行语句时再次解释这些运算。这和 Redis 处理非确定性命令是同一类思路：在源头确定要传播的变更。</p>
+<p>代价是日志可能更重：一条 <code>UPDATE ... WHERE id&lt;100</code> 如果实际改动了一百行，ROW 格式就需要记录这一百行的变更。多行变更可以合并在一个行事件中，事件数量还取决于行大小等因素。但副本拿到的是具体的行变更，对复制正确性来说，这个代价值得付。</p>
 <h3 id="s220">传统复制：两段式的收流 + 回放</h3>
-<p>MySQL 的传统异步复制是<strong>两段式</strong>的，背后是两个独立的线程：</p>
+<p>MySQL 的传统异步复制分为<strong>接收和回放两段</strong>。先以单线程回放为例：</p>
 <ul><li><strong>I/O 线程（从节点上）</strong>：主动连接主节点，订阅主节点的 binlog 流，把收到的事件写入本地的中继日志。这一段是"收流"：副本发起后，主端 dump 线程把事件流持续推过来。</li><li><strong>SQL 线程（从节点上）</strong>：读 relay log，按顺序回放事件到本地存储引擎。这一段是"本地回放"。</li></ul>
-<p>主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见<a class="xref" href="#fig-9-5">图 9-5</a>。这里有一个微妙的设计点：把"网络"和"回放"解耦成两个线程，让收流可以快（先行把事件流接到本地缓冲），回放可以慢（按本地的引擎速度执行）。两者不互相阻塞。这是收流与回放的解耦：副本发起后主端持续把事件流推进来，relay log 是流的本地缓冲，回放按本地引擎速度走。</p>
+<p>主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见<a class="xref" href="#fig-9-5">图 9-5</a>。这里有一个微妙的设计点：把网络接收和本地回放分开，让接收可以先行把事件流写入 relay log，回放按本地引擎的速度执行。relay log 缓冲了两者的速度差，但接收仍会受到缓冲空间等资源限制。</p>
 <figure class="fig" id="fig-9-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 940 524" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -540,7 +541,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="50" y="394" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="150" y="414" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Binlog Dump 线程</text>
-  <text x="150" y="432" text-anchor="middle" font-size="11" fill="#374151">按 GTID 推送未同步事件</text>
+  <text x="150" y="432" text-anchor="middle" font-size="11" fill="#374151">按 GTID 集合补发所缺事务</text>
 
   
   <rect x="670" y="80" width="240" height="380" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
@@ -559,10 +560,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="790" y1="242" x2="790" y2="260" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_9_5_arrow)"/>
 
   <rect x="690" y="264" width="200" height="50" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="790" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">SQL 线程（回放）</text>
+  <text x="790" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">SQL 线程（图示单线程）</text>
   <text x="790" y="302" text-anchor="middle" font-size="11" fill="#374151">读 relay log → 本地重放事务</text>
 
-  <line x1="790" y1="314" x2="790" y2="332" stroke="#EF4444" stroke-width="1.2" marker-end="url(#fig_9_5_arrowRed)"/>
+  <path d="M 890 217 L 900 217 L 900 361 L 893 361" fill="none" stroke="#EF4444" stroke-width="1.2" marker-end="url(#fig_9_5_arrowRed)"/>
+  <path d="M 690 289 L 680 289 L 680 421 L 687 421" fill="none" stroke="#059669" stroke-width="1.2" marker-end="url(#fig_9_5_arrowGreen)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
@@ -570,14 +572,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="790" y="416" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">本地数据追平</text>
-  <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 进度自动定位续传</text>
+  <text x="790" y="434" text-anchor="middle" font-size="11" fill="#374151">GTID 集合定位所缺事务</text>
 
   
   
   <line x1="252" y1="419" x2="688" y2="145" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_9_5_arrow)"/>
   <rect x="370" y="180" width="200" height="42" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="470" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event 流向（主 → 从）</text>
-  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">按 GTID 段，I/O 线程收流写入</text>
+  <text x="470" y="215" text-anchor="middle" font-size="11" fill="#374151">I/O 线程接收所缺事务的 binlog</text>
 
   
   <path d="M 688 361 Q 470 510 252 347" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#fig_9_5_arrowRed)"/>
@@ -585,25 +587,25 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="30" y="548" width="880" height="32" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
-  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">两段式本质：收流（I/O 线程）与本地回放（SQL 线程）分离；GTID 让续传点从"文件名+字节偏移"升级为全局事务序号</text>
+  <text x="470" y="568" text-anchor="middle" font-size="12" fill="#374151">接收与应用分离；GTID 标识来源和事务序号，按集合定位需要补发的事务</text>
 </svg>
-</div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制主写完即返回，半同步增加 ACK 回路，GTID 把位点从文件偏移变成全局事务标识。</figcaption></figure>
-<h3 id="s221">异步复制：默认的 AP 形态</h3>
-<p>默认配置下，MySQL 复制是异步的：主节点提交事务（写完 binlog 并落盘）就立刻给客户端返回 OK，不等任何副本。但这只是 MySQL 复制的默认形态，不是它的产品定位：MySQL 通过半同步和组复制把一致性一路做到强一致（见下文"半同步复制"一节、<a class="xref" href="07-cluster.html">第 7 章</a>），整体定位偏 CP。MySQL 以异步复制为默认配置，因为大量 OLTP 场景下，吞吐和延迟比强一致更重要。</p>
-<h3 id="s222">半同步复制：可降级的一致性</h3>
-<p>半同步（semi-sync）是 MySQL 在异步和强一致之间的中间点：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 并落盘后即回 ACK，不等本地回放）才返回成功。它有两档提交时点。<code>AFTER_SYNC</code>（8.0 默认）是先等副本 ACK 再提交，所有副本看到的事务顺序与主一致。<code>AFTER_COMMIT</code> 反过来：先在引擎层提交，再等 ACK。这一档有个危险窗口：事务先在引擎层提交，其他会话已经能读到它；若此刻副本 ACK 还没回来主就崩了，晋升的新主上并没有这笔；之前读到它的会话，等于看见数据凭空消失——这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
+</div><figcaption>图 9-5　异步 / 半同步 / GTID：异步复制完成本地提交后返回，半同步增加 ACK 等待，GTID 以事务标识辅助定位复制进度。</figcaption></figure>
+<h3 id="s221">异步复制：本地提交不等待副本</h3>
+<p>默认配置下，MySQL 复制是异步的：主节点完成本地事务提交后就给客户端返回 OK，不等任何副本。半同步增加副本确认，组复制则增加组内事务协调与一致性选项（见下文“半同步复制”一节、<a class="xref" href="07-cluster.html">第 7 章</a>）。异步方式省去了提交时等待副本的延迟，代价是故障转移时可能缺少已提交事务。</p>
+<h3 id="s222">半同步复制：可降级的副本确认</h3>
+<p>半同步（semi-sync）在本地提交路径上增加了副本确认：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 并落盘后即回 ACK，不等本地回放）才返回成功。它有两档等待时点。<code>AFTER_SYNC</code>（8.0 默认）是主节点先将 binlog 刷盘，等副本 ACK 后再提交到存储引擎。<code>AFTER_COMMIT</code> 则先在引擎层提交，再等 ACK。这一档有个危险窗口：事务先在引擎层提交，其他会话已经能读到它；若此刻副本 ACK 还没回来主就崩了，晋升的新主可能没有这笔事务；之前读到它的会话，等于看见数据消失。这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
 <p>半同步还可降级：等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 <code>rpl_semi_sync_source_wait_for_replica_count</code> 控制（默认 1）。</p>
-<p>半同步仍不保证零丢失：它只确认"副本收到了"，不确认"副本已提交"，且超时降级后等同异步。<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.3.2">7.3.2 节</a>从集群拓扑角度也提到了它作为中间路线的定位。</p>
-<p>从同步的视角看，半同步的设计要点只有一个：一致性可以临时关掉（超时就降级回异步），但关掉这件事必须可观测。如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>能降级的一致性机制，降级状态和正常状态同等重要，都得可观测</strong>：Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩，都是同一个道理。</p>
+<p>半同步仍有适用边界：超时降级后，提交不再等待副本确认；故障转移时，也必须选择持有已确认事务的副本，并保留、应用其 relay log。事务还未在副本上回放，并不等于它已经丢失。<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.3.2">7.3.2 节</a>从集群拓扑角度也提到了这些条件。</p>
+<p>从同步的视角看，半同步的一个设计要点是：副本确认可以因超时而暂时取消，但这种降级必须可观测。如果降级默默发生，你以为在半同步其实在异步，故障时才发现缺少数据，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>正常状态与降级状态同等重要，都得可观测</strong>。Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩虽然采取了不同动作，也都需要让运维知道保护条件发生了什么变化。</p>
 <blockquote><strong>说明</strong>：8.0.26 起，半同步相关的 master/slave 命名变量统一重命名为 source/replica（如 <code>rpl_semi_sync_master_enabled</code> → <code>rpl_semi_sync_source_enabled</code>），旧名变量在过渡期仍可用但已标记弃用。本章统一以新名为准。</blockquote>
-<h3 id="s223">GTID：位点不再一换主就失效</h3>
-<p>传统复制用"文件名 + 字节偏移"作为位点（比如 <code>mysql-bin.000123:4567</code>）。这种位点主节点一换就对不上：文件名和位置全失效，故障切换时人工对位点既繁琐又容易出错。</p>
-<p>GTID（Global Transaction Identifier，全局事务标识）把位点升级成 <code>source_id:transaction_id</code> 的形式：<code>source_id</code> 是发起事务的源节点的 UUID，<code>transaction_id</code> 是该节点上单调递增的事务序号。每个事务在 binlog 里都有一个全局唯一的 GTID。</p>
-<p>GTID 带来的简化很直接。副本只要告诉新主"我这里有 GTID 1-100"，新主就自动从 101 开始追，不用人工对文件、不用查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此变得直观。位点因此成了一个能拿来推理的工具，不再只是内部细节。</p>
+<h3 id="s223">GTID：用事务标识辅助切换复制源</h3>
+<p>传统复制用“文件名 + 字节偏移”作为位点（比如 <code>mysql-bin.000123:4567</code>）。这种位点只对相应复制源的日志有效。换主时，新主的文件名和位置可能不同，故障切换时人工对齐既繁琐又容易出错。</p>
+<p>GTID（Global Transaction Identifier，全局事务标识）把位点升级成 <code>source_id:transaction_id</code> 的形式：<code>source_id</code> 是发起事务的源节点的 UUID，<code>transaction_id</code> 是该节点上单调递增的事务序号。启用 GTID 后，已记录事务用这个标识区别于其他来源的事务。</p>
+<p>GTID 带来的简化很直接。启用自动定位后，副本把已经接收或提交的 GTID 集合告诉新主，新主从自己的 binlog 中发送副本缺少的事务，不用人工对文件、查偏移。故障切换、级联复制、多源复制（一个副本同时从多个源同步）都因此更容易管理。所需日志如果已被清理，仍要从其他复制源补齐，或用较新的备份重建副本。位点因此成了一个能拿来推理的工具，不再只是内部细节。</p>
 <h3 id="s224">多线程并行复制：缓解单线程回放瓶颈</h3>
-<p>传统复制最大的问题是<strong>复制延迟</strong>：从节点只有一个 SQL 线程串行回放事件（8.0.27 起 MTS 默认开启 4 个 worker，更早版本默认单线程），主节点并发写入、从节点串行追赶，吞吐不对称导致从节点越落越远。</p>
-<p>多线程并行复制（基于 <code>LOGICAL_CLOCK</code> 的组提交并行）提供了一个有效的解法。它利用了主节点上的一个事实：<strong>同一组提交（group commit）内的事务，本身就没冲突过</strong>（否则不可能同组落盘；主节点把每个事务的锁区间以 last_committed / sequence_number 标记写进 binlog，副本按这些标记划定可并行窗口）。既然它们在主节点上是并行无冲突的，那在从节点上也可以并行回放：这是基于"既成事实"的并行，不需要副本自己再做依赖分析。</p>
-<p>配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，复制延迟在现代硬件上可以降到很低。但这个并行的上限是主库的组提交宽度：主库并发低、每次落盘成组的事务没几个时，从库能并行的也只有那几个——串行瓶颈没有消失，只是从从库转移到了主库的提交队列。低写入并发的库，MTS 的提升有限。并行复制与 MGR 共识的关系见<a class="xref" href="#fig-9-6">图 9-6</a>。</p>
+<p>单线程回放容易遇到<strong>复制延迟</strong>：主节点并发写入，从节点只有一个 SQL 线程串行追赶；当回放速度持续低于写入速度时，从节点就会越落越远。8.0.27 起，MTS 默认开启 4 个 worker，更早版本默认单线程。</p>
+<p>基于 <code>LOGICAL_CLOCK</code> 的多线程并行复制利用主节点写入 binlog 的依赖标记 <code>last_committed</code> / <code>sequence_number</code>，划定可并行回放的事务范围。默认的 <code>COMMIT_ORDER</code> 根据主节点上事务提交窗口是否重叠来生成这些依赖，不只限于同一次组提交。<code>WRITESET</code> 还可以根据写集识别互不冲突的事务，扩大可并行范围。副本按主节点提供的依赖信息调度，无须重新推导全部行级依赖。</p>
+<p>配合 <code>replica_parallel_workers</code>（8.0.26 前为 <code>slave_parallel_workers</code>）、<code>replica_parallel_type=LOGICAL_CLOCK</code> 等参数，并行回放可以缓解复制延迟。实际收益取决于依赖信息、事务冲突、worker 数量和回放资源。使用 <code>COMMIT_ORDER</code> 时，主库并发低会限制可识别的并行范围；使用 <code>WRITESET</code> 可以放宽这项限制，但存在依赖的事务仍需等待。并行复制与 MGR 共识的关系见<a class="xref" href="#fig-9-6">图 9-6</a>。</p>
 <figure class="fig" id="fig-9-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 940 517" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_6_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -622,7 +624,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="50" y="100" width="370" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="235" y="120" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">主库一次组提交（group commit）= 同一 LOGICAL_CLOCK</text>
+  <text x="235" y="120" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">源端 binlog 中记录事务依赖关系</text>
   <rect x="65" y="130" width="100" height="32" rx="4" fill="#FFFFFF" stroke="#D97706"/>
   <text x="115" y="150" text-anchor="middle" font-size="11" fill="#374151">事务 T1</text>
   <rect x="175" y="130" width="100" height="32" rx="4" fill="#FFFFFF" stroke="#D97706"/>
@@ -636,8 +638,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="50" y="194" width="370" height="44" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
-  <text x="235" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Coordinator 线程：按 LOGICAL_CLOCK 判定可并行</text>
-  <text x="235" y="231" text-anchor="middle" font-size="11" fill="#374151">同一组内事务无锁冲突 → 分发给多个 worker</text>
+  <text x="235" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Coordinator：按事务依赖调度 worker</text>
+  <text x="235" y="231" text-anchor="middle" font-size="11" fill="#374151">依赖已满足的事务可并行回放</text>
 
   
   <line x1="115" y1="238" x2="115" y2="258" stroke="#059669" stroke-width="1.3" marker-end="url(#fig_9_6_arrowGreen)"/>
@@ -659,20 +661,20 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="50" y="328" width="370" height="68" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="235" y="350" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">收益：缓解单 SQL 线程的复制延迟</text>
-  <text x="235" y="370" text-anchor="middle" font-size="11" fill="#374151">前提：主库组提交粒度大（同组事务多）→ 从库并行度才高</text>
-  <text x="235" y="386" text-anchor="middle" font-size="11" fill="#6B7280">仍是异步最终一致，不改变一致性模型</text>
+  <text x="235" y="370" text-anchor="middle" font-size="11" fill="#374151">并行度受事务依赖与 worker、资源配置限制</text>
+  <text x="235" y="386" text-anchor="middle" font-size="11" fill="#6B7280">并行回放不改变源端的副本确认条件</text>
 
   
   <line x1="470" y1="90" x2="470" y2="400" stroke="#6B7280" stroke-width="1" stroke-dasharray="4 4"/>
 
   
-  <text x="710" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">② 组复制（MGR）多数派共识（CP）</text>
+  <text x="710" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#D97706">② 组复制（MGR）：组内排序与认证</text>
 
   
   <rect x="500" y="100" width="410" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="705" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">binlog event = 共识 log entry</text>
+  <text x="705" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">读写事务提交前广播写集与更新内容</text>
   <text x="705" y="140" text-anchor="middle" font-size="11" fill="#374151">交由 XCom（Paxos 变种）仲裁：组内多数派确认</text>
-  <text x="705" y="158" text-anchor="middle" font-size="11" fill="#6B7280">事务先达成全局顺序，再各自本地提交</text>
+  <text x="705" y="158" text-anchor="middle" font-size="11" fill="#6B7280">先确定广播顺序，再认证冲突</text>
 
   
   <line x1="600" y1="170" x2="600" y2="190" stroke="#4B5563" stroke-width="1.3" marker-end="url(#fig_9_6_arrow)"/>
@@ -686,25 +688,25 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="655" y="194" width="100" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="705" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员 M2</text>
-  <text x="705" y="232" text-anchor="middle" font-size="11" fill="#374151">投票 / 写日志</text>
-  <text x="705" y="246" text-anchor="middle" font-size="10" fill="#6B7280">应答 ACK</text>
+  <text x="705" y="232" text-anchor="middle" font-size="11" fill="#374151">参与组通信</text>
+  <text x="705" y="246" text-anchor="middle" font-size="10" fill="#6B7280">参与多数派协议</text>
 
   <rect x="760" y="194" width="100" height="56" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="810" y="214" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">成员 M3</text>
-  <text x="810" y="232" text-anchor="middle" font-size="11" fill="#374151">投票 / 写日志</text>
-  <text x="810" y="246" text-anchor="middle" font-size="10" fill="#6B7280">应答 ACK</text>
+  <text x="810" y="232" text-anchor="middle" font-size="11" fill="#374151">参与组通信</text>
+  <text x="810" y="246" text-anchor="middle" font-size="10" fill="#6B7280">参与多数派协议</text>
 
   
-  <line x1="660" y1="250" x2="690" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#fig_9_6_arrowRed)"/>
-  <line x1="750" y1="250" x2="720" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#fig_9_6_arrowRed)"/>
+  <line x1="600" y1="250" x2="690" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#fig_9_6_arrowRed)"/>
+  <line x1="705" y1="250" x2="720" y2="270" stroke="#EF4444" stroke-width="1.3" marker-end="url(#fig_9_6_arrowRed)"/>
   <rect x="615" y="274" width="180" height="40" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="705" y="291" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">多数派确认（2/3）</text>
-  <text x="705" y="307" text-anchor="middle" font-size="11" fill="#374151">事务在共识层"已提交"</text>
+  <text x="705" y="307" text-anchor="middle" font-size="11" fill="#374151">确定事务广播的顺序</text>
 
   <line x1="705" y1="314" x2="705" y2="334" stroke="#059669" stroke-width="1.3" marker-end="url(#fig_9_6_arrowGreen)"/>
   <rect x="500" y="338" width="410" height="58" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="705" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">各成员各自本地 apply（按共识后的全局顺序）</text>
-  <text x="705" y="376" text-anchor="middle" font-size="11" fill="#374151">状态机复制：相同顺序 → 相同最终状态</text>
+  <text x="705" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">各成员按同一顺序认证，通过后提交或应用事务</text>
+  <text x="705" y="376" text-anchor="middle" font-size="11" fill="#374151">冲突认证失败的事务回滚</text>
   <text x="705" y="390" text-anchor="middle" font-size="11" fill="#6B7280">group_replication_consistency 可调读写等待强度</text>
 
   
@@ -713,35 +715,35 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   <rect x="60" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="260" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">多线程并行复制</text>
-  <text x="80" y="516" font-size="12" fill="#374151">代价：仍是"可丢"语义，切换时已提交事务可能丢失</text>
-  <text x="80" y="544" font-size="12" font-weight="600" fill="#059669">要点：快，但不改变一致性强度</text>
+  <text x="80" y="516" font-size="12" fill="#374151">作用：提升回放并行度，不改变源端确认条件</text>
+  <text x="80" y="544" font-size="12" font-weight="600" fill="#059669">要点：收益受事务依赖和回放资源限制</text>
 
   <rect x="480" y="466" width="400" height="88" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.2"/>
   <text x="680" y="488" text-anchor="middle" font-size="13" font-weight="700" fill="#D97706">组复制 MGR</text>
-  <text x="500" y="516" font-size="12" fill="#374151">代价：每次提交多一轮 RTT，吞吐与延迟权衡</text>
-  <text x="500" y="544" font-size="12" font-weight="600" fill="#EF4444">要点：强一致，但延迟随多数派确认上升</text>
+  <text x="500" y="516" font-size="12" fill="#374151">代价：读写事务提交前需要组内通信和认证</text>
+  <text x="500" y="544" font-size="12" font-weight="600" fill="#EF4444">要点：多数派维持进展，应用等待条件可调</text>
 </svg>
-</div><figcaption>图 9-6　并行回放与 MGR：从节点按组提交边界并行回放，MGR 把 binlog event 当作共识 log entry，多数派确认才提交。</figcaption></figure>
+</div><figcaption>图 9-6　并行回放与 MGR：从节点按依赖标记调度回放，MGR 通过组通信建立事务顺序，再进行认证和提交。</figcaption></figure>
 <h3 id="s225">组复制（MGR）：把复制升级为共识</h3>
-<p>MGR（MySQL Group Replication）是把 MySQL 的复制从"异步可丢"推进到"强一致"的关键一步。它的核心思想是：<strong>把 binlog event 当作共识协议（XCom，Paxos 变种）的 log entry，要求多数派确认才能提交</strong>。</p>
-<p>这正是状态机复制在 MySQL 里的强一致形态：每个事务在主节点发起，经过多数派节点的 Paxos 确认后写入各节点的 binlog，再由各节点本地回放。因为多数派都确认过，所以任何一个少数派节点的故障都不会丢事务：只要多数派存活，已确认的事务就一定在。</p>
-<p>代价是延迟：每一次提交都要多走一次跨节点的共识往返。但这是换取强一致的必要代价，是延迟-一致性曲线上靠 CP 的一端。MGR 还把一致性级别做成了参数 <code>group_replication_consistency</code>，默认 <code>EVENTUAL</code>（不额外等待）。从弱到强有几档：<code>BEFORE_ON_PRIMARY_FAILOVER</code>（仅主切换时等追平）、<code>BEFORE</code>（读前等本节点追平）、<code>AFTER</code>（写后等全组追平）、<code>BEFORE_AND_AFTER</code>（读写都等）。读写是否要等本节点追平，按场景选。</p>
+<p>MGR（MySQL Group Replication）在复制链路中加入组内事务协调。读写事务准备提交时，节点广播行变更及对应写集，由基于 Paxos 的 XCom 提供组通信和全序消息传递，再由各成员按这个顺序进行冲突认证。通过认证的事务才能提交。</p>
+<p>组通信需要多数派才能继续作出决定，因此少数成员故障时，只要剩余成员仍能形成多数派，组就能继续运行。事务通过认证后，发起节点提交本地事务，其他成员接收并应用远端事务。共识确定的事务顺序，并不意味着每个成员在同一时刻都已应用到同一位置。</p>
+<p>组通信与认证增加了提交等待，但跨成员读取是否需要追平，还由 <code>group_replication_consistency</code> 控制。MySQL 8.0 默认 <code>EVENTUAL</code>（不额外等待）；<code>BEFORE_ON_PRIMARY_FAILOVER</code> 在主切换后等待新主应用积压事务；<code>BEFORE</code> 在事务执行前等待本节点应用先前事务；<code>AFTER</code> 让读写事务等待其变更在其他 ONLINE 成员上应用；<code>BEFORE_AND_AFTER</code> 同时提供前后两种等待。<code>BEFORE</code> 对只读和读写事务都生效，可以按场景选择。</p>
 <h3 id="s226">分布式恢复：新成员怎么追上</h3>
-<p>新成员加入 MGR 时，状态和老成员差很多，默认先走增量恢复：从现有成员（donor）拉取缺失区间的 binlog 补差。只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件（参数 <code>group_replication_clone_threshold</code> 看似按缺失事务数触发，默认值实为 int64 上限，默认配置下从不因缺口大小而 clone）：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。这是"先全量再增量"的标准做法：先克隆拿到基线，再用 binlog 补上这期间的增量，思路和 Redis 的"fork RDB + 期间增量补发"一样。</p>
+<p>新成员加入 MGR 时，要从现有成员（donor）补齐缺失的数据。binlog 仍可用时，默认走增量恢复；<code>group_replication_clone_threshold</code> 的默认值是 GTID 事务序号上限，实际上不会仅因缺口大而触发 clone。若所需 binlog 已被清理，或缺口超过调低后的阈值，MGR 会尝试使用 8.0.17+ 的 clone 插件，前提是 donor 和新成员已配置好克隆所需的插件、权限及兼容环境。克隆以 donor 的物理数据建立基线，重启后再用 binlog 追平克隆期间的新事务。这是“先全量再增量”的做法：先拿到基线，再补上期间的增量，思路和 Redis 的“RDB 快照 + 期间增量补发”相近。</p>
 <h3 id="s227">取舍总结</h3>
-<p>MySQL 在数据同步上的取舍是三档：从异步（可丢、最快）到半同步（多数情况下不丢、超时降级）到组复制（多数派强一致、最慢），业务方按场景选档。Redis 则只提供一个默认档，另给一个弱保证参数和一个按写生效的 <code>WAIT</code> 命令（均见 <a class="xref" href="#sec-9.2">9.2 节</a>）。</p>
+<p>MySQL 在数据同步上提供了不同选择：异步复制不等待副本，半同步增加可超时降级的接收确认，组复制增加组内事务协调和可配置的一致性等待。业务方需要分别判断确认范围、故障转移条件和读取要求。Redis 默认使用异步复制，另有参数按副本状态限制写入，也可以使用 <code>WAIT</code> 命令，等待副本确认本连接此前的写入（均见 <a class="xref" href="#sec-9.2">9.2 节</a>）。</p>
 <h2 id="sec-9.4">9.4 Kafka 的做法</h2>
 <p>Kafka 本身就是围绕"日志"构建的系统。当别的系统要想办法把状态变化封装进某种传播单元时，Kafka 的传播单元就是它的原生数据结构：分区日志里按偏移量追加的消息。这让 Kafka 的复制机制变得简洁：副本就是分区日志的一份拷贝，同步就是把这份日志从 Leader 拷到 Follower。</p>
 <h3 id="s229">传播单元：按分区有序的消息</h3>
-<p>Kafka 的传播单元是<strong>消息</strong>。每个分区（partition）是一个独立的、按偏移量（offset）严格有序的追加日志。一条消息一旦按偏移量写入 Leader 的日志，它在分区内的顺序就固定了，这种顺序性来自日志的"只追加"本质，不需要额外的排序协议。</p>
-<p>这一点和<a class="xref" href="05-layered-architecture.html">第 5 章</a> Kafka 存储层的 Log 抽象直接呼应：日志天然提供了全序关系，所以"状态机复制里的有序输入序列"在 Kafka 这里是现成的：日志本身就是序列。</p>
-<h3 id="s230">纯拉模式：和消费者走同一条路径</h3>
-<p>Kafka 复制用的是<strong>纯拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis、MySQL"副本发起后主端流推"都不同。</p>
-<p><strong>Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径</strong>（对本地日志段成立，Tiered Storage 的例外见下段）。Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应——只有一处读上界的差别：普通消费者被截在高水位 HW 以下，Follower 可以一直读到 LEO（区分标志是请求里的 replica_id 取值：Follower 填自己的 broker id，消费者填 -1）。这种复用让 Leader 端只需要一套日志读取逻辑：副本同步和消费读取共享同一份代码、同一套优化（零拷贝、页缓存命中、批量返回）。<a class="xref" href="05-layered-architecture.html">第 5 章</a>的分层思想在这里收敛成一个具体结论：读路径不分副本还是消费者。</p>
-<p>拉模式的代价是 Follower 自己掌握追赶节奏，副本数量多时大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一大段日志）和页缓存（Leader 端日志常驻页缓存，FETCH 命中内存不落盘）。3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载直接帮到的是消费者读取，不是副本拉取：消费者读冷段时回源远程存储，Follower 的 FETCH 仍只由 Leader 本地日志服务，拉取位点落到 Leader 本地起点之前时，副本从远程存储重建辅助状态、把日志起点抬到 Leader 本地起点后继续拉，仍能追上（详见<a class="xref" href="08-storage-format.html">第 8 章</a> <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。本地保留窗口盖住最慢 ISR 副本的落后量，为的是让副本留在本地快路径上，不必走这条远程追赶。</p>
+<p>Kafka 的传播单元是<strong>消息</strong>。每个分区（partition）是一个独立的、按偏移量（offset）有序的追加日志。Leader 为追加的消息分配偏移量，副本按这个顺序复制。尚未提交的日志尾部在换主时可能被截断；已提交部分的保留还依赖副本和选主条件。</p>
+<p>这一点和<a class="xref" href="05-layered-architecture.html">第 5 章</a> Kafka 存储层的 Log 抽象直接呼应：每个分区的日志都提供一条有序序列，可以作为副本共同复制的输入。不同分区之间并没有由 offset 建立的统一顺序。</p>
+<h3 id="s230">拉模式：复用本地日志读取逻辑</h3>
+<p>Kafka 复制用的是<strong>拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis、MySQL"副本发起后主端流推"都不同。</p>
+<p><strong>Follower 与消费者的 FETCH 复用本地日志的读取逻辑</strong>，但 Leader 会区分请求角色。Follower 可以拉取到 LEO，其请求还用于更新副本进度；消费者的读取受 HW 约束，使用 <code>read_committed</code> 时还受事务稳定边界 LSO 约束。请求中的 <code>replica_id</code> 可区分副本与普通消费者：Follower 填自己的 broker id，普通消费者填 -1。两类请求可以共享页缓存、批量读取等底层优化；本地文件传输在条件满足时还能使用零拷贝。<a class="xref" href="05-layered-architecture.html">第 5 章</a>的分层思想在这里体现为：上层职责不同，底层日志读取仍可复用。</p>
+<p>拉模式让 Follower 自己掌握追赶节奏，但副本数量多时，大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一批日志）和页缓存（命中时可从内存读取，未命中时仍需磁盘 I/O）。3.9 的 Tiered Storage 已可用于生产，冷段可卸载到远程存储。消费者可以读取远程段；Follower 的 FETCH 仍由 Leader 的本地日志提供消息。若所需数据已移到远程层，副本会从远程段恢复 leader epoch、生产者快照等辅助状态，再从对应远程段之后继续拉取本地日志（详见<a class="xref" href="08-storage-format.html">第 8 章</a> <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。本地保留窗口覆盖副本的落后量，有助于避免这条较复杂的追赶路径。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
 <p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.2">7.4.2 节</a>展开；LEO 与 HW 的语义定义就在这里给出。</p>
-<p>从同步视角看，LEO 是每个副本的本地位点，HW 是 Leader 据此计算出的"已确认边界"：HW 等于当前 ISR 中所有副本（含 Leader 自己）的最小 LEO，HW 以下才算已提交，消费者才读得到。<strong>副本间的同步进度，由 ISR 里最慢的那一个决定</strong>。只要有一个副本变慢，HW 就被拖慢；变慢的副本掉队到 <code>replica.lag.time.max.ms</code> 阈值之外就被移出 ISR，HW 重新由剩下的较快副本决定。所以 HW 始终反映"当前 ISR 集合的实际同步进度"，而 ISR 的动态进出是在做可用性与一致性之间的实时权衡。Leader、Follower、ISR 与 HW 的时间关系见<a class="xref" href="#fig-9-7">图 9-7</a>。</p>
+<p>从同步视角看，LEO 是副本下一条消息的追加位置，HW 是复制提交的边界。Leader 根据 FETCH 中获知的副本进度和 ISR 状态推进 HW，不能直接看到所有副本此刻的实际 LEO。ISR 稳定且满足最小副本数要求时，较慢副本的已知进度会限制 HW 的推进。副本长时间未追上 Leader，超过 <code>replica.lag.time.max.ms</code> 后会被移出 ISR，随后按调整后的集合推进。HW 以下的记录已完成复制提交；消费者是否能返回其中的事务记录，还取决于隔离级别。Leader、Follower、ISR 与 HW 的时间关系见<a class="xref" href="#fig-9-7">图 9-7</a>。</p>
 <figure class="fig" id="fig-9-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 61 940 639" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_9_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -760,7 +762,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="60" y="100" width="820" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="80" y="120" font-size="13" font-weight="700" fill="#111827">Leader 日志（按偏移量追加）</text>
+  <text x="80" y="113" font-size="11" font-weight="700" fill="#111827">Leader 日志（按偏移量追加）</text>
   
   <rect x="200" y="118" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
   <text x="255" y="132" text-anchor="middle" font-size="11" fill="#374151">m0</text>
@@ -783,13 +785,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="711" y="146" text-anchor="middle" font-size="10" fill="#6B7280">off=4</text>
 
   
-  <line x1="711" y1="164" x2="711" y2="180" stroke="#EF4444" stroke-width="2"/>
-  <polygon points="705,178 717,178 711,188" fill="#EF4444"/>
-  <text x="711" y="204" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">Leader LEO = 5（日志末端）</text>
+  <line x1="766" y1="164" x2="766" y2="180" stroke="#EF4444" stroke-width="2"/>
+  <polygon points="760,178 772,178 766,188" fill="#EF4444"/>
+  <text x="766" y="204" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">Leader LEO = 5（下一追加位置）</text>
 
   
   <rect x="60" y="220" width="820" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="80" y="240" font-size="13" font-weight="700" fill="#111827">Follower 日志（仅同步到 m1）</text>
+  <text x="80" y="233" font-size="11" font-weight="700" fill="#111827">Follower 日志（仅同步到 m1）</text>
   <rect x="200" y="238" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
   <text x="255" y="262" text-anchor="middle" font-size="11" fill="#374151">m0 ✓</text>
   <rect x="314" y="238" width="110" height="34" rx="3" fill="#FFFFFF" stroke="#059669"/>
@@ -798,111 +800,109 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="483" y="262" text-anchor="middle" font-size="11" fill="#6B7280">尚未拉到</text>
 
   
-  <line x1="369" y1="284" x2="369" y2="300" stroke="#4B5563" stroke-width="2"/>
-  <polygon points="363,298 375,298 369,308" fill="#4B5563"/>
-  <text x="369" y="324" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Follower LEO = 2</text>
+  <line x1="428" y1="284" x2="428" y2="300" stroke="#4B5563" stroke-width="2"/>
+  <polygon points="422,298 434,298 428,308" fill="#4B5563"/>
+  <text x="428" y="324" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Follower LEO = 2</text>
 
   
   <path d="M 440 260 Q 500 195 540 160" fill="none" stroke="#059669" stroke-width="1.6" marker-end="url(#fig_9_7_arrowGreen)"/>
   <rect x="270" y="178" width="160" height="36" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.3"/>
-  <text x="350" y="192" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">FETCH（同消费者读路径）</text>
+  <text x="350" y="192" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">FETCH（共享本地读逻辑）</text>
   <text x="350" y="207" text-anchor="middle" font-size="10" fill="#374151">"给我 off≥2 的消息"</text>
 
   
   <rect x="60" y="340" width="820" height="76" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.6"/>
-  <text x="80" y="362" font-size="13" font-weight="700" fill="#EF4444">HW（高水位）= ISR 中最小 LEO = min(Leader LEO 5, Follower LEO 2) = 2</text>
-  <text x="80" y="384" font-size="12" fill="#374151">只有 HW 以下的消息算"已提交"，消费者只能读到 HW</text>
-  <text x="80" y="404" font-size="12" fill="#374151">ISR：跟上 Leader 的动态副本集合；只有 ISR 成员才有资格当选新 Leader</text>
+  <text x="80" y="362" font-size="13" font-weight="700" fill="#EF4444">示例：ISR 稳定，Leader 已知两副本的 LEO 分别为 5、2，HW 推进到 2</text>
+  <text x="80" y="384" font-size="12" fill="#374151">HW 以下完成复制提交；read_committed 还要满足事务可见性要求</text>
+  <text x="80" y="404" font-size="12" fill="#374151">ISR：动态同步副本集合；禁止 unclean 选举时，新 Leader 从 ISR 中选择</text>
 
   
   <line x1="60" y1="436" x2="880" y2="436" stroke="#6B7280" stroke-width="1" stroke-dasharray="4 4"/>
 
   
-  <text x="470" y="466" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">② leader epoch 截断不一致尾部（解决脑裂）</text>
+  <text x="470" y="466" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">② leader epoch 定位并截断不一致尾部</text>
 
   
   
   <rect x="70" y="488" width="260" height="80" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
   <text x="200" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=1（旧 Leader A）</text>
   <text x="90" y="532" font-size="11" fill="#374151">日志：m0 m1 m2 m3 m4</text>
-  <text x="90" y="552" font-size="11" fill="#374151">A 短暂失联，被仲裁下线</text>
+  <text x="90" y="552" font-size="11" fill="#374151">A 失联，集群选出新 Leader</text>
 
   
   <rect x="340" y="488" width="260" height="80" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="470" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">epoch=2（新 Leader B）</text>
-  <text x="360" y="532" font-size="11" fill="#374151">新主只确认到 m2，新写 m2'</text>
-  <text x="360" y="552" font-size="11" fill="#374151">权威日志：m0 m1 m2 m2'</text>
+  <text x="360" y="532" font-size="11" fill="#374151">B 保留 m0–m2，新写 m3'</text>
+  <text x="360" y="552" font-size="11" fill="#374151">B 的日志：m0 m1 m2 m3'</text>
 
   
   <rect x="610" y="488" width="270" height="80" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">A 复活，试图以 Follower 加入</text>
-  <text x="630" y="532" font-size="11" fill="#374151">A 仍持 m3 m4（已被新主否决）</text>
+  <text x="630" y="532" font-size="11" fill="#374151">A 仍持旧任期的 m3 m4</text>
   <text x="630" y="552" font-size="11" fill="#374151">若不截断 → 数据分叉（脑裂）</text>
 
   
   <line x1="470" y1="568" x2="470" y2="588" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_9_7_arrowRed)"/>
   <rect x="120" y="592" width="700" height="74" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
   <text x="470" y="614" text-anchor="middle" font-size="13" font-weight="700" fill="#EF4444">leader epoch 协议：副本恢复时按 epoch 比对</text>
-  <text x="140" y="636" font-size="12" fill="#374151">A 携带 (epoch=1, lastOffset=4) FETCH；B 回 EndOffsetForEpoch(epoch=1, endOffset=3)</text>
-  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">A 自身 epoch=1 到 off=4，超过权威 endOffset=3 → 截断 m3 m4，对齐 off=3 后追赶 B</text>
+  <text x="140" y="636" font-size="12" fill="#374151">A 发 FETCH(last_fetched_epoch=1, fetch_offset=5)；B 返回分叉任期 1、结束位点 3</text>
+  <text x="140" y="656" font-size="12" font-weight="700" fill="#059669">A 截断 off≥3 的旧尾部 m3 m4，再从 off=3 开始拉取 B 的日志</text>
 </svg>
-</div><figcaption>图 9-7　HW 与 leader epoch：HW = ISR 中最小 LEO，只有 HW 以下算已提交；leader epoch 用任期号界定权威日志段，截断老 Leader 的脑裂尾部。</figcaption></figure>
-<h3 id="s232">leader epoch：解决老 Leader 复活的脑裂</h3>
-<p>老 Leader 复活导致的<strong>日志分叉（脑裂）</strong>是分布式复制里最棘手的边界之一。场景是这样的：Leader A 在任期 1 写了几条消息后假死，集群选出 Leader B 进入任期 2，B 又写了几条；此时 A 复活，带着任期 1 的旧日志回来——它还顶着 Leader 的身份，日志却和 B 不一致。</p>
-<p>Kafka 用 <strong>leader epoch</strong>（单调递增的任期号）来截断这种不一致的尾部。每个任期对应一段"权威日志"，落盘到分区的 <code>leader-epoch-checkpoint</code> 文件里（一行 = 任期号 + 该任期起始偏移量）。副本恢复或重新追随时，在 FETCH 请求里带上自己最后一个已知的 <code>(epoch, offset)</code>；Leader 据此判断这段日志是否已被新任期否决，并在响应里回一个 <code>EndOffsetForEpoch</code>（"该 epoch 的权威日志到哪为止"）。副本尾部一旦超过这个权威边界，就干净地截掉。这样老 Leader 的脑裂尾部被切掉，副本状态回到与新 Leader 一致。</p>
-<p>leader epoch 的引入是为了补 offset 的不足：offset 只描述"日志长度"，无法表达"某段日志是否被新任期否决"。epoch 给每段日志标上了"由哪一任 Leader 写下"的标记，让截断决策有据可依。这和 MySQL 用 GTID 标识事务、Redis 用 replid 标识主节点身份，本质是同类思路：<strong>给日志段一个权威的归属标记</strong>。</p>
-<h3 id="s233">acks 参数：一致性强度的生产者级档位</h3>
-<p>Kafka 把一致性强度做成了生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档），它配合 <code>min.insync.replicas</code>（ISR 最少要有几个副本才允许写入）构成 Kafka 的可靠性语义。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
-<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步在超时时降级回异步，弱化一致性以保障可用性，Kafka 在 ISR 不足 <code>min.insync.replicas</code> 时，写入操作会失败。同一个"一致性 vs 可用性"的抉择，这两款软件在生产者侧画在了相反的位置。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。一个常见的强可靠配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>，能容忍单副本故障而不丢数据。</p>
-<h3 id="s234">unclean leader 选举：CAP 取舍的显式开关</h3>
-<p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。这是一个把 CAP 取舍暴露成显式开关的典型设计：</p>
-<ul><li><strong>允许（true）</strong>：ISR 全挂时，从落后副本中选一个当 Leader，系统恢复可用，但 HW 之后未同步的消息会丢——可用性优先。</li><li><strong>禁止（false，3.x 默认）</strong>：ISR 全挂时宁可不选主，等 ISR 成员恢复——一致性优先，但分区可能短时不可用。（这个默认值自 0.11 起就由 true 改为 false，KIP-106，3.x 沿用并强化了这一取向。）</li></ul>
-<p>默认值的演变对应现代实践对数据安全的偏向。但这个开关的存在本身比它的默认值更重要：它让你按业务（金融级 vs 日志采集级）显式选择要 AP 还是 CP。</p>
-<h3 id="s235">KRaft：元数据同步与数据同步同构</h3>
-<p>Kafka 用 KRaft（Kafka Raft）替代 ZooKeeper 管理集群元数据：KRaft 自 2.8 作为预览特性引入，在 3.3 达到生产可用。<strong>元数据本身也是一条 Raft 复制日志</strong>（由 Controller quorum 维护），它的复制机制和数据分区的复制<strong>同构</strong>：都是日志 + 副本 + Leader + epoch（Raft 用 term）。这种统一让 Kafka 在去掉 ZooKeeper 后依然自洽：它复用了自己已有的那一套同步机制。</p>
-<h3 id="s236">幂等与事务：从状态一致到语义一致</h3>
-<p>生产者幂等（enable.idempotence=true）和事务（transactional）是 Kafka 把一致性做到更细粒度的两步。</p>
-<p>幂等靠 ProducerId + ProducerEpoch + BaseSequence 实现：每个生产者有一个 ID，每次发送的消息带一个单调递增的序列号；Broker 据此去重，即使消息因重试被发送多次，最终也只生效一次。网络重传造成的重复，就在 Broker 这一层把它去掉。幂等和事务之间有层级依赖：开启事务（设置 <code>transactional.id</code>）会自动启用幂等，无需重复设置；但反过来，仅开幂等不会隐式启动事务：幂等是单分区维度的"恰好一次"，事务是跨分区维度的"原子提交"。</p>
-<p>事务更进一步：跨多个分区的一组写入要么全部成功要么全部不可见，靠 transaction coordinator 和两阶段提交（对消费者暴露 <code>committed</code> 标记）实现。这把"状态机复制"从"状态一致"延伸到了"操作语义一致"：不止副本们的数据状态相同，连"这条算不算生效"也一致。</p>
-<p>事务甚至能把消费 offset 纳入同一个提交单元，纳入不了的是外部系统的处理结果。消费端的进度从来有三个：当前读取位置、已提交的 offset、业务系统里这条记录的处理结果；前两种由客户端管理，第三种在 Kafka 之外。提交位置因此有条纪律：能提交的只有已交付记录中处理完成的前缀。并行处理时后一条先完成，不能越过前面还没处理完的记录去提交，否则重启后那条消息会被直接跳过。我写消费者默认按分区顺序处理完再提交，拿消费并行度换这条规则自动成立。</p>
+</div><figcaption>图 9-7　HW 与 leader epoch：Leader 根据副本反馈的进度推进 HW；leader epoch 标识任期边界，帮助恢复中的副本定位并截断不一致尾部。</figcaption></figure>
+<h3 id="s232">leader epoch：定位旧 Leader 日志中的分叉</h3>
+<p>旧 Leader 恢复后，可能带回与新 Leader 不一致的日志尾部。场景是这样的：Leader A 在任期 1 写了几条消息后失联，集群选出 Leader B 进入任期 2，B 又写了几条；此时 A 恢复，仍保存着任期 1 的本地日志，需要先与当前 Leader 对齐。</p>
+<p>Kafka 用 <strong>leader epoch</strong>（单调递增的任期号）标识日志的任期边界。分区的 <code>leader-epoch-checkpoint</code> 文件记录任期号和该任期的起始偏移量。副本重新追随时，可以在 FETCH 请求中带上最后已获取记录的任期和下一次拉取的偏移量；Leader 检查是否分叉，必要时返回 <code>diverging_epoch</code> 中的任期及结束偏移量。副本据此定位共同日志的边界，截断不一致尾部，再继续拉取。任期边界也可通过 <code>OffsetsForLeaderEpoch</code> 请求查询。</p>
+<p>leader epoch 补充了 offset 所没有的历史信息：相同偏移量在不同任期可能对应不同的日志内容。Redis 的 replid 也用于区分复制历史；MySQL 的 GTID 则标识事务来源和事务身份。它们都让位点带上了可核对的来源信息，但各自标识的对象不同。</p>
+<h3 id="s233">acks 参数：生产者的写入确认要求</h3>
+<p>Kafka 通过生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档）设置写入确认要求。<code>acks=all</code> 等待当前 ISR 中的副本确认，并配合 <code>min.insync.replicas</code> 检查 ISR 是否达到最低数量；达到最低数量后，<code>all</code> 仍要求当前 ISR 全部确认。确认复制也不等于各副本已逐条执行 fsync。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
+<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步确认超时后可降级为异步；Kafka 在 ISR 不足最低要求时会拒绝这类写入。两款软件在确认条件无法满足时，采取了不同的处理方式。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。一个常见的配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>：它可在一个副本故障后继续写入；保留已确认数据还要求始终有同步副本存活，并避免从缺少这些数据的副本选主。</p>
+<h3 id="s234">unclean leader 选举：数据保留与恢复可用性的取舍</h3>
+<p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。没有可用的 ISR 成员时，这个开关决定是否接受从落后日志恢复服务的风险：</p>
+<ul><li><strong>允许（true）</strong>：ISR 全挂时，从落后副本中选一个当 Leader，系统恢复可用，但新 Leader 缺少的消息可能丢失，其中也可能包括原先已提交、位于 HW 以下的消息——可用性优先。</li><li><strong>禁止（false，3.x 默认）</strong>：ISR 全挂时宁可不选主，等待 ISR 成员恢复，分区在此期间不可用。（这个默认值自 0.11 起就由 true 改为 false，KIP-106，3.x 沿用。）</li></ul>
+<p>默认值的演变反映了对数据保留的重视。这个开关让业务在等待合格副本恢复与接受日志缺失风险之间作出明确选择。</p>
+<h3 id="s235">KRaft：元数据也采用复制日志</h3>
+<p>Kafka 用 KRaft（Kafka Raft）替代 ZooKeeper 管理集群元数据：KRaft 自 2.8 作为预览特性引入，在 3.3 对新集群达到生产可用状态。<strong>元数据本身也是一条 Raft 复制日志</strong>，由 Controller quorum 维护。它和数据分区都使用日志、Leader、副本与任期信息，但确认规则不同：KRaft 使用多数派共识，数据分区按 ISR 机制推进复制提交。两者复用了日志化状态管理的思路，并不是同一套复制协议。</p>
+<h3 id="s236">幂等与事务：处理重试与跨分区提交</h3>
+<p>生产者幂等（<code>enable.idempotence=true</code>）处理重试导致的重复追加，事务则把多项 Kafka 写入纳入同一提交单元。</p>
+<p>幂等使用 ProducerId、ProducerEpoch 和按分区维护的序列号，消息批次携带 BaseSequence。Broker 据此识别生产者的重复重试，避免在日志中再次追加同一批数据。它不负责识别应用重新发送的相同业务内容，也不保证消费处理只执行一次。开启事务（设置 <code>transactional.id</code>）会隐含启用幂等；反过来，仅开幂等不会自动启动事务。</p>
+<p>事务由 transaction coordinator 协调，可以包含跨分区写入及消费 offset 的更新。提交或中止结果通过控制记录传播。使用 <code>read_committed</code> 的消费者只返回已提交事务的记录，并跳过中止事务；默认的 <code>read_uncommitted</code> 仍可能返回未提交或已中止事务的记录。事务提交结果与消费者的隔离级别共同决定哪些记录能被返回。</p>
+<p>事务甚至能把消费 offset 纳入同一个提交单元，纳入不了的是外部系统的处理结果。消费端需要区分三件事：当前读取位置、已提交的 offset、业务系统里这条记录的处理结果；前两种由客户端管理，第三种在 Kafka 之外。因此，提交位置必须遵守一条规则：能提交的只有已交付记录中处理完成的前缀。并行处理时后一条先完成，不能越过前面还没处理完的记录去提交，否则重启后那条消息会被直接跳过。我写消费者默认按分区顺序处理完再提交，接受消费并行度降低，换来这条规则自动成立。</p>
 <h3 id="s237">取舍总结</h3>
-<p>Kafka 的取舍思路：<strong>把一致性、可靠性、可用性全部参数化</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值，每个参数都是一档取舍。用户通过组合这些参数自行划定自己需要的边界。</p>
+<p>Kafka 的取舍思路是：<strong>把写入确认、准入条件和故障选主要求分别交给配置控制</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值各有作用，组合起来决定相应场景下的等待、失败和数据保留行为。</p>
 <h2 id="sec-9.5">9.5 横向对比</h2>
-<p>把这三个软件的同步机制并到同一张表里，以本章澄清的六个维度为行。</p>
+<p><a class="xref" href="#table-9-1">表 9-1</a> 从六个维度对比三个软件的同步机制。</p>
 <p class="tab-label"><strong>表 9-1　三个软件数据同步机制横向对比</strong></p>
-<div class="table-wrap"><table id="table-9-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（RESP 重写）</td><td>binlog event（ROW 行级）</td><td>消息（按分区偏移量有序）</td></tr><tr><td>传播方式</td><td>副本发起后持续流推（推入内存缓冲）</td><td>副本发起后持续流推（relay log 持久化缓冲，收流与回放分离）</td><td>周期性 FETCH 请求-响应（副本自掌节奏）</td></tr><tr><td>一致性模型</td><td>默认偏 AP（异步可丢写，分区时偏 CP）</td><td>异步 / 半同步 / 多数派强一致（逐档增强）</td><td>ISR + acks 可调（AP ↔ CP）</td></tr><tr><td>位点语义</td><td>replication offset（字节进度）</td><td>GTID（全局事务标识）</td><td>offset + leader epoch</td></tr><tr><td>故障恢复粒度</td><td>backlog 窗口内部分重同步，否则全量</td><td>GTID 自动定位 + clone 分布式恢复</td><td>leader epoch 截断 + ISR 仲裁</td></tr><tr><td>全量同步代价</td><td>fork RDB 传输（主节点阻塞 + 内存翻倍风险）</td><td>clone 插件或全量 binlog 回放</td><td>分区日志拷贝（按分区粒度）</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-9-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（必要时改写为确定操作）</td><td>binlog event（默认 ROW 行级）</td><td>消息（按分区偏移量有序）</td></tr><tr><td>传播方式</td><td>副本发起后持续流推（复制缓冲）</td><td>副本发起后持续流推（relay log 缓冲，接收与回放分离）</td><td>FETCH 请求-响应（副本发起拉取）</td></tr><tr><td>确认与协调</td><td>默认异步；WAIT 可等待此前写入的副本确认</td><td>异步、半同步确认或 MGR 组内协调；读等待另有配置</td><td>ISR + acks + min ISR；选主与事务读取另有条件</td></tr><tr><td>位点语义</td><td>replid + replication offset（历史与字节进度）</td><td>GTID 集合（事务来源与已处理事务）</td><td>分区 offset + leader epoch</td></tr><tr><td>故障恢复条件</td><td>历史匹配且所需日志仍在 backlog，才能部分重同步</td><td>GTID 自动定位需有可补发日志；组复制可按条件克隆</td><td>以任期检查分叉，再从有效保留范围追赶</td></tr><tr><td>建立副本基线的代价</td><td>fork 与 RDB 传输，保存期间的写入可能带来 COW 开销</td><td>备份恢复或按条件克隆，再补所需 binlog</td><td>获取分区保留日志及必要辅助状态</td></tr></tbody></table></div>
 <h3 id="s239">解读一：传播单元的选择决定下游设计</h3>
 <p>传播单元是多数下游设计的起点。</p>
-<p>Redis 走命令流这条路，看重的是轻：序列化小、副本直接复用命令处理路径，但非确定性命令得在源头改写。MySQL 走 ROW 格式则换确定性：下发行级事实，副本算不出第二种结果，代价是日志更重。Kafka 最简单，日志本身就是序列，复制天然有序无需额外排序，只是更新和删除都要靠追加 tombstone（墓碑消息，标记删除的特殊消息）或新版本去表达。</p>
+<p>Redis 走命令流这条路，看重的是轻：序列化开销小、副本直接复用命令处理路径，但非确定性命令得在源头改写。MySQL 的 ROW 格式记录行变更，减少了副本重新执行 SQL 时产生不同结果的风险，代价是日志可能更大。Kafka 则由分区 Leader 确定追加顺序，副本复制这条日志；应用可以追加新记录表示状态变化，在启用 compaction 的主题中，还可以用 tombstone 表示删除。</p>
 <p>传播单元定下来后，传播方式、位点形态、故障恢复粒度会高度耦合。</p>
 <h3 id="s240">解读二：位点（offset / GTID / leader epoch）是同步的通用度量</h3>
 <p>三个软件的位点各走一路：</p>
-<ul><li>Redis 的 replication offset 是字节进度，粗但够用，因为单元是字节流；</li><li>MySQL 的 GTID 是全局事务标识，细到事务级，且全局唯一，便于跨节点推理；</li><li>Kafka 的 offset + leader epoch 是偏移量加任期：偏移量描述进度，epoch 标定权威段。</li></ul>
-<p>对应的都是同一个问题："我已经处理到哪里了"。</p>
+<ul><li>Redis 用 replid 区分复制历史，用 replication offset 表示该历史中的字节进度；</li><li>MySQL 的 GTID 标识事务来源与事务序号，跨来源的进度用集合表示；</li><li>Kafka 的 offset 表示分区内的位置，leader epoch 用于核对这段日志的任期历史。</li></ul>
 <h3 id="s241">解读三：一致性的位置差异</h3>
-<p>在这条取舍上，三个软件站在不同位置。Redis 默认偏 AP（异步，可能丢少量写），MySQL 提供了从偏 AP 到偏 CP 的整排档位（异步 / 半同步 / MGR），Kafka 则把位置做成可调参数（acks 与 ISR 设置）。三种姿态对应三种产品定位：Redis 要最低延迟，MySQL 要适配从 OLTP 到金融级的不同场景，Kafka 要让使用者按消息价值自己选。</p>
+<p>三个软件提供了不同的确认与故障处理方式。Redis 默认异步复制，并提供写入准入限制和显式等待确认；MySQL 可在异步复制上增加半同步确认，或通过 MGR 进行组内事务协调；Kafka 则分别配置写入确认、副本准入和选主条件。这些机制回应了不同的需求：减少等待、保留已确认数据、控制故障时是否继续服务。选型时需要看清业务要的是哪一种保证。</p>
 <h2 id="sec-9.6">9.6 架构启示</h2>
 <p>复制系统的设计，说到底都围着一件事转：写丢了怎么办。</p>
 <h3 id="s243">启示一：数据同步的本质是状态机复制</h3>
-<p>把"导致当前状态的那串操作"按相同顺序重放到副本上，输入序列和执行顺序都相同，终态就必然相同。这不排斥状态快照：追赶落后太多的副本时，三家都用快照打底（RDB、clone、分区日志拷贝），再用增量序列续传。快照决定同步的起始位置，有序重放保证此后每一步对齐。</p>
+<p>从相同状态出发，按相同顺序确定性地执行输入，副本才能得到相同状态。追赶落后较多的副本时，可以先建立数据基线，再传输后续变化：Redis 使用 RDB，MySQL 可以恢复备份或克隆数据，Kafka 获取分区保留日志及相关状态。基线与增量必须衔接到同一份历史，重放也要遵守相应的顺序和应用规则。</p>
 <h3 id="s244">启示二：位点是断点续传的基础</h3>
-<p>同步进度怎么表示，是这个机制要解决的头一个问题（三个软件的位点形态<a class="xref" href="#sec-9.5">见 9.5</a> 解读二）。没有位点，副本断了就无从续传；有了它，增量同步、故障恢复都成了对齐位点的简单操作。多份副本要对齐，靠的就是同一套度量标准。</p>
-<p>好的位点要满足三个条件：单调、持久、唯一，能比较前后大小，重启不丢，跨节点也不产生歧义。GTID 在这三点上做得最完整，是位点设计的一个参考实现；Redis 的复制偏移量和 Kafka 的偏移量则走了"够用就好"的路线。我自己设计同步系统时，会<strong>先把位点想清楚</strong>，其他问题也会随之清晰。</p>
+<p>同步进度怎么表示，是这个机制要解决的头一个问题（三个软件的位点形态<a class="xref" href="#sec-9.5">见 9.5</a> 解读二）。位点帮助副本找到续传起点；对应历史匹配、所需日志仍然保留时，系统才有条件补发缺少的部分。记录位点、保留日志和核对历史，需要一起设计。</p>
+<p>好的位点需要标清所属的日志或事务来源，能识别已经处理的范围，并在重启和切主后用于比对。GTID 用源节点 UUID 和事务序号标识事务，用集合记录已经执行的范围；不同源节点的 GTID 不构成一条全局递增序列。Redis 用 replid 配合复制偏移量标识复制流，Kafka 用分区、offset 与 leader epoch 识别日志位置及任期。我自己设计同步系统时，会<strong>先把位点想清楚</strong>，其他问题也会随之清晰。</p>
 <h3 id="s245">启示三：增量同步必须先解决断点续传</h3>
-<p>全量同步是兜底手段。它们都在"怎么让断线尽量走增量"上投入了大量设计：Redis 的 PSYNC2 + backlog、MySQL 的 GTID 自动定位、Kafka 的 offset + leader epoch 截断，都是为了在断线后精准补差，避免重头来过。</p>
-<p>原因在于全量同步代价巨大。Redis 全量要 fork（阻塞 + 内存风险），MySQL 的全量靠克隆或长 binlog 回放，Kafka 则要拷整个分区日志。频繁全量会拖垮主节点、消耗带宽、延长恢复时间。所以设计原则是：<strong>能增量就别全量</strong>，把全量降级为"实在没办法时的最后手段"。前提是位点经得起主节点切换、缓冲窗口足够覆盖常见断线时长。</p>
-<h3 id="s246">启示四：先定延迟预算，再定一致性档位</h3>
-<p>正如 9.5 解读三所说，三个软件在同一条延迟-一致性曲线上站在不同位置；<a class="xref" href="07-cluster.html">第 7 章</a>启示二从集群选型看过同一条谱线，这里把它落到复制设计的动作上。MySQL 的半同步超时参数（默认 10 秒）就是这条延迟预算的上限：等副本确认超过 10 秒，主节点就不再等待，降级回异步。我自己设计复制系统时，先问业务能承受多少额外确认往返：延迟预算定了，一致性档位自然就定了。</p>
+<p>全量同步是建立数据基线的一种手段。三个软件都在"怎么让断线尽量走增量"上投入了大量设计：Redis 的 PSYNC2 + backlog、MySQL 的 GTID 自动定位、Kafka 的 offset + leader epoch 检查，都是为了识别已有历史，补齐缺少的内容，避免不必要的重建。</p>
+<p>原因在于重建副本可能代价很大。Redis 全量同步需要 fork 和 RDB 传输；MySQL 可通过备份或克隆建立基线，再回放此后的 binlog；Kafka 需要取得分区保留范围内的日志及相关状态。频繁重建会消耗主节点资源和带宽，延长恢复时间。所以设计原则是：<strong>能增量就别全量</strong>。这要求复制历史能够核对，所需日志的保留窗口足够覆盖常见断线时间。</p>
+<h3 id="s246">启示四：把延迟预算与确认要求一起确定</h3>
+<p><a class="xref" href="07-cluster.html">第 7 章</a>从集群选型讨论过可用性和数据保留的取舍，这里把它落到复制设计上。MySQL 的半同步超时参数（默认 10 秒）限制的是副本确认等待；超时后降级为异步，它不是整个事务响应时间的上限。我自己设计复制系统时，会把保证与等待放在一起考虑：业务需要保留什么数据、允许看到多旧的结果，以及为这些保证能承受多少等待。确认条件无法满足时，还要明确是失败、继续等待，还是允许降级。</p>
 <h3 id="s247">启示五：故障恢复是同步的反向问题</h3>
-<p>同步把状态从主推到副本，故障恢复把落后的副本拉回一致。二者用的是同一套工具：日志、位点和截断规则都相同。Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，补差所需 binlog 已不可得才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</p>
-<p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础：只要保证日志可重放、位点可比对、截断有依据，恢复就能复用同步机制本身。反过来，如果你的同步机制在某些边界（比如脑裂、位点丢失）处理得不严谨，真到了故障时，出事的往往就是这些地方。</p>
+<p>同步传递持续发生的变化，恢复则需要先确认落后副本可以从哪里继续。二者会复用日志、位点和历史检查：Redis 故障转移后重连，用 PSYNC2 核对 replid 与 offset；MySQL 组复制成员按 GTID 补差，在日志不可用或达到配置阈值等条件下可选择克隆；Kafka 副本检查任期分叉，再继续 FETCH 追赶。</p>
+<p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础。日志能够重放、位点能够核对、分叉有处理依据，恢复就可以复用已有路径；实际恢复还需要可用的数据来源。反过来，同步机制没有处理好的历史冲突和日志缺失，往往也会在故障恢复时暴露出来。</p>
 <h3 id="s248">反模式提醒</h3>
-<p>三个常见的反模式，都是从正面启示的反面衍生出来的：</p>
-<ul><li><strong>同步链路过深致延迟累积</strong>：Redis 链式副本拉得太长、MySQL 级联复制层级太多，末端副本读到的是几个版本前的状态。我会控制拓扑深度，宁可主节点出口带宽多用一些，也不让延迟在链路上无限累积。</li><li><strong>位点丢失退化为全量同步</strong>：backlog 太小、relay log 被清、offset 元数据损坏：位点丢了，能增量的也只能退回全量。避免的方式是把位点当作一等公民来运维，监控它的健康度。</li><li><strong>忽视脑裂致数据分叉</strong>：老 Leader 复活没被正确截断，两个副本对同一区间有不同数据。没有 replid / GTID / leader epoch 这类权威归属标记，脑裂既无法检测也无法修复。</li></ul>
+<ul><li><strong>同步链路过深致延迟累积</strong>：Redis 链式副本拉得太长、MySQL 级联复制层级太多，末端副本读到的是几个版本前的状态。我会控制拓扑深度，宁可主节点出口带宽多用一些，也不让延迟在链路上无限累积。</li><li><strong>续传信息不足导致副本重建</strong>：backlog 太小、所需日志已被清理、位点元数据损坏，都可能使原有续传路径失效。位点记录与日志保留范围需要一起检查。</li><li><strong>忽视历史分叉导致数据冲突</strong>：旧副本带回不同历史中的日志，不能直接按相同位置继续拼接。replid、GTID、leader epoch 提供不同的历史或事务标识，还需要配合相应的核对、补差或截断规则。</li></ul>
 <h2 id="sec-9.7">9.7 小结</h2>
-<p>数据放一份不够，多份就要让它们看起来像一份：Redis 用命令流、MySQL 用 binlog event、Kafka 以有序消息为载体。形式不同，底层是同一个模型：状态机复制，保证相同输入序列、相同执行顺序，副本终将一致。</p>
-<p>共性框架只有四个部件：传播单元（传什么）、位点（传到哪了）、一致性参数（传到什么程度算数）、故障恢复（断了怎么续）。</p>
-<p>一致性不是要么有要么无，而是一连串档位上的取舍。这三个软件把档位做成了参数和默认值，让使用者按延迟预算选择。</p>
+<p>数据放一份不够，就需要说明多份数据怎样对齐：Redis 用命令流、MySQL 用 binlog event、Kafka 以分区日志消息为载体。状态机复制提供了一个理解框架：共同的初始状态、相同的有序输入和确定性执行，才能导出相同状态；具体系统还要落实日志保留与故障处理规则。</p>
+<p>本章围绕四个问题展开：传播单元（传什么）、传播方式（怎么传）、确认条件（传到什么程度才算数）、故障恢复（断了怎么续）。位点和历史标识贯穿其中，帮助副本记录进度、判断是否还能续传。</p>
+<p>确认、应用可见性和故障后的数据保留，分别有自己的条件。这三个软件通过协议、参数和默认值提供不同选择，需要与业务的等待预算和失败处理要求一起确定。</p>
 <p>导读里"缓存和数据库不一致时该以谁为准"的答案不在多副本，而在正本（source of truth）：数据库是正本、缓存是可重建的派生数据。</p>
 <p>本章的状态机复制和位点对齐，是<a class="xref" href="10-summary.html">第 10 章</a>规律五的核心印证。</p><nav class="page-nav"><a href="08-storage-format.html">← 第 8 章 磁盘存储格式 — 文件结构的设计哲学</a><a href="10-summary.html">第 10 章 总结：架构设计的共性规律与取舍 →</a></nav></article>
 </main>

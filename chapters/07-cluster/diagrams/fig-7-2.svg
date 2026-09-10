@@ -78,6 +78,6 @@
   <text x="525" y="478" font-size="12" fill="#374151">② 节点 B：此 key 已迁至节点 A，槽迁移未完成，返回：</text>
   <rect x="525" y="486" width="380" height="34" rx="4" fill="#F3F4F6" stroke="#6B7280"/>
   <text x="715" y="507" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#111827">-ASK 8000 节点A 地址:端口</text>
-  <text x="525" y="540" font-size="12" fill="#374151">③ 客户端临时重定向，并带 ASKING 打开 A</text>
+  <text x="525" y="540" font-size="12" fill="#374151">③ 客户端向 A 发送 ASKING，再重发本次请求</text>
   <text x="525" y="560" font-size="12" font-style="italic" fill="#059669">语义：一次性重定向 · 不更新本地表</text>
 </svg>

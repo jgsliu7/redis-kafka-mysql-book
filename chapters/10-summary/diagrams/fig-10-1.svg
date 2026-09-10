@@ -11,7 +11,7 @@
 
   <!-- ============ 列标题 ============ -->
   <text x="255" y="64" text-anchor="middle" font-size="15" font-weight="700" fill="#374151">处理器：硬件的存储层次</text>
-  <text x="665" y="64" text-anchor="middle" font-size="15" font-weight="700" fill="#374151">存储系统：软件的对应分层</text>
+  <text x="665" y="64" text-anchor="middle" font-size="15" font-weight="700" fill="#374151">三个软件：内存与磁盘的分工</text>
   <text x="665" y="84" text-anchor="middle" font-size="11.5" fill="#6B7280"><tspan fill="#4F46E5">Redis</tspan> · <tspan fill="#D97706">MySQL</tspan> · <tspan fill="#059669">Kafka</tspan> 在内存与磁盘之间</text>
 
   <!-- ============ 左列：处理器（上快下慢，框逐级变宽变深） ============ -->
@@ -22,7 +22,7 @@
   <!-- 行2 L1/L2 缓存：宽 250 -->
   <rect x="130" y="164" width="250" height="68" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.4"/>
   <text x="255" y="192" text-anchor="middle" font-size="13.5" font-weight="700" fill="#111827">L1 / L2 缓存</text>
-  <text x="255" y="212" text-anchor="middle" font-size="11" fill="#4B5563">核心私有，挡在内存之前</text>
+  <text x="255" y="212" text-anchor="middle" font-size="11" fill="#4B5563">缓存近期访问的数据</text>
 
   <!-- 行3 内存：宽 290 -->
   <rect x="110" y="248" width="290" height="84" rx="6" fill="#E5E7EB" stroke="#6B7280" stroke-width="1.4"/>
@@ -37,7 +37,7 @@
 
   <!-- ============ 右列：存储系统（行高与左列对齐，行1 空缺） ============ -->
   <!-- 行1 空缺说明 -->
-  <text x="665" y="127" text-anchor="middle" font-size="11" fill="#9CA3AF">（软件一侧没有对应层）</text>
+  <text x="665" y="127" text-anchor="middle" font-size="11" fill="#9CA3AF">（按职责对照，不是逐层缓存）</text>
 
   <!-- 行2 进程内缓存 / 缓冲池：MySQL 琥珀，宽 250 -->
   <rect x="540" y="164" width="250" height="68" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.4"/>
@@ -58,7 +58,7 @@
 
   <!-- ============ 中间：同高度层的对应关系（虚线 + 层名） ============ -->
   <line x1="380" y1="198" x2="540" y2="198" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3"/>
-  <text x="460" y="190" text-anchor="middle" font-size="11" fill="#6B7280">缓存层</text>
+  <text x="460" y="190" text-anchor="middle" font-size="11" fill="#6B7280">缓存作用</text>
   <line x1="400" y1="290" x2="520" y2="290" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3"/>
   <text x="460" y="282" text-anchor="middle" font-size="11" fill="#6B7280">内存层</text>
   <line x1="420" y1="402" x2="500" y2="402" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3"/>
@@ -69,7 +69,5 @@
   <text x="54" y="88" text-anchor="middle" font-size="11.5" fill="#374151">更快 · 更小</text>
   <text x="54" y="470" text-anchor="middle" font-size="11.5" fill="#374151">更慢 · 更大</text>
 
-  <line x1="866" y1="102" x2="866" y2="450" stroke="#6B7280" stroke-width="1.4" marker-start="url(#arrowGray)" marker-end="url(#arrowGray)"/>
-  <text x="866" y="88" text-anchor="middle" font-size="11.5" fill="#374151">更快 · 更小</text>
-  <text x="866" y="470" text-anchor="middle" font-size="11.5" fill="#374151">更慢 · 更大</text>
+
 </svg>

@@ -8,16 +8,16 @@
 
   <!-- ============ 起点 ============ -->
   <rect x="310" y="24" width="300" height="56" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
-  <text x="460" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">起点：你的数据怎么被访问？</text>
-  <text x="460" y="68" text-anchor="middle" font-size="11" fill="#374151">逐层回答判断题，再选结构</text>
+  <text x="460" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">本章三个样本的存储选择</text>
+  <text x="460" y="68" text-anchor="middle" font-size="11" fill="#374151">按主要持久化与访问需求归类</text>
 
   <!-- 边1: 起点 → Q1 -->
   <path d="M 460 80 L 460 110" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
   <!-- ============ Q1 第一问: 会不会原地改 ============ -->
   <polygon points="460,112 610,164 460,216 310,164" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="460" y="154" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">数据会被原地改吗？</text>
-  <text x="460" y="172" text-anchor="middle" font-size="10" fill="#374151">（最根本的分叉）</text>
+  <text x="460" y="154" text-anchor="middle" font-size="12" font-weight="700" fill="#D97706">需要更新磁盘中的已有记录？</text>
+  <text x="460" y="172" text-anchor="middle" font-size="10" fill="#374151">（本章页式样本）</text>
 
   <!-- 边2: Q1 是（事务改）→ 直达页式范式，进框顶 x=150 -->
   <path d="M 310 164 L 150 164 L 150 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
@@ -29,8 +29,8 @@
 
   <!-- ============ Q2a 第二问之一: 随机定位（页式家族） ============ -->
   <polygon points="770,250 900,300 770,350 640,300" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
-  <text x="770" y="292" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">随机定位要快？</text>
-  <text x="770" y="310" text-anchor="middle" font-size="10" fill="#374151">（定长页 + 索引）</text>
+  <text x="770" y="292" text-anchor="middle" font-size="11" font-weight="700" fill="#D97706">需要按索引读写数据页？</text>
+  <text x="770" y="310" text-anchor="middle" font-size="10" fill="#374151">（页式访问需求）</text>
 
   <!-- 边4: Q2a 是 → 页式范式，第二条入边进框顶 x=220（与边2的 x=150 错开） -->
   <path d="M 640 300 L 220 300 L 220 558" stroke="#4B5563" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
@@ -42,7 +42,7 @@
 
   <!-- ============ Q2b 第二问之二: 批量流式（日志家族） ============ -->
   <polygon points="770,406 900,456 770,506 640,456" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
-  <text x="770" y="448" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">批量流式进出？</text>
+  <text x="770" y="448" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">主要供业务顺序消费？</text>
   <text x="770" y="466" text-anchor="middle" font-size="10" fill="#374151">（日志 vs 快照）</text>
 
   <!-- 边6: Q2b 是 → 追加日志范式 -->
@@ -63,12 +63,12 @@
   <rect x="350" y="560" width="240" height="80" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="470" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">追加日志范式（Kafka）</text>
   <text x="470" y="605" text-anchor="middle" font-size="10" fill="#374151">RecordBatch 变长</text>
-  <text x="470" y="621" text-anchor="middle" font-size="10" fill="#374151">纯追加 + 稀疏索引随机读</text>
+  <text x="470" y="621" text-anchor="middle" font-size="10" fill="#374151">顺序追加 + 稀疏索引随机读</text>
   <text x="470" y="635" text-anchor="middle" font-size="10" fill="#374151">compaction / retention 间接清理</text>
 
   <rect x="660" y="560" width="220" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="770" y="585" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">快照范式（Redis）</text>
-  <text x="770" y="605" text-anchor="middle" font-size="10" fill="#374151">RDB 紧凑二进制 + AOF 增量</text>
+  <text x="770" y="605" text-anchor="middle" font-size="10" fill="#374151">RDB 快照 / AOF 日志</text>
   <text x="770" y="621" text-anchor="middle" font-size="10" fill="#374151">内存才是主存储，磁盘是恢复副本</text>
   <text x="770" y="635" text-anchor="middle" font-size="10" fill="#374151">全量重写，不支持随机改</text>
 

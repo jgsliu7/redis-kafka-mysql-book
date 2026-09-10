@@ -28,7 +28,7 @@
   <!-- Three listeners on the Broker (middle column) -->
   <!-- Broker container -->
   <rect x="290" y="80" width="320" height="420" rx="10" fill="#F9FAFB" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="450" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">同一个 Broker 进程</text>
+  <text x="450" y="104" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">同一个 Broker / Controller 进程</text>
   <text x="450" y="121" text-anchor="middle" font-size="11" fill="#374151">listeners + listener.security.protocol.map</text>
 
   <!-- Listener 1: INTERNAL (SASL_SSL) -->

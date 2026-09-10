@@ -27,7 +27,7 @@
   <line x1="180" y1="168" x2="180" y2="186" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="55" y="186" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="205" text-anchor="middle" font-size="12" fill="#374151">从节点标记 PFAIL（主观下线）</text>
+  <text x="180" y="205" text-anchor="middle" font-size="12" fill="#374151">节点标记 PFAIL（疑似故障）</text>
   <text x="180" y="221" text-anchor="middle" font-size="11" fill="#6B7280">Gossip PING/PONG 携带标记</text>
 
   <line x1="180" y1="230" x2="180" y2="248" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
@@ -39,8 +39,8 @@
   <line x1="180" y1="292" x2="180" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
 
   <rect x="55" y="310" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5"/>
-  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">凑不齐多数派票？→ 槽暂不可用</text>
-  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（从节点发起选举拉票，宁可拒写不双主）</text>
+  <text x="180" y="329" text-anchor="middle" font-size="12" fill="#374151">提升新主需要多数派授权</text>
+  <text x="180" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（票数不足时不能提升新主）</text>
 
   <line x1="180" y1="354" x2="180" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
@@ -52,7 +52,7 @@
 
   <rect x="55" y="434" width="250" height="44" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
   <text x="180" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">升级新主 + Gossip 广播新拓扑</text>
-  <text x="180" y="469" text-anchor="middle" font-size="11" fill="#374151">最终一致 · 客户端经 MOVED 重连</text>
+  <text x="180" y="469" text-anchor="middle" font-size="11" fill="#374151">传播新槽归属 · 客户端更新路由</text>
 
   <!-- Redis trait -->
   <rect x="55" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
@@ -80,26 +80,26 @@
   <line x1="470" y1="292" x2="470" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
 
   <rect x="345" y="310" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
-  <text x="470" y="329" text-anchor="middle" font-size="12" fill="#374151">少数派？→ 直接停止服务</text>
-  <text x="470" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（CP 宁可不可用也不脑裂）</text>
+  <text x="470" y="329" text-anchor="middle" font-size="12" fill="#374151">无多数派？→ 组内写入无法继续</text>
+  <text x="470" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（读取仍可能返回陈旧数据）</text>
 
   <line x1="470" y1="354" x2="470" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="345" y="372" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="470" y="391" text-anchor="middle" font-size="12" fill="#374151">多数派达成 → 新视图生效</text>
-  <text x="470" y="407" text-anchor="middle" font-size="11" fill="#6B7280">自动选 Primary + GTID 对齐</text>
+  <text x="470" y="407" text-anchor="middle" font-size="11" fill="#6B7280">单主模式下按需选新 Primary</text>
 
   <line x1="470" y1="416" x2="470" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="345" y="434" width="250" height="44" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
   <text x="470" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">新 Primary 提供读写服务</text>
-  <text x="470" y="469" text-anchor="middle" font-size="11" fill="#374151">强一致 · 写延迟含多数派往返</text>
+  <text x="470" y="469" text-anchor="middle" font-size="11" fill="#374151">组内排序与认证 · 应用等待可配置</text>
 
   <!-- MySQL trait -->
   <rect x="345" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
   <text x="470" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
   <text x="470" y="540" text-anchor="middle" font-size="11" fill="#374151">共识驱动 · View Change 原子</text>
-  <text x="470" y="556" text-anchor="middle" font-size="11" fill="#374151">强一致 · 少数派停服</text>
+  <text x="470" y="556" text-anchor="middle" font-size="11" fill="#374151">少数派无法确认新的组内写入</text>
 
   <!-- ===== Kafka flow ===== -->
   <rect x="635" y="120" width="250" height="48" rx="6" fill="#ECFDF5" stroke="#059669"/>
@@ -121,30 +121,30 @@
   <line x1="760" y1="292" x2="760" y2="310" stroke="#EF4444" stroke-width="1.8" marker-end="url(#arrow-red)"/>
 
   <rect x="635" y="310" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="329" text-anchor="middle" font-size="12" fill="#374151">ISR 为空？→ 等待 / 选非 ISR</text>
-  <text x="760" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（unclean.leader.election 可配丢数据）</text>
+  <text x="760" y="329" text-anchor="middle" font-size="12" fill="#374151">无可用 ISR？→ 默认等待恢复</text>
+  <text x="760" y="345" text-anchor="middle" font-size="11" fill="#EF4444">（可配置 unclean 选举，但有丢失风险）</text>
 
   <line x1="760" y1="354" x2="760" y2="372" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="635" y="372" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669"/>
-  <text x="760" y="398" text-anchor="middle" font-size="12" fill="#374151">从 ISR 中选首位副本为新 Leader</text>
+  <text x="760" y="398" text-anchor="middle" font-size="12" fill="#374151">默认从可用 ISR 副本中选新 Leader</text>
 
   <line x1="760" y1="416" x2="760" y2="434" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
 
   <rect x="635" y="434" width="250" height="44" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
   <text x="760" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">更新元数据 + 通知生产/消费者</text>
-  <text x="760" y="469" text-anchor="middle" font-size="11" fill="#374151">ISR 内选举 · 已确认消息不丢</text>
+  <text x="760" y="469" text-anchor="middle" font-size="11" fill="#374151">数据保留还依赖确认与副本存活条件</text>
 
   <!-- Kafka trait -->
   <rect x="635" y="500" width="250" height="62" rx="6" fill="#F9FAFB" stroke="#6B7280" stroke-dasharray="4,3"/>
   <text x="760" y="522" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">决策特点</text>
   <text x="760" y="540" text-anchor="middle" font-size="11" fill="#374151">集中仲裁 · Controller 单点决策</text>
-  <text x="760" y="556" text-anchor="middle" font-size="11" fill="#374151">毫秒级恢复 · ISR 保不丢</text>
+  <text x="760" y="556" text-anchor="middle" font-size="11" fill="#374151">恢复时间取决于检测与选举过程</text>
 
   <!-- ===== Bottom summary ===== -->
   <line x1="40" y1="590" x2="900" y2="590" stroke="#E5E7EB" stroke-width="1"/>
   <text x="470" y="615" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">
-    红色箭头标注的是“放弃可用性以保一致性”的取舍节点
+    红色箭头标注故障转移或继续写入受限的条件
   </text>
   <text x="470" y="637" text-anchor="middle" font-size="11" fill="#9CA3AF">注：Controller 自身的 Leader 选举（KRaft）与 Partition 的 Leader 选举是两套独立机制</text>
 </svg>

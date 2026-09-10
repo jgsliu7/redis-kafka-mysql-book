@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "changedIndexEntries": [
+    "dist/chapters/00-preface.html",
+    "dist/chapters/01-introduction.html",
+    "dist/chapters/02-data-structures-protocols.html",
+    "dist/chapters/03-lifecycle.html",
+    "dist/chapters/04-memory-disk.html",
+    "dist/chapters/05-layered-architecture.html",
+    "dist/chapters/06-security.html",
+    "dist/chapters/07-cluster.html",
+    "dist/chapters/08-storage-format.html",
+    "dist/chapters/09-data-sync.html",
+    "dist/chapters/10-epilogue.html",
+    "dist/chapters/10-summary.html",
+    "dist/chapters/11-references.html",
+    "架构之道.html"
+  ],
+  "unexpectedIndexChanges": [],
+  "outputFilesSyncedToIndex": 15,
+  "otherIndexEntriesPreserved": 795,
+  "commitCreated": false,
+  "pushed": false
+}

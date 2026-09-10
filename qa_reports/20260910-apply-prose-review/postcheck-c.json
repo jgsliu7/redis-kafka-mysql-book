@@ -1,0 +1,1246 @@
+{
+  "reviewer": "C",
+  "passed": true,
+  "checks": [
+    {
+      "id": "001",
+      "file": "chapters/00-preface.md",
+      "currentLine": 3,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "002",
+      "file": "chapters/00-preface.md",
+      "currentLine": 5,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "003",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 25,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "004",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 34,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "005",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 66,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "006",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 96,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "007",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 130,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "008",
+      "file": "chapters/01-introduction/chapter.md",
+      "currentLine": 192,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "009",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 22,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "010",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 41,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "011",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 43,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "012",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 58,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "013",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 78,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "014",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 100,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "015",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 134,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "016",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 160,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "017",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 193,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "018",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 201,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "019",
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "currentLine": 225,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "020",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 41,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "021",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 50,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "022",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 61,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "023",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 137,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "024",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 167,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "025",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 227,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "026",
+      "file": "chapters/03-lifecycle/chapter.md",
+      "currentLine": 243,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "027",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 17,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "028",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 45,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "029",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 184,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "030",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 204,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "031",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 264,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "032",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 274,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "033",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 278,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "034",
+      "file": "chapters/04-memory-disk/chapter.md",
+      "currentLine": 306,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "035",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 9,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "036",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 31,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "037",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 102,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "038",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 110,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "039",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 116,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "040",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 137,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "041",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 147,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "042",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 162,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "043",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 271,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "044",
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "currentLine": 277,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "045",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 7,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "046",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 19,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "047",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 46,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "048",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 76,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "049",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 87,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "050",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 91,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "051",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 97,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "052",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 133,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "053",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 163,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "054",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 167,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "055",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 195,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "056",
+      "file": "chapters/06-security/chapter.md",
+      "currentLine": 211,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "057",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 84,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "058",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 111,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "059",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 119,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "060",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 180,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "061",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 207,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "062",
+      "file": "chapters/07-cluster/chapter.md",
+      "currentLine": 218,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "063",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 7,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "064",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 35,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "065",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 73,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "066",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 95,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "067",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 224,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "068",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 327,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "069",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 340,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "070",
+      "file": "chapters/08-storage-format/chapter.md",
+      "currentLine": 344,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "071",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 13,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "072",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 23,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "073",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 27,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "074",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 103,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "075",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 200,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "076",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 241,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "077",
+      "file": "chapters/09-data-sync/chapter.md",
+      "currentLine": 264,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "078",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 11,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "079",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 53,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "080",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 63,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "081",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 86,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "082",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 125,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "083",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 173,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "084",
+      "file": "chapters/10-summary/chapter.md",
+      "currentLine": 197,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "085",
+      "file": "chapters/10-epilogue.md",
+      "currentLine": 29,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "086",
+      "file": "chapters/10-epilogue.md",
+      "currentLine": 51,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    },
+    {
+      "id": "087",
+      "file": "chapters/11-references.md",
+      "currentLine": 37,
+      "revisedMatchCount": 1,
+      "exactApprovedTextPresent": true,
+      "sourceSemanticAccepted": true,
+      "singlePageContainsCompleteRevisedText": true,
+      "chapterPageContainsCompleteRevisedText": true,
+      "notes": "当前落稿完整句段已逐条复读，含范围内未改句；与已审定版本一致，未发现条件、技术对象、作者判断力度或相邻建议的冲突。"
+    }
+  ],
+  "errors": [],
+  "sourceChecks": [
+    {
+      "file": "chapters/00-preface.md",
+      "sha256": "d0a4b6bc66966faec7903f587884cff5a7eb6250ab135105f186893cfc70a5ef",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/00-preface.html"
+    },
+    {
+      "file": "chapters/01-introduction/chapter.md",
+      "sha256": "81b2e93301f49458dc30953c7b79085c9eac6bccb771cef913492cbc2bae1b8a",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/01-introduction.html"
+    },
+    {
+      "file": "chapters/02-data-structures-protocols/chapter.md",
+      "sha256": "54c77599d78fe1c939b784c9ecba0329991297dbb0a94eb81490933f6d20db87",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/02-data-structures-protocols.html"
+    },
+    {
+      "file": "chapters/03-lifecycle/chapter.md",
+      "sha256": "2b4bef57dec95585163925362b5c075d569bf989e9fd1381258cbd381820321a",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/03-lifecycle.html"
+    },
+    {
+      "file": "chapters/04-memory-disk/chapter.md",
+      "sha256": "2cd10530647f32a6cdbee1f24b5a049a1d36604d18d34e9953207b825f771269",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/04-memory-disk.html"
+    },
+    {
+      "file": "chapters/05-layered-architecture/chapter.md",
+      "sha256": "baed07b99217e30090ac86994ebf903ac5284fd949d446e284cdf6d46a3f91de",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/05-layered-architecture.html"
+    },
+    {
+      "file": "chapters/06-security/chapter.md",
+      "sha256": "90844e63811550da4035e91e63bb86d48781669ec2e5a0f1eab1f1d69539bfd1",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/06-security.html"
+    },
+    {
+      "file": "chapters/07-cluster/chapter.md",
+      "sha256": "1db53f69eb59820fa4016b64bdf2ac8eb6579769e89732953cda014d2d0c1b62",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/07-cluster.html"
+    },
+    {
+      "file": "chapters/08-storage-format/chapter.md",
+      "sha256": "f92222b14df595453ab80e5880143a409c80f81bad97fafb7043d3234d6da629",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/08-storage-format.html"
+    },
+    {
+      "file": "chapters/09-data-sync/chapter.md",
+      "sha256": "7a85f7ecba884b9997ffd6793472e7edf9e7042357d977394a34ace1923032c8",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/09-data-sync.html"
+    },
+    {
+      "file": "chapters/10-summary/chapter.md",
+      "sha256": "a5b391b2a2ede6f88754c5c56713dd7369960aec18c58a661d67fc7ffa04f816",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/10-summary.html"
+    },
+    {
+      "file": "chapters/10-epilogue.md",
+      "sha256": "a437b01140ba74dd0ad449190abc0de2b7e631337ae12b5a8232e949ee8980fe",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/10-epilogue.html"
+    },
+    {
+      "file": "chapters/11-references.md",
+      "sha256": "a776ae5522d30baf74b70e534ee18d7efe71f82657b7e137d5fd6ba98c210092",
+      "exactExpectedSourceBytes": true,
+      "singleAndPagedFullVisibleTextEqual": true,
+      "page": "dist/chapters/11-references.html"
+    }
+  ],
+  "semanticSummary": {
+    "appliedPassagesReadInFull": 87,
+    "mergeAndAdjacentContextRead": [
+      "012",
+      "026",
+      "030",
+      "036",
+      "037",
+      "039",
+      "041",
+      "044",
+      "055",
+      "068",
+      "069",
+      "080",
+      "086"
+    ],
+    "scope": "指定87项落稿范围逐条复读，删并范围里的存量句也重读，并核实际邻接语境；没有扩展为新全书审稿或新增技术结论。",
+    "noNewConflictsFound": true
+  },
+  "protectedFiles": {
+    "baselineFilesChecked": 877,
+    "changedFiles": [
+      "chapters/00-preface.md",
+      "chapters/01-introduction/chapter.md",
+      "chapters/02-data-structures-protocols/chapter.md",
+      "chapters/03-lifecycle/chapter.md",
+      "chapters/04-memory-disk/chapter.md",
+      "chapters/05-layered-architecture/chapter.md",
+      "chapters/06-security/chapter.md",
+      "chapters/07-cluster/chapter.md",
+      "chapters/08-storage-format/chapter.md",
+      "chapters/09-data-sync/chapter.md",
+      "chapters/10-epilogue.md",
+      "chapters/10-summary/chapter.md",
+      "chapters/11-references.md",
+      "dist/chapters/00-preface.html",
+      "dist/chapters/01-introduction.html",
+      "dist/chapters/02-data-structures-protocols.html",
+      "dist/chapters/03-lifecycle.html",
+      "dist/chapters/04-memory-disk.html",
+      "dist/chapters/05-layered-architecture.html",
+      "dist/chapters/06-security.html",
+      "dist/chapters/07-cluster.html",
+      "dist/chapters/08-storage-format.html",
+      "dist/chapters/09-data-sync.html",
+      "dist/chapters/10-epilogue.html",
+      "dist/chapters/10-summary.html",
+      "dist/chapters/11-references.html",
+      "qa/build-audit.json",
+      "qa/content-audit.json",
+      "qa/pages-audit.json",
+      "架构之道.html"
+    ],
+    "unexpectedChanges": [],
+    "missingFiles": [],
+    "outlineAndSvgAndOtherSourceDocsUnchanged": true,
+    "priorSuggestionReportUnchanged": {
+      "review-data.json": true,
+      "index.html": true,
+      "selection-log.json": true
+    },
+    "indexState": "未评判或修改git index；按根调度指令由其在暂存HTML后独立对比index-before。"
+  },
+  "buildValidation": {
+    "auditOutputsPassed": true,
+    "auditFiles": {
+      "build-audit": {
+        "label": "single",
+        "pages": {
+          "架构之道.html": 480
+        },
+        "xrefs_linked": 180,
+        "xrefs_unresolved": {},
+        "broken_anchors": 0,
+        "external_resources": 0
+      },
+      "pages-audit": {
+        "label": "paged",
+        "pages": {
+          "index.html": 2,
+          "chapters/00-preface.html": 3,
+          "chapters/01-introduction.html": 33,
+          "chapters/02-data-structures-protocols.html": 41,
+          "chapters/03-lifecycle.html": 45,
+          "chapters/04-memory-disk.html": 52,
+          "chapters/05-layered-architecture.html": 50,
+          "chapters/06-security.html": 40,
+          "chapters/07-cluster.html": 43,
+          "chapters/08-storage-format.html": 61,
+          "chapters/09-data-sync.html": 72,
+          "chapters/10-summary.html": 31,
+          "chapters/10-epilogue.html": 6,
+          "chapters/11-references.html": 14
+        },
+        "xrefs_linked": 180,
+        "xrefs_unresolved": {},
+        "broken_anchors": 0,
+        "external_resources": 0
+      },
+      "content-audit": {
+        "chapters": {
+          "chapters/00-preface.md": {
+            "hanzi_md": 1595,
+            "hanzi_html": 1595
+          },
+          "chapters/01-introduction/chapter.md": {
+            "hanzi_md": 7465,
+            "hanzi_html": 7465
+          },
+          "chapters/02-data-structures-protocols/chapter.md": {
+            "hanzi_md": 8180,
+            "hanzi_html": 8180
+          },
+          "chapters/03-lifecycle/chapter.md": {
+            "hanzi_md": 8610,
+            "hanzi_html": 8610
+          },
+          "chapters/04-memory-disk/chapter.md": {
+            "hanzi_md": 10777,
+            "hanzi_html": 10777
+          },
+          "chapters/05-layered-architecture/chapter.md": {
+            "hanzi_md": 10691,
+            "hanzi_html": 10691
+          },
+          "chapters/06-security/chapter.md": {
+            "hanzi_md": 8121,
+            "hanzi_html": 8121
+          },
+          "chapters/07-cluster/chapter.md": {
+            "hanzi_md": 11218,
+            "hanzi_html": 11218
+          },
+          "chapters/08-storage-format/chapter.md": {
+            "hanzi_md": 13113,
+            "hanzi_html": 13113
+          },
+          "chapters/09-data-sync/chapter.md": {
+            "hanzi_md": 11303,
+            "hanzi_html": 11303
+          },
+          "chapters/10-summary/chapter.md": {
+            "hanzi_md": 7826,
+            "hanzi_html": 7826
+          },
+          "chapters/10-epilogue.md": {
+            "hanzi_md": 1574,
+            "hanzi_html": 1574
+          },
+          "chapters/11-references.md": {
+            "hanzi_md": 1909,
+            "hanzi_html": 1909
+          }
+        },
+        "unreferenced_svgs": [],
+        "figure_gaps": {},
+        "ok": true
+      }
+    },
+    "renderedChapterCount": 13,
+    "pagedHtmlFilesIncludingIndex": 14,
+    "completeRevisedTextsInBothBuilds": 87,
+    "wholeChapterVisibleTextEqualAcrossBuilds": 13,
+    "indexLinksAll13Pages": true,
+    "duplicateIds": [],
+    "brokenLocalLinksOrAnchors": [],
+    "externalResources": [],
+    "singleHtmlSha256": "410242007ec5422d3956aac409473591df5db95f99753581223f23fc9258c1b0",
+    "singleHtmlBytes": 807717,
+    "pagedHtmlHashes": {
+      "dist/chapters/00-preface.html": "616d7c023597102a000d22f352d51c35fc6665d69dcf815e1df24cf5bcbe732a",
+      "dist/chapters/01-introduction.html": "b971ae5dec8bbc475268f16e7c11fd264712feac0171ff4c8e484a79a6505f5c",
+      "dist/chapters/02-data-structures-protocols.html": "8cbc34f26522ca531bae9ad77b3c1a43ea6f7a65417a83df0f74eb80ac33e7fd",
+      "dist/chapters/03-lifecycle.html": "3167878cc2ddd2462e5405580de8e213774b3cfd2271acda859a01a226467dab",
+      "dist/chapters/04-memory-disk.html": "49a8b216b2589450d4c0d830291f2e2ec2473e7344976b7709ca79c8ebaa6aad",
+      "dist/chapters/05-layered-architecture.html": "52029a93a423e2eb91dd15554a3a0e48a2556c2489cde09b8e5ca45c7cebb237",
+      "dist/chapters/06-security.html": "96682120322018dea7fd96828c61d93ada313b6c8a7e4b5b23bf7495fb3f5466",
+      "dist/chapters/07-cluster.html": "3b14557841cdc3d4e4752190d2da831dd338b7349b0b88ae96f01709871c5141",
+      "dist/chapters/08-storage-format.html": "6c10413ad7bd9ce760ec010687ac7d632ac2f02c2f9a2f6d50da5cdbfd26199d",
+      "dist/chapters/09-data-sync.html": "8f5db5ef757a8091f518b5858f00eb7372531252188fb2cf87412a08eb7084b2",
+      "dist/chapters/10-epilogue.html": "6a02d4b026709f301ec2a0f08c2a213ae500d8df8b9f4b9e8eacb1e27d6c3b3b",
+      "dist/chapters/10-summary.html": "6d1a4bf9750b8b5b27a3e91ad88f0e3119aa2cdcf08fae5d7bf9998e8c722de7",
+      "dist/chapters/11-references.html": "8dbc3b4d560032578772a46ce9ad4b219efe913425ffd6f3d43425dfc0422dd9",
+      "dist/index.html": "9bcaca110934dc4dada176068e2bf6d3044cfbae71c7aa7e5d2ea2fd4fdf3d8e"
+    },
+    "wholeChapterComparisonMethod": "逐章比较单页section.chapter与分页article.chapter的完整解码文本（含数字/拉丁/标点/SVG文字），仅排除分页版额外的nav.page-nav导航文字并归一化排版空白；13/13相等。代码内容另由check_content.py逐条核验。"
+  },
+  "checkedAt": "2026-09-09T23:43:36.600766+00:00"
+}

@@ -29,7 +29,7 @@
   <rect x="450" y="150" width="220" height="30" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="560" y="170" text-anchor="middle" font-size="11.5" fill="#374151">RDB / AOF（恢复副本：崩溃后重建内存）</text>
 
-  <text x="685" y="170" font-size="12" fill="#374151">磁盘占比小</text>
+  <text x="685" y="170" font-size="12" fill="#374151">持久化与恢复</text>
 
   <!-- ============ MySQL row ============ -->
   <rect x="40" y="230" width="120" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
@@ -45,7 +45,7 @@
   <text x="560" y="262" text-anchor="middle" font-size="13" font-weight="600" fill="#D97706">表空间 .ibd（正本）</text>
   <text x="560" y="282" text-anchor="middle" font-size="11" fill="#374151">16KB 页 · B+ 树 · 原地改</text>
 
-  <text x="685" y="270" font-size="12" fill="#374151">内存占比小</text>
+  <text x="685" y="270" font-size="12" fill="#374151">缓冲池缓存页</text>
 
   <!-- sync arrow MySQL mem<->disk -->
   <line x1="410" y1="265" x2="450" y2="265" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
@@ -65,8 +65,8 @@
   <text x="560" y="362" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">日志段 .log（唯一正本）</text>
   <text x="560" y="382" text-anchor="middle" font-size="11" fill="#374151">纯追加 · 稀疏索引随机读</text>
 
-  <text x="685" y="370" font-size="12" fill="#374151">磁盘就是全部</text>
+  <text x="685" y="370" font-size="12" fill="#374151">日志持久保存</text>
 
   <!-- footnote -->
-  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框大小示意数据主存储的权重</text>
+  <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框区分存储职责，不表示容量比例</text>
 </svg>

@@ -13,8 +13,8 @@
 
   <!-- Phase labels -->
   <text x="160" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">① 本地热段</text>
-  <text x="440" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">② 段关闭 → 异步上传</text>
-  <text x="720" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">③ 远程存储 + 本地可选</text>
+  <text x="440" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">② 段关闭且稳定 → 上传</text>
+  <text x="720" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#4F46E5">③ 远程已存，本地按策略保留</text>
 
   <!-- ===== Phase 1: Local hot segments ===== -->
   <rect x="40" y="90" width="240" height="100" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
@@ -35,8 +35,8 @@
   <rect x="340" y="90" width="200" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
   <text x="440" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">RemoteStorageManager</text>
   <text x="440" y="140" text-anchor="middle" font-size="12" fill="#374151">异步上传 S3/GCS/Azure</text>
-  <text x="440" y="160" text-anchor="middle" font-size="11" fill="#6B7280">格式不变 · 三个文件原样传输</text>
-  <text x="440" y="180" text-anchor="middle" font-size="11" fill="#6B7280">本地可保留可丢弃</text>
+  <text x="440" y="160" text-anchor="middle" font-size="11" fill="#6B7280">上传日志、索引及辅助状态</text>
+  <text x="440" y="180" text-anchor="middle" font-size="11" fill="#6B7280">上传完成后才可清理本地</text>
 
   <!-- Arrow 2->3 -->
   <line x1="540" y1="140" x2="590" y2="140" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -55,7 +55,7 @@
   <!-- ===== Read path (bottom) ===== -->
   <rect x="40" y="250" width="810" height="32" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
   <text x="445" y="271" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">读取路径：消费者请求 → 先查本地 → 未命中则回源远程流式读取</text>
-  <text x="445" y="298" text-anchor="middle" font-size="11" fill="#6B7280">副本同步不走此路径：Follower 拉取始终由 Leader 本地日志服务</text>
+  <text x="445" y="298" text-anchor="middle" font-size="11" fill="#6B7280">Follower 从本地日志拉取消息；必要时从远程恢复辅助状态</text>
 
   <!-- Arrow from read path to local -->
   <line x1="120" y1="250" x2="120" y2="195" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
@@ -68,6 +68,6 @@
   <!-- ===== Key insight box ===== -->
   <rect x="40" y="310" width="810" height="70" rx="8" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5"/>
   <text x="445" y="336" text-anchor="middle" font-size="13" font-weight="700" fill="#92400E">核心取舍</text>
-  <text x="445" y="358" text-anchor="middle" font-size="12" fill="#374151">格式不变 · 介质解耦 · 上层感知不到</text>
-  <text x="445" y="376" text-anchor="middle" font-size="11" fill="#6B7280">冷数据延迟：毫秒级（磁盘/PageCache）→ 数十毫秒级（对象存储 GET）</text>
+  <text x="445" y="358" text-anchor="middle" font-size="12" fill="#374151">日志格式复用 · 客户端仍按 offset 读取</text>
+  <text x="445" y="376" text-anchor="middle" font-size="11" fill="#6B7280">远程读取增加网络与存储访问，延迟取决于缓存、后端与负载</text>
 </svg>
