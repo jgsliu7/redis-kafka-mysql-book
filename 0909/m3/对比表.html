@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0909 m3 出版审查对比表</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f5f5f4; color: #1f2937; margin: 0; padding: 0; line-height: 1.6;
+}
+header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: white; padding: 32px 40px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+header h1 { margin: 0 0 8px 0; font-size: 28px; }
+header .meta { font-size: 14px; color: #cbd5e1; }
+.container { max-width: 1600px; margin: 0 auto; padding: 32px 24px; }
+.filter-bar {
+  background: white; border-radius: 12px; padding: 16px 24px;
+  margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+}
+.filter-bar label { font-weight: 600; color: #475569; font-size: 14px; }
+.filter-bar select, .filter-bar input {
+  padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px;
+  font-size: 14px; background: white;
+}
+.filter-bar input { min-width: 200px; }
+.legend {
+  background: #fef3c7; border-left: 4px solid #f59e0b;
+  padding: 16px 24px; margin-bottom: 24px; border-radius: 4px; font-size: 14px;
+}
+.section-title {
+  font-size: 22px; font-weight: 700; margin: 32px 0 16px 0;
+  padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; color: #1e293b;
+}
+.section-title .badge {
+  display: inline-block; background: #ef4444; color: white;
+  padding: 2px 10px; border-radius: 12px; font-size: 14px;
+  margin-left: 12px; vertical-align: middle;
+}
+.card {
+  background: white; border-radius: 12px; margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;
+  border-left: 5px solid #e5e7eb;
+}
+.card-header {
+  padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid #e5e7eb;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.card-header .id { font-weight: 700; color: #1e293b; font-size: 16px; }
+.card-header .topic {
+  padding: 2px 10px; border-radius: 10px; font-size: 12px;
+  color: white; font-weight: 600;
+}
+.card-header .agent { font-size: 12px; color: #64748b; }
+.card-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 120px; }
+.col { padding: 16px 20px; overflow-wrap: break-word; }
+.col-left { background: #fef2f2; border-right: 1px solid #e5e7eb; }
+.col-right { background: #f0fdf4; }
+.col-label {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; letter-spacing: 0.5px;
+}
+.col-left .col-label { background: #fecaca; color: #991b1b; }
+.col-right .col-label { background: #bbf7d0; color: #166534; }
+.col-content { font-size: 14px; color: #1f2937; white-space: pre-wrap; }
+.col-content .field { margin-bottom: 8px; }
+.col-content .field-name { font-weight: 600; color: #475569; margin-right: 6px; }
+.col-content code {
+  background: rgba(0,0,0,0.05); padding: 1px 6px; border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px; color: #be185d;
+}
+.top10-card { border-left-color: #f59e0b; }
+.summary-bar {
+  background: white; border-radius: 12px; padding: 20px 24px;
+  margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+.stat { text-align: center; padding: 12px; border-radius: 8px; background: #f8fafc; }
+.stat-num { font-size: 32px; font-weight: 800; color: #1e293b; }
+.stat-label { font-size: 13px; color: #64748b; margin-top: 4px; }
+.toc {
+  background: white; border-radius: 12px; padding: 20px 24px;
+  margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.toc h3 { margin: 0 0 12px 0; font-size: 16px; color: #1e293b; }
+.toc-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
+}
+.toc-grid a {
+  display: block; padding: 6px 12px; border-radius: 6px;
+  text-decoration: none; color: #1f2937; font-size: 13px; transition: background 0.2s;
+}
+.toc-grid a:hover { background: #f1f5f9; }
+.toc-grid .count { color: #64748b; font-size: 12px; margin-left: 4px; }
+@media print {
+  body { background: white; }
+  .filter-bar, .toc { display: none; }
+  .card { box-shadow: none; border: 1px solid #e5e7eb; page-break-inside: avoid; }
+}
+@media (max-width: 900px) {
+  .card-body { grid-template-columns: 1fr; }
+  .col-left { border-right: none; border-bottom: 1px solid #e5e7eb; }
+  .summary-bar { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 0909 m3 出版审查对比表</h1>
+  <div class="meta">范围：Top 10 必改清单 + 43 个 P0 必改项 ｜ 左原文·右改后 ｜ 生成时间：2026-09-09</div>
+</header>
+
+<div class="container">
+
+<div class="summary-bar">
+  <div class="stat"><div class="stat-num">10</div><div class="stat-label">Top 10 必改</div></div>
+  <div class="stat"><div class="stat-num" style="color:#ef4444">43</div><div class="stat-label">P0 必改项</div></div>
+  <div class="stat"><div class="stat-num">15-20h</div><div class="stat-label">预估修复工作量</div></div>
+  <div class="stat"><div class="stat-num">6-10d</div><div class="stat-label">按每天 2-3h</div></div>
+</div>
+
+<div class="filter-bar">
+  <label>主题筛选：</label>
+  <select id="topicFilter"><option value="">全部主题</option></select>
+  <label>关键词：</label>
+  <input type="text" id="searchInput" placeholder="搜索位置/章节/关键词...">
+  <span style="margin-left:auto;color:#64748b;font-size:13px;">共 <span id="visibleCount">53</span> 条</span>
+</div>
+
+<div class="legend">
+💡 <strong>使用提示</strong>：左栏（浅红）是"原文摘录 + 问题描述 + 依据"，右栏（浅绿）是"改法 + 建议样板"。
+  每条卡片可单独对照阅读；打印可用浏览器 Ctrl+P。
+</div>
+<div class="section-title">🔥 Top 10 必改清单 <span class="badge">最高优先级</span></div>
+<div class="card top10-card" data-topic="Top10" data-search="top10 AI 披露合规 `chapters/00-preface.md` 全文 + `chapters/10-epilogue.md` L43-45 前言零 AI 披露段、后记缺"AI 不署名"声明、未指明具体工具。Springer/Elsevier/IEEE 2023 起强制">
+  <div class="card-header">
+    <div>
+      <span class="id">#1 · AI 披露合规</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>`chapters/00-preface.md` 全文 + `chapters/10-epilogue.md` L43-45</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>`chapters/00-preface.md` 全文 + `chapters/10-epilogue.md` L43-45</code></div>
+        <div class="field"><span class="field-name">问题：</span>前言零 AI 披露段、后记缺"AI 不署名"声明、未指明具体工具。Springer/Elsevier/IEEE 2023 起强制</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>30 分钟</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 免责声明完整 `chapters/10-epilogue.md` + `chapters/00-preface.md` 缺独立版本演进免责、缺故障故事脱敏标注、缺"数据丢失仅供参考"提示、缺"以官方文档为准"提示">
+  <div class="card-header">
+    <div>
+      <span class="id">#2 · 免责声明完整</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>`chapters/10-epilogue.md` + `chapters/00-preface.md`</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>`chapters/10-epilogue.md` + `chapters/00-preface.md`</code></div>
+        <div class="field"><span class="field-name">问题：</span>缺独立版本演进免责、缺故障故事脱敏标注、缺"数据丢失仅供参考"提示、缺"以官方文档为准"提示</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>30 分钟</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 出版形式要素 后记版权页 缺 ISBN / CIP 数据核字号 / 出版社 / 版次 / 印次 / 勘误渠道 / 作者简介">
+  <div class="card-header">
+    <div>
+      <span class="id">#3 · 出版形式要素</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>后记版权页</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>后记版权页</code></div>
+        <div class="field"><span class="field-name">问题：</span>缺 ISBN / CIP 数据核字号 / 出版社 / 版次 / 印次 / 勘误渠道 / 作者简介</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>1 小时（需作者提供信息）</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 商标声明 前言/版权页 Redis®/MySQL™/Kafka™ 等商标无 ®/™ 标记、无统一声明段">
+  <div class="card-header">
+    <div>
+      <span class="id">#4 · 商标声明</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>前言/版权页</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>前言/版权页</code></div>
+        <div class="field"><span class="field-name">问题：</span>Redis®/MySQL™/Kafka™ 等商标无 ®/™ 标记、无统一声明段</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>15 分钟</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 参考文献著录 `chapters/11-references.md` 全文 "按章分组"格式离 GB/T 7714 顺序编码制差距大、缺作者/题名/出处/年份/DOI、缺访问日期">
+  <div class="card-header">
+    <div>
+      <span class="id">#5 · 参考文献著录</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>`chapters/11-references.md` 全文</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>`chapters/11-references.md` 全文</code></div>
+        <div class="field"><span class="field-name">问题：</span>"按章分组"格式离 GB/T 7714 顺序编码制差距大、缺作者/题名/出处/年份/DOI、缺访问日期</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>2-3 小时</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 CAP 归类 outline vs 正文 `chapters/07-cluster/outline.md` L13/L63/L88/L93 + `chapters/09-data-sync/outline.md` L74 outline 13 处绝对归类与正文谨慎口径冲突">
+  <div class="card-header">
+    <div>
+      <span class="id">#6 · CAP 归类 outline vs 正文</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>`chapters/07-cluster/outline.md` L13/L63/L88/L93 + `chapters/09-data-sync/outline.md` L74</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>`chapters/07-cluster/outline.md` L13/L63/L88/L93 + `chapters/09-data-sync/outline.md` L74</code></div>
+        <div class="field"><span class="field-name">问题：</span>outline 13 处绝对归类与正文谨慎口径冲突</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>15 分钟（outline 不进构建产物，但会渗入编辑讨论）</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 作者声音 N.6 ch3/ch4/ch7/ch9 N.6 节 4 章主亲历（库存超卖、缓存 DB 不一致、第 3 章迁移脚本、第 4 章教训）未进入 N.6 启示节">
+  <div class="card-header">
+    <div>
+      <span class="id">#7 · 作者声音 N.6</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>ch3/ch4/ch7/ch9 N.6 节</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>ch3/ch4/ch7/ch9 N.6 节</code></div>
+        <div class="field"><span class="field-name">问题：</span>4 章主亲历（库存超卖、缓存 DB 不一致、第 3 章迁移脚本、第 4 章教训）未进入 N.6 启示节</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>2 小时</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 核心裸数字 P0 ch4:34（fork 开销）/ch4:36（缓冲池 8-128GB）/ch8:48（RDB 压缩比）/ch6/9（QPS） 4 条核心数据无出处或无前提">
+  <div class="card-header">
+    <div>
+      <span class="id">#8 · 核心裸数字 P0</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>ch4:34（fork 开销）/ch4:36（缓冲池 8-128GB）/ch8:48（RDB 压缩比）/ch6/9（QPS）</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>ch4:34（fork 开销）/ch4:36（缓冲池 8-128GB）/ch8:48（RDB 压缩比）/ch6/9（QPS）</code></div>
+        <div class="field"><span class="field-name">问题：</span>4 条核心数据无出处或无前提</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>1 小时</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 KIP 链接 404 ch4/ch7/ch9 §XXX + bibliography KIP-480/679/320/106 的 Wiki 页面 404（4 个 KIP）">
+  <div class="card-header">
+    <div>
+      <span class="id">#9 · KIP 链接 404</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>ch4/ch7/ch9 §XXX + bibliography</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>ch4/ch7/ch9 §XXX + bibliography</code></div>
+        <div class="field"><span class="field-name">问题：</span>KIP-480/679/320/106 的 Wiki 页面 404（4 个 KIP）</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>30 分钟（查 Apache Jira 替换或删除）</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card top10-card" data-topic="Top10" data-search="top10 概念定义先行 全书"位点""正本" 概念 "位点"（offset 抽象）和"正本"（source of truth）两个核心架构概念全书未正式定义（仅在序言隐式提及）">
+  <div class="card-header">
+    <div>
+      <span class="id">#10 · 概念定义先行</span>
+      <span class="topic" style="background:#f59e0b">Top 10</span>
+    </div>
+    <span class="agent">📍 <code>全书"位点""正本" 概念</code></span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">位置：</span><code>全书"位点""正本" 概念</code></div>
+        <div class="field"><span class="field-name">问题：</span>"位点"（offset 抽象）和"正本"（source of truth）两个核心架构概念全书未正式定义（仅在序言隐式提及）</div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 复 成 本</span>
+      <div class="col-content">
+        <div class="field"><span class="field-name">修复成本：</span>30 分钟</div>
+        <div class="field" style="color:#64748b;font-size:13px;">详见综合报告 <code>00-综合出版就绪报告.md</code> §5 修复路线图对应阶段</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="section-title">📋 P0 必改清单（43 个，按主题归类）<span class="badge">不修不可出版</span></div><div class="toc"><h3>📑 主题目录</h3><div class="toc-grid"><a href="#topic-AI 披露">AI 披露 <span class="count">(5)</span></a><a href="#topic-CAP 归类">CAP 归类 <span class="count">(3)</span></a><a href="#topic-KIP 引用">KIP 引用 <span class="count">(4)</span></a><a href="#topic-作者声音">作者声音 <span class="count">(4)</span></a><a href="#topic-免责声明">免责声明 <span class="count">(5)</span></a><a href="#topic-出版形式">出版形式 <span class="count">(3)</span></a><a href="#topic-前置依赖">前置依赖 <span class="count">(2)</span></a><a href="#topic-参考文献">参考文献 <span class="count">(3)</span></a><a href="#topic-命令可运行性">命令可运行性 <span class="count">(1)</span></a><a href="#topic-商标授权">商标授权 <span class="count">(2)</span></a><a href="#topic-图表编号">图表编号 <span class="count">(1)</span></a><a href="#topic-术语稳定">术语稳定 <span class="count">(2)</span></a><a href="#topic-横向对比">横向对比 <span class="count">(1)</span></a><a href="#topic-裸数字">裸数字 <span class="count">(3)</span></a><a href="#topic-金句密度">金句密度 <span class="count">(2)</span></a><a href="#topic-钩子导读闭环">钩子导读闭环 <span class="count">(2)</span></a></div></div><div class="section-title" id="topic-AI 披露" style="border-bottom-color:#ef4444">🎯 AI 披露（5 个 P0）</div>
+<div class="card" data-topic="AI 披露" data-search="A1-AI辅助披露合规审计员 位置：前言（chapters/00-preface.md），缺失 位置：前言（chapters/00-preface.md），缺失  问题：全书前言（序言）没有任何 AI 辅助使用披露段落。  依据：Springer/Elsevier/IEEE 均要求作者在&quot;manuscript&quot;中披露 AI 使用情况，技术书前言是披露的标准位置。国际惯例是前言 + 版权页（或前言 + 致谢）双重披露，仅靠后记致谢不够。  改法：在前言末尾（&quot;是为序&quot;之前）插入独立 AI 辅助披露段落，格式示例见 §4。" style="border-left-color:#ef4444">
+  <div class="card-header">
+    <div>
+      <span class="id">AI 披露 · P0-1</span>
+      <span class="topic" style="background:#ef4444">AI 披露</span>
+    </div>
+    <span class="agent">🧑 A1-AI辅助披露合规审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>前言（chapters/00-preface.md），缺失</code></div><div class="field"><span class="field-name">问题：</span>全书前言（序言）没有任何 AI 辅助使用披露段落。</div><div class="field"><span class="field-name">依据：</span>Springer/Elsevier/IEEE 均要求作者在"manuscript"中披露 AI 使用情况，技术书前言是披露的标准位置。国际惯例是前言 + 版权页（或前言 + 致谢）双重披露，仅靠后记致谢不够。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>在前言末尾（"是为序"之前）插入独立 AI 辅助披露段落，格式示例见 §4。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="AI 披露" data-search="A1-AI辅助披露合规审计员 位置：后记（chapters/10-epilogue.md）致谢节，缺失 位置：后记（chapters/10-epilogue.md）致谢节，缺失  问题：现有致谢中的 AI 披露（L43-45）未包含&quot;AI 不参与署名&quot;声明。  依据：Springer Nature 明确要求作者声明&quot;AI tools and/or AI-assisted technologies were NOT listed as authors&quot;；Elsevier 和 IEEE 虽未明文强制，但三家惯例均强调 AI 不具署名资格。  改法：在后记致谢的 AI 披露句末加：&quot;AI 工具不参与本书署名，所有署名作者以外的贡献均已在正文中如实说明。&quot;" style="border-left-color:#ef4444">
+  <div class="card-header">
+    <div>
+      <span class="id">AI 披露 · P0-2</span>
+      <span class="topic" style="background:#ef4444">AI 披露</span>
+    </div>
+    <span class="agent">🧑 A1-AI辅助披露合规审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>后记（chapters/10-epilogue.md）致谢节，缺失</code></div><div class="field"><span class="field-name">问题：</span>现有致谢中的 AI 披露（L43-45）未包含"AI 不参与署名"声明。</div><div class="field"><span class="field-name">依据：</span>Springer Nature 明确要求作者声明"AI tools and/or AI-assisted technologies were NOT listed as authors"；Elsevier 和 IEEE 虽未明文强制，但三家惯例均强调 AI 不具署名资格。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>在后记致谢的 AI 披露句末加："AI 工具不参与本书署名，所有署名作者以外的贡献均已在正文中如实说明。"</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="AI 披露" data-search="A1-AI辅助披露合规审计员 位置：后记（chapters/10-epilogue.md）致谢节，笼统 位置：后记（chapters/10-epilogue.md）致谢节，笼统  问题：现有披露只说&quot;生成式 AI 工具&quot;，未指明具体是哪个产品（ChatGPT/GPT-4/Claude/Gemini 等）。  依据：Springer Nature 要求&quot;disclose the use of AI tools&quot;（指明工具），Elsevier 要求在 cover letter 中指明工具名。国际出版界对&quot;哪个 AI&quot;的透明度要求越来越高，含糊表述在正式出版审稿中可能被要求补正。  改法：将&quot;生成式 AI 工具&quot;改为具体产品名称（若用了多个，可列主要工具）；若确实无法披露工具名，至少说明&quot;大语言模型&quot;类别而非更模糊的&quot;生成式 AI 工具&quot;。" style="border-left-color:#ef4444">
+  <div class="card-header">
+    <div>
+      <span class="id">AI 披露 · P0-3</span>
+      <span class="topic" style="background:#ef4444">AI 披露</span>
+    </div>
+    <span class="agent">🧑 A1-AI辅助披露合规审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>后记（chapters/10-epilogue.md）致谢节，笼统</code></div><div class="field"><span class="field-name">问题：</span>现有披露只说"生成式 AI 工具"，未指明具体是哪个产品（ChatGPT/GPT-4/Claude/Gemini 等）。</div><div class="field"><span class="field-name">依据：</span>Springer Nature 要求"disclose the use of AI tools"（指明工具），Elsevier 要求在 cover letter 中指明工具名。国际出版界对"哪个 AI"的透明度要求越来越高，含糊表述在正式出版审稿中可能被要求补正。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>将"生成式 AI 工具"改为具体产品名称（若用了多个，可列主要工具）；若确实无法披露工具名，至少说明"大语言模型"类别而非更模糊的"生成式 AI 工具"。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="AI 披露" data-search="A1-AI辅助披露合规审计员 位置：前言（chapters/00-preface.md）L8 和 L50，正面提及 AI 破坏披露一致性 位置：前言（chapters/00-preface.md）L8 和 L50，正面提及 AI 破坏披露一致性  问题：前言 L8 将 AI 描述为正面工具（&quot;AI 让写代码越来越快&quot;），L50 鼓励读者使用 AI 补齐知识——这两处均在 AI 披露缺失的前提下正面推广 AI，与后文致谢中的&quot;用了 AI&quot;形成隐性矛盾：作者用 AI 辅助写书却告诉读者&quot;你用 AI 补齐知识点&quot;，语义上是鼓励双向 AI 辅助，读者读完可能困惑&quot;作者到底用没用 AI？&quot;  依据：披露的语义一致性原则——若正文已声明使用了 AI，应避免在同一章节内出现未加说明的&quot;AI 让 X 更快&quot;类正面断言（这类表述默认作者未使用 AI，属修辞上的自我豁免）。  改法：L8 改为中性表述，如&quot;取舍牵涉周期、成本、团队状况等现实约束，这些很难靠工具自动化&quot;；L50 删除或改为&quot;如果你对某些知识点不熟悉，可以查阅官方文档或技术社区&quot;。" style="border-left-color:#ef4444">
+  <div class="card-header">
+    <div>
+      <span class="id">AI 披露 · P0-4</span>
+      <span class="topic" style="background:#ef4444">AI 披露</span>
+    </div>
+    <span class="agent">🧑 A1-AI辅助披露合规审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>前言（chapters/00-preface.md）L8 和 L50，正面提及 AI 破坏披露一致性</code></div><div class="field"><span class="field-name">问题：</span>前言 L8 将 AI 描述为正面工具（"AI 让写代码越来越快"），L50 鼓励读者使用 AI 补齐知识——这两处均在 AI 披露缺失的前提下正面推广 AI，与后文致谢中的"用了 AI"形成隐性矛盾：作者用 AI 辅助写书却告诉读者"你用 AI 补齐知识点"，语义上是鼓励双向 AI 辅助，读者读完可能困惑"作者到底用没用 AI？"</div><div class="field"><span class="field-name">依据：</span>披露的语义一致性原则——若正文已声明使用了 AI，应避免在同一章节内出现未加说明的"AI 让 X 更快"类正面断言（这类表述默认作者未使用 AI，属修辞上的自我豁免）。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>L8 改为中性表述，如"取舍牵涉周期、成本、团队状况等现实约束，这些很难靠工具自动化"；L50 删除或改为"如果你对某些知识点不熟悉，可以查阅官方文档或技术社区"。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="AI 披露" data-search="A1-AI辅助披露合规审计员 位置：前言（chapters/00-preface.md）L50，向读者推荐 AI 工具但未披露自身使用情况 位置：前言（chapters/00-preface.md）L50，向读者推荐 AI 工具但未披露自身使用情况  问题：在前言向读者推荐&quot;多用 AI 工具补齐知识点&quot;（L50），但前言本身无 AI 披露——读者在不知情的情况下读到作者推荐自己使用 AI，而作者自己的 AI 使用在数百字之后才在后记提及，顺序倒置，且前言没有任何&quot;作者本人也借助了 AI&quot;的背景铺垫。  依据：信息披露的&quot;第一时间原则&quot;——若作者在书中使用了 AI，正文一旦出现&quot;AI&quot;字样就应同时建立上下文，而非让读者在致谢里才知道事实。L50 的推荐语与后记致谢的时间差使读者产生信息不对称。  改法：将 AI 推荐语迁移至前言末尾的 AI 披露段落内（作为作者亲身经验的自然延伸：&quot;我在写作本书时也借助了 AI 辅助，以下说明……&quot;），同时在正文保持零 AI 叙事。" style="border-left-color:#ef4444">
+  <div class="card-header">
+    <div>
+      <span class="id">AI 披露 · P0-5</span>
+      <span class="topic" style="background:#ef4444">AI 披露</span>
+    </div>
+    <span class="agent">🧑 A1-AI辅助披露合规审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>前言（chapters/00-preface.md）L50，向读者推荐 AI 工具但未披露自身使用情况</code></div><div class="field"><span class="field-name">问题：</span>在前言向读者推荐"多用 AI 工具补齐知识点"（L50），但前言本身无 AI 披露——读者在不知情的情况下读到作者推荐自己使用 AI，而作者自己的 AI 使用在数百字之后才在后记提及，顺序倒置，且前言没有任何"作者本人也借助了 AI"的背景铺垫。</div><div class="field"><span class="field-name">依据：</span>信息披露的"第一时间原则"——若作者在书中使用了 AI，正文一旦出现"AI"字样就应同时建立上下文，而非让读者在致谢里才知道事实。L50 的推荐语与后记致谢的时间差使读者产生信息不对称。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>将 AI 推荐语迁移至前言末尾的 AI 披露段落内（作为作者亲身经验的自然延伸："我在写作本书时也借助了 AI 辅助，以下说明……"），同时在正文保持零 AI 叙事。</div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-CAP 归类" style="border-bottom-color:#dc2626">🎯 CAP 归类（3 个 P0）</div>
+<div class="card" data-topic="CAP 归类" data-search="B1-CAP一致性归类全书对齐审查员 ch7/outline.md L13 开篇第一句话写&quot;Redis 选 AP、MySQL 选 CP、Kafka 在 AP 与 CP 之间可调&quot;，与正文 L92 谨慎立场直接打架。  依据：outline 是内部草稿不进入构建产物，但这段话曾出现在编辑讨论和 cross-review 中，有渗入正文的风险。  改法：把 outline L13 改写为&quot;Redis 选择异步复制+少数派停写、MySQL 可在异步/半同步/多数派之间配、Kafka 用 ISR+副本准入控制强度——具体归类依赖配置和部署，不是固定 AP 或 CP&quot;。" style="border-left-color:#dc2626">
+  <div class="card-header">
+    <div>
+      <span class="id">CAP 归类 · P0-1</span>
+      <span class="topic" style="background:#dc2626">CAP 归类</span>
+    </div>
+    <span class="agent">🧑 B1-CAP一致性归类全书对齐审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch7/outline.md L13</code></div><div class="field"><span class="field-name">依据：</span>outline 是内部草稿不进入构建产物，但这段话曾出现在编辑讨论和 cross-review 中，有渗入正文的风险。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>把 outline L13 改写为"Redis 选择异步复制+少数派停写、MySQL 可在异步/半同步/多数派之间配、Kafka 用 ISR+副本准入控制强度——具体归类依赖配置和部署，不是固定 AP 或 CP"。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="CAP 归类" data-search="B1-CAP一致性归类全书对齐审查员 ch7/outline.md L63/L88/L93 Redis=AP（&quot;AP 系统&quot;）、MySQL MGR=CP（&quot;CP 系统&quot;）各出现两次，叠加&quot;CP 路线的正名&quot;措辞。  依据：正文 L174 说&quot;这些机制不会把 Redis 变成强一致系统&quot;但从未称其 AP；正文 L129 说 MGR 跨成员读取可能看到旧数据（EVENTUAL 默认）也未称其 CP。  改法：删掉&quot;AP 系统&quot;&quot;CP 系统&quot;等绝对归类表述，替换为&quot;默认偏 AP/CP（具体依赖配置）&quot;或直接说&quot;以 ch7 正文 L92 立场为准&quot;。" style="border-left-color:#dc2626">
+  <div class="card-header">
+    <div>
+      <span class="id">CAP 归类 · P0-2</span>
+      <span class="topic" style="background:#dc2626">CAP 归类</span>
+    </div>
+    <span class="agent">🧑 B1-CAP一致性归类全书对齐审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch7/outline.md L63/L88/L93</code></div><div class="field"><span class="field-name">依据：</span>正文 L174 说"这些机制不会把 Redis 变成强一致系统"但从未称其 AP；正文 L129 说 MGR 跨成员读取可能看到旧数据（EVENTUAL 默认）也未称其 CP。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>删掉"AP 系统""CP 系统"等绝对归类表述，替换为"默认偏 AP/CP（具体依赖配置）"或直接说"以 ch7 正文 L92 立场为准"。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="CAP 归类" data-search="B1-CAP一致性归类全书对齐审查员 ch9/outline.md L74 一致性模型列直接标 AP/CP/AP↔CP，与正文表 9-1 已去掉 CAP 列形成矛盾。  依据：表 9-1 正文版已不列 CAP，只描述机制（异步/半同步/MGR/ISR 等）；outline 还停在老版有 CAP 列的草稿。  改法：把 outline L74 表格的 CAP 列删掉，与正文表 9-1 对齐。" style="border-left-color:#dc2626">
+  <div class="card-header">
+    <div>
+      <span class="id">CAP 归类 · P0-3</span>
+      <span class="topic" style="background:#dc2626">CAP 归类</span>
+    </div>
+    <span class="agent">🧑 B1-CAP一致性归类全书对齐审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch9/outline.md L74</code></div><div class="field"><span class="field-name">依据：</span>表 9-1 正文版已不列 CAP，只描述机制（异步/半同步/MGR/ISR 等）；outline 还停在老版有 CAP 列的草稿。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div class="field"><span class="field-name">改法：</span>把 outline L74 表格的 CAP 列删掉，与正文表 9-1 对齐。</div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-KIP 引用" style="border-bottom-color:#84cc16">🎯 KIP 引用（4 个 P0）</div>
+<div class="card" data-topic="KIP 引用" data-search="D3-KIP编号与外部引用核验报告 KIP-480 Wiki 页面 404**（ch7 §7.4.1 + bibliography [28]） KIP-480 Wiki 页面 404**（ch7 §7.4.1 + bibliography [28]） - **位置**：ch7 正文字段 + 参考文献 [28] - **问题**：Apache Kafka wiki 页面 `KIP-480+-+Add+Sticky+Partitioning+Mode+to+Linger` 返回 HTTP 404，链接已失效 - **影响**：正文技术内容（Kafka 2.4 粘性分区器）可从其他来源印证，但链接本身无法访问 - **修复建议**：将正文括号注释中的 KIP-480 标注为&quot;kip-480（wiki 已迁移，内容见官方升级说明）&quot;，或将正文描述改为&quot;Kafka 2.4 引入默认粘性分区（Sticky Partitioning）&quot;而不依赖 KIP 编号；参考文献更新为当前可访问的官方文档 URL" style="border-left-color:#84cc16">
+  <div class="card-header">
+    <div>
+      <span class="id">KIP 引用 · P0-1</span>
+      <span class="topic" style="background:#84cc16">KIP 引用</span>
+    </div>
+    <span class="agent">🧑 D3-KIP编号与外部引用核验报告</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>KIP-480 Wiki 页面 404**（ch7 §7.4.1 + bibliography [28]）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>D3-KIP编号与外部引用核验报告.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="KIP 引用" data-search="D3-KIP编号与外部引用核验报告 KIP-679 Wiki 页面 404**（ch4 §4.4 + ch7 §7.4.3 + bibliography 无对应条目） KIP-679 Wiki 页面 404**（ch4 §4.4 + ch7 §7.4.3 + bibliography 无对应条目） - **位置**：ch4 §4.4（acks 默认值调整）+ ch7 §7.4.3（`acks=all` 成为默认）+ bibliography - **问题**：KIP-679 wiki 页面返回 HTTP 404，链接已失效 - **影响**：正文技术内容（Kafka 3.0 将 acks=all 改为默认）可从 Kafka 官方升级说明印证 - **修复建议**：正文括号引用改为&quot;Kafka 3.0 升级说明（官方文档）&quot;，或确认 KIP 编号对应的 Jira Issue 是否有对应 PR 文档" style="border-left-color:#84cc16">
+  <div class="card-header">
+    <div>
+      <span class="id">KIP 引用 · P0-2</span>
+      <span class="topic" style="background:#84cc16">KIP 引用</span>
+    </div>
+    <span class="agent">🧑 D3-KIP编号与外部引用核验报告</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>KIP-679 Wiki 页面 404**（ch4 §4.4 + ch7 §7.4.3 + bibliography 无对应条目）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>D3-KIP编号与外部引用核验报告.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="KIP 引用" data-search="D3-KIP编号与外部引用核验报告 KIP-320 Wiki 页面 404**（bibliography [28]） KIP-320 Wiki 页面 404**（bibliography [28]） - **位置**：参考文献 [28] - **问题**：KIP-320 wiki 页面返回 HTTP 404，链接已失效 - **影响**：参考文献条目不可访问 - **修复建议**：将 bibliography [28] 替换为可访问的官方文档 URL，或通过 Apache Kafka 官方升级说明引用" style="border-left-color:#84cc16">
+  <div class="card-header">
+    <div>
+      <span class="id">KIP 引用 · P0-3</span>
+      <span class="topic" style="background:#84cc16">KIP 引用</span>
+    </div>
+    <span class="agent">🧑 D3-KIP编号与外部引用核验报告</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>KIP-320 Wiki 页面 404**（bibliography [28]）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>D3-KIP编号与外部引用核验报告.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="KIP 引用" data-search="D3-KIP编号与外部引用核验报告 KIP-106 Wiki 页面 404**（ch9 §9.4 acks + bibliography 无对应条目） KIP-106 Wiki 页面 404**（ch9 §9.4 acks + bibliography 无对应条目） - **位置**：ch9 §9.4 unc lean leader 选举正文 + bibliography - **问题**：KIP-106 wiki 页面返回 HTTP 404，链接已失效 - **影响**：正文&quot;Kafka 0.11 起 unclean leader election 默认改为 false&quot;这一技术事实可印证，但引用来源不可访问 - **修复建议**：正文引用改为&quot;Kafka 0.11 官方升级说明（unclean leader election 默认关闭）&quot;" style="border-left-color:#84cc16">
+  <div class="card-header">
+    <div>
+      <span class="id">KIP 引用 · P0-4</span>
+      <span class="topic" style="background:#84cc16">KIP 引用</span>
+    </div>
+    <span class="agent">🧑 D3-KIP编号与外部引用核验报告</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>KIP-106 Wiki 页面 404**（ch9 §9.4 acks + bibliography 无对应条目）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>D3-KIP编号与外部引用核验报告.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-作者声音" style="border-bottom-color:#eab308">🎯 作者声音（4 个 P0）</div>
+<div class="card" data-topic="作者声音" data-search="C3-作者声音在N6的密度审查员 第3章启示五的亲历故事被锁在 N.7 第3章启示五的亲历故事被锁在 N.7 - **位置**：ch3 L246（N.7 小结末段） - **问题**：亲历故事（凌晨三点 `kill -9`、丢数据）有完整的时间/动作/后果/认知转变，但落在 N.7 而非 N.6 启示五。 - **影响**：启示五（&quot;可观测性是状态机的外显&quot;）本身是分析句，读者看不到这个判断的亲历来源；整章 N.6 无一条含亲历出处的启示。 - **建议修复**：把这段亲历移入启示五作为首段，N.7 小结只保留收束句。原文已有&quot;开头说的那次事故就是这样&quot;与正文呼应，迁移后语义连贯。" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">作者声音 · P0-1</span>
+      <span class="topic" style="background:#eab308">作者声音</span>
+    </div>
+    <span class="agent">🧑 C3-作者声音在N6的密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>第3章启示五的亲历故事被锁在 N.7</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C3-作者声音在N6的密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="作者声音" data-search="C3-作者声音在N6的密度审查员 第4章 N.6 全章零亲历，导读亲历未注入启示节 第4章 N.6 全章零亲历，导读亲历未注入启示节 - **位置**：ch4 N.6（L266–301）共 5 条启示 + ch4 N.0 导读（L266 前的导读） - **问题**：导读里有&quot;我参与过一次选型争论：缓存到底该用 Redis 还是 MySQL？&quot;的高质量亲历（具体场景+后果+认知转变），完全未进入 N.6。5 条启示全为纯分析句。 - **影响**：全章 N.6 失去&quot;前辈私房经验&quot;的辨识度，变成高质量分析但无声音。 - **建议修复**：从导读提炼 1-2 条亲历锚点注入 N.6。例如 4-1&quot;先问访问模式，再选存储范式&quot;可加首句&quot;我参与那次选型争论，把访问模式列成表之后争论就停了——两个系统比的不是哪个更好，而是哪个更匹配你的访问模式。&quot;" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">作者声音 · P0-2</span>
+      <span class="topic" style="background:#eab308">作者声音</span>
+    </div>
+    <span class="agent">🧑 C3-作者声音在N6的密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>第4章 N.6 全章零亲历，导读亲历未注入启示节</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C3-作者声音在N6的密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="作者声音" data-search="C3-作者声音在N6的密度审查员 第7章主亲历（库存超卖）完全未进 N.6 第7章主亲历（库存超卖）完全未进 N.6 - **位置**：ch7 N.0 导读 + N.6（L218–243） - **问题**：导读有全章最重磅亲历（大促网络分区、Redis Cluster 主从切换、库存超卖），**一条也未进入 N.6 的 5 条启示**。 - **影响**：7-1（&quot;分片与副本是正交的两件事&quot;）和 7-5（&quot;选错定位，比选错参数严重得多&quot;）的判断可以从这段经历里直接锚定，但读者看不到这个锚定过程。 - **建议修复**：7-5&quot;分区时的取舍要由业务需求倒推&quot;加首句：&quot;我做过一个库存服务……那次之后我才真正理解，CAP 不只是理论选择题，落到代码里就是实打实的取舍。使用异步复制，就要为故障转移可能丢数据做好预案。&quot;这段亲历已经含在导读里了，直接搬到启示五。" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">作者声音 · P0-3</span>
+      <span class="topic" style="background:#eab308">作者声音</span>
+    </div>
+    <span class="agent">🧑 C3-作者声音在N6的密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>第7章主亲历（库存超卖）完全未进 N.6</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C3-作者声音在N6的密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="作者声音" data-search="C3-作者声音在N6的密度审查员 第9章主亲历（缓存数据库不一致）完全未进 N.6 第9章主亲历（缓存数据库不一致）完全未进 N.6 - **位置**：ch9 N.0 导读 + N.6（L303–340） - **问题**：导读有&quot;我排查过不止一次缓存和数据库不一致的问题……现在涉及多份数据的写路径，我先把'以谁为准、怎么对齐'画清楚再动手&quot;，这是 9-1（&quot;数据同步的本质是状态机复制&quot;）和 9-2（&quot;位点是断点续传的基础&quot;）的直接亲历来源，但未进 N.6。 - **影响**：全章 N.6（6 条）无一条含亲历出处，与导读的亲历密度形成刺眼对比。 - **建议修复**：9-1 或 9-2 任选一条注入亲历首段。9-1 改写为：&quot;数据同步要把一处的状态变化传给其他副本——我排查过不止一次缓存和数据库不一致的问题，根源都在'以谁为准'没画清楚。同步的本质是状态机复制：共同初始状态 + 相同有序输入 + 确定性执行。&quot;" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">作者声音 · P0-4</span>
+      <span class="topic" style="background:#eab308">作者声音</span>
+    </div>
+    <span class="agent">🧑 C3-作者声音在N6的密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>第9章主亲历（缓存数据库不一致）完全未进 N.6</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C3-作者声音在N6的密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-免责声明" style="border-bottom-color:#10b981">🎯 免责声明（5 个 P0）</div>
+<div class="card" data-topic="免责声明" data-search="A5-免责声明与法律边界审计员 缺独立&quot;版本演进&quot;免责段 缺独立&quot;版本演进&quot;免责段 完全缺失  现状：前言 L17 仅有&quot;版本会迭代（本书基于……），但这些抉择的逻辑长期不变&quot;，这句话混淆了两个问题：①基线版本标注；②设计规律是否长期有效。没有独立、显式的&quot;未来版本可能演进，请以官方文档为准&quot;免责段。  风险：一旦某条正文中的版本特定断言（参数默认值、行为描述）被新版本推翻，读者可能主张&quot;书里没说会过时&quot;。  修法：见 §5 样板。" style="border-left-color:#10b981">
+  <div class="card-header">
+    <div>
+      <span class="id">免责声明 · P0-1</span>
+      <span class="topic" style="background:#10b981">免责声明</span>
+    </div>
+    <span class="agent">🧑 A5-免责声明与法律边界审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>缺独立"版本演进"免责段</code></div><div class="field"><span class="field-name">现状：</span>前言 L17 仅有"版本会迭代（本书基于……），但这些抉择的逻辑长期不变"，这句话混淆了两个问题：①基线版本标注；②设计规律是否长期有效。没有独立、显式的"未来版本可能演进，请以官方文档为准"免责段。</div><div class="field"><span class="field-name">风险：</span>一旦某条正文中的版本特定断言（参数默认值、行为描述）被新版本推翻，读者可能主张"书里没说会过时"。
+
+修法：见 §5 样板。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A5-免责声明与法律边界审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="免责声明" data-search="A5-免责声明与法律边界审计员 &quot;一个真实的故事&quot;节缺脱敏标注 &quot;一个真实的故事&quot;节缺脱敏标注 完全缺失  现状：后记&quot;一个真实的故事&quot;节（L38–49）完整描述了一次大促库存事故，含项目背景（&quot;业务方说'要快'&quot;）、技术方案（Redis Cluster）、故障过程（网络分区、异步复制丢写）、复盘结论（&quot;Redis 不能替代 MySQL 做正本&quot;）。全文无任何&quot;经过脱敏处理，不代表任何具体生产系统&quot;标注。  风险：该节以&quot;真实复盘&quot;形式直接给出架构决策结论（&quot;Redis 不能替代 MySQL 做正本&quot;），读者可能将其作为生产系统架构决策的依据。如果该故事与任何真实存在的公司/项目存在可识别性关联，存在隐私/商誉风险。  修法：节首加脱敏标注；节末加&quot;以上为基于真实经历的技术复盘，细节已模糊化，供技术分析用，不代表任何具体生产系统&quot;。" style="border-left-color:#10b981">
+  <div class="card-header">
+    <div>
+      <span class="id">免责声明 · P0-2</span>
+      <span class="topic" style="background:#10b981">免责声明</span>
+    </div>
+    <span class="agent">🧑 A5-免责声明与法律边界审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>"一个真实的故事"节缺脱敏标注</code></div><div class="field"><span class="field-name">现状：</span>后记"一个真实的故事"节（L38–49）完整描述了一次大促库存事故，含项目背景（"业务方说'要快'"）、技术方案（Redis Cluster）、故障过程（网络分区、异步复制丢写）、复盘结论（"Redis 不能替代 MySQL 做正本"）。全文无任何"经过脱敏处理，不代表任何具体生产系统"标注。</div><div class="field"><span class="field-name">风险：</span>该节以"真实复盘"形式直接给出架构决策结论（"Redis 不能替代 MySQL 做正本"），读者可能将其作为生产系统架构决策的依据。如果该故事与任何真实存在的公司/项目存在可识别性关联，存在隐私/商誉风险。
+
+修法：节首加脱敏标注；节末加"以上为基于真实经历的技术复盘，细节已模糊化，供技术分析用，不代表任何具体生产系统"。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A5-免责声明与法律边界审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="免责声明" data-search="A5-免责声明与法律边界审计员 正文裸数字缺乏&quot;请核实后使用&quot;差异化提示 正文裸数字缺乏&quot;请核实后使用&quot;差异化提示 结构性缺口  现状：全书（含正文各章）存在大量裸数字（TPS、延迟、内存占用、压缩比等），后记免责段仅笼统提及&quot;配置参数&quot;，未对&quot;正文中的量化数字&quot;作差异化提示。读者看到&quot;Kafka 单分区吞吐约 1–5 万条/秒&quot;可能直接用于容量规划。  风险：量化数字具有最强的行动导向性，读者照此配置生产系统后若出问题，作者无法以&quot;仅供参考&quot;抗辩。  修法：正文数字后加括注&quot;（以实际环境测试为准）&quot;或在前言/后记加专门段落说明&quot;正文所有量化数字均为特定测试环境结果，读者采纳前应在自己的环境实测&quot;。" style="border-left-color:#10b981">
+  <div class="card-header">
+    <div>
+      <span class="id">免责声明 · P0-3</span>
+      <span class="topic" style="background:#10b981">免责声明</span>
+    </div>
+    <span class="agent">🧑 A5-免责声明与法律边界审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>正文裸数字缺乏"请核实后使用"差异化提示</code></div><div class="field"><span class="field-name">现状：</span>全书（含正文各章）存在大量裸数字（TPS、延迟、内存占用、压缩比等），后记免责段仅笼统提及"配置参数"，未对"正文中的量化数字"作差异化提示。读者看到"Kafka 单分区吞吐约 1–5 万条/秒"可能直接用于容量规划。</div><div class="field"><span class="field-name">风险：</span>量化数字具有最强的行动导向性，读者照此配置生产系统后若出问题，作者无法以"仅供参考"抗辩。
+
+修法：正文数字后加括注"（以实际环境测试为准）"或在前言/后记加专门段落说明"正文所有量化数字均为特定测试环境结果，读者采纳前应在自己的环境实测"。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A5-免责声明与法律边界审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="免责声明" data-search="A5-免责声明与法律边界审计员 缺&quot;数据丢失/故障场景仅供参考&quot;特别提示 缺&quot;数据丢失/故障场景仅供参考&quot;特别提示 完全缺失  现状：全书（含正文各章）复盘了多个故障场景（Redis 持久化失败、Kafka 丢消息、MySQL 半同步降级等），后记免责段未提及故障场景的脱敏属性。  风险：读者可能将书中的故障场景描述当作真实生产系统的代理，直接影响其故障应对预案的制定。  修法：在后记&quot;版权与勘误&quot;节免责段中加入&quot;书中复盘的故障场景均经过脱敏处理，不代表任何具体生产系统&quot;。" style="border-left-color:#10b981">
+  <div class="card-header">
+    <div>
+      <span class="id">免责声明 · P0-4</span>
+      <span class="topic" style="background:#10b981">免责声明</span>
+    </div>
+    <span class="agent">🧑 A5-免责声明与法律边界审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>缺"数据丢失/故障场景仅供参考"特别提示</code></div><div class="field"><span class="field-name">现状：</span>全书（含正文各章）复盘了多个故障场景（Redis 持久化失败、Kafka 丢消息、MySQL 半同步降级等），后记免责段未提及故障场景的脱敏属性。</div><div class="field"><span class="field-name">风险：</span>读者可能将书中的故障场景描述当作真实生产系统的代理，直接影响其故障应对预案的制定。
+
+修法：在后记"版权与勘误"节免责段中加入"书中复盘的故障场景均经过脱敏处理，不代表任何具体生产系统"。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A5-免责声明与法律边界审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="免责声明" data-search="A5-免责声明与法律边界审计员 后记免责段法律用词不统一 后记免责段法律用词不统一 内部矛盾  现状：后记 L65 同一免责段内，&quot;不对因……而导致的……承担责任&quot;与&quot;不承担责任&quot;两种措辞混用。  风险：用词不统一可能在法律争议时被解读为&quot;部分责任未被明确放弃&quot;。  修法：统一为&quot;不承担任何直接或间接责任&quot;或&quot;不负责任&quot;。" style="border-left-color:#10b981">
+  <div class="card-header">
+    <div>
+      <span class="id">免责声明 · P0-5</span>
+      <span class="topic" style="background:#10b981">免责声明</span>
+    </div>
+    <span class="agent">🧑 A5-免责声明与法律边界审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>后记免责段法律用词不统一</code></div><div class="field"><span class="field-name">现状：</span>后记 L65 同一免责段内，"不对因……而导致的……承担责任"与"不承担责任"两种措辞混用。</div><div class="field"><span class="field-name">风险：</span>用词不统一可能在法律争议时被解读为"部分责任未被明确放弃"。
+
+修法：统一为"不承担任何直接或间接责任"或"不负责任"。</div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A5-免责声明与法律边界审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-出版形式" style="border-bottom-color:#8b5cf6">🎯 出版形式（3 个 P0）</div>
+<div class="card" data-topic="出版形式" data-search="A4-出版形式要素完整性审计员 版权页字段组完全缺失 版权页字段组完全缺失 - **问题**：全书无任何版权页文件（如 `copyright.md`），也未在任何文件中预留出版社名、ISBN、CIP 数据、版次、印次、印数、开本、字数、定价、责任编辑、封面设计等字段的占位。 - **影响**：出版社对接时无结构化字段清单，出版流程推进困难。 - **修复方案**：在仓库根目录新建 `copyright-page.md`，按中文图书版权页规范预留所有字段占位（详见 §5 版权页样板）。 - **对应 QA P1-6 注**：版权年份（2026）已更新，但完整的 CIP 数据块（含核字号）需出版社提供。" style="border-left-color:#8b5cf6">
+  <div class="card-header">
+    <div>
+      <span class="id">出版形式 · P0-1</span>
+      <span class="topic" style="background:#8b5cf6">出版形式</span>
+    </div>
+    <span class="agent">🧑 A4-出版形式要素完整性审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>版权页字段组完全缺失</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A4-出版形式要素完整性审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="出版形式" data-search="A4-出版形式要素完整性审计员 ISBN 完全缺失 ISBN 完全缺失 - **问题**：ISBN 是图书出版的法定标识，全书无任何 ISBN 相关字段。 - **影响**：无法进入正式发行渠道。 - **修复方案**：在 `copyright-page.md` 预留 `ISBN: [待出版社分配]` 占位，出版社分配后填入；同时在 `README.md` 封面信息区补 ISBN。" style="border-left-color:#8b5cf6">
+  <div class="card-header">
+    <div>
+      <span class="id">出版形式 · P0-2</span>
+      <span class="topic" style="background:#8b5cf6">出版形式</span>
+    </div>
+    <span class="agent">🧑 A4-出版形式要素完整性审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ISBN 完全缺失</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A4-出版形式要素完整性审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="出版形式" data-search="A4-出版形式要素完整性审计员 CIP 数据核字号完全缺失 CIP 数据核字号完全缺失 - **问题**：中文图书 CIP 数据（`中国版本图书馆 CIP 数据核字（XXXX）第 XXXXXX 号`）是法定的出版信息，全书无任何占位。 - **影响**：未取得 CIP 的图书无法在大陆正式销售。 - **修复方案**：在 `copyright-page.md` 预留 `CIP 核字号：[待出版社申报后提供]` 占位，出版社 CIP 申报完成后再填入。" style="border-left-color:#8b5cf6">
+  <div class="card-header">
+    <div>
+      <span class="id">出版形式 · P0-3</span>
+      <span class="topic" style="background:#8b5cf6">出版形式</span>
+    </div>
+    <span class="agent">🧑 A4-出版形式要素完整性审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>CIP 数据核字号完全缺失</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A4-出版形式要素完整性审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-前置依赖" style="border-bottom-color:#7c3aed">🎯 前置依赖（2 个 P0）</div>
+<div class="card" data-topic="前置依赖" data-search="B4-跨章前置依赖审查员 核心架构概念&quot;位点&quot;从未正式定义 核心架构概念&quot;位点&quot;从未正式定义  - **位置**：Ch1 L138（表 1-2 架构视角列：&quot;日志作为数据正本，边界到哪为止&quot;）、Ch9 L25（&quot;要求系统记录同步位点&quot;）、Ch9 L85（&quot;位点按复制流的字节计数&quot;）、Ch9 L167（&quot;位点升级成...&quot;）、Ch9 L293（&quot;解读二：位点是断点续传的基础&quot;） - **概念**：&quot;位点&quot;是作者用来统指&quot;同步进度坐标&quot;的隐喻性新造词，但从未给出&quot;位点是什么&quot;的定义句 - **实际定义位置**：Ch9 9.5 解读二（&quot;位点（offset / GTID / leader epoch）是同步的通用度量&quot;），但这是**使用语境**，不是定义句 - **读者遭遇**：Ch1 表 1-2 就出现&quot;位点&quot;相关表述；Ch9 开篇第一段就要求读者理解&quot;位点&quot;；Ch10 checklist 又用&quot;位点&quot;表述同步进度 - **改法**：在 Ch9 9.1 末尾或 9.5 解读二开头加一段定义：**&quot;本书把同步进度标记统称为位点：Redis 用复制 ID 加字节偏移量（replication offset），MySQL 用 GTID 集合，Kafka 用分区 offset 加 leader epoch，三家形态各异，共同抽象是'记录同步进行到哪里的坐标'&quot;**；然后 Ch1 表 1-2 改写时去掉&quot;位点&quot;改用现有术语" style="border-left-color:#7c3aed">
+  <div class="card-header">
+    <div>
+      <span class="id">前置依赖 · P0-1</span>
+      <span class="topic" style="background:#7c3aed">前置依赖</span>
+    </div>
+    <span class="agent">🧑 B4-跨章前置依赖审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>核心架构概念"位点"从未正式定义</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B4-跨章前置依赖审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="前置依赖" data-search="B4-跨章前置依赖审查员 核心架构概念&quot;正本&quot;（source of truth）从未正式定义 核心架构概念&quot;正本&quot;（source of truth）从未正式定义  - **位置**：Ch3 L61（&quot;rename 不会发生，正本不受影响&quot;）、Ch8 L35（&quot;消息只有一份正本&quot;）、Ch8 L56（&quot;数据正本在内存&quot;）、Ch9 L13（&quot;正本与派生数据&quot;）、Ch9 L349（&quot;正本（source of truth）&quot;） - **概念**：&quot;正本&quot;是作者为&quot;source of truth&quot;造的中文对应词，但这个对应关系从未在正文中建立；Ch10 规律一只说&quot;哪份数据是正本&quot;，仍是用词而非定义 - **实际定义位置**：无全书层面的正式定义；Ch9 L349 给出的括号对应&quot;正本（source of truth）&quot;是**反向对应**（用中文解释英文，而非用英文解释中文），不符合本书&quot;首次出现时中英对照&quot;的约定 - **改法**：在 Ch9 9.1 或 Ch10 10.2.1 规律一开头加定义：**&quot;本书把'数据系统中那份被认定为准的确切数据'称为正本（source of truth）——所有副本和派生数据都以其为准。&quot;** 并将 Ch1 L138 表 1-2 中的&quot;正本&quot;替换为已有说明" style="border-left-color:#7c3aed">
+  <div class="card-header">
+    <div>
+      <span class="id">前置依赖 · P0-2</span>
+      <span class="topic" style="background:#7c3aed">前置依赖</span>
+    </div>
+    <span class="agent">🧑 B4-跨章前置依赖审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>核心架构概念"正本"（source of truth）从未正式定义</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B4-跨章前置依赖审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-参考文献" style="border-bottom-color:#3b82f6">🎯 参考文献（3 个 P0）</div>
+<div class="card" data-topic="参考文献" data-search="A3-参考文献GB-T-7714格式审查员 4 个&quot;同 [N]&quot;条目违反 GB/T 7714 格式规则 4 个&quot;同 [N]&quot;条目违反 GB/T 7714 格式规则  GB/T 7714-2015 顺序编码制中，**没有&quot;同 [N]&quot;这一格式**。重复引用应完整著录或以尾注/脚注形式处理，不应在参考文献正文条目中使用&quot;同&quot;字引导。  涉及条目： - `[32] 同 [1]` —— DDIA - `[33] 同 [22]` —— CAP 定理 - `[35] 同 [1]` —— 综合推荐节，重复引用 DDIA - `[36] 同 [2]` —— 综合推荐节，重复引用 I Heart Logs  **改写方案（二选一）**：  方案 A（推荐）：将&quot;同 [N]&quot;条目改写为 GB/T 7714 合规的简短引用格式，利用文献类型标识 `[M]` 的特性，在题名后加注&quot;同 [N]&quot;说明： ``` [32] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017.（同第 1 章引用） [33] Gilbert S, Lynch N. Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services[J]. ACM SIGACT News, 2002, 33(2): 51-59.（同第 7 章引用） [35] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017.（同第 1 章引用） [36] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014.（同第 1 章引用） ```  方案 B：将重复引用从正文条目中移除，在注释中说明&quot;本书多次引用&quot;，由出版编辑决定是否保留。" style="border-left-color:#3b82f6">
+  <div class="card-header">
+    <div>
+      <span class="id">参考文献 · P0-1</span>
+      <span class="topic" style="background:#3b82f6">参考文献</span>
+    </div>
+    <span class="agent">🧑 A3-参考文献GB-T-7714格式审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>4 个"同 [N]"条目违反 GB/T 7714 格式规则</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A3-参考文献GB-T-7714格式审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="参考文献" data-search="A3-参考文献GB-T-7714格式审查员 正文引用与文末条目缺少对应关系 正文引用与文末条目缺少对应关系  全书正文（10 章 + 序言/后记）未使用 `[N]` 编号引用标注，读者无法从正文直接跳转到文末具体条目。这意味着参考文献部分实质上是&quot;延伸阅读&quot;而非&quot;引用证明&quot;——不符合 GB/T 7714&quot;参考文献&quot;的功能定位。  **整改方向**：可选路径—— - 路径 1（轻量）：在参考文献序言段落中说明&quot;本书正文无编号引用，参考文献为延伸阅读用途&quot;，声明此为技术书惯例 - 路径 2（合规）：全书正文补充 `[N]` 引用（工程量大，涉及全 10 章修改）  **建议**：对于技术类自出版书，采用路径 1，在参考文献页开头加注说明，声明为延伸阅读型参考文献，与正文编号引用型有所区别。此做法在 O'Reilly/Manning 系列技术书中常见。" style="border-left-color:#3b82f6">
+  <div class="card-header">
+    <div>
+      <span class="id">参考文献 · P0-2</span>
+      <span class="topic" style="background:#3b82f6">参考文献</span>
+    </div>
+    <span class="agent">🧑 A3-参考文献GB-T-7714格式审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>正文引用与文末条目缺少对应关系</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A3-参考文献GB-T-7714格式审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="参考文献" data-search="A3-参考文献GB-T-7714格式审查员 在线资源访问日期格式不统一 在线资源访问日期格式不统一  26 个 `[EB/OL]` 条目的访问日期格式存在不一致：  | 格式 | 示例 | 条目 | |------|------|------| | `. [日期]. URL.` | `[2026-08-14]. http://...` | 多数条目 | | `(年份)[日期]. URL.` | `(2015)[2026-08-14]. http://...` | [37] | | `[EB/OL]. 日期. URL.` | `[EB/OL]. [2026-08-14].` | 全部 |  GB/T 7714-2015 规定：**更新日期/修订日期用圆括号，访问日期用方括号**。因此： - 有原始发布/修订日期时：`(原始年)[访问日期]` - 无原始日期时：`[访问日期]`（如 [37] 应为 ` (2015)[2026-08-14]` —— 但缺少前导空格）  **需统一**：全文 `[2026-08-14]`、`[2026-09-09]` 格式统一（已统一为 `[YYYY-MM-DD]`，✅ 基本合格；问题在于与圆括号的原始日期混用时的空格一致性）" style="border-left-color:#3b82f6">
+  <div class="card-header">
+    <div>
+      <span class="id">参考文献 · P0-3</span>
+      <span class="topic" style="background:#3b82f6">参考文献</span>
+    </div>
+    <span class="agent">🧑 A3-参考文献GB-T-7714格式审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>在线资源访问日期格式不统一</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A3-参考文献GB-T-7714格式审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-命令可运行性" style="border-bottom-color:#84cc16">🎯 命令可运行性（1 个 P0）</div>
+<div class="card" data-topic="命令可运行性" data-search="D1-命令SQL在基线版本的可运行性审查员 `SHUTDOWN NOW` — ch03:L54 `SHUTDOWN NOW` — ch03:L54 **文件**：`chapters/03-lifecycle/chapter.md`   **问题**：`SHUTDOWN NOW` 不是任何 Redis 版本（包括 7.x）的合法命令  **根因**：Redis 7.0 引入了 `shutdown-timeout` 配置参数来控制关闭时等待落后副本的行为，但 SHUTDOWN 命令本身的语法始终只有 `SHUTDOWN [NOSAVE | SAVE]`。`NOW` 不是合法的子命令。  **Redis SHUTDOWN 官方语法**（来自 redis.io / redis.conf 注释）： ``` SHUTDOWN [NOSAVE | SAVE] ```  **原文**（ch03 L54）： > `SHUTDOWN NOW` 可跳过这道等待。  **改法**（ch03 L54）： > `SHUTDOWN NOW` 可跳过这道等待。  → 删除整句，改为： > 若不想等待，可把 `shutdown-timeout` 设为 0（或在 redis.conf 中直接设为 0 秒），超时后直接退出；也可以用 `SHUTDOWN NOSAVE` 直接退出（跳 RDB，不跳副本等待）。`NOW` 不是合法的 SHUTDOWN 子命令。" style="border-left-color:#84cc16">
+  <div class="card-header">
+    <div>
+      <span class="id">命令可运行性 · P0-01</span>
+      <span class="topic" style="background:#84cc16">命令可运行性</span>
+    </div>
+    <span class="agent">🧑 D1-命令SQL在基线版本的可运行性审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>`SHUTDOWN NOW` — ch03:L54</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>D1-命令SQL在基线版本的可运行性审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-商标授权" style="border-bottom-color:#f59e0b">🎯 商标授权（2 个 P0）</div>
+<div class="card" data-topic="商标授权" data-search="A2-商标与第三方内容授权审计员 序言完全缺失商标声明段（硬伤，与历史审查重复未修复） 序言完全缺失商标声明段（硬伤，与历史审查重复未修复）  **位置**：`chapters/00-preface.md` **问题描述**：全书序言（Preface）中无任何商标声明段落。2026-07-05 compliance agent（C01）报告与 G6-global-trademark 三席审查均明确指出此问题，要求在序言 L34&quot;是为序。&quot;前插入商标声明段。但截至本轮审查，该段仍**未补入**。这是本书目前唯一的 P0 合规硬伤。 **现状**：序言仅包含正文、版本约定、AI 披露三段，末尾&quot;是为序。&quot;前无任何法律声明。 **修法**：在 `chapters/00-preface.md` &quot;是为序。&quot; 前插入：  ```markdown" style="border-left-color:#f59e0b">
+  <div class="card-header">
+    <div>
+      <span class="id">商标授权 · P0-1</span>
+      <span class="topic" style="background:#f59e0b">商标授权</span>
+    </div>
+    <span class="agent">🧑 A2-商标与第三方内容授权审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>序言完全缺失商标声明段（硬伤，与历史审查重复未修复）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A2-商标与第三方内容授权审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="商标授权" data-search="A2-商标与第三方内容授权审计员 后记商标声明使用无符号纯文本，覆盖不全 后记商标声明使用无符号纯文本，覆盖不全  **位置**：`chapters/10-epilogue.md` L63 **问题描述**：后记版权页的商标声明段落**使用了无符号纯文本**，写成&quot;Redis 是 Redis Ltd. 的商标；MySQL 是 Oracle Corporation 及其关联公司的商标或注册商标；Apache Kafka、Kafka 是 Apache Software Foundation 的商标&quot;，既未加 ®/™ 符号，也未声明 InnoDB、ZooKeeper（均需声明）。这是本书目前**唯一的在案商标声明**，但它不合格。 **当前文本（L63）**： > 商标声明：Redis 是 Redis Ltd. 的商标；MySQL 是 Oracle Corporation 及其关联公司的商标或注册商标；Apache Kafka、Kafka 是 Apache Software Foundation 的商标。本书对上述名称的使用仅作技术讨论，不代表各商标权属方对本书内容的认可。  **问题**： - Redis 应为 **Redis®**（Redis Ltd. 注册商标） - MySQL 应为 **MySQL®**（Oracle 注册商标） - Kafka 应为 **Kafka®**（ASF 注册商标） - InnoDB 未列入（Oracle 注册商标，正文出现 105 次） - ZooKeeper 未列入（ASF 商标，正文出现 33 次） - Linux 未列入（®） **修法**：替换 L63 为：  ```markdown 商标声明：Redis® 是 Redis Ltd. 的注册商标；MySQL® 与 InnoDB® 是 Oracle Corporation 及其附属公司的注册商标；Apache Kafka® 是 Apache Software Foundation 的注册商标；Apache ZooKeeper™ 是 Apache 软件基金会的商标。本书对上述名称的使用仅作技术讨论，不代表各商标权属方对本书内容的认可。 ``` **优先级**：P0，与 P0-1 同时修复。声明样板见 §4。" style="border-left-color:#f59e0b">
+  <div class="card-header">
+    <div>
+      <span class="id">商标授权 · P0-2</span>
+      <span class="topic" style="background:#f59e0b">商标授权</span>
+    </div>
+    <span class="agent">🧑 A2-商标与第三方内容授权审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>后记商标声明使用无符号纯文本，覆盖不全</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>A2-商标与第三方内容授权审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-图表编号" style="border-bottom-color:#a855f7">🎯 图表编号（1 个 P0）</div>
+<div class="card" data-topic="图表编号" data-search="E3-图表编号三重一致审查员 无。 无。  出版标准终审报告 P0-1（图序跳号 ch6/ch7/ch8）已全部修复。文件名与正文引用 100% 一致。跨章引用 0 错误。" style="border-left-color:#a855f7">
+  <div class="card-header">
+    <div>
+      <span class="id">图表编号 · P0-0</span>
+      <span class="topic" style="background:#a855f7">图表编号</span>
+    </div>
+    <span class="agent">🧑 E3-图表编号三重一致审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>无。</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>E3-图表编号三重一致审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-术语稳定" style="border-bottom-color:#0891b2">🎯 术语稳定（2 个 P0）</div>
+<div class="card" data-topic="术语稳定" data-search="B2-术语全书稳定审查员 quorum 未标注（ch7 L65） quorum 未标注（ch7 L65） - 位置：`chapters/07-cluster/chapter.md` 第 65 行 - 原文：`配置的 quorum（quorum 是人工设定的判定票数，不必是多数派）` - 问题：quorum 是缩写首现，且 book-bible §7 明确规定 `quorum → 多数派`，首次出现应标注为 `quorum（多数派）`，而非括号内又用&quot;quorum&quot;自释 - 修复建议：在 ch7 L65，将 `配置的 quorum（quorum 是人工设定的判定票数，不必是多数派）` → `配置的 quorum（多数派，人工设定的判定票数，不必是多数派）`" style="border-left-color:#0891b2">
+  <div class="card-header">
+    <div>
+      <span class="id">术语稳定 · P0-1</span>
+      <span class="topic" style="background:#0891b2">术语稳定</span>
+    </div>
+    <span class="agent">🧑 B2-术语全书稳定审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>quorum 未标注（ch7 L65）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B2-术语全书稳定审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="术语稳定" data-search="B2-术语全书稳定审查员 epoch 未标注（ch7 L90） epoch 未标注（ch7 L90） - 位置：`chapters/07-cluster/chapter.md` 第 90 行 - 原文：`epoch 用来区分选举和配置的新旧` - 问题：epoch 与 book-bible §7 的 `epoch / term → 任期` 对应，首现直接用英文&quot;epoch&quot;而未标注中文&quot;任期&quot;。后续章节（ch9 L225、L231）已正确标注为 `leader epoch（单调递增的任期号）`，ch7 的首次出现反而缺失标注 - 修复建议：在 ch7 L90，将 `epoch 用来区分选举和配置的新旧` → `epoch（任期）用来区分选举和配置的新旧`" style="border-left-color:#0891b2">
+  <div class="card-header">
+    <div>
+      <span class="id">术语稳定 · P0-2</span>
+      <span class="topic" style="background:#0891b2">术语稳定</span>
+    </div>
+    <span class="agent">🧑 B2-术语全书稳定审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>epoch 未标注（ch7 L90）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B2-术语全书稳定审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-横向对比" style="border-bottom-color:#ec4899">🎯 横向对比（1 个 P0）</div>
+<div class="card" data-topic="横向对比" data-search="B5-横向对比公平性与同口径审查员 ch1 缺 N.5 横向对比节 ch1 缺 N.5 横向对比节 - **位置**：ch1 引言章无 N.5 节 - **问题**：book-bible §4 规定每章（除第 1、10 章外）必须有 N.5 节，ch1 豁免于&quot;1.1/1.2/1.3/1.4&quot;特型结构，但 ch1 确实没有 N.5 节 - **影响**：✅ **豁免**，ch1 是引言章，按 §4 模板的&quot;第 1、10 章除外&quot;条款，豁免合理 - **裁定**：不需修复，豁免于结构模板" style="border-left-color:#ec4899">
+  <div class="card-header">
+    <div>
+      <span class="id">横向对比 · P0-1</span>
+      <span class="topic" style="background:#ec4899">横向对比</span>
+    </div>
+    <span class="agent">🧑 B5-横向对比公平性与同口径审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch1 缺 N.5 横向对比节</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B5-横向对比公平性与同口径审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-裸数字" style="border-bottom-color:#0891b2">🎯 裸数字（3 个 P0）</div>
+<div class="card" data-topic="裸数字" data-search="B3-裸数字溯源审计员 ch8:48 — Redis RDB 压缩比估算 ch8:48 — Redis RDB 压缩比估算 - **位置**：ch8-storage-format/chapter.md，第 48 行，关键数字框 - **数字**：`1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照` - **缺什么**：无官方出处；Redis RDB 压缩比受数据类型（字符串 vs 哈希 vs 列表）、Redis 版本（7.0+ 用 zstd vs 之前用 LZF）、对象大小分布影响极大，1GB→300-500MB 的比例过于精确 - **建议改法**：**补前提**，改为：   > `典型负载下，RDB 文件通常可压缩至内存占用的 30–50%（实际比例随数据类型、Redis 版本和编码格式变化，以实测为准）` - **改后文本**：保留 RDB 压缩比经验值，但加&quot;实际比例随数据类型、Redis 版本和编码格式变化，以实测为准&quot;" style="border-left-color:#0891b2">
+  <div class="card-header">
+    <div>
+      <span class="id">裸数字 · P0-1</span>
+      <span class="topic" style="background:#0891b2">裸数字</span>
+    </div>
+    <span class="agent">🧑 B3-裸数字溯源审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch8:48 — Redis RDB 压缩比估算</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B3-裸数字溯源审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="裸数字" data-search="B3-裸数字溯源审计员 ch4:34 — Redis fork 开销区间 ch4:34 — Redis fork 开销区间 - **位置**：ch4-memory-disk/chapter.md，第 34 行，关键数字框 - **数字**：`小实例几十毫秒，大实例（几十 GB 以上）可达数百毫秒` - **缺什么**：数百毫秒是经验估算，无出处；不同实例内存、不同内核版本、THP 是否开启，fork 耗时差异可超过一个数量级 - **建议改法**：**补前提**，改为：   > `fork 要拷贝页表，阻塞时间随实例内存线性上升，**受页表大小和是否开启透明大页（THP）影响，大实例（数十 GB 以上）的 fork 阻塞可达数百毫秒**` - **改后文本**：`小实例几十毫秒，大实例（数十 GB 以上）可达数百毫秒，还受页表大小和是否开启透明大页（THP）影响`" style="border-left-color:#0891b2">
+  <div class="card-header">
+    <div>
+      <span class="id">裸数字 · P0-2</span>
+      <span class="topic" style="background:#0891b2">裸数字</span>
+    </div>
+    <span class="agent">🧑 B3-裸数字溯源审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch4:34 — Redis fork 开销区间</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B3-裸数字溯源审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="裸数字" data-search="B3-裸数字溯源审计员 ch4:36 — InnoDB 缓冲池&quot;生产典型 8–128GB&quot; ch4:36 — InnoDB 缓冲池&quot;生产典型 8–128GB&quot; - **位置**：ch4-memory-disk/chapter.md，第 36 行，关键数字框 - **数字**：`InnoDB 缓冲池：生产典型 8–128GB` - **缺什么**：&quot;生产典型&quot;是行业经验，无权威来源；64GB 缓冲池 + 1TB 数据库是假设场景，无出处 - **建议改法**：**补前提**，改为：   > `InnoDB 缓冲池：生产经验来看通常设在 8–128GB 范围（具体取决于物理内存和工作集大小），命中率在工作集接近或超过缓冲池大小时急剧下降；` - **改后文本**：`InnoDB 缓冲池：生产经验来看通常设在 8–128GB 范围（具体取决于物理内存和工作集大小），命中率在工作集接近或超过缓冲池大小时急剧下降`" style="border-left-color:#0891b2">
+  <div class="card-header">
+    <div>
+      <span class="id">裸数字 · P0-3</span>
+      <span class="topic" style="background:#0891b2">裸数字</span>
+    </div>
+    <span class="agent">🧑 B3-裸数字溯源审计员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch4:36 — InnoDB 缓冲池"生产典型 8–128GB"</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>B3-裸数字溯源审计员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-金句密度" style="border-bottom-color:#eab308">🎯 金句密度（2 个 P0）</div>
+<div class="card" data-topic="金句密度" data-search="C4-章末金句密度审查员 ch10 N.6 节金句引用块数量为限额的 2.5 倍（6 块 / 限额 2 块） ch10 N.6 节金句引用块数量为限额的 2.5 倍（6 块 / 限额 2 块）  - **发现**：10.2.1–10.2.6 节含 5 条规律金句 + 1 条规律边界说明引用块，共 6 条，均在 N.6 启示节范围。 - **违规依据**：style-guide §1.5：&quot;N.6 架构启示里每章最多 2 句金句进引用块&quot;。 - **稀释风险**：5 条规律金句连续进块，单章密度是全书的集中爆发——6 块中 5 块是原则级金句，读者即使跳过正文也无法忽视，反而可能产生&quot;到处都是重点 = 没有重点&quot;的逆反。 - **修复建议**（二选一）：   - **方案 A（推荐）**：保留 2 条最强金句进引用块，其余 3 条规律金句改为加粗正文句，不进 `>` 块。规律边界说明移出 N.6 或改为普通段落。   - **方案 B**：将 10.2.6 规律小结中的&quot;规律边界说明&quot;引用块删除（1 条），其余 5 条金句合并两条到一条（将规律二/三或规律四/五合并表述），最终保留 2–3 条金句引用块。" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">金句密度 · P0-1</span>
+      <span class="topic" style="background:#eab308">金句密度</span>
+    </div>
+    <span class="agent">🧑 C4-章末金句密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch10 N.6 节金句引用块数量为限额的 2.5 倍（6 块 / 限额 2 块）</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C4-章末金句密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="金句密度" data-search="C4-章末金句密度审查员 ch10 规律五末句&quot;能写出来才算可控&quot;与规律三存在同义重叠 ch10 规律五末句&quot;能写出来才算可控&quot;与规律三存在同义重叠  - **发现**：规律三（L59）正文末有&quot;能写出来才算可控&quot;（原文：&quot;能写出来才算可控，写不出来的状态，故障时很可能演变成事故&quot;），规律五金句（L84）几乎相同。 - **位置**：ch10 L59 正文 → ch10 L84 规律五金句引用块 - **风险**：读者连读两段会觉得规律三的收尾被&quot;引用块化&quot;后在规律五里又来一遍，有工程感。原文确认：L59 收尾是普通段落句，L84 是引用块——形式上不同但内容高度重合。 - **修复建议**：规律五金句末句改为&quot;写不出来的状态，故障时很可能演变成事故&quot;（删除&quot;能写出来才算可控&quot;五字），或另起角度（&quot;故障时有没有预案，决定了状态泄露会不会演变成事故&quot;）。" style="border-left-color:#eab308">
+  <div class="card-header">
+    <div>
+      <span class="id">金句密度 · P0-2</span>
+      <span class="topic" style="background:#eab308">金句密度</span>
+    </div>
+    <span class="agent">🧑 C4-章末金句密度审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch10 规律五末句"能写出来才算可控"与规律三存在同义重叠</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C4-章末金句密度审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+<div class="section-title" id="topic-钩子导读闭环" style="border-bottom-color:#06b6d4">🎯 钩子导读闭环（2 个 P0）</div>
+<div class="card" data-topic="钩子导读闭环" data-search="C2-钩子导读小结闭环审查员 ch8 N.0 亲历段落弱于标杆，认知转变句缺失 ch8 N.0 亲历段落弱于标杆，认知转变句缺失  - **位置**：ch8 本章导读首段 - **问题**：亲历段落止于&quot;折腾了整整一周迁移脚本&quot;，无&quot;认知转变句&quot;直接说清从这次错误学到了什么规律（对比 ch2/ch5/ch7 都有明确的认知句）。N.0 后半段&quot;格式不会只写一次……演进自由度&quot;有教训，但那是陈述，不是&quot;认知转变&quot;。 - **book-bible 要求**：§3 明确&quot;每章导读原则上以作者亲历开场，第 7 章导读为标杆（场景一句、错误判断一句、后果一句、认知转变一句）&quot; - **建议**：在 N.0 亲历段末增加一句认知转变，例如：&quot;从那以后，我定格式第一件事是先想清楚向前兼容，再动手写第一条字段。&quot;——与 ch5 &quot;边界不在这三行里&quot;、ch7 &quot;落到代码里就是取舍&quot;同构。" style="border-left-color:#06b6d4">
+  <div class="card-header">
+    <div>
+      <span class="id">钩子导读闭环 · P0-A</span>
+      <span class="topic" style="background:#06b6d4">钩子导读闭环</span>
+    </div>
+    <span class="agent">🧑 C2-钩子导读小结闭环审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch8 N.0 亲历段落弱于标杆，认知转变句缺失</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C2-钩子导读小结闭环审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-topic="钩子导读闭环" data-search="C2-钩子导读小结闭环审查员 ch9 N.0 核心问题&quot;主节点写入后从节点何时可见&quot;未在 N.7 收束 ch9 N.0 核心问题&quot;主节点写入后从节点何时可见&quot;未在 N.7 收束  - **位置**：ch9 9.7 小结 - **问题**：N.0 导言的问题是&quot;主节点刚写入的那条记录，从节点什么时候能看到&quot;；N.7 小结只在末尾一句（&quot;缓存是可重建的派生数据&quot;）给出答案，但 N.0 开场的&quot;从节点何时可见&quot;问题在 N.7 正文未明确扣回。与 ch2（&quot;选数据结构看核心访问方式&quot;直接收束）、ch7（四问逐一收束）相比，紧密度不足。 - **建议**：在 9.7 小结正文倒数第二句加一句扣回，例如：&quot;主节点写入后从节点何时可见，取决于传播方式与确认条件；但更重要的是，先弄清哪份数据是正本、哪份是可重建的派生数据——这是本章在第 7 章线索上的核心结论。&quot;" style="border-left-color:#06b6d4">
+  <div class="card-header">
+    <div>
+      <span class="id">钩子导读闭环 · P0-B</span>
+      <span class="topic" style="background:#06b6d4">钩子导读闭环</span>
+    </div>
+    <span class="agent">🧑 C2-钩子导读小结闭环审查员</span>
+  </div>
+  <div class="card-body">
+    <div class="col col-left">
+      <span class="col-label">原 文 · 摘 录</span>
+      <div class="col-content"><div class="field"><span class="field-name">位置：</span><code>ch9 N.0 核心问题"主节点写入后从节点何时可见"未在 N.7 收束</code></div></div>
+    </div>
+    <div class="col col-right">
+      <span class="col-label">修 改 建 议</span>
+      <div class="col-content"><div style="color:#64748b;font-size:13px;">详见子报告 <code>C2-钩子导读小结闭环审查员.md</code></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const topicFilter = document.getElementById('topicFilter');
+const searchInput = document.getElementById('searchInput');
+const cards = document.querySelectorAll('.card');
+const visibleCount = document.getElementById('visibleCount');
+const topics = new Set();
+cards.forEach(c => { const t = c.getAttribute('data-topic'); if (t) topics.add(t); });
+[...topics].sort().forEach(t => {
+  const opt = document.createElement('option');
+  opt.value = t; opt.textContent = t;
+  topicFilter.appendChild(opt);
+});
+function updateFilter() {
+  const topic = topicFilter.value;
+  const search = searchInput.value.toLowerCase();
+  let count = 0;
+  cards.forEach(c => {
+    const cardTopic = c.getAttribute('data-topic');
+    const cardSearch = c.getAttribute('data-search').toLowerCase();
+    const topicMatch = !topic || cardTopic === topic;
+    const searchMatch = !search || cardSearch.includes(search);
+    const visible = topicMatch && searchMatch;
+    c.style.display = visible ? '' : 'none';
+    if (visible) count++;
+  });
+  visibleCount.textContent = count;
+}
+topicFilter.addEventListener('change', updateFilter);
+searchInput.addEventListener('input', updateFilter);
+</script>
+</div>
+</body>
+</html>

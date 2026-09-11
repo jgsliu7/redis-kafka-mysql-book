@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第五章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第五章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/05-layered-architecture/chapter.md</code>（295 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／表格内容／作者第一人称故事与判断不动。ch2–ch4 确诊模式复发者标「前章同款」。两席引文 60+ 处经总调度对文件逐字复核，0 失配。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">句子大多不坏，坏在包装机只买了一套模具</span></h2>
+<p>ch5 的怪与前三章都不同：几乎没有哪句话单独写坏——素材层人味很足（L7 亲历案例、L252/L272 个人判断、家常短句存在），<b>宣誓句零命中、无节奏倒挂</b>（两项都比 ch2/ch4 实质健康）。怪的是全章只有一副包装：三大节节首同一副模具铸三次、同一句图导语说了七遍、同一句"三种形态"跨节复制粘贴、同一句结论加粗两遍。tech-editor 的总判断："没有哪一句单独写坏，问题是全章只有一种节奏"；detector 给 5/10（ch2 4 → ch3 5 → ch4 6 → ch5 5），判词是<b>"每一句单看都像懂行的人写的，连起来看是同一套包装机在反复封装"</b>。修法核心不是改写句子，是<b>给每副模具设出现预算</b>。</p>
+<div class="stats">
+  <div class="stat"><div class="n">21 位</div><div class="t">播音员冒号主持人（detector 逐处点名）；其中图导语 7 连发"下面这张图把……画了出来"，"画了出来"收尾逐字 ×4</div></div>
+  <div class="stat"><div class="n">13 遍</div><div class="t">三家绕场（ch2 五遍 → ch3 11 → ch4 17 → ch5 13）；L24/26/28"X 的约束是<b>加粗</b>"三段同模，L213 是 120 字三分号巨句绕场峰值</div></div>
+  <div class="stat"><div class="n">71 / 16</div><div class="t">黑体 71 处、整句加粗 16 处；L153 一句 50 字整句加粗，L286 一段三句整句加粗——加粗沿章尾渐强，"幻灯片尾页行为"</div></div>
+  <div class="stat"><div class="n">39 / 4 句</div><div class="t">≥80 字巨句 39 句 / ≤7 字短句仅 4 句——CV 0.65 假安全（与 ch2 的 0.67 同款）；13 句 ≤10 字里 6 句在<b>报数</b>：ch3 格言垄断、ch4 标签垄断，ch5 短句槽位被报幕员占了</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L202 ⇄ L286</span><h3>同一句话加粗两遍（复制粘贴级一稿多盖）</h3><span class="badge b2">双票 · 铁证</span></header>
+  <p class="why">"分层要为水平扩展服务"在 5.4.5 结尾（L202）与 5.7 小结（L286）逐字出现且都整句加粗。人类作者复读自己的结论时会变奏，不会把同一句话连加粗一起贴第二遍。且 L286 一段之内三句整句加粗（一家一条格言），是全章"加粗渐强链"的终点。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L286，5.7 小结主体段）</div>
+      <p>Redis 的经验是：<span class="cut">**性能敏感处，分层要薄，跨层要直接**</span>。它用极少的层和函数调用把延迟降到亚毫秒，代价是放弃存储的可插拔。MySQL 走的是另一端，用 Handler API 接入几十种引擎，<span class="cut">**标准化接口能支撑起生态，但多态有开销**</span>。Kafka 的分层边界天然是网络，<span class="cut">**分层要为水平扩展服务**：交互层是三者中最重的，用来利用多核；存储层做得最薄，以此支撑高吞吐。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Redis 的经验是：<span class="add">性能敏感处，分层要薄，跨层要直接。</span>它用极少的层和函数调用把延迟降到亚毫秒，代价是放弃存储的可插拔。MySQL 走的是另一端，Handler API 接进来几十种引擎——<span class="add">生态撑起来了，行操作每次过虚函数表的开销也是实打实的。</span>Kafka 的分层边界天然是网络，<span class="add">层是给水平扩展铺路的：交互层在三家最重，吃满多核；存储层反而最薄，好把吞吐顶上去。</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>处置</b>：L202 保留原位定义（结论落地处），L286 变奏且卸加粗；三句整句加粗全卸。"交互层是三者中最重的"同族三盖（L140/L153/L286），在本段收成一处口语版。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L59 ⇄ L101</span><h3>THD / client 同一手法，正反各盖一次</h3><span class="badge b2">双票</span><span class="badge b1">前章同款</span></header>
+  <p class="why">"这与 MySQL 的 THD 是同一种思路"（5.2 里说）与"这与 Redis 的 <code>client</code> 结构体（5.2.2 节）是同一手法"（5.3 里说）是同一笔账结了两次。删哪面由全书既有裁定决定：<b>禁前向节引用、用后向呼应</b>——L59 是前向预告（MySQL 还没出场），L101 是后向呼应，删前留后。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L59，5.2.2 图后段末）</div>
+      <p>……三段之间不传参数，只传这个对象。<span class="cut">这与 MySQL 的 THD 是同一种思路，区别只在 Redis 把交互层和逻辑层放在了同一线程，所以这个对象甚至不需要跨线程。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……三段之间不传参数，只传这个对象。<span class="add">它甚至不需要跨线程——Redis 的交互层和逻辑层，本来就跑在同一线程里。</span>（跨软件呼应移到 5.3 的 L101 后向结账，"区别只在跨线程"这半句真内容随 L101 展开）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L132 ⇄ L198</span><h3>"层间通信有三种形态"——同一开头跨节用了两次</h3><span class="badge b2">双票 · 铁证</span></header>
+  <p class="why">"MySQL 的层间通信有三种形态，分别对应三条边界"（5.3.4）与"Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配"（5.4.5）——tech-editor 称"复制粘贴级同句"，是全章最容易验证的一处节级同构。5.4.5 后文 L200 靠"与部署形态匹配"展开，这个开头有实质内容，留它。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（两处开头并排）</div>
+      <p>L132：MySQL 的层间通信<span class="cut">有三种形态，分别对应三条边界</span>。连接层到服务层：THD 对象加函数调用，跨线程但同进程。……</p>
+      <p>L198：Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配。交互层到 API 层是 RequestChannel 队列，**跨线程**但同一 JVM 内。……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>L132：<span class="add">MySQL 的三层之间，走法各不相同。</span>连接层到服务层：THD 对象加函数调用，跨线程但同进程。……</p>
+      <p>L198：保留"三种形态"提法，<span class="add">卸句内三处词级加粗（**跨线程**/**同 JVM 内**/**网络协议**）——正文句自己带重音，加粗是表格里当列头用的</span>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L61 ⇄ L163</span><h3>同一位冒号主持人，隔 100 行复职两次</h3><span class="badge b2">双票（播音员族）· det 配对</span></header>
+  <p class="why">"这里有一个关键的设计取舍：**把命令做成数据**"（5.2.2）与"这里有一个设计决策：**Kafka 把"逻辑层"切成……两段**"（5.4.2）——同一句型、同一位置（小节中段）、同样接一个加粗宾语。它们是全章 21 处播音员冒号里最扎眼的一对。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>L61：<span class="cut">这里有一个关键的设计取舍：**把命令做成数据**。</span>`redisCommandTable` 是一张可查的表……</p>
+      <p>L163：<span class="cut">这里有一个设计决策：**Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段**。</span>`KafkaApis` 只做协议适配和分派……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>L61：<span class="add">Redis 把命令做成了数据。</span>`redisCommandTable` 是一张可查的表……</p>
+      <p>L163：<span class="add">Kafka 把"逻辑层"切成了两段：协议分派，和领域逻辑。</span>`KafkaApis` 只做协议适配和分派……</p>
+    </div>
+  </div>
+  <p class="dir">直接开讲、卸整句加粗——两句的内容自己都站得住，不需要主持人先举牌。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L54 / L63 / L96 / L121 / L148 / L177 / L208</span><h3>图导语七连发：同一句话介绍七张图</h3><span class="badge b2">双票</span><span class="badge b1">前章同款</span></header>
+  <p class="why">"下面这张图（时序图）把 X 画了出来"七处同模，其中四处以"画了出来"逐字收尾。每幅展品旁边都站着同一位讲解员。tech-editor 名之为"播音员导游"；detector 点名"画了出来"×4 逐字。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（四例）</div>
+      <p>L63：<span class="cut">下面这张图把 type 和 encoding 的解耦关系画了出来。</span></p>
+      <p>L96：<span class="cut">下面这张时序图把 THD 如何贯穿三层画了出来。</span></p>
+      <p>L121：<span class="cut">下面这张图把这套可插拔结构画了出来。</span></p>
+      <p>L148：<span class="cut">下面这张图把这套四级结构画了出来。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>L63：<span class="add">type 和 encoding 怎么各管一半，见图 5-2。</span>（带问题引图，不报物流）</p>
+      <p>L96：<span class="add">THD 怎么跟着一条请求穿过三层，见图 5-3。</span></p>
+      <p>L121／L148：<span class="add">（整句删——图 5-4、图 5-5 的图题已自带说明）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>预算</b>：7 处留 2–3 处，且换至少三种说法；"下面这张图把……画了出来"这个句式全章至多出现一次。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L153</span><h3>50 字整句加粗：重音外包的极值</h3><span class="badge b2">双票</span></header>
+  <p class="why">一句四个分句、整句加粗——detector："重音外包给加粗，句子自己不带重音，讲义指纹"；tech-editor 点它为黑体喇叭最重一处。且"三者中最重的"在 L140/L153/L286 出现三遍（一小节内两遍）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>……两者对并发的需求差出几个数量级。<span class="cut">**Kafka 的交互层是三者中最重的，以此利用多核、实现水平扩展，延迟比 Redis 高，但吞吐高出一整个量级**。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……两者对并发的需求差出几个数量级。<span class="add">Kafka 的交互层因此是三家最重的：吃满多核，撑起水平扩展——延迟比 Redis 高，吞吐高出一个量级。</span>（整句加粗解除）</p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L284 – L292（5.7）</span><h3>收束块：全章模具浓度峰值</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">detector 列全章最差第 1 位：绕场三格＋三整句加粗＋逐字一稿多盖＋"三条经验可以收成一句："主持人＋金句独立段加粗＋L292 好坏对仗——所有模具在最后十行里同时到齐。真正的金句 L290 反而被 15 处其他整句加粗淹没。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L284＋L288＋L292）</div>
+      <p>回到本章开头的问题：为什么必须分层？分多深？层间靠什么通信？谁可以替换？<span class="cut">三个软件用各自不同的形态解决了同一个问题：</span>怎么把交互、逻辑、存储分开，且分得划算。</p>
+      <p><span class="cut">三条经验可以收成一句：</span></p>
+      <p>**分层的价值，是让每次修改都有明确的改动位置。**</p>
+      <p>好分层下，加新功能、换实现、修 bug 各有各的落点；坏分层下，任何修改都牵动全局。<span class="cut">区分好坏的标准，是边界画得准不准。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>回到本章开头的问题：为什么必须分层？分多深？层间靠什么通信？谁可以替换？<span class="add">三家各交了各的答卷：</span>怎么把交互、逻辑、存储分开，且分得划算。</p>
+      <p><span class="add">经验的落点其实只有一句：</span></p>
+      <p>**分层的价值，是让每次修改都有明确的改动位置。**（金句与加粗都留——全章整句加粗收敛到 ≤3 处之后，它才重新成为唯一重音）</p>
+      <p>好分层下，加新功能、换实现、修 bug 各有各的落点；坏分层下，任何修改都牵动全局。<span class="add">（凿子删——答案上一句已经给了）</span></p>
+    </div>
+  </div>
+  <p class="dir">L286 主体段的手术见 §1.1。四连问后甩 41 字总结袋的节奏随拆句顺带解决。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L213（5.5 图 5-7 后）</span><h3>空转导览：图刚画完，再用 120 字三栏念一遍</h3><span class="badge b2">双票（导览族）· det 定位</span></header>
+  <p class="why">图 5-7 已把三段式映射画出来，紧接着的解读段又是三分号三家各一栏、栏长相近（37/38 字双胞胎句）——图说一遍、文念一遍。detector 列全章最差第 2 位、绕场峰值。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p><span class="cut">同样的交互、逻辑、存储三段，落到三个软件差别很大：Redis 分层最粗也最薄，跨层全是函数调用；MySQL 粒度居中，服务层里还套着解析/优化/执行三段子层，靠 THD 串起来；Kafka 则因为要跨机器，多了协调层，分层最细，靠队列和网络协议衔接。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">三段是一样的，落下来厚薄全不同：Redis 跨层就是一次函数调用；MySQL 居中，服务层里还套着解析/优化/执行；Kafka 最细——它要跨机器，层就得按网络边界切。</span>（120 字 → 一句半；三栏等重改不等重，"协调层"细节留给 5.4.4 已讲过的内容不重复）</p>
+    </div>
+  </div>
+  <p class="dir">同族：L215 表前导览句"接下来用一张三栏对比表把六个核心维度并排呈现。"——表自己会说话，删。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L119 / L54 / L68 / L126</span><h3>枚举巨句当散文跑：括号栈与箭头串</h3><span class="badge b2">双票</span></header>
+  <p class="why">全章 39 句 ≥80 字，两席 Top5 重合四句。最重 L119：Handler API 的方法清单（三层括号嵌套）塞进一个句号里收尾；L54 用箭头串把五步流水线写成一句。共同病灶：本该分行/分句的枚举，句号只出现在"一整包想法"末尾。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L119，全章最长句）</div>
+      <p>一套方法签名，规定了"引擎必须能做什么"。<span class="cut">表级的方法（`open` / `close`）、行级的方法（`rnd_init` / `rnd_next` 顺序扫描、`index_init` / `index_read` 索引扫描）、事务相关的方法（`external_lock` / `start_stmt` / `commit` / `rollback`，后两者由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行）。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>一套方法签名，规定了"引擎必须能做什么"，<span class="add">按粒度分三档。表级：`open` / `close`。行级：`rnd_init` / `rnd_next` 管顺序扫描，`index_init` / `index_read` 管索引扫描。事务级：`external_lock` / `start_stmt` / `commit` / `rollback`——后两者由 handler 层转发，真正执行在引擎级 handlerton 插件结构的同名钩子里。</span>（164 字一句 → 四句，括号栈出成正文）</p>
+    </div>
+  </div>
+  <p class="dir">同族：L54（五步箭头流水线一句跑完，拆成两三句）、L68（148 字，括号里还套"作为 quicklist 的节点"）、L126（133 字，InnoDB 文件组织多括号嵌套）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L17（导读）</span><h3>"一是/二是/三是/最严重的是"四分号报账巨句</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 全章绊脚点第 1 名：123 字一句吞下四个痛点的完整表述，读者读到"最严重的是"时第一条已经忘了。导读是全书翻阅率最高的段落，形状坏代价最大。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>这种代码在原型阶段跑得很快，但只要复杂度上来一点，它就会从四个方面同时出问题。<span class="cut">一是改任何一行都要同时理解协议、SQL 和内存模型，认知负担重；二是换网络库或改存储格式会牵动整个文件，爆炸半径大；三是可测试性差，业务逻辑没法脱离网络做单元测试；最严重的是难以演进，升级存储格式时会发现协议处理代码里到处是针对旧格式的硬编码假设。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>这种代码在原型阶段跑得很快，但只要复杂度上来一点，就会四面同时出问题。<span class="add">改任何一行，都得同时理解协议、SQL 和内存模型——认知负担重。想换网络库或改存储格式，牵动的是整个文件，爆炸半径大。业务逻辑钉死在网上，没法脱离网络做单元测试。最严重的是难以演进：升级存储格式时，协议处理代码里到处是针对旧格式的硬编码假设。</span>（四分号报账 → 四句；四个事实原样保留）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L142 – L148（5.4.1）</span><h3>四连黑体标签段：Acceptor / Processor / RequestChannel / KafkaRequestHandler</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 绊脚点第 4 名：四个组件四段，全部"**黑体标签** 是……"同一姿势起手、同一重量。段内有真料（L146 有界队列与背压、L142 "只做一件事：`accept` 新连接"），被台账排版盖住了。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L144，四连之二）</div>
+      <p><span class="cut">**Processor** 是一组线程（数量可配，典型几个到十几个）</span>，每个 Processor 管理一批连接的网络读写和协议编解码。它把客户端发来的字节流按 Kafka 协议解析成 `Request` 对象，写入 RequestChannel；同时把 `Response` 从 RequestChannel 取出来，序列化写回客户端。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">Processor 是一组线程，数量可配，典型几个到十几个。</span>每个管一批连接的网络读写和协议编解码：把客户端发来的字节流按 Kafka 协议解析成 `Request` 对象，写入 RequestChannel；再把 `Response` 从队列里取出来，序列化写回客户端。（标签卸、句长拉开）</p>
+    </div>
+  </div>
+  <p class="dir"><b>四段改两深一浅一收</b>：RequestChannel 段（背压机理）与 Acceptor 段（"只做一件事"轻快）展开；Processor 与 KafkaRequestHandler 两段合并速览；L146 末句普适盖章（"是高吞吐系统的通用做法"）见 §4 待裁。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L36 / L86 / L136（三大节节首）</span><h3>节首 T 台：同一副骨架铸三次</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">三大软件节的首段都是同一副"定位句＋核心目标句（可加粗）＋冒号＋『X 层 用/把…』三项顿号清单"。任何一节单独读都成立，三节连读即穿帮：读者翻到 5.4 第一段就知道冒号后必然是三项顿号。tech-editor 的关键洞察：<b>Kafka 恰是三家里最不一样的一家，却被塞进同一副模板</b>——5.4.4 自己承认"比三段式多出一段"，这就是"三段式装不下它"的正文证据。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L136，5.4 节首）</div>
+      <p>Kafka 的分层是第三条路。它的核心目标是<span class="cut">**水平扩展与高吞吐**</span>，所以它的分层是为分布式服务的：每一层都要能跨机器并行。<span class="cut">网络层用 Reactor 加 RequestChannel 把"收发"和"处理"在多线程间解耦、API 层用统一的 `handle` 分派把"请求类型"做成可枚举的协议、Log 层把存储抽象成"追加写加偏移量寻址"</span>，使存储层与复制层共享同一份数据。此外还有 Kafka 独有的"协调层"。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">Kafka 装不进前两节那个三段式。机器一多，"层"就不再是进程里的函数边界，而是网络边界：收发和处理要在多线程间拆开（Reactor 加 RequestChannel），请求类型做成可枚举的协议（统一的 `handle` 分派），存储抽象成追加写加偏移量寻址（Log），让存储层与复制层共享同一份数据。三段之外还多出一段——协调层，5.4.4 单独讲。</span>（起手从"三段式装不下它"破题，替换第三副同模节首；目标句加粗与冒号清单一并卸）</p>
+    </div>
+  </div>
+  <p class="dir"><b>预算</b>：节首模具全章留一副（5.2 首现定义处）；5.3 轻调（"与 Redis 相反"转场保留，三项顿号清单改两句）；5.4 重写（上例）。同族"相反/对照"节尾转场 7 处（L72/L86/L115/L132/L136/L244/L286）留 2–3 处。</p>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">给每副模具设出现预算，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>黑体预算：71 处黑体 / 16 整句加粗 → 整句加粗 ≤3 处</h3><span class="badge b2">双票</span></header>
+  <p class="why">全章 59 行含 <code>**</code>，整句/整分句加粗 16 处、词级加粗成串（L198 一句三处）。detector 的判词：重音外包给加粗，句子自己不带重音——讲义指纹；tech-editor 的判词：加粗沿章尾渐强成"渐强链"，是幻灯片尾页行为不是文章行为。每句都有重音＝没有重音。</p>
+  <p class="dir"><b>预算落地</b>：整句加粗收敛到 ≤3 处——L290 金句必留（全章真重音），L278（"当一层的价值不再抵得过它带来的协调成本，就该删"）与 L101（"边界靠对象，不靠拷贝。"）二选一可留；其余全卸（术语黑体是排版契约，不动——动的是"整句定律加粗"）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>播音员冒号 21 → ≤5；报数布告收敛</h3><span class="badge b2">双票</span></header>
+  <p class="why">冒号前先站一位主持人报幕（"就看一件事：""这里有一个设计决策：""可以概括成一句："），全章 21 处；"N 件事："强模板 4 处（L11/L19/L44/L142），"有 N 种/根因有三条/分成四级"式报数布告 10+ 处，"三/四/五＋N 个"框架密度约 20 处——本章签名级口癖。</p>
+  <p class="dir">冒号留 ≤5 处真正需要预告的（节级路标如 L228"差异的根因有三条。"可留）；L11/L19/L44/L142 四处强模板句直接开讲；L82"可以概括成一句："、L288"三条经验可以收成一句："两处"收成一句"留一处。报数句与后文枚举不必一一对应——内容天然几块写几块。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场 13 遍 → 5 遍</h3><span class="badge b2">双票（tech 以三连/节级同构同位命中）</span></header>
+  <p class="why">点名句全章 13 遍：导读 L9、三约束段 L24–28（三段同模）、L30 源码目录、L206、L213（峰值）、L215、L230–234、L244（谓语"X 的答案是"三连）、L248 双遍、L256、L286。对比节 5.5 的绕场是本职工况；病在它又是唯一的总结姿势。</p>
+  <p class="dir">保留：L206（对比节开门正式版）＋表 5-1＋L213 压缩后的一句半＋导读一句钥匙版。砍：L244 启示一"X 的答案是"三连换不等长（Redis 深进、其余一拍）；L248 双遍并一遍；L24–28 三段同模保留约束陈述、换掉三段同一个"X 的约束是**加粗**"骨架（一段留榫头，两段换起手）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>短句槽位：报幕员退场，家常短句补位</h3><span class="badge b2">双票</span></header>
+  <p class="why">13 句 ≤10 字短句里 6 句在报数（"线程模型有两种。""差异的根因有三条。""分多深？"）、1 句格言、1 句断片标签——短句出现时多半在数数，不在喘气。70 个多句段里 39 段全段无 ≤12 字短句（56%）；最平的节是 5.4.2（CV 0.39）与两个"层间通信"节（0.41/0.50）——罗列节。</p>
+  <p class="dir">章内好样子已在：<code>"它是个可选优化。"</code>（L44）、<code>"认证本身是可插拔的。"</code>（L92）、<code>"索引是稀疏的。"</code>（L171）、<code>"这三者都谈不上优雅。"</code>（L248）——机制讲完随手一记，不雕刻。向 5.4.2、5.3.4、5.4.5 三个罗列节铺；连排峰值段（L126 七连长句）优先拆一脚刹车。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>凿子与对仗刹车：密度病</h3><span class="badge b2">双票</span></header>
+  <p class="why">段末凿子约 12 处、节末"相反/对照"对仗 6 处必有——单看多数成立（L101/L236 有分量），密度上来后读者开始等它。另："代价是"句首 5 处＋换来/换掉/换取 6 处，每个大节末尾都用同一副"收益/代价"天平收秤（L128 是双分录峰值："如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎……这笔开销就是生态收益"）。</p>
+  <p class="dir">凿子留真有分量的 4–5 处；对仗刹车 6 处留 2 处；取舍的动词换着说——章内好例 L169"追加写是磁盘上最快的写法。"（直接陈述，不记账）。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>L113 查询缓存段</b><br><span class="badge bd">两席分歧</span></td>
+      <td>tech-editor 列全章标杆（分层失败案例的解剖，内容最硬）；detector 列 5.3.2 扣分主因（"任何一张表……收益"一句 90 字三连分号）</td>
+      <td>内容与形状分开裁：<b>技术内容一字不动</b>；分号串拆句属低优先顺带（拆法随流水线）。<b>上作者</b>裁要不要动形状</td></tr>
+  <tr><td><b>L101 THD 段</b><br><span class="badge bd">两席分歧</span></td>
+      <td>tech-editor 列标杆（指着图说话、"MySQL 顶上的分层边界是虚的"有锋芒）；detector 计入盖章句（"是同一手法"）＋凿子（"边界靠对象，不靠拷贝。"）</td>
+      <td>段好章坏：段与后向呼应保留、章头软化（§1.2 已处理前向那面）；"边界靠对象，不靠拷贝。"是全章最有分量的凿子之一，建议留。<b>上作者</b></td></tr>
+  <tr><td><b>L146 RequestChannel 段</b><br><span class="badge bd">两席分歧</span></td>
+      <td>tech-editor 列标杆（"一个**有界阻塞队列**。"断片有力）；detector 列普适盖章（"这种用有界队列阻塞入队来限制请求进入速度的模式，是高吞吐系统的通用做法。"）＋断片算标签垄断</td>
+      <td>断片留；末句盖章删或留<b>上作者</b>（内容是真规律，问题只在"通用做法"的背书姿势）</td></tr>
+  <tr><td>「最」字颁奖 ~10 处</td>
+      <td>detector 新模式：叙述者不断发奖牌（"三者里最'重'的""最成功的接口""最朴素的""最真实的"），L248 一段双最、L140/L153"最重"一小节两盖</td>
+      <td>detector 单票。有的"最"是实义判断（"交互层最重"是真观察）。逐处问：这个"最"删掉后判断是否受损？<b>上作者</b></td></tr>
+  <tr><td>「这里」讲解员 ×10</td>
+      <td>detector 新模式："这里要做一次概念校准：""这里有一个设计决策：""这里只看它作为……的形态"——文章持续给自己定位，像博物馆讲解员举手（L30/L61/L140/L163/L167/L177/L256/L270）</td>
+      <td>detector 单票。L42"根子就在这里。"是自然口语收点（保留），其余 9 处走流水线软化。<b>上作者</b>裁力度</td></tr>
+  <tr><td>元口径布告 ×3</td>
+      <td>detector 新模式："层数的口径先说清：""这里要做一次概念校准：""这里把夹在中间的 RequestChannel 也单独数作一级"——先立数数规则再数数</td>
+      <td>detector 单票。L140 有真实跨章口径对齐内容（第 3 章图 3-5 数三层 vs 此处数四级），部分正当；L215 随表格导读瘦身。<b>上作者</b></td></tr>
+  <tr><td>盖章句计数 4 vs 8</td>
+      <td>tech-editor 数 4 处（L59/L101/L115/L202，只计"跨软件呼应"型）；detector 数 8 处（另计 L5/L76/L280/L284）</td>
+      <td>口径差异登记，非方向分歧。两票重合的 L59/L101/L202 已列 §1；L5（导读主旨句，定义型可留）与 L280/L284 随 §2.1/§3 处理</td></tr>
+  <tr><td>节奏倒挂</td>
+      <td>detector 判"未命中"（相较 ch2 的实质进步：5.5 CV 0.74、5.7 0.59，最平的是罗列节）；tech-editor 判"全章只有一种节奏"</td>
+      <td>两席相容：没有哪区特别死，因为处处同模——5.5/5.7 的高方差是"模具方差"（9 字报数句与 120 字绕场巨句交替），不是会话方差。登记表述，不改文</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L7 导读案例</b>（作者第一人称亲历，豁免契约）："我接手过一个运营后台……我只动了三行，但影响的边界根本不在这三行里。"——两席共举全章人味锚点。</li>
+  <li><b>L272 评审必问句</b>："我评审分层方案时必问一句：这一层挡住了什么变化？答不上来的层，就是我下一步要删的层；为'将来可能需要'预留的扩展点，我至今没见几个真用上的。"——detector 判"全章锋芒最利"；<b>L252</b> 检验标准句同豁免。两处均非宣誓模具（detector 明确）。</li>
+  <li><b>L113 查询缓存段的全部技术内容</b>（"缓存做在服务层，而数据失效的源头在引擎层"的失败解剖）——分歧只在分号形状，内容一个字不动。</li>
+  <li><b>家常短句好例</b>：L42"Redis 看起来分层薄，根子就在这里。"／L171"索引是稀疏的。"／L175"消息是不可变的字节流，Broker 拿到什么就转发什么。"／L230"它的存储根本换不了，换了就不叫 Kafka 了"／L248"这三者都谈不上优雅。"</li>
+  <li><b>L206</b>"三个软件都分层，但 Redis 薄、MySQL 中、Kafka 厚。"——5.5 对比节开门的正式版绕场，本职工况。</li>
+  <li><b>L290 金句本身</b>："分层的价值，是让每次修改都有明确的改动位置。"——内容与加粗都留；手术是卸掉周围 15 处整句加粗，让它重新成为全章唯一重音。</li>
+  <li><b>表 5-1 内容、术语黑体（结构名）、图注编号、L294 下章钩子、"详见第 7/8/9 章"分工句</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准：好文字给的是<b>具体事实＋带牙口的个人判断</b>（L7、L272、"换了就不叫 Kafka 了"）；怪的全是<b>包装动作</b>（报幕、颁奖、盖章、加粗）。这章不用动内容，动的是包装机的复用率。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch5 新增四测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>导览员测试</b><br>（ch5 新增）</td><td>数"下面这张图把……画了出来"式图导语——超过 3 处同句式，就是每幅展品旁都站了讲解员。改成带问题引图，或信图题自己说话。</td></tr>
+  <tr><td><b>报幕员测试</b><br>（ch5 新增）</td><td>把全章 ≤10 字短句挑出来，数几成在报数（"有两种""根因有三条""分多深？"）。报数过半＝该喘气的地方在数数——ch3 是格言垄断、ch4 是标签垄断，ch5 是报数垄断。</td></tr>
+  <tr><td><b>T 台测试</b><br>（ch5 新增）</td><td>把各大节的首段抄下来并排——同一副"定位句＋加粗目标＋冒号＋三项顿号清单"＝节级模具。读者翻到第三家的第一段就能背出整段，模具就外露了。</td></tr>
+  <tr><td><b>加粗通胀测试</b><br>（ch5 新增）</td><td>数整句加粗的处数——超过 3 处就是通胀（每句都有重音＝没有重音）。检验：全章最想留给读者的那句话，现在还"响"吗？</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车＝三长无一短（本章 39/70 段全段无 ≤12 字短句，L126 七连为最）。</td></tr>
+  <tr><td><b>复读测试</b><br>（沿用）</td><td>同一句话在本章逐字出现两遍（"分层要为水平扩展服务"L202/L286 连加粗一起贴了两次）＝复制粘贴级复读——留一处定义，其余变奏或删。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；L119 拆句中 handlerton 转发链、L186 Tiered Storage 版本口径属<b>技术内容</b>，动到即走技术席</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 全章量化 + 分节评分，tech-editor 绊脚点/标杆/修法优先级）；ch2–ch4 同轮参照：0908/第二章/、0908/第三章/、0908/第四章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

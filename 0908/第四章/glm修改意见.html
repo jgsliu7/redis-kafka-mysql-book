@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第四章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第四章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气；127 处引文逐字核验 0 失配）｜ 对象：<code>chapters/04-memory-disk/chapter.md</code>（315 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／表格内容／作者第一人称故事不动。ch2/ch3 确诊模式复发者标「前章同款」。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">病不在机制区，在每一次“总结动作”</span></h2>
+<p>ch4 是三章里最两极的一章：4.2–4.4 的故事与现场（fork 破案、大报表、缓冲池污染）是全书最好级别的文字；但<b>每一个总结动作都是同一套模具</b>——三个节末“取舍总结”是同一句话的三次填空、绕场 17 遍（导读、三范式、4.5 五段、4.6 五启示、小结两轮）、启示末段“我会先……”五连发＋“这条规律普适”四枚图章。detector 的判词：**判断区死于模具，机制区死于巨句；活的部分只在“故事”，不在“论述”**。现状 6/10（ch2 4 分、ch3 5 分、ch4 浓度渐升；分节最重：4.5 与 4.6 各 8 分），作者及格线 ≈2/10。</p>
+<div class="stats">
+  <div class="stat"><div class="n">14 + 3 处</div><div class="t">三家绕场（14 完整＋3 半场）——ch2 五遍、ch3 11 处、ch4 升到 17；L280 谓语“把缓存建在”三遍一字不差，启示五（L300）甚至扩到四家</div></div>
+  <div class="stat"><div class="n">15+ / 22 句</div><div class="t">≤10 字短句 22 个里 15+ 个是<b>结构标签</b>（清单标签/黑体维度/“有三个事实”式引入句）——ch3 是格言垄断短句槽位，ch4 是<b>路牌垄断</b>；真呼吸的短句约 5 句且全部藏在机制区</div></div>
+  <div class="stat"><div class="n">22 句</div><div class="t">≥80 字巨句（最长 211 字在 L212 零拷贝段；L218 162、L206 153）；CV 0.68 表面达标仍是单向方差——与 ch2/ch3 等剂量</div></div>
+  <div class="stat"><div class="n">22+ 处</div><div class="t">被“三”预分格（“三个”22 处＋三种/三档/三组＋四组第一二三枚举＋8 处“N 个 X”引入句）——连八种淘汰策略也要“归成三组”（L83）</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L120 / L178 / L235</span><h3>取舍总结三连模具（账单句）</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">三个软件节的收尾都是同一副骨架：“X 的取舍：它付出／用 A 换来 B”＋“代价是 C”找零句。三连击后读者学会直接跳过每节最后一段的前半句。这是对账单段（ch2 已确诊）的章节级放大——配上散布全章的“换来”6 处、“换掉”2 处，<b>整章表达取舍的动词只剩“换”一种</b>（约 12 处交易腔）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L178，4.3 取舍总结首句）</div>
+      <p><span class="cut">MySQL 的取舍：它用“复杂的缓冲池 + redo log + 三个辅助结构”换来“大容量 + ACID 可靠 + 通用 SQL 查询能力”。</span> 它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式撑不了这个容量，Kafka 的顺序日志范式给不了随机查询，剩下能选的就是 MySQL 这种“磁盘为主、内存加速”的复杂系统。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">（账单句删——后两句已经把账算完了，且算得比账单句好）</span>它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式撑不了这个容量，Kafka 的顺序日志范式给不了随机查询，剩下能选的就是 MySQL 这种“磁盘为主、内存加速”的复杂系统。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L120，4.2 取舍总结首句）</div>
+      <p><span class="cut">Redis 的取舍可以一句话概括：它付出内存成本、接受秒级的持久化窗口，换来读写低延迟和原生的多种数据结构。</span> 这套取舍在缓存和快速键值场景成立……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">Redis 这笔账在缓存场景才划算：花内存的钱，买每次访问不过毫秒的延迟；持久化只做兜底，丢最近一秒也认。</span>这套取舍在缓存和快速键值场景成立……（口语收法——三节三种收法，不再互为填空）</p>
+    </div>
+  </div>
+  <p class="dir"><b>三节三收</b>：4.2 口语一句收、4.3 删账单句让反例提头（上例）、4.4 干脆不总结（L235 段的“这是流式日志与通用数据库的边界”本身够收）。全章“换来/换掉”12 处压到 3–4 处——取舍换成具体动词说（章内好例：L156“把‘事务提交’的延迟<b>从</b>‘随机写一堆页’<b>降到了</b>‘顺序写一条日志’”，用“降”不用“换”）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L280（4.6 启示二）</span><h3>最机械的一遍绕场：谓语三遍一字不差</h3><span class="badge b2">双票 · 最重</span><span class="badge b1">前章同款·加重</span></header>
+  <p class="why">“把缓存建在”三遍逐字相同，且这是全章第 9+ 遍绕场——到启示二时读者已经看了八遍同款。两席共判绕场为 ch4 第一病理：对比章里绕场是正当动作，问题是<b>它成了唯一的总结姿势</b>，导读、4.1 末、4.5 五段、4.6 五条、4.7 两轮，每次收束都是同一支舞。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>把它们的缓存建层选择并列：<span class="cut">Redis 把缓存建在进程内（它自己就是缓存）；MySQL 把缓存建在进程内（缓冲池）；Kafka 则把缓存建在操作系统内核（PageCache）。</span> 层级越靠下，复用面越广（同一台机器上的所有进程共享 PageCache），但控制力越弱……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>把它们的缓存建层选择并列：<span class="add">这一层三家只给了两个答案。Redis 和 MySQL 都建在进程内——Redis 自己就是缓存，MySQL 靠缓冲池；Kafka 把这一层交给了操作系统内核。</span>层级越靠下，复用面越广（同一台机器上的所有进程共享 PageCache），但控制力越弱……</p>
+    </div>
+  </div>
+  <p class="dir"><b>总量目标</b>：17 遍压到 3–4 遍——4.1 末的三范式列表（L59–63）是正式版、保留；4.5 对比节是本职工况、保留一至两遍；4.6 五条启示留两轮（启示五 L300 的四家层级链有内容，可留）；导读、4.7 小结两轮砍掉（见下条与 §2）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L7（导读第二段）</span><h3>第 2 段就把全章结论倒出来</h3><span class="badge b2">双票</span></header>
+  <p class="why">99 字完整三栏对比＋段末“一个快但容量有上限，一个稳但延迟看命中率，Kafka 吞吐高，但换不来随机查询”又一栏——之后 4.1 末（L57–63）17 行内原样再来一遍正式版，全章 14 次绕场都是这句的变奏。导读留钥匙，把完整三栏推迟到 4.5。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>面对同一个问题，Redis、MySQL、Kafka 有三个几乎相反的方案：<span class="cut">Redis 以内存为主、磁盘只做备份；MySQL 以磁盘为主、内存只做加速；Kafka 以磁盘上的顺序日志为主，加速靠操作系统内核的 PageCache。</span>这三个选择各自从所服务的访问模式倒推出来。理解了这个分叉，它们后续的性能特征和取舍就都能对上：<span class="cut">一个快但容量有上限，一个稳但延迟看命中率，Kafka 吞吐高，但换不来随机查询。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>面对同一个问题，三家给出了几乎相反的方案——<span class="add">怎么个相反法，本章三节分头看，4.5 放进一张表里对齐。</span>这里先给一把钥匙：<span class="add">每个方案都是从它所服务的访问模式倒推出来的</span>，理解了这个分叉，后面各家的性能特征和取舍就都能对上。</p>
+    </div>
+  </div>
+  <p class="dir">导读 L5（物理困境）与 L9（选型故事）两席共举为全章最有人味的段落，不动；动的只是这段“预告片”。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L276 / L284 / L290 / L296 / L302</span><h3>启示末段五连：宣誓句＋普适盖章</h3><span class="badge b2">双票（同位异名）</span></header>
+  <p class="why">五条启示每条的收尾段都是同一个动作——tech-editor 命名<b>宣誓句</b>（“我做选型时会先列出……”“我现在……会先问自己一句”“下次评估……我会先看”五连发），detector 命名<b>普适盖章</b>（“这条启示在中间件设计里反复出现”“这条规律在系统设计里普适”“这条规律从处理器体系结构到存储系统是同一条”四枚图章，模具率 80%）。第一人称本是这本书的命脉，五连发把它变成了道具；四枚图章则替规律的普遍性反复背书。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L284 段末，启示二）</div>
+      <p>……Kafka 不需要这种精度，所以它直接用上了 OS 缓存的复用面，以及重启后 PageCache 仍然有效的好处。<span class="cut">这条启示在中间件设计里反复出现。</span>我现在在用户态造缓存之前，会先问自己一句：这段缓存换来的精度，值不值它和 OS 缓存竞争内存的代价。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……Kafka 不需要这种精度，所以它直接用上了 OS 缓存的复用面，以及重启后 PageCache 仍然有效的好处。<span class="add">（空图章删——“反复出现”零信息）</span>我现在在用户态造缓存之前，会先问自己一句：这段缓存换来的精度，值不值它和 OS 缓存竞争内存的代价。（此处的宣誓留——它是五条里最具体的）</p>
+    </div>
+  </div>
+  <p class="dir"><b>留二删三</b>：宣誓留 L284（问自己一句，最具体）与 L302（章末钩子，接第 10 章）；L276／L290／L296 的宣誓段换成事实或反例收口。图章四枚只留 L300（“从处理器体系结构到存储系统”那枚有跨层实料，且是全章主线的收束），L284／L296 两枚空章删。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L288（启示三）</span><h3>自认复读，然后又复读一遍</h3><span class="badge b1">detector · 强证据</span><span class="badge b1">ch3 同族双票</span></header>
+  <p class="why">“刷盘参数＝同一取舍”这个论点全章盖了 4 次章（L104→L218→L288→L290），L288 开头还写着“**4.4 节已把 `acks` 三档和另外两家的刷盘参数对照过一次**”——自己承认对照过了，然后再把三家参数原样列一遍。同病：“顺序写远快于随机写”盖了 6 次（L45/53/156/194/294/296）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>它们的每个刷盘参数，都是同一道选择题的不同档位——4.4 节已把 `acks` 三档和另外两家的刷盘参数对照过一次。<span class="cut">Redis 的 `appendfsync`（always / everysec / no）、MySQL 的 `innodb_flush_log_at_trx_commit`（1 / 2 / 0）、Kafka 的 `acks`（all / 1 / 0）与 `log.flush.*`。</span>把它们画在同一根轴上，它们的位置几乎一一对应：最严的那档“每条都落盘”对应最强不丢，最松的那档“交给 OS”对应最高吞吐。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>它们的每个刷盘参数，都是同一道选择题的不同档位——4.4 节已把 `acks` 三档和另外两家的刷盘参数对照过一次，<span class="add">参数表不重列。</span>这里只记轴的两端：<span class="add">“每条都落盘”买最强不丢，“交给 OS”买最高吞吐</span>——中间那档，各家叫法不同，账是同一本。</p>
+    </div>
+  </div>
+  <p class="dir">6 次“顺序写快”收敛：4.1 的 L53（约束三）与 L156（WAL 动机）是定义处保留；L45／L194／L294／L296 四处复述压成一处处（建议留 L294 启示四正文，其余卸掉）。</p>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L256 – L264（4.5）</span><h3>五个黑体标签段连续同模——全章最死的一节</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">表 4-3 之后五个维度解读段，全部“**黑体维度词。**＋点名骨架＋100–150 字＋段内最长句收尾”——五段同一重量、同一形状，教科书词条排版；表格已经对比过一遍，这五段又用同一模具 parade 一遍（双重对比）。detector 评 4.5 全章最高分 8/10。段内唯一的好变奏是 L260“这条最好记……直接出局”。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L258，五连之二）</div>
+      <p><span class="cut">**内存管理主体**。</span>这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 运维的重心在某种程度上从“调 Kafka 参数”转到了“调操作系统参数”，这点常被忽略。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">内存管理主体是最实用的分界线。</span>Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）；Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）——Kafka 运维的重心因此从“调 Kafka 参数”挪到了“调操作系统参数”，<span class="add">这点常被忽略。</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>五段改两深一浅一拳</b>：只展开“持久化机制”与“典型故障模式”两段（这两段有“为什么不同”可讲，句长拉开、卸黑体标签）；“内存管理主体”半展开（上例）；“随机访问能力”（L260 原样保留，它就是那记轻拳）与“崩溃恢复代价”并成一小段速览。段前导 L254“按维度解读，要点都在‘为什么不同’。”是最空转的一句——删。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L212（图 4-6 后）</span><h3>211 字巨句：冒号清单＋两重括号＋分号串＋箭头串</h3><span class="badge b2">双票</span></header>
+  <p class="why">全章最长句，一句之内四件套全上。它又是图后解读段——读者刚看完图正放松，撞上全章第二密的句子。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录首尾）</div>
+      <p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。<span class="cut">零拷贝路径（基于 `sendfile` / Java NIO `transferTo`）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；在支持 scatter-gather DMA 的现代网卡上（生产环境基本默认满足），剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。<span class="add">零拷贝路径（基于 `sendfile` / Java NIO `transferTo`）砍掉中间两次：磁盘 → 内核 PageCache → 网卡，数据全程不进用户空间，只剩 2 次上下文切换。</span><span class="add">再往下是硬件的事：支持 scatter-gather DMA 的现代网卡（生产环境基本默认满足）上，剩下的 2 次拷贝也由 DMA 完成，CPU 不碰数据——“零拷贝”的名字就是这么来的。</span><span class="add">它有个前提：数据得已经在 PageCache 里；冷数据仍要先等磁盘 I/O。</span></p>
+    </div>
+  </div>
+  <p class="dir">211 字 → 4 句。同族巨句：L218（162 字，一句塞三个参数对照＋两个跨章指引——指引拆出括号独立成句）、L104（109 字默认值纠正，见下）、L264（故障段 Kafka 半句三层嵌套）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L79（4.2 LFU 段）</span><h3>全章走神王：约 340 字无一个短句</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 绊脚点第 1 名：5 个分句的 4 步逻辑链一口气读完，嵌在全章最长的段落里；段中“按距上次访问的时长和 `lfu-decay-time` 参数懒式计算衰减量（非后台定时衰减）”是术语压缩，普通读者必回读。detector 以“LFU 段巨句群”列 4.2 主因。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（巨句本体）</div>
+      <p>为了不在这个计数器上花太多内存，它用的是 Morris 风格的**概率近似计数器**：只用 8 位。<span class="cut">普通 8 位计数器最大只能到 255，而这个计数器按概率递增，值越大再往上加 1 的概率越小，计数值随真实访问次数对数增长，所以 8 位能近似记到数十万级。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>为了不在这个计数器上花太多内存，它用的是 Morris 风格的**概率近似计数器**：只用 8 位。<span class="add">8 位普通计数器数到 255 就封顶。这个不一样：访问一次不一定加一，计数值越大，再加一的概率越小。</span><span class="add">于是计数不随访问次数线性涨，而是按对数爬——8 位就够近似记到数十万次访问。</span>LFU 不需要精确计数……（后文原样）</p>
+    </div>
+  </div>
+  <p class="dir">技术事实全保留（Morris／8 位／255／对数增长／数十万级）。段末衰减机制句“每次访问时，按距上次访问的时长和 `lfu-decay-time` 参数懒式计算衰减量”顺带拆成两句。紧随其后的 L81 场景段是全章救场好例，不动。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L312（4.7 实操三要点）</span><h3>清单中项膨出（15 / 128 / 26 字三明治）</h3><span class="badge b2">双票 · ch4 特有</span></header>
+  <p class="why">三个要点“第一”约 15 字、“第二”128 字、“第三”约 26 字——中项把全部信息量（括号参数、让步、条件、吞吐警告）吞进一句，两端光杆。这是 ch3“清单尾部塌陷”的镜像病：塌陷在尾，膨出在中。读者扫读只见骨架，精读被中项噎死。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（第二项全文）</div>
+      <p>第一，避免用 Redis 存储全量业务数据。<span class="cut">第二，Kafka 默认把刷盘交给操作系统、用异步刷盘换吞吐，不丢数据的兜底是副本机制（`acks=all` 配合 `min.insync.replicas`）而不是本地 fsync，所以通常无需开启 `log.flush.*`；只有合规等硬要求场景才考虑显式 fsync，开启前需要先实测吞吐跌幅。</span>第三，缓冲池命中率和 PageCache 命中率是两个需要持续关注的核心指标。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>第一，避免用 Redis 存储全量业务数据。<span class="add">第二，Kafka 不丢数据的兜底是副本，不是本地 fsync。可靠性靠 `acks=all` 配合 `min.insync.replicas`；`log.flush.*` 只在合规这类硬要求下才考虑，开启前先实测吞吐跌幅。</span>第三，缓冲池命中率和 PageCache 命中率是两个需要持续关注的核心指标。（中项首句短斩立骨，参数与条件跟句展开；三项体重拉匀）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L206（4.4 三个理由·第三条）</span><h3>括号藏私货：80 余字两层嵌套塞进主句</h3><span class="badge b2">双票</span></header>
+  <p class="why">主句讲“Kafka 重启后 PageCache 仍在”，括号把 MySQL 的 I/O 路径和 `O_DIRECT` 分支整段塞进来，读到右括号时主句已经忘了。信息本身有价值（tech-editor：该是独立小段），位置和形态全错。修法不是删是<b>出栈</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>第三，进程重启后 PageCache 仍在。这是把内存交给 OS 才有的好处。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动<span class="cut">（MySQL 有个小例外：默认缓冲 I/O 下数据文件也过 PageCache，进程重启后页若还在，缓冲池回温会快些；配了 `O_DIRECT` 则连这层便利也没有）</span>；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>第三，进程重启后 PageCache 仍在。这是把内存交给 OS 才有的好处。Redis 重启后内存是空的，MySQL 重启后缓冲池是空的，都要经历一段冷启动。<span class="add">MySQL 有个小例外：默认缓冲 I/O 下数据文件也过 PageCache，进程重启后页若还在，缓冲池回温会快些；配了 `O_DIRECT`，连这层便利也没有。</span>Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。这对运维极友好。</p>
+    </div>
+  </div>
+  <p class="dir">同病：表 4-1 的 L26 单元格在“相对内存”数值列里塞了两代 PCIe 叙述句（表格是拿来扫的，这格逼眼睛开始“读”）——数值化或移脚注，随 §4 待裁。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L104（4.2 AOF 档位后）</span><h3>109 字默认值纠正巨句</h3><span class="badge b1">detector · 单票</span></header>
+  <p class="why">纠正默认值的一句话吞了四层让步（“确实是……但……只有……才”），是“内容好、形状坏”的典型。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>这三档本质上是同一个取舍的三个落点：可靠性 vs 性能。很多生产环境会选择 `everysec`，代价只是每秒一次的 `fsync`。<span class="cut">`appendfsync` 的默认值确实是 `everysec`，但 Redis 7.x 出厂默认并不开启 AOF（`appendonly no`，即 RDB-only）；只有显式打开 AOF 后，`appendfsync` 才以 `everysec` 为默认档（详见第 8 章）。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>这三档本质上是同一个取舍的三个落点：可靠性 vs 性能。很多生产环境会选择 `everysec`，代价只是每秒一次的 `fsync`。<span class="add">不过这里有两层默认值，容易记混：`appendfsync` 的默认档是 `everysec`；而 Redis 7.x 出厂默认根本不开 AOF（`appendonly no`，即 RDB-only）——显式打开 AOF 之后，才轮得到 `appendfsync` 谈默认档（详见第 8 章）。</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">节奏层与总结姿势，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场总量 17 → 3–4（最高优先）</h3><span class="badge b2">双票</span></header>
+  <p class="why">点名句（一句话里三家各领半句）全章约 17 处：导读 L7、三范式 L59–63、4.4 三理由 L202–206、4.5 五段、4.6 五条、4.7 两轮。4.5 对比节是绕场的正当职业；病在它成了<b>唯一的总结姿势</b>——读者从启示二起就能闭眼预测下一段的第一句。</p>
+  <p class="dir">保留：三范式列表（正式版）、4.5 一至两遍、启示五 L300（四家层级链有内容）。砍：导读版（§1.3 已示意）、4.7 两轮（L306 与导读 L7 是同一内容两次出演，L308 的新视角“谁让热数据留在快介质上”好，从点名句里解出来单说）、启示一 L274（“最合适/更合适/最合适”三连换成单家深进）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>数字框架布告（“N 个 X”引入句＋“三”预分格）</h3><span class="badge b2">双票</span></header>
+  <p class="why">“这张表里有三个事实”（L30）→“这组数字引出三个根本约束”（L47）→“拆成两条轴”（L55）→“三种范式”（L57）→“有三个理由”（L200）→“五条启示”（L270）→“有三个要点”（L310）。4.1 三十三行内同一组物理事实被“三/三/两/三”框架收割四轮，其中“三个事实”与“三个根本约束”间隔 17 行——读者隐约觉得“刚才不是总结过一遍了吗”。全章被“三”预分格 22+ 处，连八种淘汰策略也要“归成三组”（L83）。</p>
+  <p class="dir">8 处引入句留 3–4 处（节级路标可留：L55 两条轴、L270 五条启示）；L30“这张表里有三个事实”与 L47“引出三个根本约束”二合一（表后直接说事实，约束段直接说约束，不两次报数）；L83“归成三组”按实义拆（noeviction／allkeys 系／volatile 系本来就是天然分组，去掉报数句直接分组说）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>标签垄断短句槽位 → 补家常短句</h3><span class="badge b2">双票</span></header>
+  <p class="why">≤10 字短句 22 个，15+ 个是结构标签（“第一，内存易失。”“**随机访问能力**。”、“边界上能挖出五条启示。”）——ch3 是格言垄断短句槽位，ch4 换成了<b>路牌垄断</b>：该喘气的地方站着一块路牌。真呼吸的短句约 5 句（“系统数据越积越多。”“这是缓冲池的主体。”“整个写路径天然顺序。”“这对运维极友好。”），全部集中在机制区；判断区（取舍总结／4.5／4.6）接近零短句地板。</p>
+  <p class="dir">章内好样子已存在，向 4.5–4.7 铺：每个维度段／启示段压一记家常短句；17 个“多句段以最长句收尾”优先倒过来（判断区 L120/L178/L256/L264 全部最长句收尾——结论永远压在最重的句子上，没有一次轻收）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>图三件套／导览员段</h3><span class="badge b2">双票</span></header>
+  <p class="why">导语模具 7 处清一色“下图（表）把 X 画／列出来（＋目的）”（L40/85/112/146/160/208/220）；图题带冒号总结 3 处；图后分侧解读 3 处（“第一，…第二，…”“LRU 一侧，…LFU 一侧，…”“传统路径：…零拷贝路径…”）。每幅展品旁边都站着讲解员，先报看点再开讲。</p>
+  <p class="dir">导语向 L241 看齐（“导读里那次选型争论，答案就藏在这张表里”——三处表格前导里唯一有记忆回放的）；L15“先把这组约束量化。”与 L254“按维度解读，要点都在‘为什么不同’。”两处空导览句删；分侧解读三处留一处，其余换不对称陈述。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>L30 时间换算＋“一个数量级以内”×4＋表 4-1 叙述句单元格</b><br><span class="badge bd">两席侧重不同</span></td>
+      <td>tech-editor 列绊脚点第 2：“17 分钟／28 小时”是全章最好的数字却被埋在 120 字长句中段；“进入……一个数量级以内”方向含混（差十倍还是达到十分之一？）且 L26/28/30/45 出现 4 次；表 4-1 的 L26 单元格在数值列里塞叙述句。detector 则把时间换算列为 4.1 的亮点</td>
+      <td>两席对内容的估值一致（数字本身好），分歧在处置。修法兼容：<b>好数字独立成句、“一个数量级以内”换成方向明确的说法（如“顺序吞吐已够到内存带宽的十分之一”）、单元格数值化或移注</b>。上作者裁表述方向（技术口径须技术席核）</td></tr>
+  <tr><td>L38 “关键数字”box 第三条</td><td>Kafka PageCache 条目一句塞“分母澄清→算例→动态行为→结论”四个动作（tech-editor 绊脚点第 3：box 是速查卡，拿到的是内核机制小论文）</td><td>tech-editor 单票。方向：box 留“10%／20%、分母是可用内存、64GB≈6.4GB”＋一句后果，机制长句挪正文或第 8 章</td></tr>
+  <tr><td>4.4 “核心假设”子节与节首复读</td><td>L184“不在进程里维护自己的缓冲池，把加速几乎全部交给 PageCache”与 L188“Kafka 再在用户态造一个缓冲池意义不大”同义两遍——模板强行对齐 4.3 的产物（4.3 的“核心假设”有真内容：缓冲池污染）</td><td>tech-editor 单票。方向：子节与节首合并，或子节只讲增量（预读／回写为何够用）</td></tr>
+  <tr><td>L282 金句卡（blockquote 箴言）</td><td>“能交给操作系统的缓存，通常不必在用户态再造一份，除非你需要它给不了的精度。”——detector：教科书式重点框，AI 最爱的“金句卡”</td><td>detector 单票。内容是真准则；处置两选：并入启示二正文，或保留框（作者 2026-08 已废箴言 KPI，但存量是否保留属体例裁定）。<b>上作者</b></td></tr>
+  <tr><td>段末凿子密度／段末最长句收尾</td><td>凿子收口约 10 处（平均每 31 句一记，4.5–4.7 最密）；17 个多句段以最长句收尾</td><td>detector 单票。凿子留真有分量处（L266／L308 两席都当好句）；最长句收尾随 §3 家常短句手术顺带解决</td></tr>
+  <tr><td>播音员冒号</td><td>约 3 处（L30／L194／L288），无 ch3“得先理解一个基本事实：”式重灾</td><td>detector 轻度命中——较 ch3（约 10 处）明显改善，登记在案，随巨句拆分顺带处理</td></tr>
+  <tr><td>L132 段末句评价</td><td>“这就是缓冲池被污染：延迟跟着命中率一起起伏，没有稳定值。”——detector 列入凿子清单；tech-editor 判“收口自然不盖章”</td><td>两席分歧，段本身两席共举为全章最像人写的一段——<b>随段保留不动</b>，仅作凿子密度统计的数据点</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L5 导读开局</b>：“全放内存快是快，可内存贵、容量有限，几十 GB 就到顶，断电后数据就全没了。……谁都想要快、稳、省，但这三样无法同时要满。”——口语让步＋说话人语气，全章节奏的正面样本。</li>
+  <li><b>L9 选型故事</b>（作者第一人称亲历，豁免契约）：“我花了一下午把两者的访问模式拉了一张表……表摊开之后争论就停了。”——“一下午”这类时间词是真人写作的指纹。</li>
+  <li><b>L96 fork 破案段</b>：“期间整个实例看上去像卡住了”“排查时若发现告警间隔正好等于 `save` 规则的触发周期，基本就能确定根因是 fork。”——只有真排过障才写得出的指纹；骨架（理想机制→真实代价→生产表象→定位方法）是叙述性的。</li>
+  <li><b>L132 缓冲池污染段</b>：三个短句对应三个时间阶段（启动／跑稳／扫描后），“现象在动”而不是“我在讲现象”——两席共举全章最像人写的一段。</li>
+  <li><b>L81 LFU 场景段</b>（“你跑一次全表扫描……过几秒又来一波真正的热点查询”）／<b>L260</b>“这条最好记：需要按主键查一行数据，Kafka 直接出局。”（4.5 五段里唯一的一记轻拳）／<b>L266</b>“哪一列对得上你的场景，就选哪一列。”</li>
+  <li><b>L108“（快）”“（少）”单字括号</b>——节奏工具而非藏私货；<b>L196“整个写路径天然顺序。”／ L206“这对运维极友好。”</b>——家常短句的章内好例。</li>
+  <li><b>表 4-1／4-2／4-3 的内容、术语黑体（结构名）、“详见第 7/8/9/10 章”分工句、L302 章末钩子（接第 10 章）</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准：好文字全在“故事＋现场细节＋口语短句”三件套上（L5、L9、L96、L132、L196、L206）；怪全在“总结动作”上（绕场、账单、标签、图章）。<b>这章不用动故事，动的是每一次收束。</b></p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch4 新增三测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>弹匣测试</b><br>（ch4 新增）</td><td>数一章里“三个／三种／三档／N 个 X”的报数句。超过七八处、或出现“八种东西也要归成三组”，就是动笔前预分格——内容天然是几块就写几块。</td></tr>
+  <tr><td><b>账单测试</b><br>（ch4 新增）</td><td>数“换来／换掉／拿 X 换 Y”的出现次数。取舍若只有“换”一种动词，整章就成了记账——换成具体动词（降／省掉／挪出／兜底）。</td></tr>
+  <tr><td><b>宣誓测试</b><br>（ch4 新增）</td><td>数以“我会先……／我现在……之前，会先……”收口的段落数。第一人称是命脉，但连续两条启示都用它收口，它就成了道具——留最具体的两条。</td></tr>
+  <tr><td><b>路牌测试</b></td><td>把全章短句（≤10 字）挑出来分类：家常句、格言、清单标签／黑体维度／报数句。标签占比过半，“该喘气的地方站着路牌”。</td></tr>
+  <tr><td><b>刹车测试</b></td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车，就是“三长无一短”（本章 22 处，L96 五连为最）。</td></tr>
+  <tr><td><b>复读测试</b></td><td>同一论点本章盖了几次章？开口就说“X 节已对照过一次”然后又列一遍的，删重列。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方（如 L26 单元格的 PCIe 代际数值若移注，注里须全数保留）</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；表 4-1 单元格改写、“一个数量级以内”换表述属<b>技术口径变更</b>，走技术席而非文风席</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 127 处引文逐字核验 0 失配）；ch2/ch3 同轮参照：0908/第二章/、0908/第三章/ 与 qa_reports/20260908-ch2语言组织层两席诊断.md ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

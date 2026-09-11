@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第九章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第九章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/09-data-sync/chapter.md</code>（353 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／参数／表格内容／作者第一人称故事与判断锋芒不动。ch2–ch7 确诊模式复发者标「前章同款」。两席引文 80+ 处经总调度对文件逐字复核，1 处校正（tech 席引 L5 漏一"配"字，原文为「Redis 缓存<b>配</b>着 MySQL 数据库」，本页已按原文引用）。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">中段是全章最硬的骨头，收束段是全章最软的坡</span></h2>
+<p>两席判词合流。tech-editor：「<b>中段是全章最硬的骨头，收束段是全章最软的坡——压轴正文章把力气花反了。</b>」detector 给 6.5/10：「血肉里有真人，骨架是机器的——句子内部的细节（参数、算式、踩坑）常见手艺人，但句与句、段与段之间的组织动作高度模板化且全章复用，读到第三屏就能预测下一段的形状。」合流的签名病理六件：<b>框架级三级复读到峰值</b>（状态机复制定律 6 次、三家载体排比 7 次、四部件框架 3 次，导读 L7 与小结 L345 近逐字互为复印——ch7 确诊的病理在压轴章达到最浓）、<b>冒号引擎</b>（正文冒号 143 个／306 句，47% 的句子是"X：Y"展开式，长句靠冒号二次三次点火）＋<b>括号栈</b>（&gt;40 字括号 12 处，L246 括号内含整句）、<b>鉴定句税</b>约 9 处、<b>三元组绕场成瘾</b>（顺序 R→M→K 全章锁死，收束段读者已看过阵容五次以上）、<b>9.2–9.3 首人称荒漠</b>（约 140–150 行）＋9.6 宣誓孪生、<b>账房 34 处</b>（"……的代价是："固定节拍 8+ 次）。节奏底子：306 句、CV 0.59 但 20–59 字中段聚堆 61%、<b>家常短句为零</b>；9.4 全节 64 句短句 0；9.5 是全章唯一无新信息源区（无图、无人、无短句），且紧接 L239/L262 两段全章最好文字之后，落差被放大。</p>
+<div class="stats">
+  <div class="stat"><div class="n">6 / 7 / 3 遍</div><div class="t">状态机复制定律 6 次（L7/L30/L188/L260/L311/L345）、三家载体排比 7 次、四部件框架 3 次（L17–25 正文→L28 图注→L347 小结）——框架级三级复读（ch7 新支）在压轴章达到峰值</div></div>
+  <div class="stat"><div class="n">47%</div><div class="t">正文冒号 143 个／306 句：近半句子是"X：Y"展开式；L107/L144/L155/L214/L216 一句 2–3 个冒号——detector 命名"冒号引擎"，是节奏均质的直接机械原因</div></div>
+  <div class="stat"><div class="n">140–150 行</div><div class="t">9.2/9.3 两个机制节全程零第一人称（口径 det ~140／tech ~150）；回场的"我"里 L317 与 L327 是同模宣誓孪生——十行内两副"我自己设计X系统时，先Y"</div></div>
+  <div class="stat"><div class="n">0 句</div><div class="t">家常口语短句为零：全章 ≤7 字短句 3 句全是标签／报数／切分伪句；9.4 全节 64 句无一个短句——短句槽位被标签、报数、凿子三类垄断</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L7 ⇄ L345</span><h3>导读与小结近逐字互为复印：同一场舞隔 338 行跳两遍</h3><span class="badge b2">双票 · 铁证</span></header>
+  <p class="why">L7「Redis 传命令流、MySQL 传 binlog event、Kafka 传有序消息。底下是同一条主线：状态机复制。」→ L345「Redis 用命令流、MySQL 用 binlog event、Kafka 以有序消息为载体。形式不同，底层是同一个模型：状态机复制，保证相同输入序列、相同执行顺序，副本终将一致。」——顺序、谓词、"底层是同一"句式全部复用。处置：L7 首立保留；L345 换角度收束（位置留、字面换，见 §4.3）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L345 首句）</div>
+      <p>数据放一份不够，多份就要让它们看起来像一份：<span class="cut">Redis 用命令流、MySQL 用 binlog event、Kafka 以有序消息为载体。形式不同，底层是同一个模型：状态机复制，保证相同输入序列、相同执行顺序，副本终将一致。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>数据放一份不够，多份就要让它们看起来像一份。<span class="add">三种载体本章各拆了一遍，收束时只留一句：副本一致不需要聪明的协议，只需要同一串输入、同一个执行顺序——命令流、binlog event、有序消息，都是这串输入的包装。状态机复制的保证，落的就是这两样。</span>（不再复述 L7 的排比与"同一条主线"句式；定律按 §3.1 预算在此收最后一次）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L17–L28</span><h3>四子问题框架块的四层包装：粗体×4＋设问×5＋三家预告＋图注重列</h3><span class="badge b2">双票</span><span class="badge b1">det 列全章最差第 2 位</span></header>
+  <p class="why">detector 的定性：「报数布告＋四连黑体标签＋设问聚堆＋清单外挂，四病同体，再经 L28 图注、L347 小结三次曝光，是全章 AI 味的策源地。」其中设问聚堆是本章特有：全章仅有的 5 个真问句全部挤在这块清单里（"到底把什么东西传给副本？"等），此后 330 行无疑问句——设问成了清单的排版件，不是思维的声音。框架本体是全章骨架（表 9-1 的行来源、L13 埋线的指向），<b>动的是包装不是骨架</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>把"数据同步"这个大词拆开，背后是四个独立但彼此关联的子问题。<span class="cut">**第一，传播什么。**</span> 到底把什么东西传给副本？……（四连同构）……<span class="cut">后面 Redis 的 `min-replicas`、MySQL 的半同步、Kafka 的 `acks` 参数，都是在这条取舍上选定的位置。</span></p>
+      <p>L28 图注：<span class="cut">图 9-1　数据同步的四个子问题：传播什么、怎么传播、到什么程度、断了怎么办。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">四连粗体全卸（编号保留、加粗去）；五个设问留两个，其余改陈述；L23 三家预告整句删——9.2/9.3/9.4 各节首自然出场，读者不需要提前对表；L28 图注的四问重列删，只留图题本身。</span></p>
+      <p>（L347 小结的部件重列随 §3.1 框架预算一并收）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L317 ⇄ L327</span><h3>宣誓孪生：十行内两副"我自己设计X系统时，先Y"</h3><span class="badge b2">双票</span><span class="badge b1">ch4 同款·流水线化</span></header>
+  <p class="why">tech-editor 判词：「回场的不是作者，是作者的照片。」L317「我自己设计同步系统时，会<b>先把位点想清楚</b>」与 L327「我自己设计复制系统时，先问业务能承受多少额外确认往返」是同一副填空题；L339 反模式 bullet 里还有第三个「我会控制拓扑深度」。9.6 全节只留一个"我会"，判断内容与锋芒一字不动。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L327 段内）</div>
+      <p><span class="cut">我自己设计复制系统时，先问业务能承受多少额外确认往返：</span>延迟预算定了，一致性档位自然就定了。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">"额外确认往返，业务能吃几跳？"——选同步档位前我先问这一句，答案定了，档位基本也就定了。</span>（同一判断、不同骨架；L317 是三句里连着主线的那个，保留原形；段首「正如 9.5 解读三所说……」的两枚前文徽章随 §3.6 收束区去重一并卸）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L161 / L186 / L214 / L222 / L233 / L266 / L323</span><h3>整句加粗 6 处 → 保 2 处反直觉结论</h3><span class="badge b2">双票</span></header>
+  <p class="why">detector 计整句／整命题加粗 6 处判通胀（术语首现加粗不算）；tech-editor 逐处过尺后保 2：<b>L214</b>「Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径」与 <b>L222</b>「副本间的同步进度，由 ISR 里最慢的那一个决定」——都是反直觉结论，值得全章重音；其余四处（L161/L186/L233/L266/L323）与小节标题或后文凿子同义复述，加粗是第二遍说。全章重音收敛后，留下的两句才响。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L161）</div>
+      <p><span class="cut">**能降级的一致性机制，降级状态和正常状态同等重要，都得可观测**</span>：Redis 的 `min-replicas` 触发拒绝写入、Kafka 的 ISR 收缩，都是同一个道理。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">能降级的一致性机制，降级状态和正常状态同等重要，都得可观测</span>：Redis 的 `min-replicas` 触发拒绝写入、Kafka 的 ISR 收缩，都是同一个道理。<span class="add">（文字一字不动、加粗卸；段尾"都是同一个道理"的归一尾巴另见 §4.2 待裁）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L30 / L76 / L94 / L144 / L179 / L222</span><h3>图导语六连：「见图 9-N」两型模板锁死</h3><span class="badge b2">双票</span><span class="badge b1">ch5 同款·轻发</span></header>
+  <p class="why">六处全部两型（"X 见图 9-N。"／"X，见图 9-N。"）。tech-editor 过尺：L144「主节点写 binlog、从节点 I/O 线程拉到 relay log、SQL 线程回放，这条链路见图 9-5。」复述了链路本身，有信息量，留；L94/L179/L222 纯布告（"……的位置关系，见图 9-4。"）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（三例）</div>
+      <p>L94：backlog 窗口与主从 offset 的位置关系<span class="cut">，见图 9-4。</span></p>
+      <p>L179：并行复制与 MGR 共识的关系<span class="cut">见图 9-6。</span></p>
+      <p>L222：Leader、Follower、ISR 与 HW 的时间关系<span class="cut">见图 9-7。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>L94：<span class="add">差多少才追得上，看的就是 backlog 这个窗口的宽窄（图 9-4）。</span></p>
+      <p>L179：<span class="add">（整句删——8.3.4 已讲清 MTS 与 MGR 的分工，图 9-6 图题自带说明）</span></p>
+      <p>L222：<span class="add">（整句删——本段正文正在讲 ISR 与 HW，布告句多余；下句即 L222 保留的加粗句）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>预算</b>：六处留 2（L144＋其一），说法至少三种；"……，见图 9-N。"这一型全章至多一次。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L57 / L63 / L76 / L117 / L135 / L190 / L212</span><h3>"……的代价(是/同样/在于)："句首节拍器，9.2 内三连</h3><span class="badge b2">族内双票</span><span class="badge b1">ch4/ch6 同族</span></header>
+  <p class="why">句首"代价"×9 分布全章；L63 两句背靠背等长对撞（「代价同样明确：主节点故障时……会永久丢失。」／「Redis 用"可能丢失少量写"换来主节点不受副本拖累……」——两个代价冒号句硬碰硬）；<b>L190 一句双敲</b>（"代价是延迟……但这是换取强一致的必要代价"）。tech-editor 判「"……的代价是："成了固定节拍」；detector 计账房词族 34 处、约每 440 字一笔。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L190）</div>
+      <p><span class="cut">代价是延迟：每一次提交都要多走一次跨节点的共识往返。但这是换取强一致的必要代价，</span>是延迟-一致性曲线上靠 CP 的一端。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">代价是延迟：每一次提交都要多走一次跨节点的共识往返——延迟-一致性曲线上靠 CP 的一端。</span>（一句双敲并一记；"必要代价"半句删——MGR 的取舍 L127 一节已立过账）</p>
+    </div>
+  </div>
+  <p class="dir"><b>处置</b>：L63 两句并一句报一次账；全章句首"代价"留 2–3 处，其余直陈后果。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L295–L297</span><h3>位点 bullet 三连：主语槽＋"是"字谓语＋三段评语，同构度极高</h3><span class="badge b1">detector · 句长铁证</span></header>
+  <p class="why">detector 确认的邻句三连最强组：三条 bullet 各为"X 的 Y 是 Z，A，B；"同一模具。9.5 一节内三家绕场×3（bullet 版＋段落版），读者此时已看过同阵容五次以上。段后收束句 L299 是好句，原样保留。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Redis 的 replication offset <span class="cut">是字节进度，粗但够用，因为单元是字节流；</span></p>
+      <p>MySQL 的 GTID <span class="cut">是全局事务标识，细到事务级，且全局唯一，便于跨节点推理；</span></p>
+      <p>Kafka 的 offset + leader epoch <span class="cut">是偏移量加任期：偏移量描述进度，epoch 标定权威段。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">Redis 的 replication offset 记的是字节进度，粗，但字节流要的也就是这个。</span></p>
+      <p><span class="add">MySQL 的 GTID 细到事务、全局唯一，跨节点推理全靠它。</span></p>
+      <p><span class="add">Kafka 是两件套：offset 记进度，leader epoch 标权威段。</span></p>
+      <p>（三段评语改不等长；"是"字谓语只在第一家保留）</p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L194（9.3.5）</span><h3>全章最长句：clone 插件巨句，86 字括号劫持了全章最值钱的坑</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">两席共判全章最长句（口径 det 183／tech 195 字）、卡住型绊脚点。一句装下"条件＋参数陷阱＋两个动作＋收尾"；括号里的 int64 默认值陷阱还带分号级转折。detector 的判词：「信息是真金（int64 默认值这个坑很值钱），句子是麻绳。」修法＝出栈＋断句，且这个坑从括号里提为正文判断句，恰好是 9.3 荒漠区恢复在场感的落点（det 修法 8：把括号里的判断性旁注提为正文句）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件<span class="cut">（参数 `group_replication_clone_threshold` 看似按缺失事务数触发，默认值实为 int64 上限，默认配置下从不因缺口大小而 clone）</span>：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>只有补差所需的 binlog 已不可得（被清理）时，才改用 8.0.17+ 提供的 clone 插件：直接从现有成员物理克隆一份完整的数据目录，跳过漫长的 binlog 回放，克隆完再用 binlog 增量追平期间的新事务。</p>
+      <p><span class="add">这个插件的触发参数 `group_replication_clone_threshold` 有个坑：名字看似按缺失事务数触发，默认值实为 int64 上限——默认配置下，它从不因缺口大小而 clone。想让它真按缺口触发，得自己把阈值设下来。</span>（陷阱从括号出栈、自成两句；参数语义属技术内容，正式稿以技术席核对为准）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L216（9.4.2）</span><h3>Tiered Storage 巨句：三重条件无一处分句，转折信息埋在长句尾部</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">det 巨句 Top2（169 字）／tech 口径 185 字，判「全章最可能被整段跳过的句子」：卸载帮的是消费者读取、不是副本拉取——这个反直觉转折被压在长句末尾，读者到不了那里。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录首尾）</div>
+      <p>3.9 起 Tiered Storage 让冷段可卸载到对象存储，但卸载直接帮到的是消费者读取，不是副本拉取：<span class="cut">……（三重条件连排）……</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">3.9 起 Tiered Storage 让冷段可以卸载到对象存储。先说清它帮的是谁：消费者读取直接受益，副本拉取不受益。</span></p>
+      <p><span class="add">［中间三重条件各起一句，一重一行；条件与版本口径（3.9+）属技术内容，正式稿以技术席核对为准］</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L214（9.4.2）</span><h3>FETCH 巨句：要保留的加粗重音，恰是全章第三难读的句子</h3><span class="badge b2">双票</span></header>
+  <p class="why">「同一条读路径」是 §1.4 保下来的两句重音之一，却装在 138–150 字、双括号双冒号的句子里——重音给了最难读的句子。拆句后加粗保留。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应<span class="cut">——只有一处读上界的差别：……（双括号双冒号续行）……</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Leader 不区分对面是副本还是消费者，统一按"给我从偏移量 X 开始的日志"来响应。<span class="add">**Follower 的 FETCH 请求和消费者的 FETCH 请求走的是同一条读路径。**</span><span class="add">差别只有一处读上界：［原句剩余部分拆两句，读上界的具体语义走技术席核对］</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L107（9.2.2）</span><h3>min-replicas 规则句：三职一段＋一句三冒号，尾句却是全章好人味</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 列卡住型绊脚点；detector 点名一句三冒号。一段三职：①规则本体 ②心跳判定的公式括号 ③纠误读。而段尾「"字节进度差"和"心跳时间"是两套不同度量。」被 det 判为最像人的句子之一（"像踩过坑的人拦住读者别混用两个监控口径"）——保留，动的是前三层。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Redis 默认偏 AP，但它给了一个弱保证参数：`min-replicas-to-write N` + `min-replicas-max-lag T`。这条规则的意思是：<span class="cut">主节点接受写入的前提是至少有 N 个副本在线（连接存活），且这些副本在最近 T 秒内向主节点发过 REPLCONF ACK 心跳（主节点上对每个副本记录 `server.unixtime - repl_ack_time ≤ T`，即距离上次心跳的秒数）。</span>`master_repl_offset - replica_offset` 是字节进度差，用于 INFO 监控，不是 `min-replicas-max-lag` 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Redis 默认偏 AP，但它给了一个弱保证参数：`min-replicas-to-write N` + `min-replicas-max-lag T`。<span class="add">规则读作：至少 N 个副本在线，且最近 T 秒内发过 REPLCONF ACK 心跳，主节点才接受写入。心跳新旧怎么判？主节点给每个副本记着上次 ACK 的时刻，距今不超过 T 秒算数。</span>`master_repl_offset - replica_offset` 是字节进度差，用于 INFO 监控，不是 `min-replicas-max-lag` 的判定依据。"字节进度差"和"心跳时间"是两套不同度量。<span class="add">（公式从括号里出来变成话；尾句一字不动）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L155（9.3.2）</span><h3>AFTER_COMMIT 危险窗口句：窗口、后果、防杠尾巴挤一句</h3><span class="badge b1">tech-editor · 卡住型</span></header>
+  <p class="why">约 110 字一句：先立危险窗口，再讲后果，尾巴上还挂着防杠的"不是隔离级别意义上的幻读"。det 的旁注提正文修法同样适用：幻读辨析是判断性旁注，值得当正文句。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>这一档有个危险窗口：<span class="cut">……（窗口＋后果连排）……不是隔离级别意义上的幻读。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">这一档有个危险窗口。［窗口本体一句］［后果一句，含"你以为提交了、副本还没收到"的读者视角］</span></p>
+      <p><span class="add">有人会问这是不是幻读——不是，隔离级别管的是本节点内事务看到的快照，这里是提交可见性与副本确认之间的缝。（防杠尾巴独立成句；AFTER_COMMIT 语义属技术内容，走技术席）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L287–L289（9.5）</span><h3>解读一：表格上方用正文把表格又念一遍，随后光杆句戛然收束</h3><span class="badge b2">双票</span></header>
+  <p class="why">detector 列全章最差第 3 位：顺序锁死、每家带代价刹车，随后 L289「传播单元定下来后，传播方式、位点形态、故障恢复粒度会高度耦合。」单句成段——tech-editor 判这记刹车「戛然而止」，是坏收束不是好凿子。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>Redis 走命令流这条路，看重的是轻：<span class="cut">……MySQL 走 ROW 格式则换确定性：……Kafka 最简单，……</span></p>
+      <p>传播单元定下来后，传播方式、位点形态、故障恢复粒度会高度耦合。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">表 9-1 的第一行已经把三家载体并排了，这里只讲"为什么"：轻从哪来（命令即操作，副本拿到就能执行）、确定性换什么（行变更不带执行环境）、消息为什么天然可复制。对照交给表格。</span></p>
+      <p><span class="add">传播单元一定，后面三件事——怎么传、位点长什么样、断了怎么补——就都被它框住了：L289 的判断保留，往前再垫半句，不再单句裸收。</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L283–L303（9.5 全节）</span><h3>三个"解读"＝复习课：全章唯一无新信息源区，且紧跟两段最好文字</h3><span class="badge b2">双票 · 结构</span></header>
+  <p class="why">tech-editor：9.5 全节 11 句、无图、无人、无短句，是全章唯一"无新信息源"的区——三个解读各自复述 9.2/9.3/9.4 已讲的机制，属复习课；它又紧跟 L239（acks 立场）与 L262（offset 纪律）两段全章最好文字，落差被放大。detector 给 9.5 全章最高 AI 味 7.5 分（"解读一/二/三"编号＋三家绕场×3，最像填表）。</p>
+  <p class="dir"><b>处置方向</b>：分工——表管"是什么"，文管"为什么"。三个解读各留一个表里没有的"为什么"增量（例：解读一讲"单元定下则三事被框住"的因果，而非再列三家载体），复述句全删；「以本章澄清的六个维度为行」的表格说明书口吻（L270）一并卸。</p>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">给骨架件设复读预算、给模具设出现预算，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>框架件预算：定律 6→2、载体排比 7→2、四部件 3→1、位点金句链 5→2</h3><span class="badge b2">双票 · 最高优先</span></header>
+  <p class="why">ch7 确诊的"框架级三级复读"在本章达到峰值：<b>状态机复制</b> L7→L30（首立）→L188→L260→L311（启示一整段重述）→L345；<b>三家载体排比</b> L7/L23/L30/L287/L303/L321/L331/L345＋bullet 版 L295–297；<b>四部件框架</b> L17–25 正文→L28 图注→L347 小结重列（表 9-1 是变体）；<b>位点金句链</b> L7→L233→L299→L313–317→L347 五级重播。detector 修法 7 与 tech-editor 收束区去重在此合流。</p>
+  <p class="dir"><b>预算</b>：定律留 L30（首立）＋小结收束一次（§1.1 变奏后），L188/L260/L311 降为不点破的事实陈述；排比留导读钥匙（L7）＋表 9-1；四部件只留 9.1 本体（§1.2 已处理两处复读）；位点链留 L299（收束句）＋启示一，其余卸。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场 7+ → 2–3；解锁一处顺序</h3><span class="badge b2">双票</span><span class="badge b1">前章同款·收敛趋势倒退</span></header>
+  <p class="why">ch5 13 遍→ch6 ~10→ch7 复评后收敛，本章又回到 7+ 次整队出场，顺序 R→M→K 全章锁死（ch1 起 8 章同序）。健康样本就在章内：<b>L233</b>「MySQL 用 GTID 标识事务、Redis 用 replid 标识主节点身份」——顺序换了、切入角换了，没人觉得乱，因为它跟着论点走。</p>
+  <p class="dir"><b>保留</b>：表 9-1（对比节本职工况）＋导读钥匙＋小结（变奏后）。<b>砍/变</b>：L287（§2.6）、L303（「Redis 默认偏 AP……MySQL 提供了……Kafka 则把位置做成可调参数」改成只讲主角）、L321/L331（§3.6）。<b>解锁</b>：保留的绕场至少一处换顺序或换切入角（参照 L233）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>短句地板＋叙述者排班：9.4 补四处落地短句；荒漠区两条路线</h3><span class="badge b2">双票</span></header>
+  <p class="why">9.4 全节 64 句短句 0、长句 55%——tech-editor 修法第一优先：L214/L216/L222/L231 四处补落地短句，仿 L101 句式（"两个预算要分开算。"式的机制收口，措辞作者定）。巨句切分 Top10（L194/L216/L214/L163/L169/L69/L239/L177/L107/L157）顺带补齐 5–19 字锯齿带（现在只有 30 句且一半是标签）。荒漠（9.2/9.3，约 140–150 行）两条路线并行：<b>a) detector</b>——把括号里的判断性旁注提为正文句（L194 int64 陷阱、L155 幻读辨析），不新增材料恢复在场感；<b>b) tech-editor</b>——L161 附近植入 ≤2 句具体回忆（半同步降级无告警的事故形态），<b>素材须作者本人出，改文笔不得代写（不造经历，ch6 立规沿用）</b>。</p>
+  <p class="dir">章内好句式基准：L55「能用一种日志说清的事，就不引入第二种。」、L101「两个预算要分开算。」、L299「对应的都是同一个问题："我已经处理到哪里了"。」——补的短句向这三句的"机制收口"看齐，不向格言看齐。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>冒号限频＋括号出栈：每句至多一个冒号；&gt;40 字括号 12 处出栈</h3><span class="badge b2">双票</span><span class="badge b1">ch6 括号栈同款·加重</span></header>
+  <p class="why">detector 命名"冒号引擎"：143 个正文冒号／306 句，47% 的句子在"报幕后展开"；L107/L144/L155/L214/L216 一句 2–3 个冒号——冒号替代了断句，成为节奏均质的直接机械原因。括号栈：&gt;40 字 12 处，最长 86 字（L194），L69（83 字）、L177（85 字）次之；<b>L246 括号内含整句</b>（「（这个默认值自 0.11 起就由 true 改为 false，KIP-106，3.x 沿用并强化了这一取向。）」）必须出栈。</p>
+  <p class="dir"><b>判据</b>：第二个冒号处改句号；括号超 40 字、或含分号／破折号／句号＝注释在吞正文，出栈成独立句（版本考证与参数语义出栈后仍全数保留，走技术席核对）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>账房 34 → 约 12；鉴定句族逐处过尺</h3><span class="badge b2">双票</span><span class="badge b1">ch6/ch7 同族·最密</span></header>
+  <p class="why">取舍 ×12、代价 ×14、换来/换成/拿 X 换 ×5、权衡 ×2、折中 ×1，约每 440 字一笔且每节都有（det 口径）；tech-editor 补节拍维度："……的代价是："固定节拍 8+ 次（§1.6）。鉴定句"这是＋评级名词"×8（L63/L109/L123/L144/L155/L177/L194/L243），评级副词（经典的/典型的/标准的）连用约 9 处——tech-editor 判词：「章法从我在观察滑向我在归档。」</p>
+  <p class="dir">账房换直陈后果（章内好例：L63 换来句、L101 两预算分开算）；鉴定句逐处过尺（§4.4）：删掉后少一个<b>事实</b>的留（L123「已确认的写丢失」是术语定义），只少一个"总结感"的删（L243"典型设计"）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L321 / L331 / L323（9.6）</span><h3>收束区去重：两条三元组巨句各砍成单家聚焦；启示三与启示二撞题</h3><span class="badge b2">双票</span></header>
+  <p class="why">L321（120 字）与 L331（122 字）是收束段两条三元组绕场巨句——读者到 9.6 已看过同阵容五次以上；tech-editor 另点启示三标题「增量同步必须先解决断点续传」与启示二内容撞车（两者都在说断点续传），L323 尾巴「前提是位点经得起主节点切换、缓冲窗口足够覆盖常见断线时长。」limp 收束；detector 补：9.5"解读一二三"＋9.6"启示一至五"＋"反模式"连续 9 个编号件（P6）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L331）</div>
+      <p><span class="cut">Redis 故障转移后副本重连走 PSYNC2 比对 offset；MySQL 新成员加入默认按 GTID 增量补差，补差所需 binlog 已不可得才 clone；Kafka 副本恢复则靠 leader epoch 截断后再 FETCH 追赶。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">以 Kafka 为例把"恢复=同步的反向"走一遍：leader epoch 截断，再 FETCH 追赶——工具还是同步那三样。Redis 与 MySQL 的对应动作表 9-1 末行已列，不重述。</span>（单家深进、其余一拍；L321 同法，另一家）</p>
+    </div>
+  </div>
+  <p class="dir"><b>另</b>：启示三标题改到能区分启示二（例如落到"全量是兜底"的代价面）；L323 尾巴并进段中或删；编号件 9 连发降到 5–6。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>三个"传播单元"小节起手</b><br>（L53/L131/L206）<br><span class="badge bd">两席分歧</span></td>
+      <td>detector：同一道填空题——"Redis 把命令本身作为传播单元。""MySQL 把**行变更的逻辑日志**作为传播单元。""Kafka 的传播单元是**消息**。"；tech-editor：三个"传播单元"平行属<b>对比结构，保留</b>，字典腔在另外四个机制小节</td>
+      <td>一个说模具、一个说对仗。相容案：起手三连若动，至少一家换切入角（如 Kafka 从"没有'复制专用数据'这回事"进）。另 det 独立发现 L61/L139/L212 <b>标题词原样进首句 ×3</b>（"单向异步"/"两段式"/"纯拉模式"），可与本项合并处理。<b>上作者</b></td></tr>
+  <tr><td><b>L161 半同步段处置</b><br><span class="badge bd">两席侧重不同</span></td>
+      <td>detector 列全章最差第 4 位：整句加粗＋"都是同一个道理"跨软件盖章＋播音员段式，⑤①⑦三指纹同段叠加；tech-editor 把段尾降级警句列为全章标杆</td>
+      <td>两席其实同源：det 自己注明"这段前半'你以为在半_sync其实在异步'本是全章最好的声音之一"。相容案（§1.4 已采）：警句一字不动、加粗卸；"都是同一个道理"归一尾巴去留<b>上作者</b>裁力度</td></tr>
+  <tr><td><b>L345 收束排比去留</b><br><span class="badge bd">两席侧重不同</span></td>
+      <td>detector：小结绕场是正当位置，保留（修法 5 只砍 L287/L303）；tech-editor：与 L7 近逐字，小结首段应换角度</td>
+      <td>相容案已采（§1.1）：位置留、字面换。若作者更倾向保留原句，则 L7 导读侧变奏——两头只动一头。<b>上作者</b></td></tr>
+  <tr><td>「鉴定句」族 8–9 处</td>
+      <td>"这是＋X 的＋评级名词"：L63"这是默认偏 AP 的取向"、L109"这是一个事实上的门槛"、L123"这就是经典的'已确认的写丢失'"、L144"这是收流与回放的解耦"、L155、L177"这是基于'既成事实'的并行"、L194"这是'先全量再增量'的标准做法"、L243"这是一个把 CAP 取舍暴露成显式开关的典型设计"</td>
+      <td>双票族、逐句处置需人耳：L123 有实义（术语定义处）、L109 次之；L243"典型设计"、L194"标准做法"最空。<b>上作者</b>逐处过尺（删掉后少一个事实还是只少一个总结感）</td></tr>
+  <tr><td>巨句字数与行数口径差</td>
+      <td>L194：det 183／tech 195；L216：det 169／tech 185；L214：det 138／tech 150；荒漠：det ~140／tech ~150 行；总行数：det 353／tech 354</td>
+      <td>口径差异登记（切分与去标记规则不同），非方向分歧。两席 Top 集合一致锁定 <b>L194/L216/L214</b>＋tech 独有 L107/L155、det 独有 L163/L169，手术位并集处理</td></tr>
+  <tr><td>「取舍总结」标题 L196/L264<br>（tech 单票）</td>
+      <td>9.3 末与 9.4 末两处小节标题逐字相同（「### 取舍总结」），9.2（Redis 节）无对应物——模板只落了一半，恰是"收尾靠模具"的结构证据</td>
+      <td>属体例与标题裁定非文风手术。三节统一配齐 vs 全部改各异 vs 维持，<b>上作者</b>；登记不改文</td></tr>
+  <tr><td>det 单票新模式登记<br>（P4/P5/P7）</td>
+      <td>P4 设问聚堆：全章仅有的 5 个真问句全在 L19–25 清单框架里，此后 330 行无疑问句；P5 回声框堆叠：L327 一句挂两枚前文徽章（"正如 9.5 解读三所说……第 7 章启示二……"）；P7"让"字使役链 ×19（"让使用者按业务选位"类，物称主语＋让）</td>
+      <td>detector 单票（P5 被 tech 以"回声框/前文徽章"间接印证；P7 属翻译腔骨架指纹）。登记不改文，随 §3 预算与收束区去重顺带收敛。<b>上作者</b>裁 P7 力度</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L9 缓存不一致事故</b>（作者第一人称亲历，豁免契约；两席共举）——「查到最后，是删缓存和写数据库的先后顺序在不同代码路径里不一致。」detector："侦探式收案句，短、具体、有过程感。"</li>
+  <li><b>L45 主从延迟告警</b>（det 最像人 #2）——「用户的查询恰好落在了从节点上。……后来我们加了一个写后读一致的路由层，但前提是必须先知道这道窗口的存在。」真事故＋真补救＋"但前提是"的作者口气。</li>
+  <li><b>L101 追赶算术</b>（两席共举）——「比如落后 120MB、每秒净追赶 2MB，约一分钟追完。……两个预算要分开算。」现场算数＋手工收口，全章最有手艺人触感的一段；也是 §3.3 补短句的对齐基准。</li>
+  <li><b>L107 尾句</b>（det #4）——「"字节进度差"和"心跳时间"是两套不同度量。」踩过坑的人拦住读者别混用两个监控口径，这种纠偏性短句是人的分布。</li>
+  <li><b>L161 降级警句本体</b>——「如果这一降级默默发生，你以为在半同步其实在异步，故障时丢数据才意识到，为时已晚。」（§4.2 相容案：句子不动，动的是加粗与归一尾巴）</li>
+  <li><b>L179 尾</b>（tech 标杆）——「——串行瓶颈没有消失，只是从从库转移到了主库的提交队列。」</li>
+  <li><b>L239 acks 立场句</b>（两席共举；det："全章最锋利：敢站队、有钱／日志的具体分界线"）——「这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。」（所在长句前半是巨句病灶、随 §3 拆形，本句内容与锋芒一字不动）</li>
+  <li><b>L262 offset 纪律</b>（tech 标杆）——「我写消费者默认按分区顺序处理完再提交，拿消费并行度换这条规则自动成立。」</li>
+  <li><b>L55 / L63 / L299 好凿子</b>——「能用一种日志说清的事，就不引入第二种。」「两个预算要分开算。」「对应的都是同一个问题："我已经处理到哪里了"。」凿子总量按 §3 收敛后，留下的才响。</li>
+  <li><b>L233 leader epoch 句内容</b>——「给日志段一个权威的归属标记」（加粗随 §1.4 卸）；且其 MySQL→Redis 顺序是全章唯一自然变奏，§3.2 解锁顺序时的健康样本。</li>
+  <li><b>表 9-1 内容、L13→L351 埋线兑现（det 判合法）、L351 正本答案、L353 第 10 章钩子、术语黑体首现、图注编号</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准：好句子＝具体事实＋带牙口的判断，或现场算数／事故复盘的手艺人触感（L9/L45/L101/L239）；怪句子＝<b>把讲过的框架再升格盖章（"都是同一个道理"）、把三家整队再走一遍、或用冒号把两句话压成一句</b>。tech-editor 的总尺：这章不用动机制，动的是每一次重播与每一处二次点火。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch9 新增两测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>冒号引擎测试</b><br>（ch9 新增）</td><td>数一句里的冒号：超过一个＝二次点火，第二个冒号处改句号。再抽 100 句数冒号句占比——本章 47%，近半句子在"报幕后展开"，这是节奏均质的机械原因；先扫 L107/L144/L155/L214/L216。</td></tr>
+  <tr><td><b>收束区保鲜测试</b><br>（ch9 新增）</td><td>把最后三节的每个论点问一遍"这个事实本章第几次出现"：≥3 次的只在小结留一次。本章记录：定律 6 遍、载体排比 7 遍、位点金句 5 级——收束区成了重播区，"复习课"段落（9.5 三解读）整节可问。</td></tr>
+  <tr><td><b>框架复读测试</b><br>（ch7 沿用）</td><td>骨架件（框架／定律／排比）画线计数，≥3 次＝三级复读闭环，留"一立一收"。</td></tr>
+  <tr><td><b>书签测试</b><br>（ch7 沿用）</td><td>"我"标在行号轴上：中段 100+ 行无人称＝荒漠（本章 9.2/9.3 约 140–150 行）；回场的"我"若全是同模宣誓（L317/L327 十行内孪生），回场也是道具。</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车＝三长无一短（本章 14 段三长连排；9.4 全节 64 句短句 0）。</td></tr>
+  <tr><td><b>账单测试</b><br>（沿用）</td><td>数"取舍／代价／换来"（本章 34 处，约每 440 字一笔；句首"……的代价是："9 次）——取舍只剩这一种货币时，换成直陈后果。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；本页已登记 1 处校正：tech 席引 L5 作「Redis 缓存着 MySQL 数据库」，原文为「Redis 缓存<b>配</b>着 MySQL 数据库」</li>
+  <li>以下属<b>技术内容</b>，动到即走技术席：L39–43 关键数字框（backlog 1MB／1 秒、半同步超时 10 秒、<code>replica.lag.time.max.ms</code> 30 秒）、L57 效果复制 5.0 默认／verbatim 7.0 移除、L69 PSYNC 协议语义、L99–101 追赶数学 B/(C−W)、L107 min-replicas 规则与心跳判定、L111 WAIT、L151/L155 AFTER_SYNC／AFTER_COMMIT 语义、L157/L163 半同步参数与重命名考据、L169 GTID 结构、L175–179 MTS 参数与组提交、L186–190 MGR／XCom／consistency 档位、L194 clone 插件与 int64 默认值、L206–216 消息／拉模式／Tiered Storage 3.9、L220–222 LEO／HW／ISR、L229–231 leader epoch 机制、L237–239 acks／min.insync.replicas、L243–246 unclean 选举与 KIP-106、L252–258 KRaft 版本与幂等／事务、L262 offset 纪律、表 9-1 全部行</li>
+  <li><b>不造经历</b>（ch6 立规沿用）：L161 附近的半同步降级回忆素材须作者本人出，作者无真事则走 detector 路线（括号旁注提正文，不新增材料）</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 306 句量化＋分节评分＋七个新模式：冒号引擎／括号栈／"同一"崇拜／设问聚堆／回声框／三重编号／使役链；tech-editor 逐镜头＋绊脚点 Top5＋标杆六处＋节奏地图＋四步修法）；同轮参照：0908/第一至八章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

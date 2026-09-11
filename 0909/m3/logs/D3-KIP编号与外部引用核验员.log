@@ -1,0 +1,32 @@
+报告已完成，写入 `/Users/liu/dev/demos/redis-kafka-books/0909/m3/D3-KIP编号与外部引用核验报告.md`。
+
+以下是核心发现摘要：
+
+---
+
+## 核心发现
+
+### 🔴 P0 级（4个，必须修）
+
+| # | 问题 | 位置 |
+|---|------|------|
+| 1 | **KIP-480**（Kafka 2.4 粘性分区器）——Apache Kafka wiki 页面 HTTP 404 | ch7 §7.4.1 + 参考文献 |
+| 2 | **KIP-679**（acks=all 改为默认）——Wiki 页面 HTTP 404 | ch4 §4.4 + ch7 §7.4.3 |
+| 3 | **KIP-320**（Fetcher 截断协议）——Wiki 页面 HTTP 404 | 参考文献 [28] |
+| 4 | **KIP-106**（unclean leader election 默认关闭）——Wiki 页面 HTTP 404 | ch9 §9.4 |
+
+> ⚠️ 注意：KIP（Jira Issue）和 Apache Kafka KIP Wiki 是**两套独立编号体系**。Jira 返回 200 不代表 KIP wiki 页面有效。例如 KAFKA-480 Jira Issue 是"Producer-perf system test does not work"，与 Sticky Partitioning 无关。
+
+### 🟡 P1 级（6个）
+
+- **Morris 计数器缺少原始论文引用**：正文描述了算法原理但未标注 Morris 1978 原文
+- **Parnas 1972 模块化论文**：正文引用了但参考文献表中缺失
+- **LinkedIn 2014 基准原链接缺失**：Confluent Engineering Blog 原文已 404（基准数据可印证，但无原文可查）
+- **多条 `latest` 标签文档 URL**：随版本升级会漂移，建议锚定基线版本
+
+### 核实通过的引用
+- ARIES (ACM TODS 1992) ✅
+- Lamport 1978 ✅  
+- Gray & Reuter 1993 ✅
+- KIP-98/500/833/866/405/101（6个）302重定向→有效 ✅
+- 所有论文/图书引用均准确 ✅

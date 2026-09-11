@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后记 语言组织层修改意见</title>
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--ink:#1f2328;--muted:#6b7280;--line:#e5e7eb;
+--oldbg:#fff5f5;--oldbd:#f0c2c2;--newbg:#f2fbf4;--newbd:#b7e0c1;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 80px;}
+header h1{font-size:24px;margin:0 0 10px;}
+.meta{color:var(--muted);font-size:13px;line-height:1.95;}
+.meta code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-top:14px;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;}
+.sw.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.sw.new{background:var(--newbg);border:1px solid var(--newbd);}
+h2{font-size:19px;margin:44px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);}
+h3{font-size:16px;margin:28px 0 10px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.item-head{margin-bottom:8px;}
+.badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:6px;
+padding:1px 8px;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+.item-title{font-weight:600;font-size:15.5px;}
+.problem{color:#3f3f46;background:#fafafa;border-left:3px solid #d1d5db;
+padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0 14px;font-size:14px;}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pane{border-radius:8px;padding:10px 12px;font-size:14px;}
+.pane.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.pane.new{background:var(--newbg);border:1px solid var(--newbd);}
+.pane-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;}
+.pane.old .pane-label{color:#b91c1c;}
+.pane.new .pane-label{color:#15803d;}
+code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f3f4f6;font-weight:600;}
+td.num{white-space:nowrap;color:var(--muted);font-family:ui-monospace,monospace;}
+td.old-cell{background:var(--oldbg);}
+td.new-cell{background:var(--newbg);}
+ul.plain{margin:8px 0;padding-left:20px;}
+ul.plain li{margin:5px 0;}
+.note{font-size:13.5px;color:#52525b;margin:10px 0 0;}
+@media(max-width:760px){.diff{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>后记 语言组织层修改意见</h1>
+<div class="meta">日期：2026-09-08 ｜ 范围：<code>chapters/10-epilogue.md</code>（67 行）<br>方法：3 个独立视角 agent 逐行通读后交叉验证 ｜ 原则：只改表达，不增删信息、不动事实数字</div>
+<div class="legend"><span><i class="sw old"></i>左：原文</span><span><i class="sw new"></i>右：改后</span></div>
+</header>
+<h2>0. 一句话结论</h2><p>后记的病灶集中在<strong>章首主谓失联＋悬垂指代</strong>（L3 三个 agent 全中）和<strong>总结位的说教/归一收束</strong>（L5、L9、L29）；另有几处压缩警句和同义复读。</p><h2>1. 建议直接改</h2><div class="card"><div class="item-head"><span class="badge">L3</span><span class="item-title">1.1 章首主谓失联 + 悬垂指代</span></div><p class="problem">“讨论了”缺主语（是“书”还是“九章”在讨论？）；“它们”前有三个候选（九章/三个软件/八个主题）；且读者已读完第 10 章，开头却说“九章走完”，时间坐标让人愣一下。（三个 agent 都命中）</p><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">九章走完，讨论了三个软件、八个主题，贯穿它们的是同一种视角。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">九章正文走完，这本书讨论了三个软件、八个主题；贯穿全书的，是同一种视角。</div></div></div></div><h3>1.2 总结位说教 / 宾语类型错配</h3><p class="problem">前句宾语是“一句话”，后句变成“一个方法”；冒号后是无人称祈使句（隐含“你”）；“从使用者到设计者，差的正是这个习惯”是可套任何话题的压缩模板。</p><div class="card"><div class="item-head"><span class="badge">L5</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">如果要在结尾留一句话，我会留一个方法：下次做设计决策时，先弄清它面对什么约束、代价由谁来承担。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">如果要在结尾留一句话，我会说：我做设计决策时，会先弄清它面对什么约束、代价由谁来承担。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L9</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">从使用者到设计者，差的正是这个习惯。这本书能帮你把它养成，就够了。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">从使用者到设计者，差的其实就是这个习惯。这本书能帮你把它养成，目的也就达到了。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L29</span><span class="item-title">1.3 归一收束模板</span></div><p class="problem">故事刚讲完，段末突然把整件事收成一句普适定义，且“架构设计……选择”把选择权交给抽象概念，施事悬空。（两个 agent 独立命中）</p><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">架构设计就是在自己的约束条件下，选择承受得起的代价。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">说到底，架构设计就是人在自己的约束条件下，选一个承受得起的代价。</div></div></div></div><h3>1.4 逐句硬伤</h3><table><thead><tr><th>行号</th><th>原文</th><th>改后</th><th>说明</th></tr></thead><tbody><tr><td class="num">L7</td><td class="old-cell">在分布式里维持一致性，靠的也是这些规律。</td><td class="new-cell">在分布式系统里维持一致性，靠的也是这些规律。</td><td>“在分布式里”缺中心词</td></tr><tr><td class="num">L7</td><td class="old-cell">我最想留下的是第一条——正本守住，其余取舍才有参照。</td><td class="new-cell">我最想留下的是第一条：把正本守住，其余取舍才有参照。</td><td>破折号后缺系词；“取舍才有参照”悬空</td></tr><tr><td class="num">L15</td><td class="old-cell">变化是从开始负责系统设计来的：选型会上没人替我回答……</td><td class="new-cell">变化发生在开始负责系统设计之后：选型会上没人替我回答……</td><td>“是从……来的”套在抽象过程上，念着绕</td></tr><tr><td class="num">L15</td><td class="old-cell">关心的是命令表、索引怎么建、分区怎么配，能用好就够了。</td><td class="new-cell">关心的是命令表、索引建法和分区配置，能用好就够了。</td><td>并列项不同质（名词＋问句）</td></tr><tr><td class="num">L25</td><td class="old-cell">一个网络分区刚好把承载库存那个槽的主节点从集群里割了出去</td><td class="new-cell">一个网络分区刚好把承载库存的那个槽所在的主节点从集群里割了出去</td><td>修饰语叠四层，漏“的”</td></tr><tr><td class="num">L27</td><td class="old-cell">是我们把一个默认形态偏 AP 的系统用在了必须保证一致性的场景上</td><td class="new-cell">是我们把一个默认行为偏 AP 的系统用在了必须保证一致性的场景上</td><td>“形态偏 AP”搭配生硬</td></tr><tr><td class="num">L37</td><td class="old-cell">这本书的价值在于读完之后的动手。</td><td class="new-cell">这本书的价值在于读完之后动手去做。</td><td>“的动手”把动词硬当名词</td></tr><tr><td class="num">L37</td><td class="old-cell">哪些东西能重建、哪些东西就永久丢了？</td><td class="new-cell">哪些东西能重建、哪些东西会永久丢失？</td><td>“就永久丢了”口语</td></tr><tr><td class="num">L41</td><td class="old-cell">数据允许丢不超过 ZZ 条</td><td class="new-cell">数据最多允许丢失 ZZ 条</td><td>“允许丢不超过”两个动词叠在一起</td></tr><tr><td class="num">L51</td><td class="old-cell">但所有技术判断、取舍与案例由作者独立承担</td><td class="new-cell">但所有技术判断、取舍与案例均由作者独立负责</td><td>“承担案例”不搭</td></tr></tbody></table><h2>2. 改前需复核</h2><h3>2.1 连续收束句 / 指代不落点</h3><p class="problem">两句都是收束句，第二句又另起新话题，结尾重心分散；“这一件事”有两个候选。</p><div class="card"><div class="item-head"><span class="badge">L31</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">回头看这个故事，全书九章其实都指向这一件事。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">回头看这个故事，全书九章其实都指向同一件事：正本守住，其余取舍才有参照。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L43 / L45</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">这三件事本身不难，缺的只是动手去做。／书里的规律灵不灵，希望你在自己的系统里去印证。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">这三件事本身不难，缺的只是动手去做；书里的规律灵不灵，希望你在自己的系统里去印证。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L17</span><span class="item-title">2.2 同义复读</span></div><p class="problem">“讲得通的逻辑”与“这套逻辑……是通的”同义复读，“通”字连用，后半句没有新信息。</p><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">还是那些命令、那些参数，但背后多出一套讲得通的逻辑，而且这套逻辑在不同系统之间是通的。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">还是那些命令、那些参数，但背后多出一套讲得通的逻辑，而且这套逻辑在三个软件之间能互相印证。</div></div></div></div><h2>3. 新病理候选（建议补进 docs/去ai味道自查方法.md §1.3）</h2><table><thead><tr><th>候选名</th><th>定义</th><th>判定方法</th><th>后记实例</th></tr></thead><tbody><tr><td>归一收束模板（整段）</td><td>具体故事讲完，段末收成一句普适定义</td><td>删掉这句，故事结论是否已完整；把主语换成“人”是否更准</td><td>L29</td></tr><tr><td>总结位说教（无人称祈使）</td><td>结尾用隐含“你”的祈使句给读者布置任务</td><td>把冒号后换成第一人称经验句，是否更顺</td><td>L5</td></tr><tr><td>压缩判断句·缺系词</td><td>“从 X 到 Y，差的正是 Z”这类可套模板的压缩句</td><td>把 Z 换成任意名词，句子是否照样成立（成立即模板）</td><td>L9</td></tr></tbody></table><h2>4. 可复用的检查方法</h2><ul class="plain"><li><strong>章首回看</strong>：遮掉前一句只读本句，“谁讨论的”“它们指谁”能否立即答出。</li><li><strong>收束句测试</strong>：把某句单独读，像不像全篇最后一句；若像而后面还有内容，即中招。</li><li><strong>模板测试</strong>：把压缩句里的关键词换成任意名词，句子是否照样成立。</li></ul>
+</div>
+</body>
+</html>

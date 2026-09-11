@@ -1,0 +1,22 @@
+报告已成功写入 `/Users/liu/dev/demos/redis-kafka-books/0909/m3/D1-命令SQL在基线版本的可运行性审查员.md`（542 行）。
+
+---
+
+## 审查摘要
+
+**方法**：全书 13 个章节文件全量扫描 → 376 条唯一 backtick 项 → 逐条对照 Redis 7.x / MySQL 8.0.x / Kafka 3.x 官方文档
+
+### 发现的问题（13 个）
+
+| 级别 | 数量 | 代表问题 |
+|------|------|---------|
+| **P0** | 1 | `SHUTDOWN NOW` — **命令不存在**，Redis 7.x 的 SHUTDOWN 只有 `[NOSAVE \| SAVE]` 两种选项 |
+| **P1** | 2 | `min-replicas` 单独出现（应为 `min-replicas-to-write` + `min-replicas-max-lag`）；`repl-diskless-sync` 默认值是否改为 yes 存疑 |
+| **P2** | 10 | 变量新旧名对照、版本引入标注、SQL 空格精度、命令引入版本等 |
+
+### 被重点核查的 4 个已知问题结论
+
+- ✅ **ch9:101 `min-replicas-to-write`/`min-replicas-max-lag`** — 参数名完全正确
+- ✅ **ch6:56 ACL 命令块** — `ACL SETUSER alice on >pwd ~keys:* +get +set` 是合法 Redis 7.x 命令
+- ✅ **半同步变量新旧名** — 书中口径一致（8.0.26 重命名后统一用新名），脚注说明清楚
+- ✅ **`appendfsync` 默认值语境** — "开启 AOF 后默认 everysec" 描述准确

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第六章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第六章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/06-security/chapter.md</code>（231 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／命令／表格内容／作者第一人称故事与判断锋芒不动。ch2–ch5 确诊模式复发者标「前章同款」。两席引文 60+ 处经总调度对文件逐字复核，0 失配。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">病不在包装复用，在节拍器与叙述者离场</span></h2>
+<p>ch6 与前三章的病都不同，且整体<b>轻于 ch2–ch5</b>：整句加粗全章为零（ch5 是 71 处黑体、16 整句加粗）、图导语仅三处且动词各异、大节开场有五种变体——tech-editor 判"是节拍器化，不是模具化"。真正的签名病理两席合起来是三件事：<b>账房节拍</b>（每个机制点讲完必须记一笔"取舍/代价"才算完，账房词族 18–19 处——ch4 账单句的内化版）、<b>盖章句族复发</b>（中心论点"安全上限＝数据模型×跳数"全章盖 4–5 次，"安全让位"近逐字三盖）、<b>首人称荒漠</b>（L10–L204 之间 196 行无一个"我"——tech-editor 的判词："叙述者在导读之后消失了 196 行，回来时已经站在总结席上"）。detector 给 5/10（序列 ch2 4 → ch3 5 → ch4 6 → ch5 5 → ch6 5）。节奏底子照旧：≤7 字短句全章 2 句、≥80 字巨句 24 句，CV 0.60 仍是单向方差假安全；节奏倒挂在 ch5 缺席后复发（6.7 CV 0.37 全章最平）。</p>
+<div class="stats">
+  <div class="stat"><div class="n">2 句</div><div class="t">全章 220 句里 ≤7 字短句只有 2 句（0.9%）；家常短句仅 L9"好在只是测试环境。"一句——ch3 格言垄断、ch4 标签垄断、ch5 报数垄断，ch6 是短句槽位整个缺席</div></div>
+  <div class="stat"><div class="n">196 行</div><div class="t">L10–L204 无第一人称（仅 L9/L205/L211/L223 四行有人称）——"首人称荒漠"是 ch6 节奏问题的根：不是句子形状不够多，是叙述者不在场</div></div>
+  <div class="stat"><div class="n">4 次</div><div class="t">中心论点盖章：L5→L26→L187→L229；"请求要跨几跳"原句出现 4 次（L7/L187/L223/L231）——detector 命名"预告—兑现自我引用闭环"</div></div>
+  <div class="stat"><div class="n">18–19 处</div><div class="t">账房词族（代价×10、取舍×6、换×3），分布 14 行——每个设计点都被记成一笔账；对照 6.5 的 L155 是挣来的那笔，豁免</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L26 ⇄ L30</span><h3>相隔 4 行的两遍绕场：6.1 末预告过，6.2 节首又预告一遍</h3><span class="badge b2">双票 · 最重</span><span class="badge b1">前章同款</span></header>
+  <p class="why">L26（6.1 收束）与 L30（6.2 节首）都在做"三家路线预告"，功能完全重复；L229 收章还会原样再来一遍。tech-editor 另点出全章绕场的两个隐藏指纹：<b>顺序全部 Redis→MySQL→Kafka 无一例外</b>，且定语锁死（Redis 永远＝内网/性能/极简，MySQL 永远＝企业/列级/第一天，Kafka 永远＝多跳/分布式/可组合）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L30，6.2 节首）</div>
+      <p>认证是安全的第一步：在客户端执行任何操作之前，系统必须确认"你是谁"。<span class="cut">Redis 内网里一个全局密码就够，MySQL 要按账号、来源、插件把认证做成体系，Kafka 则因为多跳，认证没法一次做完。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>认证是安全的第一步：在客户端执行任何操作之前，系统必须确认"你是谁"。<span class="add">（绕场半句删——四行之前的 L26 刚把三家的路线预告过一遍，6.2 的三个小节马上逐一展开，这里不再预告第二遍；读者带着 L26 留下的悬念进 Redis 小节即可）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>处置</b>：L26 保留（6.1 收束处是全章路线预告挣来的位置）；L30 卸绕场。同族节首定位句 L83/L131 表层有变化（时序桥／共性句），深层"[定义]＋[三家各异]"同构——L83 的时序桥写法（"确认身份之后，下一个问题是授权"）是章内好例，可作 L30 改写参照。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L60 ⇄ L123</span><h3>"核心留变化外挂"三盖章（L48/L60/L123），二选一</h3><span class="badge b2">双票</span><span class="badge b1">ch2 同款</span></header>
+  <p class="why">同一笔账结了三次。L60 最标准："这与第 5 章讲过的'可插拔存储引擎'是同一种思路"——替读者完成了本该由读者自己完成的对位；L123 是三合一盖章，一句话给三家发同一张证书。tech-editor 裁定：两处功能重复，二选一。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L60 段末区）</div>
+      <p>……`sha256_password` 提供无缓存的高安全选项。<span class="cut">把身份验证外包给最合适的子系统，这与第 5 章讲过的"可插拔存储引擎"是同一种思路：核心保留扩展点，把变化的部分留给插件。</span>TLS 的协商嵌在握手包里……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……`sha256_password` 提供无缓存的高安全选项。<span class="add">身份验证就这样外包给了最合适的子系统。</span>TLS 的协商嵌在握手包里……<span class="add">（跨章盖章删——插件清单自己会说话，读过第 5 章的读者自己会撞上"似曾相识"，比被预告更有用）</span></p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L123 段末）</div>
+      <p>……通常外接 Apache Ranger 这类统一管控层，把 Kafka 的 ACL 作为底层落地点。<span class="cut">这种"内核只做最小 ACL，把 RBAC 留给上层"的边界划分，和 Redis 把角色留给 IAM、MySQL 把审计插件做成可选是同一种工程哲学，都把复杂语义外挂，核心保持简单。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……把 Kafka 的 ACL 作为底层落地点。<span class="add">Redis 把角色留给 IAM、MySQL 把审计插件做成可选，走的是同一条边界：复杂语义外挂，核心保持简单。</span><span class="add">（三家对位保留——这是真观察；卸掉的是"同一种工程哲学"的授证动作）</span></p>
+    </div>
+  </div>
+  <p class="dir">保留处＝L123（变奏后）；L60 删；L48 是首现定义（"是 Redis 一贯划分边界的做法"），随句保留不再加码。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L34 / L36 / L229</span><h3>"安全让位"公式三盖，L34→L229 仅差两字</h3><span class="badge b2">双票 · 近逐字</span></header>
+  <p class="why">L34"安全让位于性能、之后再按需补回"→ L36"这是'安全让位给极简内核'的取舍"→ L229"走的是'安全让位于性能、再按需补回'"。首尾两处 tech-editor 数出仅差两字，属复制粘贴级复读；L36 是原话回炉第二遍。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L36，requirepass 段）</div>
+      <p>6.0 之前的 Redis 只有一个 `requirepass` 全局密码，所有客户端共享，无法区分身份。<span class="cut">这是"安全让位给极简内核"的取舍：内核不知道调用者是谁，只校验一个共享口令。</span>这种模型在内网可信环境里够用……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>6.0 之前的 Redis 只有一个 `requirepass` 全局密码，所有客户端共享，无法区分身份。<span class="add">内核不知道调用者是谁，只校验一个共享口令。</span>这种模型在内网可信环境里够用……<span class="add">（贴标签句删——两行前的 L34 刚说过一遍，且"内核不知道…"本来就把意思说完了）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>处置</b>：L34 首现定义保留；L36 删（上例）；L229 的第三次随 §2.6 收章手术一并变奏。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L205 / L211 / L223</span><h3>6.7 三连宣誓：同一副"我＋先＋数词"骨架</h3><span class="badge b2">双票 · 内容豁免</span><span class="badge b1">ch4 同款·复发</span></header>
+  <p class="why">宣誓句在 ch5 零命中后本章复发 4 次，其中 3 次挤在 6.7 一节："我做安全评审<b>先看两件事</b>"（L205）、"我评审……<b>先数它有几层</b>"（L211）、"我自己做选型，<b>先问两个问题</b>"（L223）。tech-editor 的关键观察：因为全章仅这三处第一人称，<b>cadence 完全裸露</b>——且这三句恰是全章最"人"的句子，<b>内容与锋芒一字不动</b>，动的只是起手骨架。L205 段末还叠了"一句话："播音员公式＋对仗刹车。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L205 段）</div>
+      <p><span class="cut">我做安全评审先看两件事：</span>默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。<span class="cut">一句话：默认安全取决于部署环境——面向公网的服务应默认收紧，内部工具可以更开放。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">轮到我做安全评审，查的就是这两条：</span>默认值与部署环境是否错配、每个应用有没有独立的最小权限账号。这两条不过关，加密配得再强我也不签——默认值错配的洞，比权限配粗的洞出得快，也更难被发现。<span class="add">（"一句话：……"整句删——播音员公式叠在"我也不签"之后，锋芒句自己已经把段收完了）</span></p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L223 节录）</div>
+      <p>……分布式系统则依托标准框架（Kafka 的 SASL）。<span class="cut">我自己做选型，先问两个问题：</span>"我要对接多少种身份源""我的请求要跨多少跳"，答案自然导向对应的抽象层厚度。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……分布式系统则依托标准框架（Kafka 的 SASL）。<span class="add">"我要对接多少种身份源""我的请求要跨多少跳"——做选型时我就靠这两个问题定位抽象层的厚度。</span>（问题前置，报数起手卸掉；L211 的"先数它有几层"是三句里最形象的一副骨架，原样保留）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L98</span><h3>阶段编号式看图说话：图 6-3 刚画完，正文用"阶段一/阶段二"再念一遍</h3><span class="badge b2">双票</span><span class="badge b1">前章同款</span></header>
+  <p class="why">两席共判全章最重的导览段："这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查"——阶段编号是图里的坐标，正文跟着坐标念；"图中 alice 执行 `GET keys:1` 通过"更是纯看图说话。对照 L113（图 6-4 后用一条具体 SQL 走图）是章内好例。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>连接建立时客户端先用 `AUTH alice <密码>` 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice。<span class="cut">这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查：服务端根据当前用户绑定的规则，分别检查命令类别（GET 属于 @read）和键模式（`keys:1` 匹配 `~keys:*`）两个维度，两项都命中才放行。图中 alice 执行 `GET keys:1` 通过，但执行 `FLUSHALL` 会被拒绝：`FLUSHALL` 属于 @dangerous，alice 的规则里没有授予。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>连接建立时客户端先用 `AUTH alice <密码>` 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice——认证整个会话只做这一次。<span class="add">之后每条命令都过一遍授权：先查命令类别（GET 属于 @read），再查键模式（`keys:1` 匹配 `~keys:*`），两项都命中才放行；换成 `FLUSHALL` 就会被拒——它属于 @dangerous，alice 的规则里没有授予。</span><span class="add">（"图中 alice 执行……"删——图自己会说；正文保留图说不出的机制）</span></p>
+    </div>
+  </div>
+  <p class="dir">紧随其后的 L100 凿子（"认证握手开销大，因此按会话摊销；授权检查开销小，可以每条命令都执行"）是<b>挣来的对仗</b>，保留——它是这轮看图说话的机制落点。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L7</span><h3>布告腔起段：目录配音＋全章论点的预告起点</h3><span class="badge b1">detector · 族内双票</span></header>
+  <p class="why">detector 命名"7 字布告腔起段"："沿着认证、授权、加密、审计四个层面逐个拆解"是给目录配音——章的结构读者翻目录就知道，删掉后读者不少知道任何事实（过盖章尺）。同时它是"请求要跨几跳"四次出现的起点；后半句方法论钥匙保留原位，中间的复述在别处收（§3.2）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p><span class="cut">三个软件放进同一张安全分析表，沿着认证、授权、加密、审计四个层面逐个拆解。</span>下次给一个新系统做安全评审，先看它的数据存放在哪、请求要跨几跳。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">（首句删——目录配音零信息；导读 L5 刚给完三家的姿态反差，直接落方法论更利落）</span>下次给一个新系统做安全评审，先看它的数据存放在哪、请求要跨几跳。</p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L50（6.2）</span><h3>131 字括号栈：主语"密码"悬置 90 字才落地</h3><span class="badge b2">双票 · 最重</span><span class="badge b1">ch6 新病理</span></header>
+  <p class="why">tech-editor 绊脚点第 1 名＋detector"括号栈吞句"头号标本：括号内含分号和破折号的双层嵌套，读者必须悬置"密码以摘要形式存"这个主谓，穿过 ACL SAVE/LOAD 的操作说明才能落地"不存明文"。修法不是删是<b>出栈</b>——L40–44 已有命令块先例，照用即可。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>凭证存储上，密码以 SHA-256 摘要形式存<span class="cut">（通过 `ACL SAVE` 持久化到 `aclfile` 指定的文件，默认无 aclfile，需显式设置；在外部编辑过 aclfile 后，用 `ACL LOAD` 让服务端重读——内存中的运行时改动会被文件覆盖）</span>，不存明文。这是凭证落盘的最小安全要求。要注意这个摘要是不加盐、不迭代的裸 SHA-256：哈希不是加密，而无盐快哈希意味着相同密码的摘要相同、对弱密码有字典攻击和彩虹表风险，因此 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>凭证存储上，密码以 SHA-256 摘要形式存，不存明文。这是凭证落盘的最小安全要求。<span class="add">持久化走 `ACL SAVE`，写进 `aclfile` 指定的文件——默认没有 aclfile，要显式设置；在外部编辑过 aclfile 的，得用 `ACL LOAD` 让服务端重读，注意内存里的运行时改动会被文件覆盖。</span><span class="add">还要注意这个摘要是不加盐、不迭代的裸 SHA-256。哈希不是加密：无盐快哈希意味着相同密码的摘要相同，弱密码面对字典攻击和彩虹表站不住，所以 Redis 文档强调密码要足够长且随机，靠密码本身的熵来补无盐的短板。</span>（131 字一句 → 两段四句；技术事实全数保留）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L104（6.3）</span><h3>全章最重要的操作段，却是最难读的一段</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">tech-editor 绊脚点第 2 名，判词值得整段引用："信息上这是全章最重要的操作段落（default 全开＋protected-mode 边界），却是最难读的：重要性和可读性倒挂，读者最可能在此'想认真读→读不动→愧怍跳过'，这是弃书情绪的典型触发器。"全行 417 字、四个冒号，末句 147 字带约 90 字的巨型括号。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（末句）</div>
+      <p>要真正加固，还得运维自己动手：显式给 `default` 用户设密码或直接禁用<span class="cut">（例如 `ACL SETUSER default off` 禁用用户，或 `ACL SETUSER default resetpass` 清空密码并同时移除 nopass 标记——此后没有密码就再也没法认证成 default）</span>。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>要真正加固，还得运维自己动手：显式给 `default` 用户设密码，或者干脆禁用。<span class="add">两条路任选其一——`ACL SETUSER default off` 直接禁用用户；`ACL SETUSER default resetpass` 清空密码并移除 nopass 标记，此后没有密码就再也认证不成 default。</span>（括号出栈成正文；两条命令的语义属技术内容，正式稿以技术席核对为准）</p>
+    </div>
+  </div>
+  <p class="dir">同段中间 protected-mode 长句（78 字）顺带拆一脚刹车；"换句话说，protected-mode 拦的是'裸监听被外网命中'，不替代认证本身"是好句，原样保留。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L117 ＋ L121（6.3）</span><h3>台账当散文：四类权限一层括号一行倒完；13 个权限名目倾倒</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor：读者此处不是重读而是<b>滑读</b>——眼睛自动降级为扫表，而这正是最该有"哪一项会咬你"拣选的地方。L117 末尾的 FILE 句已经证明作者会这一手（"配合 SQL 注入可读任意文件，是高敏权限的典型"），把手艺补齐到 L121 即可。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L117 首句）</div>
+      <p><span class="cut">权限语义按风险分四类：数据操作（DML，包括 SELECT、INSERT、UPDATE、DELETE）、结构变更（DDL，包括 CREATE、ALTER、DROP，更危险）、管理（SUPER、PROCESS、FILE、RELOAD，高度敏感）、复制（REPLICATION SLAVE、REPLICATION CLIENT，专用于复制拓扑）。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">权限语义按风险分四类。日常最多的是数据操作（DML：SELECT、INSERT、UPDATE、DELETE）；改结构的是 DDL（CREATE、ALTER、DROP），危险程度上一档；管理类是 SUPER、PROCESS、FILE、RELOAD，高度敏感；复制两类专用于复制拓扑（REPLICATION SLAVE、REPLICATION CLIENT）。</span>（冒号＋四组括号的一行账 → 分类各起一句；"更危险/高度敏感"的档差落成正文重音）</p>
+    </div>
+  </div>
+  <p class="dir"><b>L121</b>（Kafka 三元组段）：资源五类、操作八项两句倒 13 个名目——<span class="add">［补一句拣选：这么多项里真正会咬人的是哪一个。拣谁由作者定——L117 的 FILE 句就是现成手法，勿由改文笔代写技术判断］</span>。L66（SASL 机制五连枚举）同理。L219"各有取舍：A；B；C"分号三连拆成三句。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L15（6.1）</span><h3>319 字定义墙：导读刚把人拉进来，翻页第一段就是台账</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 绊脚点第 3 名："导读写得好、6.1 把人劝退"的经典位置。四个定义挤在一段里，黑体标签四连（认证/授权/加密/审计）＋句长 25/19/26/45/71/46/36（第三、四项膨出）。黑体是术语首次定义的排版契约<b>不去</b>，动的是分段与起手。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录前两项）</div>
+      <p>第一个是**认证（Authentication）**，确认"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。第二个是**授权（Authorization）**，界定"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合……<i>（第三个、第四个接连同一段，共 319 字）</i></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（一拆四段）</div>
+      <p>第一个是**认证（Authentication）**，确认"你是谁"。它要解决凭证的存储、传输、校验和防暴力破解。</p>
+      <p>第二个是**授权（Authorization）**，界定"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。</p>
+      <p><span class="add">第三个是**加密（Encryption）**，分两半说：传输加密管数据在路上不被破坏，存储加密管磁盘被盗也读不出。</span>（第三、四段同法拆出；加密段的"机密性与完整性""即使磁盘被盗也无法直接读取"压成口语对应物，正式稿由流水线出）</p>
+    </div>
+  </div>
+  <p class="dir">拆段零信息损失（只拆不删）；段末收束句"这四个层面在一次……链路上各覆盖一段，审计则贯穿全程"独立成收尾小段——它本来就是 L22 图导语的引子。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L143（6.4）</span><h3>TDE 段四病叠加：括号栈＋括号内开冒号＋对账动词峰值＋鉴定句</h3><span class="badge b2">双票（tech 以对仗/账房同位命中）</span></header>
+  <p class="why">detector 列全章最差第 1 位。60 字的"发行版边界"括号里自成文章（社区版/企业版的 keyring 划界——这是读者选购时会踩的坑，值得当正文，不该埋栈）；段末"就是把'数据丢失'风险换成了'密钥丢失'风险"是真判断，留——动的是形状不是这句。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>存储加密让 MySQL 区别于另外两款。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS<span class="cut">（注意这是发行版的边界：社区版自带的只有文件型 keyring_file 插件，能对接 Vault/KMS 的 keyring 插件均属企业版）</span>。TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点：密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>存储加密让 MySQL 区别于另外两款。TDE（Transparent Data Encryption，透明数据加密）在 InnoDB 表空间级别加密数据，密钥由密钥管理插件托管，常见的是对接 HashiCorp Vault 或云厂商 KMS。<span class="add">这里有一条发行版的边界：社区版自带的只有文件型 keyring_file 插件，能对接 Vault/KMS 的 keyring 插件均属企业版。</span>TDE 的核心取舍是"对应用透明"：SQL 不需要改一个字，加解密在存储引擎层完成。代价是密钥管理变成新的单点——密钥丢失等于数据不可读，所以 TDE 必须配套密钥轮换与备份策略，否则就是把"数据丢失"风险换成了"密钥丢失"风险。（括号出栈成独立句；企业版边界措辞逐字保留）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L229（6.8）</span><h3>收章复述集锦：111 字分号串绕场＋中心论点第四盖</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 判 6.8 为"复述集锦——每半句都能在前文找到近原句"（L34/L26/L195 的原样回收）；detector 数出这是中心论点第四次盖章＋"安全让位"第三盖。两席共识：这一段的信息在前文都给过，收章要做的是<b>收束</b>不是<b>重播</b>。L231 下章钩子是全书级好收尾，一字不动。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>认证、授权、加密、审计这四件事，在三个软件身上各有侧重。<span class="cut">Redis 从全局密码补到 ACL，走的是"安全让位于性能、再按需补回"；MySQL 一上来就把权限做到列级，回应企业级场景对完整性和可审计的硬要求；Kafka 的安全配置最复杂，SASL、TLS、ACL 三套模块缺一不可，因为多跳分布式里身份要层层传递。</span>它们的差异背后是同一条规律：安全设计能达到的上限，取决于数据模型和请求要经过的跳数。脱离这两者谈"谁更安全"没有意义，正确的问法是"在它的数据模型和部署形态下，这套安全设计是否做到了合理的上限"。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>认证、授权、加密、审计这四件事，三家各按各的形态补齐。<span class="add">Redis 是先放后补，全局密码一直用到 6.0 才补上 ACL；MySQL 从第一天就做到列级，接住企业场景的硬要求；Kafka 最重，三套模块缺一不可——多跳分布式里身份要层层传递。</span>它们的差异背后是同一条规律：安全设计能达到的上限，取决于数据模型和请求要经过的跳数。脱离这两者谈"谁更安全"没有意义，正确的问法是"在它的数据模型和部署形态下，这套安全设计是否做到了合理的上限"。<span class="add">（分号串绕场压成不等长三拍；"安全让位"原话第三遍不再出现——L34 已定义过；中心论点留此终盖，末句正确的问法原样保留）</span></p>
+    </div>
+  </div>
+  <p class="dir">同族：L203（启示一绕场，谓语"（假设X）"×3 逐字模板）、L215/L223 谓语模板一并打破——绕场预算见 §3.1。</p>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">给模具设预算、给叙述者排班，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场 ~10–12 遍 → 4 遍</h3><span class="badge b2">双票</span></header>
+  <p class="why">句内绕场 7 处（L5/L26/L30/L203/L215/L223/L229）＋段落级轮走 3 轮（L26；6.5 L157–163；6.6 L191–195）。对照：ch2 五遍 → ch3 11 → ch4 17 → ch5 13。谓语逐字模板三组最重：L203"（假设X）"×3、L215"用X"×3、L223"X系统用Y（Z）"×3。</p>
+  <p class="dir"><b>保留</b>：L5（导读钥匙版，首盖）＋表 6-1＋6.6 底线三段（L191–195，对比节本职工况）＋L229（变奏后终盖）。<b>砍/变</b>：L30（§1.1）；L203 谓语模板换不等长（Redis 深进、其余一拍）；6.5 一轮是三短段轮走且节奏全章最好，只卸 L163"共同点"盖章不卸轮走。另：<b>定语解锁</b>——三家的定语（内网/企业/多跳）在保留的绕场里至少一处换角度说，同一形容词不四次跟同一家。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>中心论点与"跳数"措辞：盖 4–5 次 → 一头一尾</h3><span class="badge b2">双票</span></header>
+  <p class="why">中心论点完整表述在 L5/L26/L187/L229 四处落地；"请求要跨几跳"原句 4 次（L7/L187/L223/L231）——detector 命名"预告—兑现自我引用闭环"。L187 的回扣开头事件是 tech-editor 评的全章最漂亮回收（"把内网姿态放到公网，就是本章开头那个爬虫事件的根因"），<b>结构保留</b>；被压的是原句复读。</p>
+  <p class="dir">完整表述留 L5（立）＋L229（收）；L187 改走事件回收（"把内网姿态放到公网，就是开头那个爬虫事件的重演"），"跳数"字面不再第三次出现；L7 与 L231 一头一尾保留。中层小盖（L48/L68"典型例子"/L115/L203）随句降平叙。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>短句地板＋叙述者排班：家常短句 1 → 8–10；荒漠里落 2 处真实颗粒</h3><span class="badge b2">双票</span></header>
+  <p class="why">26 段三长连排无短句、11 段以最长句收尾（最重 L26 22/51/30/87、L104 23/78/82/35/124、L127 18/89/31/90）。根子是叙述者缺席：L10–L204 无人称。tech-editor 的修法约束值得原样立规：<b>前提是作者手里有真事，没有就落具体场景形态（某次评审看到的样子），不造经历</b>。</p>
+  <p class="dir">首选落点：L104 默认策略处、L137 TLS 代价处——各落一句 L9 密度的亲历或评审见闻。其余靠拆句顺带补：§2 五处手术每处自然带出 2–3 个短句。章内好样子：L9"好在只是测试环境。"、L151 首句"性能代价也大。"、6.5 整节的短段节奏。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>账房词族 18–19 → 8–10 处</h3><span class="badge b2">双票</span><span class="badge b1">ch4 同族·内化版</span></header>
+  <p class="why">代价×10（L79/113/135/137×2/143/151/193/195/209）、取舍×6、换×3。tech-editor 的定性："ch4 是节末外挂总结动作，ch6 把账本内化成了全章的分析引擎——每个设计点都必须记一笔'取舍/代价'才算讲完。"当每个机制都以同一种货币结账，读者开始等账。</p>
+  <p class="dir">取舍换着说——章内好例：L58"缓存让高频建连场景下的重复认证不再成为瓶颈"（用"让"不用"换"）、L79"这份复杂度换来的是"（全文留此一处"换来"）、L113"层级越细检查越慢"（直接说后果）。<b>L155"审计的每一分细致都是用吞吐换的"豁免</b>——6.5 开门第一句，是挣来的那笔账。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>数字布告 11 处 → 5 处；小节起手 8/9 同模</h3><span class="badge b2">双票</span></header>
+  <p class="why">报数布告：L7/L13/L15/L24/L54/L108/L117/L121/L195/L205/L223。tech-editor 点名最教科书的一处：L54"它的安全设计有两个关键点：层级权限表和可插拔认证"——报数之后整节照单展开。小节层面：九个厂商小节<b>八个</b>用"X 的 Y 是 Z"定位句起手（L34/L54/L64/L87/L108/L121/L139/L149），唯一例外 L135 直接从历史切入（"6.0 之前的'安全传输'靠 stunnel 代理或 SSH 隧道"）——<b>而那一小节恰好读起来最顺</b>。</p>
+  <p class="dir">报数留节级路标（L195"抓住三个重点"可留）；L54 报数句删、两关键点直接分头讲。小节起手留三四个定位句，其余两三个换 L135 式历史/场景切入——9 个小节至少 3 个不走"X 的 Y 是 Z"。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>L187 / L229 收章处置</b><br><span class="badge bd">两席分歧</span></td>
+      <td>detector：中心论点四盖，L187/L229 应改写不复读；tech-editor：这两处是"挣来的"（L187 回扣爬虫事件是全章最漂亮的回收；L229 是全章收束），应保留</td>
+      <td>两席相容处大于分歧：回扣结构都留；分歧在措辞要不要变奏。§3.2 已采相容案（结构留、原句"跳数"只出现一头一尾）。<b>上作者</b>裁力度</td></tr>
+  <tr><td><b>L151 TLS 开销段</b><br><span class="badge bd">两席分歧</span></td>
+      <td>detector 列"最像人"好例（纠直觉：开销来自记录层对称加解密、与证书算法无关）；tech-editor 列绊脚点第 5（337 字一段、三个冒号枚举链、末句枚举当散文）</td>
+      <td>内容与形状分开裁：<b>技术归因链一字不动</b>（属技术内容）；枚举句拆分属低优先顺带。<b>上作者</b>裁要不要动形状</td></tr>
+  <tr><td>「鉴定句」×9</td>
+      <td>detector 新模式："这是＋X 的＋评级名词"起手 9 处（L50"最小安全要求"/L56"现实需求"/L98"这是阶段一"/L135"明确的取舍"/L149"硬要求"等）</td>
+      <td>detector 单票（tech-editor 以盖章族部分印证 L68/L98）。逐处问：这个"是"删掉后读者少知道一个事实吗？L98 有实义（阶段编号），L135"这是一次明确的取舍"最空。<b>上作者</b>逐处裁</td></tr>
+  <tr><td>章题与小节题<br>（tech-editor 补记）</td>
+      <td>章题"安全机制 — 权限、加密、审计"漏了四维里的"认证"（目录页读者得不到这个词）；小节题「Kafka：SASL 框架加 JAAS 配置」「MySQL：多层级权限表加 8.0 RBAC」是纯目录条目，对照「Redis：从全局密码到 ACL 用户」这类有叙事姿态的题目高下立见；四个小节题共用"加"作连接词</td>
+      <td>属体例与目录裁定，非文风手术范围。补"认证"动章题（影响目录/交叉引用），<b>上作者</b></td></tr>
+  <tr><td>6.7 的节奏定性</td>
+      <td>detector：6.7 CV 0.37 全章最平，节奏倒挂复发（对照 6.2 的 0.61/6.4 的 0.68）；tech-editor：6.7 有全章最"人"的三句（L205/L211/L223），只是骨架裸露</td>
+      <td>两席相容：三句同一副骨架，所以不贡献方差；先有内容后有方差。随 §1.4 起手变奏自然解决，登记表述不改文</td></tr>
+  <tr><td>巨句字数口径</td>
+      <td>detector Top5：L143(148)/L117(140)/L74(135)/L104(124)/L60(121)；tech-editor Top5：L117(171)/L74(163)/L104(147)/L50(131)/L151(114)（口径：去代码反引号、含标点空格）</td>
+      <td>口径差异登记，非方向分歧。两席 Top 集合一致锁定 <b>L50/L74/L104/L117/L143</b> 五句为手术位，排序不决</td></tr>
+  <tr><td>大节首同模的定性</td>
+      <td>detector：6.2/6.3/6.4 三连"[定义/共性]＋[三家各异]"（L30/L83/L131）；tech-editor：大节开场有五种变体（绕场/时序桥/共性句/优先级排序/表格布告），"真正的 T 台在小节起手"</td>
+      <td>相容：表层有变化、深层同构。处置已并入 §3.5（小节起手 8/9 是主刀位）；L30 随 §1.1。登记不改文</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L9 爬虫事件</b>（作者第一人称亲历，豁免契约）："某天发现 `KEYS *` 返回来一堆不认识的东西……好在只是测试环境。真正该记住的是那个事实：一个不加认证的 6379 端口挂到公网，当天就会被扫到。"——两席共举全章人味锚点；导读 L3–L9 的真起伏整体不动。</li>
+  <li><b>L70 循环依赖句</b>："要先有 quorum 才能读到凭证，而读不到凭证又建不起 quorum。"——tech-editor："句法在表演循环依赖本身，读完能记住。"两席共举。</li>
+  <li><b>L205 / L211 / L223 的内容与锋芒</b>："加密配得再强我也不签""只押一层的方案，无论多厚，我都打回"——全章判断锋芒最利的三句，§1.4 动的只是起手骨架与"一句话："公式。</li>
+  <li><b>L145 日志加密段</b>（tech-editor 标杆）："表加密了，但日志明文写在磁盘上，攻击者仍能从日志里拼出敏感数据。日志加密补上了这个缺口。"——两个短句讲清一个缺口，无账无章。</li>
+  <li><b>6.5 整节</b>（tech-editor："全章节奏最好的一节，可作全书'短节写法'的参照物"）：三短段一价一档；L155 开头即判断；L163"共同点"盖章句软化（§3.1），轮走结构保留。</li>
+  <li><b>L100 对仗句</b>："认证握手开销大，因此按会话摊销；授权检查开销小，可以每条命令都执行。"——凿子清单里最有分量的一记（两机理解释两节奏，不是修辞对仗），留。</li>
+  <li><b>L127 默认拒绝段与 FILE 拣选句</b>（L117 末）——"哪一项会咬人"的拣选手法章内已有，§2.3 把它补齐到 L121 时以这两处为范本；L127 段末 90 字句顺带拆，低优先。</li>
+  <li><b>L231 下章钩子</b>："分片怎么切、副本怎么一致、故障怎么自动转移、元数据谁说了算，正是本章'请求要跨几跳'那句判断在更大拓扑里的展开。"——tech-editor 评全书级好收尾；上游 L7/L187/L223 复述压缩后，它自动不再是第四遍。</li>
+  <li><b>表 6-1 内容、术语黑体（认证/授权/加密/审计等结构名）、图注编号、章级分工句</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准（tech-editor 原判）：好句子要么有"我"和一个可输错的具体对象（端口/凭证/签字），要么句法形状在模仿所讲机制的形状（循环依赖写成循环句）；怪句子是<b>把已经讲完的机制再升格成"同一种思路/典型例子/同一条规律"，或把三个并列项塞进一个冒号后面用顿号拖走——句子自己在替章节做总结和工作</b>。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch6 新增三测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>括号栈测试</b><br>（ch6 新增）</td><td>量每个括号的字数：超过约 40 字、或括号里出现分号/破折号/冒号＝注释在吞正文（本章标本 L50/L104/L117/L143）。修法不是删是<b>出栈</b>——让注释自己当正文句，或落进命令块。</td></tr>
+  <tr><td><b>叙述者在场测试</b><br>（ch6 新增）</td><td>把第一人称和家常短句出现的行号标在一条轴上。中段连续 100+ 行无人称＝叙述者离场（本章 196 行）。ch3 短句被格言垄断、ch4 被标签垄断、ch5 被报数垄断，ch6 是整个槽位缺席——比垄断更进一阶的病。</td></tr>
+  <tr><td><b>预告兑现测试</b><br>（ch6 新增）</td><td>挑全章的判断金句（如"请求要跨几跳"），把每次出现画线：预告（导读）→中段复读→收章→下章钩子。同一措辞 ≥3 次＝自我引用闭环——留一头一尾，中间变奏或删。</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车＝三长无一短（本章 24 句 ≥80 字、26 段三长连排，L104 五连为最）。</td></tr>
+  <tr><td><b>复读测试</b><br>（沿用）</td><td>同一句在本章近逐字出现两遍（"安全让位于性能、再按需补回"L34⇄L229 仅差两字）＝复制粘贴级复读——留首现定义，收章变奏。</td></tr>
+  <tr><td><b>账单测试</b><br>（沿用 ch4）</td><td>数"代价/取舍/换来/权衡"的出现次数（本章 18–19 处）。取舍若只有这一种货币，整章成了记账——换成具体动词（让/摊/兜底/直接说后果）。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；以下属<b>技术内容</b>，动到即走技术席：L104 两条 `ACL SETUSER` 命令语义与 protected-mode 边界、L143 keyring 社区版/企业版划界、L137"六到八成"及 L151 开销归因链、L203 三家默认值预判、L121 拣选句点谁</li>
+  <li><b>荒漠补颗粒不造经历</b>（tech-editor 立规）：L104/L137 两处第一人称落点，作者手里有真事写真事，没有就落具体场景形态——改文笔不得代写亲历</li>
+  <li>L15 一拆四段零信息损失（只拆不删）；L98 阶段编号保留在图与图注中，正文不再引用坐标</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 220 句量化 + 分节评分 + 四个新模式；tech-editor 绊脚点/标杆/节奏地图/四步修法）；ch2–ch5 同轮参照：0908/第二章/、0908/第三章/、0908/第四章/、0908/第五章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

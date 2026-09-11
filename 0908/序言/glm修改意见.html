@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>序言 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>序言 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-09 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/00-preface.md</code>（23 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／版本口径／作者第一人称故事与判断锋芒不动。ch1–ch9 确诊模式复发者标「前章同款」。两席引文 40+ 处经总调度对文件逐字复核，<b>0 失配</b>；2 类计数口径差登记（巨句字数去标点/含标点、账房与绕场计数宽严），见 §4。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-09 版 00-preface.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的信息均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">首尾是全书最好的文字，病在中间 9 行的"卖书段"——而那恰是读者决定读不读的窗口</span></h2>
+<p>tech-editor 的判词值得整句引用：<b>「序言的病不在开头也不在结尾——首尾是全书最好的文字；病在中间 9 行的'卖书段'把作者换成了发言人，而那恰是读者决定读不读的窗口。」</b>以及那句最准的病理解剖：<b>「真心话由作者说，卖点由播音员说，读者听得出来。」</b>detector 给 6/10、tech-editor 给 5.5/10（同档：低于 ch1/ch8/ch9 的 6.5，与 ch5/ch6 同档偏上）——单位密度全书第二高（21 个内容行里 4 堵枚举墙、4 个标签冒号、同题盖章三连），但绝对伤势被 23 行体量封顶；<b>位置代价却是全书最贵</b>：正文读者有沉没成本，序言读者抬手就走，而 L9 的墙恰好在第一分钟内（三秒战场）。病理谱系上序言是 ch1 的近亲：<b>ch1 的"X 的代价："三连播在序言变体复发为"第N层："三连播</b>，"三"报数 8 次、"还是"拍型×5、疑问拍型×9 复发且加码。声音分布倒挂是根病：开篇 L3 与 L15/L17/L21 的"我"是真的（tech 判「'判断可以质疑，坑都是真的'是全序言最好的一句，可引用级」），但论证五段（L5/L9/L11/L13/L19）整体失声——det 实测 L9–L13 核心块约 290 字零"我"，且全序言没有一个具体场景：只有"写作行为的我"（想写、记的是、不讲），没有一次"干活的我"出现在具体事件里。</p>
+<div class="stats">
+  <div class="stat"><div class="n">6 / 5.5 分</div><div class="t">det 6、tech 5.5（det：落在 ch5/ch6 与 ch1 之间；tech：与 ch5/ch6 同档偏上）——单位密度全书第二高、绝对伤势被 23 行体量封顶、位置代价全书最贵（零沉没成本的"三秒战场"）</div></div>
+  <div class="stat"><div class="n">11 行 3 盖</div><div class="t">同一论点（判断与取舍是核心价值）三枚章：L5 末腰封句、L11 格言句、L13 末教科书句；另有"为什么这么设计"动机三连播（L5/L11/L21——首尾是合法书挡，L11 是中段多余盖）；"取舍"×4＋"抉择"×3</div></div>
+  <div class="stat"><div class="n">3 堵墙</div><div class="t">L9 九项问句枚举 87 字（全书最大单句枚举墙）、L13 五项约束＋七句 ~260 字（双凿子收尾）、L17 五对"还是"67 字——全在 L5–L13 卖书段；L9/L13 两峰之间只隔 L11 一个三句薄垫，与 ch1"两堵墙背靠背"同构</div></div>
+  <div class="stat"><div class="n">0 句</div><div class="t">论证五段（L5/L9/L11/L13/L19）零"我"、零家常短句——"我"的 8 次全落在 L3/L7/L15/L17 四个书签位；句级 ≤7 字短句全文仅"是为序。"一句，中段短槽全被"第一层/第二层/第三层/其一/其二"标签占领</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中，零损失先删为主，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L5 末句</span><h3>腰封盖章句：名词墙四连＋段末拔高，论点已有 L11 一枚章</h3><span class="badge b2">双票</span><span class="badge b1">ch1 模板源头同族</span></header>
+  <p class="why">「架构师的价值就在判断和取舍上，这份判断直接决定系统的复杂度、上线进度、运维难度和健壮性。」——tech-editor 步骤一第 1 删：论点保留 L11 一枚章足够；detector 判名词墙四连（复杂度/上线进度/运维难度/健壮性）无一处具体，坐在五连长均质段（段内 CV 0.09，全文最平）的末尾，机器签名最强。删后该段自然收在 AI 判断句上（那句有锋芒，§5 已保），长度同步回落。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L5 段末）</div>
+      <p>AI 让写代码越来越快，但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。<span class="cut">架构师的价值就在判断和取舍上，这份判断直接决定系统的复杂度、上线进度、运维难度和健壮性。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>AI 让写代码越来越快，但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。<span class="add">（整句删——"价值在判断和取舍"这枚章 L11 会更响地盖一次；四名词墙不给实例，是播音员拔高；段落在"很难外包出去"收住，比腰封句可信）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L13 末句</span><h3>第三枚同题盖章＋双凿子的正式凿："X 是基础，Y 才是核心能力"</h3><span class="badge b2">双票</span></header>
+  <p class="why">「掌握具体方案是基础，在复杂约束下做对决策才是核心能力。」——11 行内第三枚同题章（tech），教科书结语标准模具，全段最重的判断交给最套话的一句（det）；且它是 L13 双凿子的正式凿——前一句「要么降低要求，要么加上兜底措施。」已经把段收落地了，再补一记总结锤是把同一层意思说第三遍。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L13 段末）</div>
+      <p>……常态是非核心环节向核心目标妥协：要么降低要求，要么加上兜底措施。<span class="cut">掌握具体方案是基础，在复杂约束下做对决策才是核心能力。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……常态是非核心环节向核心目标妥协：要么降低要求，要么加上兜底措施。<span class="add">（整句删——双凿子拆掉正式凿，"要么……要么……"落地句自带余韵；七句 ~260 字的段就此瘦身，段内第一次出现自然收口）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L13 句尾</span><h3>"为X优化"模板句腹：前两个分句已经展示了它</h3><span class="badge b2">双票（整句去留见 §4.2）</span></header>
+  <p class="why">「Redis 的重点是内存访问，Kafka 的重点是顺序追加和批量消费，<span class="cut">它们各自的优化围绕这些核心目标展开。</span>」——句尾半句是"为X优化"模板复述（tech：前两个分句已经展示了它）；而整句另有疑点：与上文"约束下决策"无衔接词、MySQL 无故缺席，det 判<b>两稿并存嫌疑</b>（像从正文草稿贴进来的残句，建议作者亲核来历）。最小案先卸句尾；整句删 vs 保前半，上作者。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Redis 的重点是内存访问，Kafka 的重点是顺序追加和批量消费，<span class="cut">它们各自的优化围绕这些核心目标展开。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（最小案）</div>
+      <p><span class="add">（句尾删。两个选项上作者：①整句删——det 倾向，该段主题是"组合与约束"，此句是正文论断体残句；②保前两分句删尾巴——tech 最小案，半队绕场点名有对比功能。若保，需补半句衔接并把 MySQL 缺席交代掉）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L11 第三句</span><h3>动机三连播的中段多余盖：引号复读"为什么这么取、为什么那么舍"</h3><span class="badge b2">双票</span></header>
+  <p class="why">「为什么这么设计」（L5 首立）→「"为什么这么取、为什么那么舍"」（L11 引号复读）→「会多问几个"为什么这么设计"」（L21 回扣）——首尾两处是合法书挡，L11 这次是中段多余盖（tech 步骤一第 4 删）；det 以"为什么这么X"拍型×3 同证（⑫）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L11）</div>
+      <p>光知道有哪些方案不够，还要从这些软件的设计里看出<span class="cut">"为什么这么取、为什么那么舍"</span>。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>光知道有哪些方案不够，<span class="add">还要看懂每家为什么这么选</span>。<span class="add">（引号复读卸掉——那句话 L5 已首立、L21 会回扣，这里第二次出现不必加引号强调；第二层的信息"看出取舍的动因"仍在）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L9 / L11 / L13 起手</span><h3>"第N层："冒号标签三连播——ch1"X 的代价："三连播的序言变体</h3><span class="badge b2">双票 · 模板源头同款</span></header>
+  <p class="why">L7 布告「我在里面记的是三层东西。」→ L9/L11/L13 三段全部以"第N层："冒号标签起手，同模×3，冒号后一律枚举展开；L15「这三层不是谁教我的」回收——同一框架三次亮相（det ⑱）。三层结构本身是体裁需要（序言预告结构，<b>保留</b>），动的是第三段起手：一、二层保标签（首现立骨架），第三层变奏，一举同时解起手同模与中段声音真空（段腹注入"我"）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L13 起手）</div>
+      <p><span class="cut">第三层：</span>怎么把各个环节的方案组合成一个能落地的整体。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">到了第三层，问题变成怎么把各个环节的方案组合成一个能落地的整体。这一层最难写。</span><span class="add">（起手从标签冒号改为叙述句；补的"这一层最难写"是 10 字级写作行为自道——det/tech 共同提议的在场短句，措辞作者定）</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">三堵墙＋两个模板段；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L9（第一层）</span><h3>第一弃书单点：九项问句枚举墙，87–96 字一句到底</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">两席共判全序言第一弃书单点：读者刚被 L3 勾住，翻到"这本书讲什么"，迎面一张压缩版目录（tech）；九个问句式条目拍型全同（疑问词＋宾语），零断句零节奏变化，是"枚举生成"的典型骨架（det）。这一句独立承担了序言一半的弃书概率（tech）。tech 另提一处可选在场案例（一句"上一次我撞上的是副本对齐"量级）——<b>素材须作者本人出，不下也可</b>。注：九项大致是第 2–9 章各章主题的投影（数据结构→第 2 章、启动/关闭→第 3 章、内存磁盘→第 4 章、分层→第 5 章、权限→第 6 章、分片容错→第 7 章、文件格式→第 8 章、副本→第 9 章），砍到 3–4 项等于替读者"选章"，对应关系走 crossref 席核对。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L9 全段）</div>
+      <p>第一层：这三个软件遇到的问题，在后端系统里反复出现。<span class="cut">数据结构如何设计、怎么启动才能不丢状态、怎么关闭才能不丢请求、内存和磁盘如何协同、怎么把系统分出清晰的层、怎么做权限与加密、单机扛不住时怎么分片和容错、文件该按什么格式落盘、副本之间怎么对齐。</span>这些问题的解法，Redis、MySQL、Kafka 已经在生产环境里反复验证和改进了十几年。把这三家的解法读懂，下次遇到同类问题，就至少知道有哪些选项。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>第一层：这三个软件遇到的问题，在后端系统里反复出现。<span class="add">比如进程怎么启动才能不丢状态、怎么关闭才能不丢请求，内存和磁盘怎么协同，副本之间怎么对齐——从数据结构到权限、从分片到文件格式，每一类问题它们都交过答卷。</span>这些问题的解法，Redis、MySQL、Kafka 已经在生产环境里反复验证和改进了十几年。把这三家的解法读懂，下次遇到同类问题，就至少知道有哪些选项。<span class="add">（九项保四＋概括半句收编其余；"启动/关闭"这对两席共举最有画面；后两句一字不动）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L13（第三层）</span><h3>第二堵墙：五项约束枚举＋七句 ~260 字无刹车＋卡住型回扫</h3><span class="badge b2">双票</span></header>
+  <p class="why">「难点在于根据具体约束去判断和选择：什么时候上线、跑在什么机器上、团队什么情况、遗留系统怎么处理、公司有什么硬性约束。」——五项注释枚举（tech：砍到 3 项）；读完枚举须回扫"难点在于"的宾语（tech 卡住型）。段内七句最短 20 字、双冒号双凿子（det 密度之王）。§1 已删两处盖章后该段自然瘦身，本项补枚举与断句。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>难点在于根据具体约束去判断和选择：<span class="cut">什么时候上线、跑在什么机器上、团队什么情况、遗留系统怎么处理、公司有什么硬性约束。</span>在这些条件下如何作出架构决策，没有万能公式。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>难点在于按约束去判断和选择——<span class="add">什么时候上线、团队什么情况、遗留系统怎么处理。</span>在这些条件下如何作出架构决策，没有万能公式。<span class="add">（五项保三；"没有万能公式"这句是合格刹车，一字不动）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L17 尾句</span><h3>第三堵墙：五对"还是"连打＋冒号同位语链，句头扛到句尾</h3><span class="badge b2">双票</span></header>
+  <p class="why">「我记的是更稳定的东西：大多数系统都会反复遇到的设计抉择，速度还是持久、一致还是可用、空间还是时间、简单还是灵活、通用还是专用，以及每种抉择要付的代价。」——67–75 字巨句第二（det 巨句 Top2/tech 卡住型第一）：冒号后同位语链太长，「大多数系统都会反复遇到的设计抉择」这个头要扛过五连对才等来收口，读到尾巴已忘句头（tech）；"X还是Y"同一拍型连打五遍再补一刀"以及每种抉择要付的代价"，是枚举引擎的全功率输出（det）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>我记的是更稳定的东西：<span class="cut">大多数系统都会反复遇到的设计抉择，速度还是持久、一致还是可用、空间还是时间、简单还是灵活、通用还是专用，以及每种抉择要付的代价。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>我记的是更稳定的东西：那些反复出现的设计抉择——<span class="add">速度还是持久、一致还是可用</span>——<span class="add">以及每种抉择要付的代价。</span><span class="add">（五对保两对，det 判这两对"最有书相"；拍型断开、同位语链缩短；"抉择要付的代价"是主题性用法保留）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L5（动机段）</span><h3>全文最平段重构：五连长 CV 0.09＋双冒号＋绕场×2＋书封文案句</h3><span class="badge b2">双票</span></header>
+  <p class="why">五句全落 35–50 字区间（det 实测段内 CV 0.09，全文最死段——判断最重的段节奏最平，节奏倒挂实锤）；「但市面上的资料大多停在"怎么用"：」是选题报告句式，读者在十本技术书序言里见过十次、识别即跳过（tech 走神型）；段内冒号×2、账房词×4、绕场×2（det）。修法：冒号处拆句获得段中呼吸位＋批判句口语化＋段末盖章句删（§1.1）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L5 全段）</div>
+      <p>我们每天在用 Redis、MySQL、Kafka，后端基础设施的大部分核心工作都落在它们身上。<span class="cut">但市面上的资料大多停在"怎么用"：Redis 的数据类型有几种，MySQL 的索引怎么建，Kafka 的分区选几个。架构决策需要的不只是某个软件的用法，还有背后的设计权衡：为什么这么设计，而不那样设计，选了之后付了什么代价。</span>AI 让写代码越来越快，但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>我们每天在用 Redis、MySQL、Kafka，后端基础设施的大部分核心工作都落在它们身上。<span class="add">但市面上的资料大多停在"怎么用"——Redis 的数据类型有几种，MySQL 的索引怎么建，Kafka 的分区选几个。</span><span class="add">架构决策要问的是另一头：为什么这么设计，而不那样设计，选了之后付了什么代价。</span>AI 让写代码越来越快，但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。<span class="add">（两个"冒号＋枚举"拆成两句各司其职；第二冒号句起手从名词组改为直陈；三连问句本体一字不动——那是真内容；AI 句原样收段）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L19（读者段）</span><h3>出版模板句："适合的读者：A，B，以及 C"＋第四次标签冒号＋"用武之地"收口</h3><span class="badge b2">双票</span></header>
+  <p class="why">60–63 字巨句第三（det），"适合的读者：A，B，以及 C"是出版模板句的教科书形态；标签冒号在此已是第四次（tech：L9/L11/L13 已用三次，此处是疲劳点）；句尾「这正是它的用武之地」成语模板收口，且是全序言唯一对读者发指令的句子（使用说明语域，与 L5 那次论辩式 AI 提及功能不同——tech 裁量删或并）。全段零"我"。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L19 全段）</div>
+      <p><span class="cut">这本书适合的读者：</span>有两年以上开发经验、想从"会用"跨到"会看"的后端工程师，需要做技术选型的架构师，以及想为团队建立技术体系的技术负责人。<span class="cut">如果你对某些知识点不熟悉，多用 AI 工具补齐，这正是它的用武之地。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">我最想写给的，是有两年以上开发经验、想从"会用"跨到"会看"的后端工程师；做技术选型的架构师、要为团队建技术体系的技术负责人，也会各自找到对应的部分。</span><span class="add">个别知识点不熟，用 AI 工具补齐就行。</span><span class="add">（标签冒号卸、三类分出主次（det：点明"最想写给谁"）；指令句压成半句并入——整句删亦可，上作者裁量）</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>3 · 序言级手术<span class="sub">体量小，预算跟着小；每条都有章内书挡作对齐物</span></h2>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>盖章预算：论点三盖 → 1；动机三连播 → 首尾书挡</h3><span class="badge b2">双票</span></header>
+  <p class="why">论点章三枚（L5 末/L11/L13 末）删两枚（§1.1/§1.2），留 L11「取舍，是架构设计里最难也最值钱的一步。」——但 det 提示这枚章自身是格言模具（2 字话题前置＋"最X也最Y"评级），tech 判论点保留一枚即可。相容处置：<b>留 L11、评级降档</b>——删"最值钱"留"最难"，或从一次具体取舍引出（换作者口吻落法）。</p>
+  <p class="dir">动机章"为什么这么设计"三连播：L5 首立＋L21 回扣是合法书挡（一个开门一个关门），L11 中段那次随 §1.4 卸。判据沿用：同一论点全篇最多两次全力讲述。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>枚举落地判据（ch8 总判据沿用）：≥3 项带注释的枚举一律瘦身</h3><span class="badge b2">双票 · tech 主签名</span></header>
+  <p class="why">tech 判枚举当散文跑为<b>序言头号指纹</b>：4 堵墙（L9 九项、L13 五项、L17 五对、L19 三类）全部走"冒号＋顿号串"同一形态——巨句与播音员冒号在本篇是同一枚硬币（det）。§2 已逐堵处理；预算：保 3–4 项的上限，概括半句收编其余；"枚举第四项起眼球开始跳行"（tech）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>账房 14 处：主题豁免＋拆分布</h3><span class="badge b2">双票 · 口径差登记</span></header>
+  <p class="why">本书主题即取舍，词汇本身半合法（两席共识）；问题是<b>分布</b>——L5 单段 4 处、L17 两句内"抉择"3 连、L21 收尾"权衡……取舍"一句双打（det 逐处）。处置：不动 L11/L17 的主题性用法，优先拆 L5 段内重复（随 §2.4）与 L21 双打（收尾保留判断，二词去一）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>绕场预算：整队 5 次＋裸串×3 逐字复现 → 病理锁定 2 处</h3><span class="badge b2">族内双票 · 计数口径差见 §4</span></header>
+  <p class="why">det 计整队绕场 5 次、顺序 5/5 锁死 R→M→K、"Redis、MySQL、Kafka"裸串逐字复现 3 次（L5/L9/L15）；tech 只判 2 处病理形态（L5"一家一从句"平衡绕场、L13 半队绕场＋"为X优化"句腹），其余点名放过多主题指涉（三软件之书难免）。两尺不同源：病理锁定 L5/L13 两处（L13 已随 §1.3 处理），裸串留首现 L5，后续以"三家"等指代换装。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>在场轴修复：论证段补"干活的我"或至少一记自道短句</h3><span class="badge b2">双票</span></header>
+  <p class="why">全序言没有一个具体场景——所有"我"都是"写作行为的我"（想写、记的是、不讲），没有一次"干活的我"出现在具体事件里（tech）；L9–L13 核心块约 290 字零"我"（det）。序言按体裁该是全书"我"浓度最高处：目前浓度尚可、<b>在场时段</b>不合格。落点：L13 段腹一记自道（"这一层最难写"量级，措辞作者定）；L9 可选一句在场案例（tech 提议）——<b>素材须作者本人出，改文笔不得代写（不造经历，ch6 立规沿用）</b>；无真事则只做自道。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全篇</span><h3>凿子松绑与短句排班</h3><span class="badge b2">双票</span></header>
+  <p class="why">段末凿子 3 处（L5 末/L9 末/L13 双凿）删两拆一（§1.1/§1.2），保 L9 末「把这三家的解法读懂，下次遇到同类问题，就至少知道有哪些选项。」（有信息量的收束）与 L15「问题足够硬。」（挣来的鉴定，det/tech 双举）。家常短句现状：句级 ≤7 字全文仅"是为序。"一句，论证段全部短槽被"第一层/第二层/第三层/其一/其二"标签占领——§1.5/§2.4/§3.5 的手术顺带补 3–4 记。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>总分</b><br><span class="badge bd">两席差 0.5</span></td>
+      <td>detector 6/10；tech-editor 5.5/10</td>
+      <td>同档（低于 ch1/ch8/ch9 的 6.5，与 ch5/ch6 同档偏上）。定性完全一致：单位密度全书第二高、绝对伤势被体量封顶、位置代价全书最贵。登记不改文</td></tr>
+  <tr><td><b>L13「Redis 的重点是内存访问……」整句</b><br><span class="badge bd">两席侧重不同</span></td>
+      <td>detector：两稿并存嫌疑——与上文无衔接、MySQL 无故缺席、读感像正文草稿贴入的残句，建议作者亲核来历；tech-editor：前两分句是半队绕场点名有对比功能，删句尾模板即可</td>
+      <td>最小案已入 §1.3（句尾删）。整句删（det 倾向）vs 保前半（tech 最小案）<b>上作者</b>；若保，需补衔接半句并交代 MySQL 缺席</td></tr>
+  <tr><td><b>L11 那枚章的力度</b></td>
+      <td>「取舍，是架构设计里最难也最值钱的一步。」——tech：论点保留这一枚章足够；det：格言模具（2 字话题前置＋"最X也最Y"评级），保留判断锋芒但建议删"最值钱"或换作者口吻落法</td>
+      <td>相容：留 L11、评级降档。原句保留 vs 降档改写<b>上作者</b>裁力度</td></tr>
+  <tr><td><b>L19 指令句去留</b></td>
+      <td>「如果你对某些知识点不熟悉，多用 AI 工具补齐，这正是它的用武之地。」——tech：全序言唯一对读者发指令的句子（使用说明语域），裁量删或并；det：点"用武之地"成语模板收口</td>
+      <td>两席均未强制。压半句并入（§2.5 示意）vs 整句删，<b>上作者</b>；与 L5 的论辩式 AI 提及功能不同，不可并案处理</td></tr>
+  <tr><td><b>绕场与账房计数口径差</b></td>
+      <td>绕场：det 整队 5 次＋裸串×3 vs tech 病理形态 2 处；账房：det 14 处 vs tech ~8 枚（det 计"抉择"×3、双"权衡"等，tech 挑主词）</td>
+      <td>口径差异登记，非方向分歧。两席对"病理锁定 L5/L13 两处、主题词半合法"的定性一致</td></tr>
+  <tr><td><b>巨句字数口径差</b></td>
+      <td>L9：det 87／tech ~96；L17：67／~75；L19：60／~63；L5 句长序列 det [42,49,49,40,40]／tech [37,45,50,43,42]</td>
+      <td>口径差异登记（去标点 vs 含标点）。巨句 Top3 集合两席一致锁定 <b>{L9、L17、L19}</b></td></tr>
+  <tr><td><b>L9 在场案例注入</b></td>
+      <td>tech 提议：全序言唯一适合放一个 15 字级具体案例的位置（"上一次我撞上的是副本对齐"量级的在场一句），是否放由作者定</td>
+      <td>方向无分歧，<b>素材来源有约束</b>：须作者本人出料（不造经历，ch6 立规沿用）；作者无真事则不下，仅靠 L13 自道短句修在场轴</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">书挡质量是全书目前最好的——手术不是注入人味，是把中段拉回已有水位</span></h2>
+<ul>
+  <li><b>L3 整段</b>（两席共举全书最好开头之一）——「十年前我就想写这本书，一直拖到现在。拖的原因说起来简单：当时只觉得这三个软件的设计里有相通的东西，但说不清那是什么。后来做得久了，踩过的坑多了，才慢慢看清那是一套可以观察、可以记录的思维方式。这本书就是这份观察记录。」时间纵深＋自嘲＋"说不清那是什么"的诚实（tech：disarmingly 诚实，比任何卖点句都可信）；句长 16/37/34/11 有真起伏，CV 0.48。</li>
+  <li><b>L15 首句与尾句</b>——「这三层不是谁教我的，是我在这三个软件里一层一层看出来的。」（出处声明，叙述者回归）＋「但样本只是样本，我真正想记录的是观察的方法。」（判断有锋芒、短句落点准）＋「这条线书里会讲到。」（det：预告是序言本职，合法）。</li>
+  <li><b>L15「问题足够硬。」</b>——四个字顶一段（tech：形式上也是鉴定，但它短、且是挣来的那种——留；det：5 字断言是作者的口气）。鉴定句的豁免范本。</li>
+  <li><b>L17「判断可以质疑，坑都是真的。」</b>——tech 判<b>全序言最好的一句</b>，可引用级，替全书写下诚实契约；det：对仗但有人味，因为它押的是作者自己的态度而非公理。可惜排在第 17 行墙后面——这也是手术理由：让它被读到。</li>
+  <li><b>L17 段首「有两个约定先说清楚。」＋版本括号</b>——段首刹车好；「版本会迭代（本书基于 Redis 7.x、MySQL 8.0.x、Kafka 3.x），但这些抉择的逻辑长期不变。」版本口径属技术内容（与正文 1.4.3 基线一致性走技术席），句子本身有判断。</li>
+  <li><b>L21 末句「真到那一天，这本笔记就没白记。」</b>——温而不腻，挣来的抒情（tech）；L21 前半的"权衡……取舍"双账房随 §3.3 二词去一，末句一字不动。</li>
+  <li><b>L23「是为序。」</b>——文言套语，体裁恰当（det 给 1/10 全文最低 AI 味）。</li>
+  <li><b>L9 后两句</b>——「这些问题的解法，Redis、MySQL、Kafka 已经在生产环境里反复验证和改进了十几年。」（det：有实感）＋「把这三家的解法读懂，下次遇到同类问题，就至少知道有哪些选项。」（有信息量的收束，合格凿子）。</li>
+  <li><b>L5 AI 判断句</b>——「AI 让写代码越来越快，但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。」论辩式 AI 提及、有锋芒；段末盖章句删后由它收段。</li>
+  <li><b>三层框架本体＋L7 布告</b>——序言预告结构属体裁需要（det）；表 8-1 式骨架件在序言的首立处，保留。</li>
+</ul>
+<p class="why">共同点校准：好句子＝真实的拖延与困惑（L3）、出处声明（L15）、押上作者自己态度的对仗（L17）；怪句子＝<b>把同一论点盖三枚章、把九个问题铺成一张压缩版目录、把卖点交给播音员</b>。tech-editor 的总尺：书挡已经写出来了——L3/L15/L17/L21 就是序言自己的声音，手术不是注入人味，是把中段拉回已有水位。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含序言新增两测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>三秒战场测试</b><br>（序言新增）</td><td>逐句问"读者零沉没成本读到这句会不会走"，前三屏（约前 10 行）每句过尺——正文的墙读者会原谅，序言的墙直接弃书，位置代价×浓度双重计费。本章标本：L9 墙在第一分钟内，独立承担序言一半弃书概率。</td></tr>
+  <tr><td><b>换声测试</b><br>（序言新增）</td><td>序言每段标"作者在说 / 发言人在说"：真心话段与卖点段交错＝换声（本章标本：L5–L13 卖书段整体失声）。再数"写作行为的我"（想写、记的是、不讲）与"干活的我"（具体事件里的我）的比例——序言按体裁该是全书"干活的我"浓度最高处，本章为 8:0。</td></tr>
+  <tr><td><b>枚举瘦身测试</b><br>（ch8 判据沿用）</td><td>≥3 项带注释的枚举顿号连排＝墙——保 3–4 项，概括半句收编其余。本章四堵墙（九项/五项/五对/三类）全部"冒号＋顿号串"同形态：巨句与播音员冒号是同一枚硬币。</td></tr>
+  <tr><td><b>书挡测试</b><br>（本篇变体）</td><td>把首尾最好的句子标出水位线，中段手术以此为对齐物——不是注入人味，是把中段拉回已有水位。本章书挡：L3 整段 / L15 首尾 / L17 段腹 / L21 末句。</td></tr>
+  <tr><td><b>盖章测试</b><br>（沿用）</td><td>同一论点画线计数：≥2 次只留一枚章（本章论点三盖 11 行内）；书挡型复读（首立＋回扣）合法，中段多余盖卸。</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车＝三长无一短（本章 L5 五句 35–50 字连排 CV 0.09、L13 七句 ~260 字最短 20 字）。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的信息须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；本页对账结果：<b>0 失配</b>，2 类计数口径差登记（§4 巨句字数、绕场/账房计数）</li>
+  <li>以下属<b>技术内容/一致性问题</b>，动到即走对应席：L17 版本括号（Redis 7.x／MySQL 8.0.x／Kafka 3.x 与正文 1.4.3 版本基线的口径一致性——技术席）；L9 九项与第 2–9 章各章主题的对应关系（砍项＝选章，走 crossref 席核指向）；L19 读者分类与 ch1 L173 三类读者的同稿关系（ch1 意见 §3.1 已建议 L173 改直呼——两处若都动，措辞须同步，走 crossref 席）；L5/L19 两处 AI 提及与全书 AI 使用披露口径（compliance 席）</li>
+  <li><b>不造经历</b>（ch6 立规沿用）：L9 在场案例、L13 段腹自道的素材须作者本人出/确认；无真事则只做写作行为自道或不下</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）——序言体量小，改后全篇重读一遍</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-09 ｜ 两席完整原始报告见本轮会话记录（detector 41 句量化＋19 项清单 17 命中＋分段评分＋ch1 复发核对；tech-editor 签名病理 14 项＋弃书单点 3＋绊脚点＋节奏地图＋声音评估＋标杆＋四步处方约 10 处改动，预估仅修 L9 一处即 5.5→4.5 档）；同轮参照：0908/第一至九章/、本目录 deepseek/gpt/综合三份 ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

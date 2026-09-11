@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第二章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  .keep{background:var(--panel);border:1px dashed var(--after-bd);border-radius:8px;
+    padding:10px 14px;font-size:14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  .quote{background:var(--panel);border-left:3px solid var(--after-bd);border-radius:0 8px 8px 0;
+    padding:8px 14px;font-size:14px;margin:8px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第二章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/02-data-structures-protocols/chapter.md</code>（215 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／命令／作者判断锋芒不动。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——按项目流水线，正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  所有引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">怪不在单句，在接缝</span></h2>
+<p>段落焊接方式全章只有四五套模具轮换；句长方差是单向的（没有短句托底）；节奏最死的地方恰好是下判断的地方。现状 4/10，作者及格线 ≈2/10。</p>
+<div class="stats">
+  <div class="stat"><div class="n">1 / 229 句</div><div class="t">全章 7 字以内短句只有 1 句（≤10 字仅 2.2%，≥40 字占 46%）；"三长无一短"连排 22 处</div></div>
+  <div class="stat"><div class="n">CV 0.67</div><div class="t">句长方差表面达标（门槛 ≥0.5），但全靠百字巨句从长端撑起——这解释了二十多轮审查为何放行</div></div>
+  <div class="stat"><div class="n">0.08 – 0.24</div><div class="t">节奏最死的节恰是判断/取舍区（L197、L205、2.6 小结）；机制段反而最跳（0.84）。人写的书是反的——节奏倒挂</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">两席独立命中同一处，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L52 / L70 / L160</span><h3>盖章句："这与 X 是同一个思想/逻辑/思路"</h3><span class="badge b2">双票</span></header>
+  <p class="why">跨结构找共性本该留给读者自己撞上；作者抢先宣布，就成了替文章自己的连贯性盖章。三处同形，回声本身成了模板。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>……大字典的收尾主要靠这一路；做 RDB/AOF 的子进程在场时它暂停。<span class="cut">这与前文 SDS 的做法是同一个思想：用摊还替换集中，把省不掉的工作分摊到后续每次操作里。</span>这套双表搬迁画出来就是图 2-3。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……大字典的收尾主要靠这一路；做 RDB/AOF 的子进程在场时它暂停。<span class="add">和 SDS 的预分配是一个路数：省不掉的活儿不攒一次干，摊进每次操作里。</span>这套双表搬迁画出来就是图 2-3。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L70）</div>
+      <p>……7.2 之前直接升级为哈希表。<span class="cut">这和 Hash 类型小数据编码 listpack → hashtable 的升级是同一套逻辑。数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构。</span>纯整数集合另有个数门槛……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……7.2 之前直接升级为哈希表。<span class="add">小的时候紧凑省内存，胀过阈值自动换查询结构——Hash 类型的小数据编码走的也是这条路。</span>纯整数集合另有个数门槛……</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L160）</div>
+      <p>……零拷贝让一批消息不进用户态，直接从页缓存送到网卡。一切以 Batch 为单位。<span class="cut">这和 RecordBatch 在存储层的设计是同一个思路：协议层不做单条操作，是 Kafka 把吞吐放在第一位的必然结果。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……零拷贝让一批消息不进用户态，直接从页缓存送到网卡。一切以 Batch 为单位。<span class="add">（整句删——前句"一切以 Batch 为单位"已是天然刹车，盖章句零信息）</span></p>
+    </div>
+  </div>
+  <p class="dir">三处至多留一处点题。另有 <b>L46 软盖章</b>："本章开头排行榜的例子<b>同样</b>分成两段"——后向呼应保留，只卸"同样"（→"就是两段"）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L75 / L162</span><h3>教用法句复读："翻回来查 / 对照最直观 / 就能认出来"</h3><span class="badge b2">双票</span></header>
+  <p class="why">教读者怎么用图的元评论（§1.3am 邻接）。图后段带新信息的首提式可留，教用法收尾句全章至多一次——L167 信息最足，留它。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p><span class="cut">前面几段把五个结构分开讲，这张图合在一处，忘了哪条升级去向时适合翻回来查。</span>升级路径的方向一致：起点都是紧凑编码，终点都是面向查询的结构。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">这张图把五个结构合在一处。</span>升级的方向是一致的：起点都是紧凑编码，终点都是面向查询的结构。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L162）</div>
+      <p><span class="cut">三家的协议差异，放到同一张图上对照最直观。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">（整句删——图与图注紧随其后，自足）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>L167 保留不动</b>："三种协议的差异不用背结论，对着这三段实例就能认出来。"——全章教用法句只留这一处。章内好样在 L41："多层索引长什么样、查找怎么走，见图 2-2。"（带问题引图，不报物流）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L21 – L23</span><h3>"协议选了"三连（2.1 三段同模榫头）</h3><span class="badge b2">双票</span></header>
+  <p class="why">系统名＋加粗目标 →"所以"→ 段末"协议选了 X"，逐字三连。单段合格，连读是同一张表填了三遍——"逐段评分放行、连读才露馅"的典型。Redis 段留榫头，MySQL / Kafka 换起手。</p>
+  <div class="keep">L21 Redis 段：<b>保留现榫头</b>（全章唯一一次"协议选了"）。"Redis 要的是<b>极低延迟</b>。所以它的数据结构全部在内存里……协议选了纯文本 RESP……"</div>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L22 MySQL）</div>
+      <p>MySQL 的核心目标是<b>通用可靠</b>。它要支持任意 SQL、事务 ACID、磁盘持久化，所以它的核心数据结构 B+ 树必须对齐磁盘的 16KB 页，让一次磁盘 I/O 读到的每一页都装满了索引键，而不是半页索引半页无用数据。<span class="cut">协议选了二进制封帧</span>——经典查询的结果行走文本，紧凑收益要到预编译语句的二进制结果集才兑现；预编译也让 SQL 解析只做一次。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>MySQL 的核心目标是<b>通用可靠</b>：什么 SQL 都要能接，事务要 ACID，数据要落盘。落到结构上，B+ 树必须对齐磁盘的 16KB 页——一次 I/O 读上来的每一页都装满索引键，而不是半页索引半页无用数据。<span class="add">协议用二进制封帧</span>：经典查询的结果行走文本，紧凑收益要到预编译语句的二进制结果集才兑现；预编译也让 SQL 解析只做一次。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L23 Kafka）</div>
+      <p>Kafka 把<b>高吞吐</b>当成第一目标。所以它的核心数据结构 RecordBatch 把多条消息打成一个包，压缩、传输、落盘都以 Batch 为单位，批量化成了格式本身的内置属性。<span class="cut">协议选了带版本号的请求/响应模型。统一头部 + 逐 API 版本化，</span>让不同版本客户端可以和同一个 Broker 对话，演进能力直接靠版本号字段实现。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Kafka 把<b>高吞吐</b>当成第一目标，路子是攒批：RecordBatch 把多条消息打成一个包，压缩、传输、落盘都以 Batch 为单位，批量化成了格式本身的内置属性。<span class="add">协议是带版本号的请求/响应——统一头部、逐 API 版本化，</span>不同版本的客户端可以和同一个 Broker 对话，演进能力直接靠版本号字段。</p>
+    </div>
+  </div>
+  <p class="dir">顺手修掉同段的"+"号速记（"统一头部 + 逐 API 版本化"→"统一头部、逐 API 版本化"）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L124 / L138</span><h3>"恰好"族（必然性话术）</h3><span class="badge b2">双票</span></header>
+  <p class="why">"恰好/正好匹配"是宣布"这不是巧合"的副词，与"都是那三个目标的推论""必然结果"同族。命题是全书主线没问题，口头反复 asserting 必然性最硌人。L138 是复读＋加粗＋"恰好"三合一的灌输感峰值。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L138）</div>
+      <p><span class="cut">但 RESP 的"简单"恰好匹配了 Redis 的核心目标。</span> Redis 命令本身都很短小，协议这层开销不构成延迟的主要来源；人眼可读让调试和运维成本趋近于零。用 <code>redis-cli</code> 连上实例敲命令，就是其协议的原生交互方式。为了省那点带宽和解析开销而换用复杂的二进制协议，对 Redis 来说是过度设计。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">（整句删，含加粗——段末"对 Redis 来说是过度设计"自己会落地这个判断）</span> Redis 命令本身都很短小，协议这层开销不构成延迟的主要来源；人眼可读让调试和运维成本趋近于零。用 <code>redis-cli</code> 连上实例敲命令，就是其协议的原生交互方式。为了省那点带宽和解析开销而换用复杂的二进制协议，对 Redis 来说是过度设计。</p>
+    </div>
+  </div>
+  <p class="dir">L124 的"Batch 恰好和……对齐"在 2.3 节 L124 重写稿里一并处理。⚠ 修正一处过度延伸：L92 括号里的"每读到一个长度就<b>恰好</b>落在下一个字段的边界上"是精确义（描述机械性质），<b>保留</b>。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L171</span><h3>箭头因果链公式两现互为复读</h3><span class="badge b2">双票</span></header>
+  <p class="why">"目标 → 数据结构 → 协议"同一公式在 2.4 开头（L171）与 2.6 开头（L213）各出现一次，互为复读。两处留一处，保留处展开成完整因果。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚<span class="cut">"目标 → 数据结构 → 协议"这条因果链</span>。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>把这三个软件的内部数据结构和通信协议放进同一张表：<span class="add">目标定了结构，结构又限定协议的形状。</span></p>
+    </div>
+  </div>
+  <p class="dir">L213 那处随 2.6 小结重手术（见 §2.4）一并消失。</p>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差五段；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L197（2.5 启示一）</span><h3>全章节奏最死段＋三栏镜像＋对照框架词，占全书精华位</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">3 句 [49, 58, 51] 字，CV 0.08（全章最低），三句就是三家各一句，骨架相同；"走另一条路／又不一样"是 §1.3k 点名的对照框架词；且是绕场第四遍。取舍段应适用全量人味判据。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Redis 要快，所以 SDS 取长 O(1)、字典做渐进式 rehash、跳表在缓存局部性上付出了代价，换来实现的简洁。MySQL 走另一条路，为了对齐磁盘页，B+ 树内部节点只存键不存数据（树必须矮），叶子和叶子之间用双向链表串起来，范围扫描不用回头。Kafka 又不一样，它的吞吐需求最大，于是 RecordBatch 把一批消息当成一个不可分割的存储与传输单元。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Redis 要快，快落在最常用的操作上：SDS 取长度是读一个字段，字典把 rehash 摊进每次操作。跳表的缓存局部性不如红黑树，这点它认了——换实现简单。MySQL 面对的是磁盘：B+ 树内部节点只存键不存数据，千万行的表整棵树压在三层；叶子间双向链表串起来，范围扫描不用回头。Kafka 最直接：吞吐就是第一目标，RecordBatch 把一批消息当成不可分割的存储与传输单元。</p>
+    </div>
+  </div>
+  <p class="dir">笔墨不再三家均分（Redis 深、MySQL 中、Kafka 一拍），句长拉开。<b>启示二（L201）同病一并手术</b>：示意——"协议跟着数据走。Redis 命令短、返回轻，文本行就够；MySQL 动辄几十列几万行，才有预编译和二进制结果集的用武之地；Kafka 按 Batch 收发，版本号就长在请求头上。轮到自己设计协议时，先看访问模式……"（末句方法谕现文保留）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L124（2.2.3 取舍段）</span><h3>对账单段峰值</h3><span class="badge b2">双票</span></header>
+  <p class="why">"这套设计的取舍摆在明面上。"（零信息）→ 四条等长收益分号清单 →"代价同样直接："对仗记两笔。整段损益表——表格思维不是叙述思维；人会偏重、会先说最疼的。最长句 132 字含 3 分号。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p><span class="cut">这套设计的取舍摆在明面上。</span>相似消息聚成一批，压缩收益通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2–6 倍）；差值编码把每条记录的元数据开销降到个位数字节；CRC（循环冗余校验）整批只算一条，省掉逐条校验的 CPU；<code>magic</code> 字段标明格式版本，新旧格式可以共存。<span class="cut">代价同样直接：</span>消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远按序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">最值钱的一条是压缩。</span>一个 Batch 里的消息往往来自同一个业务流、内容相似，zstd 常见 2–6 倍（取决于内容相似度和压缩级别）。差值编码把每条记录的元数据开销压到个位数字节；CRC 整批只算一条；<code>magic</code> 标着格式版本，新旧 Batch 可以共存。<span class="add">代价也明白：</span>消费必须按 Batch 边界来，按 key 随机点查做不到。Kafka 不需要。写入永远追加、消费永远按序，Batch 对的就是这两条路。</p>
+    </div>
+  </div>
+  <p class="dir">最重的收益（压缩）提独立句放段首；代价不用对仗引出。技术事实全数保留（zstd 2–6 倍及其前提、差值编码、CRC、magic）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L41（跳表段）</span><h3>450 字无喘息，一段干了三段的活</h3><span class="badge b2">双票</span></header>
+  <p class="why">11 句覆盖：ZSET 双结构并联、跳表定义、查找路径、三组复杂度、span、两次红黑树对比。中段三连分号能力清单。段内好句"单一结构顾不全，就并联两个"已被淹没。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（整段 1 段）</div>
+      <p>跳表（skiplist）是 Redis 有序集合底层两种结构之一。skiplist 编码的 ZSET 内部是 dict + 跳表两个结构并联……跳表是多层有序链表，最底层是一条完整的有序双向链表……平均 O(log N) 的查找、插入、删除；范围扫描只需沿底层链表前进（O(log N + M)），比红黑树的中序遍历更直接；插入时按新节点的随机层数……span 逐层累加就是名次……选跳表而非红黑树，是因为实现更简单、范围操作更直接。跳表的缓存局部性确实不如红黑树，但在 Redis 的典型数据规模下，这点差异不是主导因素。多层索引长什么样、查找怎么走，见图 2-2。<br><i>（全文约 450 字一段排平，此处节录）</i></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（拆 3 段）</div>
+      <p><b>段一（并联）</b>：跳表（skiplist）是 Redis 有序集合底层两种结构之一。skiplist 编码的 ZSET 内部是 dict + 跳表并联：member→score 查分数走 dict，ZSCORE 是 O(1)；按序拉一段走跳表，ZRANGE 是 O(log N)。单一结构顾不全，就并联两个，各管一条访问路径。</p>
+      <p><b>段二（结构与查找）</b>：跳表是多层有序链表。最底层是完整的有序双向链表，上面几层是抽稀的索引，每隔几个节点留一个指针。查找从最顶层出发，定位到目标附近再逐层下沉。插入按新节点的随机层数，逐层更新前驱的前向指针和跨度（span），不旋转、不再平衡——层数是逐层独立抛硬币定的，随机反而不会失衡。</p>
+      <p><b>段三（为什么是它）</b>：查名次靠的就是 span：逐层累加即是名次，"查某人排第几"O(log N) 出结果。范围扫描沿底层链表前进（O(log N + M)），比红黑树的中序遍历直接。选它不选红黑树，图的是实现简单、范围操作直接；缓存局部性差一点，在这个数据规模下不是主导。多层索引长什么样、查找怎么走，见图 2-2。</p>
+    </div>
+  </div>
+  <p class="dir">分号清单拆掉，复杂度各自跟对应的操作走。"平均 O(log N) 的查找、插入、删除"中"查找"复杂度并入段二"树高大概率落在 O(log N)"口径（示意稿口径以技术席核对为准）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L213（2.6 小结首句区）</span><h3>已注册病理"最顽固复发位"原文命中</h3><span class="badge b2">双票</span></header>
+  <p class="why">三栏镜像＋箭头公式＋与 L171 互为复读（§1.3k 登记的小结首句复发位）；段尾作者实践句是全段唯一人声，反差更明显。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p><span class="cut">三个软件的选择各不相同，但都服从同一条因果链：核心目标 → 数据结构 → 协议形态。访问模式的基本面同样在这里定型：Redis 点查最热所以用哈希；MySQL 范围扫描多所以用 B+ 树；Kafka 几乎只有顺序追加，append-only Batch 就够用。</span>回头看本章开头的排行榜，MySQL 输的不是索引，是访问方式与结构不匹配：……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">回头看本章开头的排行榜。</span>MySQL 输的不是索引，是访问方式与结构不匹配：索引把读优化到了毫秒级，改分的高频写和数出某人排第几，却不是 B+ 树擅长的路径。<span class="add">这一章里，点查最热的用上了哈希，范围扫描多的用上了 B+ 树，几乎只剩顺序追加的，append-only Batch 就够用。</span>所以我自己定数据结构或协议前……</p>
+    </div>
+  </div>
+  <p class="dir">排行榜回扣前移当开头（后向呼应，作者偏好的方向）；镜像三栏压成一句不等长复述；末尾作者实践句一字不动。</p>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">节奏层与起手形状，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>段末刹车（最高优先）</h3><span class="badge b2">双票</span></header>
+  <p class="why">不砍长句，补短句托底：每个机制段末压一句 10 字以内的判断句。判断段、启示节、小结优先（节奏倒挂最重的区）。章内好例：L100"不对单条消息做任何拆分或索引。"、L160"一切以 Batch 为单位。"、L136"但简单也有代价。"</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L31 等 15 处</span><h3>黑体起手打散＋整句加粗解除</h3><span class="badge b2">双票</span></header>
+  <p class="why">15 个正文段以"黑体名词＋是/：＋解释"同一姿势起头（L31/33/34/41/48/59/66/81/92/94/100/138/150/152/160），整节像词典正文；整句定律加粗 7 处（L9/L52/L70/L79/L100/L119/L138）——每节一条加粗定律等于没有定律。<b>不去黑体</b>（术语锚点是排版契约），打散的是起手形状。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L31 起手）</div>
+      <p><span class="cut">SDS（简单动态字符串）是 Redis 最基础的字符串实现。不用 C 语言的 char*，而是自己另做了一套结构。</span>它的头部（header）记录了：……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">C 语言的字符串，取个长度都要遍历到 \0。Redis 不用 char*，自己另做了一套——SDS（简单动态字符串）。</span>它的头部（header）记录了：……</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L9）</div>
+      <p>这一章的核心问题是：<span class="cut"><b>每个系统为了自己的目标，选了什么样的内部数据结构、用了什么样的通信协议。</b></span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>这一章的核心问题只有一个：每个系统为了自己的目标，选了什么样的内部数据结构、用了什么样的通信协议。<span class="add">（解除整句加粗）</span></p>
+    </div>
+  </div>
+  <p class="dir">L31 的"问题先行"挪用了段末原有的对比句（"C 语言的字符串取长度要遍历到 \0 才能知道"），段末须去重——正式稿由 plain-rewriter 处理接缝。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L165 图注 / L19 等</span><h3>图注三连排比＋冒号三元枚举收敛</h3><span class="badge b1">单票/部分印证</span></header>
+  <p class="why">图注"换的是/省的是/保的是"三连排比（§1.3c）；"冒号＋恰好三项＋每项括号注释"五处（L19/L83/L98/L132/L146）。真正需要并行对照的留两处（建议 L83、L146），其余拆句。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L165 图注）</div>
+      <p>图 2-8　三个软件通信协议对比：<span class="cut">文本行换的是人眼可读与实现简单，二进制省的是带宽与解析开销，版本化请求头保的是演进兼容。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>图 2-8　三个软件通信协议对比：<span class="add">文本行与二进制的分歧在可读与带宽；Kafka 另一头，把演进做进请求头的版本号。</span></p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L19）</div>
+      <p>有三个关键点：<span class="cut">发纯文本还是紧凑二进制（可读 vs 紧凑），每条消息独立处理还是批量打包（简单 vs 效率），协议固定还是带版本号可演进。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>有三个关键点：<span class="add">消息发纯文本还是紧凑二进制；每条独立处理，还是攒成批量；协议写死，还是留出版本号可演进。</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>L148 处置</b><br><span class="badge bd">两席分歧</span></td>
+      <td>MySQL 整数编码 247 字巨句、四层括号嵌套。detector 判纯机制段享 §13 工整豁免；tech-editor 列全章第一绊脚点，指出段末 pay off 句"接收方在收到第一个字节时就知道后面还有多少字节"被埋在 247 字之后。</td>
+      <td>若采 tech-editor 方案，示意：pay off 句提前当段首，四层括号逐层拆句（int&lt;1&gt;/int&lt;2&gt;…、LengthEncodedInteger 分档、长度前缀字符串、0xFB 标 NULL 分述）。<b>作者裁</b></td></tr>
+  <tr><td>括号出栈</td><td>44 字以上机制括号 8 处（L31 内 100 字 sdshdr5 子文章最重；另 L48/L64/L81/L92/L134/L148/L158）</td><td>单票（tech-editor）。修法不是删是出栈——sdshdr5 那段值得自己当正文句</td></tr>
+  <tr><td>"＋"号概念打包</td><td>L23 / L98 / L113 正文句用速记当主语（"磁盘顺序追加 + 批量压缩 + 格式可演进"）</td><td>单票（detector）。表格/括号内可保留；正文句展开成动宾短语（L23 已在 §1.3 示意中顺手处理）</td></tr>
+  <tr><td>编号对起手</td><td>L17/L19"第一/第二"、L68/L70"第一条/第二条"</td><td>detector 提出。2.1 总起句已预告"两个问题"可保；intset 两段建议改自然过渡（"另一条路径是插入非整数时……"）</td></tr>
+  <tr><td>启示节绕场体例</td><td>启示一/二的绕场是否换成新角度</td><td>涉及全书启示节体例（跨章同位模板 §1.3ae 已注册），上作者裁定，不就地改</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L136–140（RESP 代价＋版本协商两段）</b>——全章（L7 之外）人味峰值："但简单也有代价。"（7 字刹车）、"版本演进靠手工约定。"（9 字）、"MySQL 和 Kafka 的版本协商是内建的，RESP 用了十年才补上，补的形式还是一条文本命令。"（干燥反讽，不解释）</li>
+  <li><b>L100（RecordBatch 段）</b>——生产者/Broker/消费者三视角推进，短句在场</li>
+  <li><b>L41 插叙句 / L68 段末</b>——"单一结构顾不全，就并联两个，各管一条访问路径。"／"……的概率太低，不值得。"</li>
+  <li><b>L213 末句作者实践句 / L5 导读亲历段 / L7 今日新基准</b>——豁免契约（实践句一字不动）</li>
+  <li><b>L167 教用法句（全章只留这一处）、术语黑体、图注编号、表 2-2、第 8 章后向分工句</b>——排版与结构契约</li>
+</ul>
+<p class="why">好句子的共同点：<b>短、敢断、不像格言</b>。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础</span></h2>
+<table>
+  <tr><th style="width:16%">测试</th><th>做法</th></tr>
+  <tr><td><b>刹车测试</b></td><td>随便挑一段读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车，就是"三长无一短"。</td></tr>
+  <tr><td><b>预测测试</b></td><td>读完一节的第一段，猜下一段起手。猜得中（又是黑体名词开头、又是"X 受到约束："）＝ 模具外露。</td></tr>
+  <tr><td><b>段末句测试</b></td><td>看每段最后一句——如果是副对仗格言（"A 是单向的，B 也只能单向"），数全章几副，超过两副就是 tic。</td></tr>
+  <tr><td><b>盖章测试</b></td><td>搜"同一个思想/思路/逻辑/同样"——凡替读者总结"这两处其实是一回事"的，都问一句：留给读者自己撞行不行？</td></tr>
+  <tr><td><b>焊点测试</b></td><td>段间第一句如果删掉、两段照样接得上（"这套设计的取舍摆在明面上"类），它就是纯胶水。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 完整两席诊断：qa_reports/20260908-ch2语言组织层两席诊断.md ｜ Markdown 版：同目录 glm修改意见.md ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

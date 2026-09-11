@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>参考文献 语言组织层修改意见</title>
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--ink:#1f2328;--muted:#6b7280;--line:#e5e7eb;
+--oldbg:#fff5f5;--oldbd:#f0c2c2;--newbg:#f2fbf4;--newbd:#b7e0c1;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 80px;}
+header h1{font-size:24px;margin:0 0 10px;}
+.meta{color:var(--muted);font-size:13px;line-height:1.95;}
+.meta code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-top:14px;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;}
+.sw.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.sw.new{background:var(--newbg);border:1px solid var(--newbd);}
+h2{font-size:19px;margin:44px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);}
+h3{font-size:16px;margin:28px 0 10px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.item-head{margin-bottom:8px;}
+.badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:6px;
+padding:1px 8px;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+.item-title{font-weight:600;font-size:15.5px;}
+.problem{color:#3f3f46;background:#fafafa;border-left:3px solid #d1d5db;
+padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0 14px;font-size:14px;}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pane{border-radius:8px;padding:10px 12px;font-size:14px;}
+.pane.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.pane.new{background:var(--newbg);border:1px solid var(--newbd);}
+.pane-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;}
+.pane.old .pane-label{color:#b91c1c;}
+.pane.new .pane-label{color:#15803d;}
+code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f3f4f6;font-weight:600;}
+td.num{white-space:nowrap;color:var(--muted);font-family:ui-monospace,monospace;}
+td.old-cell{background:var(--oldbg);}
+td.new-cell{background:var(--newbg);}
+ul.plain{margin:8px 0;padding-left:20px;}
+ul.plain li{margin:5px 0;}
+.note{font-size:13.5px;color:#52525b;margin:10px 0 0;}
+@media(max-width:760px){.diff{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>参考文献 语言组织层修改意见</h1>
+<div class="meta">日期：2026-09-08 ｜ 范围：<code>chapters/11-references.md</code>（81 行，仅审前言/章节导语/综合推荐说明文字）<br>方法：3 个独立视角 agent 逐行通读后交叉验证 ｜ 原则：只改表达，不增删信息、不动事实数字</div>
+<div class="legend"><span><i class="sw old"></i>左：原文</span><span><i class="sw new"></i>右：改后</span></div>
+</header>
+<h2>0. 一句话结论</h2><p>参考文献是全书最系统的一处模板化：几乎每条注解都以“——……的〈抽象名词〉”收尾（参照/缩影/设计哲学/基础/模型/渊源/代价/入口/案例/模式/来源/支撑/根基/依据/参考/范例/基石/源头/理论基础），单条合格、连读 30 遍即批量模板。另有前言承诺与体例对不上、个别注解成分残缺。</p><h2>1. 建议直接改</h2><div class="card"><div class="item-head"><span class="badge">L7–L77</span><span class="item-title">1.1 逐条注解“标签式复读收束”</span></div><p class="problem">几乎每条注解都以“——……的〈抽象名词〉”收尾，且反复用“体现……的X”。单条合格，连读 30 条即批量模板，是全书最像 AI 批量生成的一处。</p><p class="note">判定：把各条“——”后的尾句抽出来并排，看骨架能否互换。改法：保留 3–5 条术语定义型收尾，其余改成具体信息——这条参考补了正文哪一处、解决了什么。</p><ul class="plain"><li>L13：<code>体现协议与存储格式统一的设计哲学。</code></li><li>L14：<code>体现 Redis“按数据特征自适应”的设计。</code></li><li>L22：<code>体现分布式系统停止时需额外协调责任的特殊挑战。</code></li><li>L32：<code>体现分层灵活性的代价。</code></li><li>L65：<code>本章五条共性规律的上位参照。</code></li></ul></div><div class="card"><div class="item-head"><span class="badge">L7</span><span class="item-title">1.2 成分残缺</span></div><p class="problem">“本书通过……来对比设计”是动词短语，后直接接“的直接参照”，缺系词/中心语。</p><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">跨系统比较架构取舍的方法论范本，本书通过让三个软件面对同一批问题来对比设计的直接参照，强烈推荐配套阅读。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">跨系统比较架构取舍的方法论范本；本书让三个软件面对同一批问题、对比各自设计的做法，直接参照了它，强烈推荐配套阅读。</div></div></div></div><h3>1.3 逐句硬伤</h3><table><thead><tr><th>行号</th><th>原文</th><th>改后</th><th>说明</th></tr></thead><tbody><tr><td class="num">L3</td><td class="old-cell">附一句话说明它为何对该章重要</td><td class="new-cell">附一句话说明它对这一章为什么重要</td><td>“为何对该章重要”是英文直搬语序</td></tr><tr><td class="num">L52</td><td class="old-cell">—— RDB 变长整数编码（……）、CRC64 校验与 RESP 协议复用为文件格式的设计（官方未发布字节级 RDB 格式规范，此页为最接近的官方来源），快照范式文件结构的典型范例。</td><td class="new-cell">—— RDB 变长整数编码（……）、CRC64 校验与 RESP 协议复用为文件格式的设计，是快照范式文件结构的典型范例（官方未发布字节级 RDB 格式规范，此页为最接近的官方来源）。</td><td>括号插入语把主干搭配拆开</td></tr><tr><td class="num">L73</td><td class="old-cell">跨系统架构取舍的最佳入门，本书反复呼应的核心参照。</td><td class="new-cell">跨系统架构取舍的入门读物，本书反复与之呼应的核心参照。</td><td>“呼应”一般不及物，硬带宾语；“最佳入门”不可验证</td></tr></tbody></table><h2>2. 改前需复核</h2><div class="card"><div class="item-head"><span class="badge">L3 / L73</span><span class="item-title">2.1 承诺与体例对不上 / 综合推荐无话题句</span></div><p class="problem">前言说“每章列出 2–5 份最相关的外部参考”，但第 10 章两条是“同 [N]”回指、只新增一条外部参考；“综合推荐”一节没有话题句，直接以“同 [1]”开头，读者不知道选编原则。</p><ul class="plain"><li>把“外部参考”改为“参考”，与“同 [N]”回指体例一致。</li><li>把“一点阅读建议”里“官方文档适合……综合书适合建立跨系统的整体视野”提到 [35] 之前作本节导语。</li></ul></div><div class="card"><div class="item-head"><span class="badge">L75 / L76 / L81</span><span class="item-title">2.2 “适合”模板</span></div><p class="problem">“适合＋读者/用途”在综合推荐里连发，把书名换掉照样成立。</p><ul class="plain"><li>L75：<code>适合有论文阅读需求的读者。</code> → 给具体用途，如“想补论文底子的人，可以从它按主题编排的导读入手”。</li><li>L76：<code>适合深化 MySQL 理解。</code> → 同上，减少“适合”。</li><li>L81：<code>官方文档适合查证参数与版本细节……</code> → 保留这一处总述即可，前两条不必再套“适合”。</li></ul></div><div class="card"><div class="item-head"><span class="badge">L65 / L73</span><span class="item-title">2.3 广告腔 / 绝对化</span></div><p class="problem">“姊妹篇”是比喻（三零标准）；“最佳入门”是不可验证的最高级。</p><ul class="plain"><li>L65：<code>贯穿全书的姊妹篇，……</code> → <code>贯穿全书的对照之作，……</code></li><li>L73：<code>跨系统架构取舍的最佳入门</code> → <code>跨系统架构取舍的入门读物</code></li></ul></div><h2>3. 新病理候选（建议补进 docs/去ai味道自查方法.md §1.3）</h2><table><thead><tr><th>候选名</th><th>定义</th><th>判定方法</th><th>参考文献实例</th></tr></thead><tbody><tr><td>标签式复读收束（条目级）</td><td>每条注解都以“——……的〈抽象名词〉”同骨架收尾</td><td>把各条尾句抽出并排，看骨架能否互换</td><td>L7–L77 共 30+ 条</td></tr><tr><td>跨条目同位模板句</td><td>“适合＋读者/用途”等骨架在条目间复用</td><td>替换书名后句子是否仍成立</td><td>L75 / L76 / L81</td></tr><tr><td>广告腔 / 绝对化</td><td>“姊妹篇”“最佳入门”等比喻或不可验证最高级</td><td>删掉修饰词，信息是否不变</td><td>L65 / L73</td></tr></tbody></table><h2>4. 可复用的检查方法</h2><ul class="plain"><li><strong>条目并排</strong>：把相邻注解的“——”后尾句抽出来并排，骨架雷同即模板。</li><li><strong>替换测试</strong>：把“适合＋用途”里的书名换掉，句子是否照样成立。</li><li><strong>承诺对账</strong>：把前言里的数量/类别逐条数后面实际内容，对不上即中招。</li></ul>
+</div>
+</body>
+</html>

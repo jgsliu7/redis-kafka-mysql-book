@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第八章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第八章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/08-storage-format/chapter.md</code>（337 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／参数／版本口径／表格内容／作者第一人称故事与判断锋芒不动。ch2–ch7 确诊模式复发者标「前章同款」。两席引文 90+ 处经总调度对文件逐字复核，0 失配（det 席三处行号自纠：「那怎么算设计对了？」=L9、「InnoDB 的存储从大到小是四层」=L114、「这个规律也解释了」=L273，已按原文行号登记）。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">骨架是好的，肉塞得太满；这章还在用自己的章节结构演示自己讲的道理</span></h2>
+<p>tech-editor 的判词值得整句引用：<b>「骨架是好的，肉塞得太满——这章不是写得差，是'装'得差：枚举被当散文跑、括号栈吞掉主句、同一论点盖了三到四次章，读者的气口在 8.2 之后基本被没收。」</b>detector 给 6.5/10（序列 ch2 4→ch3 5→ch4 6→ch5 5→ch6 5→ch7 6→ch8 6.5，与 ch9 并列），并给了本轮 campaign 最狠的一条模式 A 判词：<b>「这章讲'格式定型后只能追加同构记录'，它自己的章节结构就在演示这个道理，自模仿到骨子里。」</b>——8.2／8.3／8.4 三大节的字段完全一致：定位先行标题→"X 的定位"起手→机制段→代价段→盖章句收尾，一章之内三次同构复用。两席合流的签名病理：<b>盖章"同一/同样/同一种思路"×23</b>（四重盖章结构：机制节→8.5 横向对比→8.6 启示→8.7 小结四道章无降调重述）、<b>账房 ~45 笔</b>（每 7.5 行一笔，全书之最）、<b>荒漠 270–276 行＋零家常短句</b>（327 句里 ≤7 字短句只有 2 句：L23 黑体标签、L141 报数）、<b>枚举当散文跑</b>（tech 头号病理：四档编码、fsync 三档、三类文件全用顿号连排塞进单句）、<b>V0/V1/V2 一稿四盖＋定律三级播放＋L9⇄L334 首尾复印</b>。节奏倒挂：8.7 小结均句 76.0 全章最高、8.6.6 32.6 全章最低——收束段是全章最喘不过气的地方。</p>
+<div class="stats">
+  <div class="stat"><div class="n">23 处</div><div class="t">盖章"同一/同样/同一种思路"（连图 8-4 图注 L137 都盖「与 Kafka 段级稀疏索引同一手法」）＋四重盖章结构：每个论点经机制节→8.5→8.6→8.7 四道章，无一降调重述</div></div>
+  <div class="stat"><div class="n">~45 笔</div><div class="t">账房词族全书之最（代价 30＋取舍 4＋折中 2＋权衡 1＋换来 3＋"用X换Y"≥5），约每 7.5 行一笔；L305 一段三结账、L334 一句双连——每讲一个机制必须记一笔账才算完</div></div>
+  <div class="stat"><div class="n">2 句</div><div class="t">327 句里家常短句为零：≤7 字短句仅 L23 黑体标签与 L141 报数两处伪短句；首人称荒漠 L11–L282 约 270–276 行（口径 det 276／tech ~270）——导读 L5 的故事之后，叙述者消失到 8.6 才回来，回来就是五连宣誓</div></div>
+  <div class="stat"><div class="n">76.0 字</div><div class="t">8.7 小节均句全章最高（对 8.6.6 的 32.6 最低）——节奏倒挂在收束段爆发；tech-editor 的三堵墙：8.2.2–8.2.4／8.3.2–8.3.4／8.4.6，三段机制区连续无气口，8.4.6（Tiered Storage）是最陡的一堵</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L283 / L299 / L309 / L317 / L321</span><h3>8.6 五连宣誓："我＋动词＋先"同一副填空题盖五条启示</h3><span class="badge b2">双票</span><span class="badge b1">ch4/ch7 同款·最重</span></header>
+  <p class="why">「我设计存储格式时，第一个要定的就是这个」（L283）／「我设计索引时，先想清楚……」（L299）／「我加可靠性机制前，先问……」（L309）／「我自己定格式，第一件事是……」（L317）／「我面对自己的存储设计时，先回答三个问题」（L321）——五条启示五副同模起手。其中 <b>L317 保留原形</b>：它的尾句「——本章开头那一周的迁移脚本，就是这一步没走完的代价。」是全章唯一带故事燃料的回场句（导读 L5 的一周迁移脚本在这里兑现），宣誓＋回场的组合是 8.6 里最值钱的一句，动它亏。L283/L299 还各带一记 verdict 整句加粗，与小节标题同义复述——加粗卸、起手变形。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L299）</div>
+      <p><span class="cut">**稀疏索引用"少量顺序扫描"换"索引小到能常驻内存"。**</span> 我设计索引时，先想清楚索引能不能放进内存，放不进就考虑稀疏化：这种方式在大多数场景下比追求严格 O(log n) 更划算。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">索引能不能整个住进内存？我设计索引先问这个。住不进，就往稀疏里做</span>：这种方式在大多数场景下比追求严格 O(log n) 更划算。<span class="add">（verdict 加粗卸——小节标题「索引越稀疏，越要靠顺序扫描补回来」已说同一件事，正文再说一遍还加粗是第二遍说；起手从"我设计X时先想清楚"变形为自问切入。L283 同法）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L231 → L271 → L334</span><h3>定律三级播放："存储格式反映访问模式"预告→颁布→重播</h3><span class="badge b2">双票</span><span class="badge b1">ch7 框架三级复读同款</span></header>
+  <p class="why">L231（Tiered Storage 三影响之第三条）先用框架半句预告「"存储格式反映访问模式"这条规律多了一个新证据」；L271 在 8.5.3 正式颁布（加粗首立，<b>保留</b>，其反事实推演「假设 Kafka 用页式格式……」是章内最好的一段论证）；L334 小结重播。三级播放的病灶在前不在后：8.4.6 还没到 8.5.3，读者先收到了定律的剧透。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L231 第三条）</div>
+      <p>第三，<span class="cut">"存储格式反映访问模式"这条规律多了一个新证据：</span>Tiered Storage 改的只是放置策略，格式一字未动，因为冷热数据的访问模式不同，冷数据换个位置放就够了，用不着另起一套格式。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>第三，<span class="add">冷热数据的访问模式不同，冷的换个位置放就够了——</span>Tiered Storage 改的只是放置策略，格式一字未动，用不着另起一套格式。<span class="add">（框架半句删，事实自己会说；定律的字面留给 L271 首立与小结收束各一次——预算见 §3.1）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L334 ⇄ L9</span><h3>首尾复印：小结第一段是导读第三段的加长重播，"为的是"三连＋分号串</h3><span class="badge b2">双票 · 铁证</span></header>
+  <p class="why">L9「Redis 把整份内存排成快照文件，<b>为的是</b>崩溃后一次性整体重建；MySQL 把数据放进 16KB 定长页，支撑事务的随机读写和原地改；Kafka 只往日志段尾部追加，把磁盘顺序写的带宽用满」→ L334「Redis 用磁盘保存内存数据的备份，<b>为的是</b>崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，<b>为的是</b>事务安全的原地改与随机读写……Kafka 永远只追加……」——同一场舞隔 325 行跳第二遍，且小结版更长更密（"为的是"×2、代价双连「代价各自不同……代价是恢复时要整体加载重建」）。小结均句 76.0 全章最高，这段是主犯。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L334 首段）</div>
+      <p>三种格式的差异源于访问模式的不同。<span class="cut">Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 永远只追加，靠 RecordBatch 压一批、稀疏索引定位，把吞吐做到上限。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改背上双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则直接连"原地改"这个选项都不要了。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>三种格式对应三种访问模式。<span class="add">Redis 要的是崩溃后快速重建，快照正好；MySQL 要事务安全的原地改，16KB 定长页加双写、redo log 扛住断电；Kafka 只要吞吐，追加、压批、稀疏索引一路到底——"原地改"这个选项它干脆不要了。</span>（导读版细节不重播；三家各一拍、拍型不等长；"代价"字面 ×2 卸掉，MySQL 写放大留在句内）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L203 ＋ L221</span><h3>V0/V1/V2 一稿四盖：正文首讲→8.4.5 复读→表 8-1→表后光杆凿子</h3><span class="badge b2">双票</span></header>
+  <p class="why">8.4.2/8.4.3（L181–L189）已把 V0/V1 元数据冗余、V2 Batch 61 字节、差值编码讲透；8.4.5 开头 L203 又近纯复读一遍（「V0 以单条消息为存储单元，没有时间戳；V1 加了时间戳但仍是单条粒度……」）；表 8-1 是第三次（正当位置，保留）；表后 L221「每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。」第四次——tech-editor 判这记光杆凿子<b>恰在 8.4.6 陡坡之前，是结构性的排雷失误</b>：读者刚收完表格，还没喘息就吃一记总结锤，然后撞上全章最陡的 Tiered Storage 巨型段。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L203 首段＋L221）</div>
+      <p>从 V0 到 V2，每代演进都在消除上一代最贵的开销。<span class="cut">V0 以单条消息为存储单元，没有时间戳；V1 加了时间戳但仍是单条粒度，元数据冗余让压缩依然低效。V2 把存储单元从单条换成 Batch，引入增量编码，并把 ProducerId/Epoch/BaseSequence 加进来支持幂等与事务。</span></p>
+      <p>（表 8-1 之后）<span class="cut">每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>从 V0 到 V2，每代演进都在消除上一代最贵的开销——<span class="add">三代各自省掉了什么、又欠下什么新债，表 8-1 一行一行看。</span></p>
+      <p><span class="add">（L221 整句删——「演进动机」一列与"代价"叙事表里都有；表后留半拍空白直接进 8.4.6，比补一记凿子更能给读者换气。若作者舍不得"解决X却引入Y"的因果链，可将半句并入上面引用句，但不单独成段）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L71 / L100 / L156 / L328</span><h3>看图说话四连：七张图每张"图＋旁白"双份计费</h3><span class="badge b2">双票</span><span class="badge b1">ch5/ch6 同款</span></header>
+  <p class="why">L71 用 143 字把图 8-2 的段落布局重述一遍；L100 用 179 字逐帧念图 8-3 的时序（fork→写文件→buffer 追加→rename，图里全有）；L156 以「图中可见完整的双重保护机制：」报幕后复述图 8-5 两条路径；L328 念图 8-8 决策树的菱形与箭头。四处的共同病灶：正文在读图，不在讲机制。tech-editor 的分工判据：<b>图管"是什么"，文管"为什么"——图上看得见的，正文不再念；正文只讲图上看不见的因果</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L71 节录）</div>
+      <p><span class="cut">整个文件分成几个清晰段落：开头魔数与版本号做自识别，metadata 区存辅助字段（如 Redis 版本、创建时间、repl-stream-db 等元信息），db-selector 标记接下来的数据属于哪个 db，entries 段是一条条键值记录，结尾是 8 字节 CRC64 校验。</span>CRC64 放尾部而非头部，是因为校验要覆盖从文件开头……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">段落划分图 8-2 一次画全，这里只讲一个图上看不出来的安排：</span>CRC64 放尾部而非头部，是因为校验要覆盖从文件开头（含魔数和版本号）到末尾校验和之前的全部内容，写完才能算出来；加载时先校验，失败直接拒绝加载，避免把损坏数据载入内存。<span class="add">（保留的恰是增量——"为什么在尾部"；L100 同法：时序细节交给图，正文留「整个过程线上服务不中断。7.0 起，缓冲区和 rename 这两步被……取代」两句结论；L156 删「图中可见……」报幕直接讲机制；L328 只留「两条线进入页式框」那半句差异点，其余删）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L305（8.6.4）</span><h3>一段三结账：三句"X 防止 Y，代价是 Z"同构连排</h3><span class="badge b2">双票</span><span class="badge b1">ch7 L82 一段三记同款</span></header>
+  <p class="why">「MySQL 的双写缓冲防止……，代价是同一份脏页刷两次盘（写放大）。redo log 保证……，代价是每次修改多记一条日志。CRC 校验用来检测……，代价是每次读写多算一次校验和。」——三个机制三笔记账，一个模板。tech-editor 指出好方向就在下一段：L307 的「什么能撤、什么不能撤」是这节真正值钱的判断，账目直陈即可，把重音留给它。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>MySQL 的双写缓冲防止断电导致 16KB 页半写，保证页完整性，<span class="cut">代价是</span>同一份脏页刷两次盘（写放大）。redo log 保证已提交事务的修改在页未落盘时也能重放回来，<span class="cut">代价是</span>每次修改多记一条日志。CRC 校验用来检测磁盘静默损坏（bit rot），<span class="cut">代价是</span>每次读写多算一次校验和。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">双写缓冲防的是断电页半写——同一份脏页要刷两次盘。redo log 接的是另一头：已提交的修改页还没落盘也能重放回来，每次修改多记一条日志。CRC 校验盯的是磁盘静默损坏（bit rot），读写多算一次校验和。</span>（"代价是"×3 卸掉，三句各换一头；防什么＋付什么都在，只是不再用同一个报账动词）</p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L229（8.4.6）</span><h3>全章最重：Tiered Storage 副本追赶巨段——9 句 653 字，4 个新名词同段首发</h3><span class="badge b2">双票 · 最重</span><span class="badge b1">tech summit 最优先</span></header>
+  <p class="why">tech-editor 列头号手术位：一段之内连续引入 OFFSET_MOVED_TO_TIERED_STORAGE、tier state machine、leader epoch 缓存、producer snapshot 四个新名词（后两个各带定义括号），再叠加远程追赶时序的分号链、`replica.lag.time.max.ms` 30 秒、local retention 设计要点、**日志段格式完全不变**加粗、第 5 章 Log 抽象回指——读者在这一段要同时消化机制、参数、取舍、跨章呼应四层。detector 以时序分号链（模式 B）＋括号栈（模式 F）同位命中。修法＝<b>拆段＋定义出栈＋白话垫句</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>副本的拉取位点落到 Leader 本地起点之前时，Leader 返回 OFFSET_MOVED_TO_TIERED_STORAGE 错误，副本转而启动 tier state machine。它从远程存储重建 leader epoch 缓存<span class="cut">（记录每一任 Leader 权威日志起点的小文件，第 9 章展开）</span>和 producer snapshot<span class="cut">（记录各生产者已确认序列号的快照，见表 4-2）</span>这些辅助状态，把本地日志起点直接抬到 Leader 的本地起点。追上之后，副本切回正常 FETCH。这条远程追赶路径要访问对象存储、要重建状态，比本地 FETCH 慢；远程存储不可用或元数据缺失时副本只能反复重试，拖过 `replica.lag.time.max.ms`（默认 30 秒）仍会被移出 ISR。……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（拆三段）</div>
+      <p><span class="add">段一（出错与转向）：副本的拉取位点落到 Leader 本地起点之前时，Leader 返回 OFFSET_MOVED_TO_TIERED_STORAGE 错误，副本转而启动 tier state machine——说白了一句话：本地缺的那段，副本得自己去远端搬回来重建。</span></p>
+      <p><span class="add">段二（重建什么）：要重建的不只是数据，还有两本账。leader epoch 缓存记每一任 Leader 的权威日志起点，是个小文件，第 9 章展开；producer snapshot 记各生产者已确认到哪个序列号，见表 4-2。这两样补齐，副本把本地日志起点直接抬到 Leader 的本地起点，追上之后切回正常 FETCH。</span></p>
+      <p><span class="add">段三（为什么本地还得留窗口）：这条远程追赶要访问对象存储、要重建状态，比本地 FETCH 慢；远端不可用时副本只能反复重试，拖过 `replica.lag.time.max.ms`（默认 30 秒）就掉出 ISR。所以本地保留窗口依然要盖住最慢 ISR 副本的落后量——让副本留在本地快路径上。</span>（定义括号出栈成同位短句；机制与参数全数保留，属技术内容，正式稿以技术席核对为准）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L81（8.2.3）</span><h3>三收益括号栈：三个"现成的东西"各拖一条括号考证挤一句</h3><span class="badge b2">双票</span></header>
+  <p class="why">det 巨句 Top2（147 字）／tech 口径 195 字：「AOF 损坏可以人工编辑修复（纯 AOF 模式下……；混合持久化模式下……`redis-check-aof --fix`），可用 redis-cli 直接重放（相当于……），格式零额外定义成本（协议早就定义好了……）」——三项收益三项考证全部塞进一个句号，第二、三项的主语要在括号栈里穿行才能接上。三条本来就是并列清单，落成 bullet 即可（L126–132 有现成先例）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>这种复用换来的都是现成的东西：<span class="cut">AOF 损坏可以人工编辑修复（纯 AOF 模式下，明确字节边界时可用编辑器删掉坏掉的那条；混合持久化模式下 AOF 文件前段为二进制 RDB 数据，需先用 `redis-check-aof --fix` 工具修复），可用 redis-cli 直接重放一个 AOF 文件（相当于现成多出了一套恢复工具），格式零额外定义成本（协议早就定义好了，存盘就是按协议写一遍）。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（bullet 化）</div>
+      <p>这种复用换来的都是现成的东西：</p>
+      <p><span class="add">- AOF 损坏可以人工编辑修复——纯 AOF 模式下明确字节边界就能用编辑器删掉坏命令；混合持久化前段是二进制 RDB，得先用 `redis-check-aof --fix` 修复。</span><br>
+      <span class="add">- redis-cli 能直接重放一个 AOF 文件，等于现成多出一套恢复工具。</span><br>
+      <span class="add">- 格式零额外定义成本——协议早就定义好了，存盘就是按协议写一遍。</span>（括号全数出栈；命令语义属技术内容，走技术席）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L143（8.3.3）</span><h3>溢出判定巨句：192 字里四层"……时，才……"嵌套＋双括号＋COMPACT 对比尾巴</h3><span class="badge b2">双票</span></header>
+  <p class="why">det 巨句 Top3（147 字）／tech 口径 192 字：判定规则（按整行不按字段）、8126 上限括号、20 字节指针、次长列递挪、40 字节豁免、COMPACT 768 前缀对比——六件事一个句号。技术内容全保留，动的是断句与括号。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>二是溢出按整行判定，不以单个字段超页大小一半为准：<span class="cut">一行总长超过行内上限（约 8126 字节，保证每页至少放得下两条记录）时，才从最长的变长列（VARCHAR、BLOB、TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针，挪完还不够再挪次长的；不超过约 40 字节的短 TEXT/BLOB 始终留在行内（区别于旧版 COMPACT 会先把 768 字节前缀留行内再外挂指针）。</span>这是"页内紧凑"与"大对象不拖累整页"的折中：……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>二是溢出按整行判定，不以单个字段超页大小一半为准。<span class="add">行内上限约 8126 字节——这个数字保证每页至少放得下两条记录。一行总长超过它，才从最长的变长列（VARCHAR、BLOB、TEXT）起整列挪到独立溢出页，行内只留一个 20 字节指针；挪完还不够，再挪次长的。</span></p>
+      <p><span class="add">短 TEXT/BLOB 不超过约 40 字节的始终留在行内。旧版 COMPACT 的做法是先把 768 字节前缀留在行内、再外挂指针，Dynamic 改掉了它。</span>这是"页内紧凑"与"大对象不拖累整页"的折中：……（一个句号拆成三拍；两处括号出栈；数字全数保留，走技术席）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L185（8.4.3）</span><h3>压缩收益巨句：两层"括号套括号"把 caution 埋进主句</h3><span class="badge b2">双票</span></header>
+  <p class="why">det 巨句 Top1（148 字）／tech 口径 187 字：wrapper 压缩的解释括号（内含"外层……内层……"两分句）与量化 caution 括号（"具体压缩比取决于……"含破折号）连栈，主句"有结构性提升"被两个括号前后夹击。caution 本身是好东西（诚实交代官方无基准），值得独立成句。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式，V2 的 Batch 级压缩相对 V0/V1 的整包 wrapper 压缩<span class="cut">（外层把一批消息压成一个消息体，内层每条仍各带一份元数据）</span>有结构性提升<span class="cut">（具体压缩比取决于负载特征与所选压缩算法；Apache 官方没给过对比基准，实战里 V2 明显更省带宽）</span>。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">这个变化最大的好处是让"压缩在 Batch 边界做"成立：一批时间相近、内容相似的消息聚在一起，压缩算法能找到大量重复模式。V0/V1 的压缩是整包 wrapper——外层把一批消息压成一个消息体，内层每条仍各带一份元数据；V2 在 Batch 边界压，有结构性提升。</span></p>
+      <p><span class="add">量化要谨慎：具体压缩比取决于负载与所选算法，Apache 官方没给过对比基准——实战里 V2 明显更省带宽。</span>（两括号出栈，caution 升为独立句；量化口径走技术席）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L64（8.2.2）</span><h3>四档编码顿号连排：枚举当散文跑的头号标本，落成四行小表</h3><span class="badge b2">双票 · tech 头号病理</span></header>
+  <p class="why">tech-editor 给全章定了一条总判据（详见 §3.2）：<b>三档以上、每档带括号注释的枚举，不再允许用顿号连排塞进散文句</b>——L64 四档、L83 fsync 三档、L93 三类文件全部命中。读者对连排枚举的处理方式是跳过，等于白写；落成小表或 bullet（L126–132 编号列表是章内先例），每一档才真正被读到。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L64 档位句）</div>
+      <p>具体由类型字节的高两位做档位选择：<span class="cut">`00` 走 6 位（0–63）、`01` 走 14 位（0–16383）、`10` 走 32 位定长、`11` 则是特殊编码（int8/int16/int32/LZF 压缩串等，把数值或压缩后的串直接放进这几个字节）。</span>小长度（0–63）只需 1 个字节就完成，连额外长度字段都省了。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（四行小表）</div>
+      <p>具体由类型字节的高两位做档位选择：</p>
+      <p><span class="add">`00`→6 位（0–63）｜`01`→14 位（0–16383）｜`10`→32 位定长｜`11`→特殊编码：int8/int16/int32、LZF 压缩串等，数值或压缩后的串直接放进这几个字节</span></p>
+      <p><span class="add">（正式排版为四行小表；后一句白话保留在表外——它正是这组档位"省字节"的点睛）</span>小长度（0–63）只需 1 个字节就完成，连额外长度字段都省了。</p>
+    </div>
+  </div>
+  <p class="dir"><b>同族处理</b>：L83 fsync 三档（always／everysec／no）三行小表；L93 三类文件（base／incr／history）bullet 化——"至多一个……零或多个……以及……"的散文串改为列举。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L44–L48（关键数字框）</span><h3>三个数字框的"括号套分号"：心算型长句拆并列短句</h3><span class="badge b2">双票</span><span class="badge b1">ch7 L38–44 同款</span></header>
+  <p class="why">三框各有病灶：L46 一句里"61 字节→V0 14→V1 22→不含外框 12→同口径 26/34"五级换算全靠括号与破折号扛；L48 的"1GB→300–500MB→变长整数＋LZF→远小于→快速加载"是心算链。数字是硬资产全保留，动的是形状（ch7 已有先例：拆成直陈短句，每句一个数）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L46 节录）</div>
+      <p>**Kafka RecordBatch V2：每批元数据约 61 字节**（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍<span class="cut">（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益）</span>，带宽与存储成本结构性下降。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">**Kafka RecordBatch V2：每批元数据约 61 字节**。对照：V0 单条消息固定开销约 14 字节，V1 约 22 字节——均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节。</span></p>
+      <p><span class="add">Batch 级压缩在同类消息上可达 2–6 倍（zstd）。前提是内容相似：文本类数据近上限，二进制次之，已压缩数据趋近 1 倍，基本无收益。带宽与存储成本结构性下降。</span>（换算链一句一数；全部数字保留，走技术席）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L56 / L108 / L164</span><h3>定位先行×3：三节起手同一副"定位"发牌</h3><span class="badge b2">双票 · 模式 A 主证</span></header>
+  <p class="why">L56「Redis 的持久化格式，源自它的定位。」→ L108「InnoDB 的定位与 Redis 正好倒过来。」→ L164「Kafka 的定位又反过来了。」——8.2/8.3/8.4 三大节用同一张模具开模（连同小节标题"定位先行：……"三连与 §0 的模式 A 判词）。L164「又反过来了」是三句里最短最活的一句，<b>保留</b>；L56 首现定义<b>保留</b>；动 L108——从数据侧直接切入，不做第三次"定位"宣告。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L108 起手）</div>
+      <p><span class="cut">InnoDB 的定位与 Redis 正好倒过来。</span>对 InnoDB 来说，磁盘上的表空间文件（系统表空间 ibdata 或独立 .ibd）才是数据的主存储，缓冲池只是磁盘页的缓存副本：命中率高的页留在内存，未命中的按需从磁盘读进来。这一倒置是理解 InnoDB 所有格式设计的前提。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">到了 InnoDB，主次换了个个儿：</span>磁盘上的表空间文件（系统表空间 ibdata 或独立 .ibd）才是数据的主存储，缓冲池只是磁盘页的缓存副本：命中率高的页留在内存，未命中的按需从磁盘读进来。这一倒置是理解 InnoDB 所有格式设计的前提。<span class="add">（"定位"字面第三现卸掉；"倒过来/反过来"留给 L164 的那一记）</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">给模具与论点设预算：这是盖章与账房的双料全书之最，预算要立得最狠</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>盖章 23 处 → ≤6；四重盖章结构降为"机制节＋终章"两道</h3><span class="badge b2">双票 · 最高优先</span></header>
+  <p class="why">"同一/同样/同一种思路/同一类机制"×23，其中真金与注水并存。四重盖章结构：同一论点在机制节（首讲）→8.5 横向对比（第二讲）→8.6 启示（第三讲）→8.7 小结（第四讲）各盖一次章，无一讲降调。detector 连图注都数到了：L137 图 8-4 图注「与 Kafka 段级稀疏索引同一手法」——图注在盖章。</p>
+  <p class="dir"><b>判据</b>（每论点全章最多两次全力讲述，其余只许降调事实句）：<b>保</b> L139「跟 Kafka 用的稀疏索引同一思想，尺度小了一个数量级」（首讲、带尺度增量）与 L199「Page Directory 在页内做过同样的事（8.3.3 节）」（8.4 侧回收，短）——稀疏索引母线两讲是本章骨架，值；<b>保</b> L271 定律、L17 分层呼应。<b>卸/降</b>：L93 git 句（§4 鉴定行）、L137 图注、L205「同一类机制」、L281「同一原则」及其余散盖——降为"不点破"的事实并置（把三家放一起，读者自己看见同与不同，比"同一思想"宣告更响）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>枚举落地判据：三档以上带注释的枚举一律出散文</h3><span class="badge b2">双票 · tech 头号病理</span></header>
+  <p class="why">tech-editor 的总判据：<b>"三档以上、每档带括号注释的枚举，不再允许顿号连排"——落成 bullet、编号列表或小表</b>。命中清单：L64 四档编码（§2.5 已处理）、L83 fsync 三档、L93 三类文件、L231 三影响、L281 三单元反例。章内健康先例就在 L126–132（InnoDB 页内七段，编号列表 1–7）——同一支笔已经会做，只是没形成默认。</p>
+  <p class="dir">落地时保留每档的注释与白话（L83 拆表后"最安全最慢／默认／最快但崩溃可能丢更多"三行各自站住）；枚举出散文后，原句位补一句"怎么选"的判断（章内好例：L120「默认值 16KB 几乎在生产中不被改动」那句的讲法）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场预算：6 场降 3 场；"为X优化"模板解锁；三处健康变奏保留</h3><span class="badge b2">双票</span></header>
+  <p class="why">现状：L9（导读钥匙）→L35（约束段）→L56/L108/L164（三大节定位）→L240+表 8-2（横向对比，正当位置）→L263–L267（8.5.2 三段范式）→L334（小结）。病灶两处：8.5.2 三段全用「快照范式（Redis）为"快速整体恢复"优化。……页式范式（MySQL）为"事务安全的随机读写"优化。……Kafka 的追加日志做法为"高吞吐的顺序写＋成批压缩"优化。」同一副"为X优化"起手＋段内"代价是"固定收尾；L281 启示一第一段 287 字把 L273 刚讲过的"基本 I/O 单元"差异又复述一遍。<b>健康样本要留住</b>：8.6.1 K→M→R、8.6.3 M→K→R、8.6.5 R→K→InnoDB——三处顺序各不相同、跟着论点走，是全章绕场里做对的部分。</p>
+  <p class="dir"><b>保留</b>：L9、表 8-2、L334（§1.3 手术后）。<b>砍/变</b>：8.5.2 三段起手各换（快照段从"崩溃后要什么"进、页式段从"事务要什么"进、日志段从"带宽要什么"进——三个"要"字各不相同）；L281 第一段砍成半句＋反例保留（"反过来想就知道代价"以下三连是真增量，一字不动）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>句长两极重建＋荒漠两条路线：327 句补 8–10 记家常短句</h3><span class="badge b2">双票</span></header>
+  <p class="why">家常短句为零（仅有的 2 句 ≤7 字是 L23 黑体标签、L141 报数）；8.7 均句 76.0 全章最高，机制区三堵墙（8.2.2–8.2.4／8.3.2–8.3.4／8.4.6）连续无气口。章内好样子就在：L73「反正加载就是一次性把内存建起来，<b>没人会对 RDB 做点查。</b>」、L85「比如一百万次 INCR 同一个 key，<b>真正有效的只有最后一次。</b>」——机制收口式，不雕刻。</p>
+  <p class="dir">补土落点：每机制节 3–4 段补一记（仿 L73/L85 句式，措辞作者定）：8.2.2 RDB 段尾、8.3.2 四层结构段中、8.3.4 双写段、8.4.2 三文件段、8.4.4 双索引段。荒漠 L11–L282（约 270–276 行）两条路线并行：<b>a)</b> 括号里的判断性旁注提为正文句（L229 手术顺带做，不新增材料）；<b>b)</b> 若要"我"的颗粒（格式设计的踩坑回忆），<b>素材须作者本人出，改文笔不得代写（不造经历，ch6 立规沿用）</b>。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>账房 ~45 笔 → ~12：全书之最，源头级解锁</h3><span class="badge b2">双票</span><span class="badge b1">ch4/ch6/ch7 同族·峰值</span></header>
+  <p class="why">det 口径：代价 30＋取舍 4＋折中 2＋权衡 1＋换来 3＋"用X换Y"≥5 ≈ 每 7.5 行一笔；tech 口径：代价 30 → 建议 12–15。最重处：L305 一段三结账（§1.6 已处理）、L334 一句双连、L27/L29 每矛盾一笔、三大代价段固定收尾。章内好例是 L149「多写的代价是写放大：<b>同一份脏页要刷两次盘</b>，但因为双写缓冲是连续的顺序写，对性能影响有限」——后果直陈＋边界交代，一笔顶三笔。</p>
+  <p class="dir">章内豁免：L83「用 fsync 频率换可靠性档位」（机制本体就 是档位切换，这笔账是内容不是包装）。其余逐处换直陈后果；§1 与 §2 的手术顺带卸掉约 15 笔。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>凿子松绑：每节末留一支；导读双凿拆外层</h3><span class="badge b2">族内双票</span></header>
+  <p class="why">段末凿子约 14 处，节末几乎必有：L5「格式不会只写一次——任何不预留扩展空间的格式，都会在以后的演进中付出这份代价。」＋L7「更关键的是，文件结构同时框定了……设计错了，后面怎么优化都很难挽救。」导读两段连凿；L15「磁盘格式从一开始就处于另一套物理规则之下。」、L64 尾「每一处省下来的字节，乘以全量快照的规模，文件体积就能小很多。」、L143 尾、L199 尾、L297 尾、L221（表后光杆凿子，§1.4 已处理）……连收，读者开始等锤子。</p>
+  <p class="dir"><b>留</b>：每节末一支（8.2 留 L100 段"线上服务不中断"一拍式、8.3 留 L158「当那类故障被下层硬件解决时，软件冗余就可以撤下来。」、8.4 留 L231 修正后的第三条）；L5/L64/L199/L297 错位保留。<b>拆</b>：L7 外层凿（"更关键的是……很难挽救"改为段中论证，段尾交还给"这些选择一旦定下来……迁移代价"那半句，一节一凿）；L15/L143 尾降平叙。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>巨句口径差</b></td>
+      <td>det Top5：L185(148)／L81(147)／L143(147)／L100(124)／L164(116)；tech Top5：L81(195)／L143(192)／L185(187)／L229 段(653 字 9 句)／L95(141)</td>
+      <td>口径差异登记（去标记与切分规则不同），非方向分歧。手术位取并集 <b>{L229 段、L81、L143、L185、L100、L64、L46、L95、L164}</b>，§2 已收前五＋L64/L46</td></tr>
+  <tr><td><b>分节最重</b><br><span class="badge bd">两尺不同源</span></td>
+      <td>detector：8.6 架构启示 8 分全章最重（五连宣誓＋verdict 加粗×2＋"同一原则"盖章全在收束区）；tech-editor：三堵墙在机制区（8.2.2–8.2.4／8.3.2–8.3.4／8.4.6），8.7 的 76 字均句是倒挂不是密度</td>
+      <td>相容：det 按句式密度、tech 按读者坡度，两把尺量的是同一章的两面。处置各自落地（§1.1 收束区、§2 机制区），登记不改文</td></tr>
+  <tr><td>det 模式 E：自问自答转道 ~7 处</td>
+      <td>「那怎么算设计对了？」（L9）／「知道了页是 16KB 之后，下一个问题是……」（L124）／「都选稀疏，是 8.4.4 节讲过的同一笔账」（L291）／L299「先想清楚索引能不能放进内存」／L309「先问……」／L321 三问／L330「第三问不画在图上，因为它不决定走哪条路」</td>
+      <td>detector 单票（与宣誓五连、三问节重叠计分）。其中 L9、L124、L330 是真转折（问了才有下一层），L299/L309/L321 已随 §1.1 处理。剩余逐处过尺后<b>上作者</b>，不默认动</td></tr>
+  <tr><td>det 模式 D：两列对照散文（L289）</td>
+      <td>8.6.2 定长／变长两段各"利于X：……。代价是Y：……"——教科书双栏对照写成了散文对仗，与表 8-2 的"维度对比"职能重叠</td>
+      <td>tech-editor 未单列此项。相容处置：表管"是什么"（三家八维），文管"为什么"（定长变长的因果）——L289 保留因果、卸对仗模板（两段起手不再镜像）。<b>上作者</b>裁力度</td></tr>
+  <tr><td>det 模式 B：时序分号链</td>
+      <td>L87 双缓冲时序（"重写期间的新写命令进 aof_rewrite_buffer，子进程完成重写……父进程把 buffer 里的命令原子追加……再做 rename 替换"）、L100（179 字逐帧）、L229——三处以分号扛时序</td>
+      <td>与 §2.1／§1.5 重叠，不再单列处置；L87 随 L100 图导语手术顺带断句。登记不改文</td></tr>
+  <tr><td>「鉴定句」族逐处过尺</td>
+      <td>L58「这一定位是决定性的。」、L87「这是"追加日志如何做在线 compaction"的经典手法」、L93「和 git 的 commit 指针切换是同一种思路：数据不动，指针换。」、L114「这个"页号即偏移"的设计是定长页结构能做随机访问的根本。」、L139、L143「这是"页内紧凑"与"大对象不拖累整页"的折中」、L151「物理逻辑混合日志在……之间取了折中」、L205「是支持混合版本部署与平滑升级的标配」、L281、L295、L297</td>
+      <td>盖章尺逐处过：L93 git 句是盖章但<b>白话落地的好句</b>（"数据不动，指针换"六字值钱），两席均未忍砍；L114 有实义（O(1) 定位的根）。建议全留、只随 §3.1 卸"同一"字面。<b>上作者</b>逐处裁</td></tr>
+  <tr><td>L95 段（aof-use-rdb-preamble 语义）</td>
+      <td>det 单票列低优先：全段是参数语义考据，与 L91 混合持久化段职能部分重叠</td>
+      <td>tech-editor 未列。参数语义是技术内容，若动走技术席＋crossref 席；文风层登记。<b>上作者</b>裁是否与 L91 合并</td></tr>
+  <tr><td>荒漠与账房口径差</td>
+      <td>荒漠：det 276 行／tech ~270 行（L11–L282 两个起算点）；账房：det ~45 笔／tech 代价 30 处起算</td>
+      <td>口径差异登记，非方向分歧。两席对"荒漠最长、账房最密"的定性一致</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L5 导读故事</b>（作者第一人称亲历，豁免契约；全书级范本）——「我第一次自己定义文件格式时犯过一个低级错误：在头部放了一个版本号字段，但没想清楚向前兼容怎么做。……那次改版折腾了整整一周的迁移脚本。」低级错误＋三个月后爆雷＋具体代价，两席共举全章人味锚点；L317 尾句的兑现全靠它。</li>
+  <li><b>L73</b>（tech-editor 气口样本）——「这对 Redis 没有损失：反正加载就是一次性把内存建起来，<b>没人会对 RDB 做点查。</b>」家常短句的母本（§3.4 排班对齐这句）。</li>
+  <li><b>L85</b>——「比如一百万次 INCR 同一个 key，真正有效的只有最后一次。」一句话把 AOF 膨胀问题钉死，重写机制的动机全在这句里。</li>
+  <li><b>L147</b>——「原地改页最大的风险是断电导致的半写（partial write）。……半写的页连"完整"这一关都没过，<b>redo log 救不了它。</b>」先立风险再收半句硬判断，双写缓冲存在的理由一段立住。</li>
+  <li><b>L170</b>——「这个设计省了一层结构：文件系统目录就相当于一层稀疏索引。」文件名即索引，一句话增量。</li>
+  <li><b>L317 尾句＋L336 章尾钩子</b>——「——本章开头那一周的迁移脚本，就是这一步没走完的代价。」（宣誓五连里唯一带故事回场的，§1.1 保原形的根据）／「AOF 的 rewrite buffer、redo log 的循环写、Kafka 的 retention 与 compaction，这些机制都通向第 9 章的数据同步：格式决定了什么能被增量同步、什么必须全量重建。」三件机制一钩，全书级收尾。</li>
+  <li><b>L271 定律本体＋反事实推演</b>——「贯穿三个软件的规律是：**存储格式反映访问模式**。……假设 Kafka 用页式格式，每条消息进来都要先按 16KB 页定位、再原地改那一页，顺序追加的带宽收益立刻没了……」用反例证明定律，是 8.5 全节最好的一段论证（加粗保留——这是定律首立处）。</li>
+  <li><b>L330 三问内容</b>——「第三问不画在图上，因为它不决定走哪条路：无论落到哪个终点框，格式都绕不开"五年后还能不能读"。」「不画在图上」的自指是好判断；起手语随 §4 模式 E 行过尺，内容一字不动。</li>
+  <li><b>L164</b>——「Kafka 的定位又反过来了。」三个定位起手里最短最活的一句，保留（§2.7 动的是 L108）。</li>
+  <li><b>8.6.1／8.6.3／8.6.5 三处变奏顺序</b>（K→M→R／M→K→R／R→K→InnoDB）——跟着论点换阵容的健康绕场样本，§3.3 预算的保留项与参照物。</li>
+  <li><b>表 8-1／表 8-2 内容、L126–132 编号列表先例、关键数字框的数字本体、术语黑体首现、图注编号</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准：好句子＝具体事实＋一句压得住的判断（L73/L85/L147/L170），或机制自己长出来的白话（「数据不动，指针换」）；怪句子＝<b>把讲过的论点再升格盖章（"同一思想"×23）、把四档枚举塞进顿号、把定义括号叠成栈</b>。tech-editor 的总尺：这章不用动骨架——8.1 的四个矛盾、8.5 的对比、8.6 的五条启示都是好骨架；要动的是装载方式：每个机制装多满、每笔记几次账、每个论点盖几次章。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch8 新增两测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>章节自模仿测试</b><br>（ch8 新增）</td><td>把相邻大节/小节的<b>骨架字段</b>抄下来并排：小节标题句式、首段起手、段落数、代价段位置、收尾句类型——字段完全一致＝节级克隆（本章标本：8.2/8.3/8.4 的"定位先行"三连＋机制段＋代价段＋盖章句）。句长统计抓不住它；修法＝留首节立模，后节至少换一个字段（起手或收尾）。</td></tr>
+  <tr><td><b>表三明治测试</b><br>（ch8 新增）</td><td>每张表前后各读一句：表前在"预告表格内容"、表后在"复述表格内容"＝表被夹成馅（本章标本：L203 预演表 8-1＋L221 复盘；L71 对图 8-2 同构）。处置：表前只留引入半句，表后只留表里没有的增量；表自己会说话。</td></tr>
+  <tr><td><b>宣誓测试</b><br>（沿用）</td><td>数"我＋动词＋先/第一"的起手句（本章五连：L283/L299/L309/L317/L321）。超过两个＝第一人称成了模板槽位。留带内容的（L317 有故事回场），其余起手变形。</td></tr>
+  <tr><td><b>复读测试</b><br>（沿用）</td><td>骨架件画线计数：定律三级播放（L231→L271→L334）、L9⇄L334 首尾复印、V0/V1/V2 四盖。≥3 次的只留"一立一收"。</td></tr>
+  <tr><td><b>账单测试</b><br>（沿用）</td><td>数"代价/取舍/换来"（本章 ~45 笔、每 7.5 行一笔，全书之最；L305 一段三结账）。取舍只剩这一种货币时，换成直陈后果（「同一份脏页要刷两次盘」）。</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。三口气以上无刹车＝三长无一短（本章 8.7 均句 76.0、8.4.6 的 653 字巨段为最）。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；本页已登记 det 席三处行号自纠（L9/L114/L273），0 处实质失配</li>
+  <li>以下属<b>技术内容</b>，动到即走技术席：L42–48 关键数字框（页开销 1%–2%、61/14/22/12/26/34 字节、2–6 倍压缩、1GB→300–500MB）、L62–66 RDB 版本谱系（v9–v12、`src/rdb.h` 口径）与变长档位、L75 listpack 取代 ziplist 与连锁更新、L79 `EXPIRE`→`PEXPIREAT`、L81 `redis-check-aof --fix`、L83 fsync 三档语义、L85–87 双缓冲与 7.0 替代、L91–95 `aof-use-rdb-preamble` 版本谱系与 Multi-Part 语义、L93 manifest 三类文件与 git 类比、L100 图 8-3 时序、L108–120 四层结构与 `innodb_page_size` 4K–64K、L124–132 页内七段、L139 槽 4–8 条与 next_record、L141–143 Dynamic 行格式（8126/20/40 字节、COMPACT 768 前缀）、L147–158 双写与 512B 对齐、8.0.30 `innodb_redo_log_capacity`、`innodb_doublewrite=OFF`、L164–177 三文件与 1GB/7 天切分、L181–189 V2 61 字节与 ProducerId/Epoch/Sequence、L195–199 条目 8/12 字节与 4KB 间隔、L203–221 Magic 机制、L225–236 Tiered Storage（3.9 GA、KIP-405、OFFSET_MOVED_TO_TIERED_STORAGE、`replica.lag.time.max.ms` 30 秒、表 4-2 回指）、L271–273 定律与 I/O 单元、L281、L289–291、L305–309、L313–317、L321–330 三问、表 8-2 全部行</li>
+  <li><b>交叉引用移改走 crossref 席</b>：L75（2.2.1 节）、L93（第 4 章）、L181（2.2.3 节表 2-1）、L189（表 4-2）、L199（8.3.3 节）、L229（第 5 章、第 9 章、表 4-2）、L307（8.3.4 节）、L313（8.1.2 节、第 2 章启示四）——手术改句时引用随动，同步核指向</li>
+  <li><b>不造经历</b>（ch6 立规沿用）：荒漠区若补"我"的颗粒须作者本人出；无真事则走 a 路线（括号旁注提正文，不新增材料）</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 327 句量化＋分节评分＋模式 A–F 六族：段落即记录/克隆复用/时序分号链/两列对照/自问自答/括号栈；tech-editor 签名病理 7 项＋绊脚点＋标杆 6 处＋节奏地图＋四步修法）；同轮参照：0908/第一至七章/、0908/第九章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

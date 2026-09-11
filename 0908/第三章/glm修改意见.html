@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第三章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  .keep{background:var(--panel);border:1px dashed var(--after-bd);border-radius:8px;
+    padding:10px 14px;font-size:14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  .quote{background:var(--panel);border-left:3px solid var(--after-bd);border-radius:0 8px 8px 0;
+    padding:8px 14px;font-size:14px;margin:8px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第三章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/03-lifecycle/chapter.md</code>（248 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／命令／作者判断锋芒不动。ch2 同轮确诊的模式在本章复发者标「ch2 同款」。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">句子大多没问题，问题在组装</span></h2>
+<p>几乎每个内容单元都是同一套模具压出来的：「黑体标签开头 → 播音员冒号 → 取舍胶囊 → 根因盖章收束」。读者说不出哪里怪，但读到第三个软件时会感到"我又在看一遍同样形状的东西"。节奏病与 ch2 完全同种（CV 0.66、单向方差、零短句地板），骨架病比 ch2 更重（盖章句族 8 处、黑体标签几乎每段）。现状 5/10，作者及格线 ≈2/10。</p>
+<div class="stats">
+  <div class="stat"><div class="n">1 句</div><div class="t">全章 262 句里真正的家常短句只有 1 句；≤10 字文句共 5 句，<b>5/5 全是格言凿子</b>（"完整优先于快"式的短，不是"没等它完成"式的短）</div></div>
+  <div class="stat"><div class="n">8 + 6 处</div><div class="t">根因盖章句（"都指向同一个事实/规律只有一条/纪律是同一套"）8 处；"本质"一词 6 处——什么现象都能用它收束</div></div>
+  <div class="stat"><div class="n">CV 0.66</div><div class="t">与 ch2（0.67）几乎相同，方差全靠 26 句 80+ 字巨句（最长 146 字）从长端撑起——等剂量复发</div></div>
+  <div class="stat"><div class="n">11 处</div><div class="t">三家绕场点名（导读一段连绕两场、3.5 三段连绕三场）；黑体标签几乎覆盖每个机制段首句</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">双票命中或证据确凿，方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L9 / L132 / L218</span><h3>收敛式盖章句（"这一切都指向同一个X"）</h3><span class="badge b2">双票 · 最重</span><span class="badge b1">ch2 同款·成簇</span></header>
+  <p class="why">每讲完一组具体东西，必补一句"这些全都指向同一个X"，用抽象名词把刚讲完的事实打包盖章。信息没增加，读者却被要求再点头一次——正常人聊天会直接停在上一个具体事实上。全章 8 次成条件反射。tech-editor 给的尺：<b>一句话删掉后读者少知道一个事实，它是正文；删掉后只少了一个"总结感"，它就是盖章</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L7 末＋L9 孤句段）</div>
+      <p>……对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。<span class="cut">差别的原因是这三个软件在启动和关闭时的处理设计差异很大：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群。</span></p>
+      <p><span class="cut">根源是它们各自保证的一致性边界不同。</span>（单句成段）</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。<span class="add">根源是三家保证的一致性边界不同。</span></p>
+      <p><span class="add">（L9 孤句段删除——"一致性边界"并进 L7 末句顶替空洞的"处理设计差异很大"；三栏复述不重复列，前文已逐一给过后果）</span></p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L132）</div>
+      <p><span class="cut">这些根因都指向同一个事实：关闭是事务、复制、后台任务的交汇点。</span> `SHOW PROCESSLIST` 在关闭期的输出，对着这四类根因看，就能定位卡点。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">（盖章句删——排障句自足，且"交汇点"是从前四条里换词复述）</span> `SHOW PROCESSLIST` 在关闭期的输出，对着这四类根因看，就能定位卡点。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L218，3.6 开场）</div>
+      <p><span class="cut">三个软件的启动与关闭各走各的流程，纪律是同一套。这五条启示，都从前文的流程取舍里来。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">五条启示，都从前文三家的流程取舍里来。</span>（首句"各走各的流程，纪律是同一套"是异中求同的收敛盖章＋自报 recap，删；次句压短保留预告功能）</p>
+    </div>
+  </div>
+  <p class="dir"><b>族内处置</b>：8 处收敛盖章保留 2–3 处真有分量的（如 L119"规律只有一条"——它定义了后文反复使用的原理，属术语定义型）；删 L9／L132／L218 式纯收束。同族 L80"本质区别所在"、L90"根本原因"见 1.2。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L13 / L15 / L80</span><h3>"本质"孪生段与族词降密</h3><span class="badge b2">双票</span></header>
+  <p class="why">"X 的本质是Y"在 3.1 开出孪生双段（启动／关闭各一），加上 L34／L80／L222／L230 全章 6 处——"本质"成了万能钥匙，密度一高就显得每句话都在上价值。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L13／L15 孪生）</div>
+      <p>**启动的本质是状态机重建。** 进程一旦重启……</p>
+      <p>**关闭的本质是状态机快照加上资源释放。** 关闭要面对两个问题……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>启动的本质是状态机重建。进程一旦重启……（首处保留定义、<span class="add">解除整句加粗</span>）</p>
+      <p><span class="add">关闭是反方向：把内存状态拍成快照落到磁盘，再把占用的资源干净地还回去。</span>关闭要面对两个问题……</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L80）</div>
+      <p>MySQL 的启动分四段：……<span class="cut">第二段最耗时，也是 MySQL 与 Redis 的本质区别所在。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>MySQL 的启动分四段：……<span class="add">第二段最耗时，MySQL 和 Redis 的差距就差在这一段。</span></p>
+    </div>
+  </div>
+  <p class="dir">孪生段只留一个用"本质"框形；L34"得先理解一个基本事实"见 1.4；L222"本质都是为了让系统启动后处于可预测状态"、L230 启示三标题见 1.3。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L232 / L214 / L230</span><h3>"快＝推迟"一稿三盖＋自报复读</h3><span class="badge b1">detector · 新型变体</span></header>
+  <p class="why">同一论点在 3.3（L119）盖一次、3.5（L214）再盖一次、3.6 又用启示标题＋首句盖第三次——而且第三次开口就说"前面反复出现的"，等于文字自己承认在复读。人类作者复读自己时会换个说法，不会自报复读。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L232，启示三首句）</div>
+      <p><span class="cut">前面反复出现的那些"快"选项，都是把某部分清理或迁移工作挪到别处：</span>留到下次启动、交给集群其他节点，或直接丢弃。我自己设计系统时，会先想清楚每个"快"背后被推迟的代价由谁承担。……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">三家的"快"各有各的名字，干的都是同一件事：把一部分工作挪到别处——</span>留到下次启动、交给集群其他节点，或直接丢弃。我自己设计系统时，会先想清楚每个"快"背后被推迟的代价由谁承担。……（后句作者声音原样保留）</p>
+    </div>
+  </div>
+  <p class="dir">L119 保留（定义型，启示三的原理出处）；L214"第三"段与启示三标题重复盖帽——L214 段随 3.5 论点页手术处理（见 2.1），启示三标题可保留（标题是路标不是复读）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L34 / L42 等</span><h3>播音员冒号（"得先理解一个基本事实："）</h3><span class="badge b1">detector · 强证据</span></header>
+  <p class="why">冒号前先站一个主持人（"这里有一个关键的取舍""规律只有一条""得先理解一个基本事实"），冒号后才给内容——每讲一个要点前都先举旗子。全章正文 50 行含冒号（20%），播音员式约 10 处，是 ch3 相对 ch2 的恶化点。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L34）</div>
+      <p><span class="cut">理解 Redis 的生命周期，得先理解一个基本事实：**Redis 的全部数据都在内存里。**</span> 一旦进程重启，所有键值对全部消失。……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">Redis 的全部数据都在内存里。</span>一旦进程重启，所有键值对全部消失。……（直接陈述：去主持人、去整句加粗——事实自己站得住）</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L42）</div>
+      <p><span class="cut">这里有一个关键的取舍：**核心基线结构在启动期就一次性预分配，不做懒加载。**</span> 启动段就把数据库数组、共享对象……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">核心基线结构在启动期就一次性预分配，不做懒加载。</span>启动段就把数据库数组、共享对象……</p>
+    </div>
+  </div>
+  <p class="dir">同族 L36"还必须考虑一个核心问题："、L82"取舍："、L228"做三件事……还要加第四件"——十处里留两三处真正需要预告的，其余直接开讲。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L19 / L107</span><h3>"更安全，但更长"跨节句式模具</h3><span class="badge b2">双票（完美平行）</span></header>
+  <p class="why">同一副句子骨架（"多X一步更安全，但Y更长"）在 3.1 一段内镜像两次、3.3 又原样出现——普通论述句的骨架被用了三遍，人类不会这么干。人列清单时会偏：一项带例子、一项特别长、一项顺嘴多说一句；机器的枚举是齐的。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L19，三对矛盾第一条）</div>
+      <p><span class="cut">启动时多恢复一步更安全，但用户等得更久。关闭时多刷一页更安全，但停服时间更长。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">启动时多恢复一步更安全，代价是用户等得更久。关闭时也一样：多刷一页，多停一秒。</span></p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L107）</div>
+      <p>三档之间要权衡的就是一致性和可用性：<span class="cut">多清理一步，关闭更安全，但停服时间更长。</span>表 3-1 把三档的取舍并排放出来。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>三档之间要权衡的还是一致性和可用性<span class="add">（具体怎么权衡，表里见）</span>。表 3-1 把三档的取舍并排放出来。</p>
+    </div>
+  </div>
+  <p class="dir">同病重灾：L236 三连"X 依赖 Y（否则 Z）"字数几乎相等、L212 三家"给出/给出/不给"三连——随 §2 手术处理。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L64 / L158</span><h3>织体预告句（"这个思路后文还会出现"）</h3><span class="badge b2">双票</span></header>
+  <p class="why">讲完一个设计，预告"这种思路后面还会以另一种形式出现"——把两个尚未讲的东西预先盖章为"同一个思想"，等于给读者开一张空头支票。三处同模（L64/L158/L212）。注：章级分工句（"详见第 4 章"）合法，此条针对的是<b>句式三连同模</b>。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L64 段末）</div>
+      <p>……一套代码就此同时服务两类用户。<span class="cut">这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……一套代码就此同时服务两类用户。<span class="add">（删——前句已是漂亮落地；MySQL 到了 3.3 自己会说，读者撞上"似曾相识"比被预告更有用）</span></p>
+    </div>
+  </div>
+  <p class="dir">三处留一处（建议留 L212 那处——它在对比节做钩子，位置正当），L158"第 5 章会……再次回到这个设计"可留但换掉"再次回到"的句式（→"第 5 章讲分层架构时还会碰到它"）。</p>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L210 – L214（3.5）</span><h3>"第N，论点。"加粗论点页三连——全章最差</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">表格之后三个解读段，每段"**第N，名词化论点。**"加粗开头＋三家各一句＋"反映了各自的定位/以不同形式呈现"式收口——三段形状完全一样，像幻灯片三条 takeaway。三段 11 句零短句，全在 18–40 字中段走廊。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L214）</div>
+      <p>**第三，"快"的代价在不同软件上以不同形式呈现。** Redis 的快来自内存优先，加上可以选择不落盘；MySQL 的快来自把清理挪出关键路径。Kafka 则不同，它的快来自日志结构本身：恢复时几乎没多少工作可做。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>三家的"快"来路不同。Redis 是内存优先，还可以选择不落盘；MySQL 是把清理挪出了关键路径；Kafka 最彻底——日志结构本身没多少恢复工作可做。</p>
+    </div>
+  </div>
+  <div class="cmp" style="margin-top:10px">
+    <div class="panel before"><div class="tag">改 前（L210）</div>
+      <p>**第一，复杂度排序与<span class="cut">"数据结构 + 一致性保证"</span>强相关。** 启动复杂度大致是 MySQL &gt; Kafka &gt; Redis……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>第一段的加粗"**第一，……**"标签可全部卸掉（表 3-2 已分栏，解读段用自然句起头即可）；<span class="add">"数据结构和一致性保证"</span>（正文句里不用"+"号速记打包）。</p>
+    </div>
+  </div>
+  <p class="dir">三段至多留一个"第一"式总起；三段句长拉开，各段至少一处短句落地。L212 段三家"给出/给出/不给"三连一并打破（保留"这道单机与分布式的分界，第 7 章会接着展开"的章级钩子）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L44（3.2 数据恢复段）</span><h3>146 字巨句：三重嵌套＋引号打包＋破折号</h3><span class="badge b2">双票</span></header>
+  <p class="why">一句吞下完整知识单元（3 个版本号、2 个文件名、1 条破折号解释链），读到"快很多"时主语已经掉了。是全章 26 句 80+ 字巨句的标本。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Redis 7.0 引入了多部分 AOF（Multi-Part AOF），AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件，所以"加载 AOF"其实是先按 RDB 二进制快速加载 base，再重放 incr 里的命令<span class="cut">——这种"RDB 打底、增量重放"的混合格式 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多</span>。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Redis 7.0 引入了多部分 AOF（Multi-Part AOF）：AOF 目录里的 base 文件默认是 RDB 格式，后面跟着记录增量写命令的 incr 文件。<span class="add">所以"加载 AOF"分两步：先按 RDB 二进制快速加载 base，再重放 incr 里的命令。</span><span class="add">这种"RDB 打底、增量重放"的混合格式 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多。</span></p>
+    </div>
+  </div>
+  <p class="dir">146 字 → 3 句，版本演进落成独立句。同族巨句：L185（141 字）、L173（143 字）、L151（107 字单句成段）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L7（导读第二段）</span><h3>一段两次三家绕场＋段末冒号镜像收尾</h3><span class="badge b2">双票</span></header>
+  <p class="why">2 句 62/104 字，CV 0.25，零短句；第二句"差别的原因是……：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群"与前句绕场内容重叠，又是段末长句＋冒号三栏镜像（双重倒挂）。与 1.1 的 L9 处置联动。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>同样是 `kill -9`，对 Redis 通常只是丢掉最近一小段时间的数据（丢多少取决于持久化配置，详见第 4 章），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。<span class="cut">差别的原因是这三个软件在启动和关闭时的处理设计差异很大：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>同样是 `kill -9`，对 Redis 通常只是丢掉最近一小段时间的数据（丢多少取决于持久化配置，详见第 4 章），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。<span class="add">根源是三家保证的一致性边界不同。</span></p>
+    </div>
+  </div>
+  <p class="dir">绕场从 11 处压到 4–5 处：3.5 对比节内的绕场是本职工况可留；导读、各节内部每节至多一场。L28、L34（"不像 MySQL……也不像 Kafka……"）、L151、L246 逐处核。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L162（3.4 关闭路径首段）</span><h3>双胞胎句长（49/48 字，CV 0.03）</h3><span class="badge b1">detector · 新型</span></header>
+  <p class="why">两句话的段落，两句字数几乎一样——同一个人用同一个步幅走了两步；再加上"区别在于'……'"引号判据公式，段落平走到底。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>Kafka 的关闭分两种路径，普通关闭和受控关闭，<span class="cut">区别在于"是否提前告知 Controller 自己要走"</span>。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>Kafka 的关闭分两种：普通关闭和受控关闭。<span class="add">差别就一点——走之前告不告诉 Controller。</span>JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
+    </div>
+  </div>
+  <p class="dir">同病：L66（22/23 字）、L187（98/107 字，内容豁免仅作节奏数据点）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L130 / L66 / L148-149</span><h3>清单尾部塌陷（前三项有机理，末项光杆）</h3><span class="badge b1">tech-editor · 单票</span></header>
+  <p class="why">清单前几项有完整展开，最后一两项突然缩成一行——为"凑够 N 类"而存在。读者对清单的期待是各项分量诚实，尾部断裂是"填表"和"列举"的区别。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L130，根因第 4 项）</div>
+      <p>4. <span class="cut">**全文检索（FTS）索引优化在跑。**</span>（前三项各有 1–2 句机理，此项零展开）</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>4. **全文检索（FTS）索引优化在跑**——<span class="add">［补一句机理：FTS 的后台优化为何拖住关闭。具体表述须技术席出，勿由改文笔补写］</span></p>
+    </div>
+  </div>
+  <p class="dir">Redis 关闭五步的第 4/5 步（L66 挤一行）、八阶段第 7/8 项（L148-149）同理：要么补一句实料，要么用一句"例行公事"式的收束大方承认它轻（如 L66 末尾加"到这一步，关闭流程走完"）——不要让清单在尾巴上露出敷衍。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">3.2 启动四阶段</span><h3>节拍器式等重四段（收口位置全同）</h3><span class="badge b2">双票</span></header>
+  <p class="why">四段每段"黑体标签＋机理 2–3 句＋一个取舍/代价收口"，连收口位置都一样——四段等重如切糕。对照 3.3 的 InnoDB 三步（第 3 步爆出 3 段正文＋图，打破"一项一段"匀速）是全章清单用得最好的样板。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L42 收口句，四段同位）</div>
+      <p>……<span class="cut">代价是启动即占用基线内存，换来的是运行期内存行为的确定性：</span>核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……<span class="add">启动于是多占一块基线内存，买回来的是运行期的确定：</span>核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
+    </div>
+  </div>
+  <p class="dir">四段里挑一到两段换收口形状（"代价是/换来"胶囊 → 事实陈述），并打破等重——有一段多给两句、有一段四句收完。3.2 节首 L32"以'快'著称，但快的背后是一组很硬的设计取舍"是空泛定位句（对照 3.3/3.4 节首直接给实质），一并重写。</p>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">节奏层与起手形状，铺开做</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>家常短句地板（ch3 特有的核心问题）</h3><span class="badge b2">双票</span></header>
+  <p class="why">全章 ≤10 字的文句只有 5 句，<b>5/5 全是格言凿子</b>（"完整优先于快""关闭是一个集群事件"）——短句槽位被格言 100% 占据，不是"短句少"，是"只有一种短法"。对照新基准段的短是家常的短（"读是快了""没有捷径"），ch3 该补的是"没等它完成"式的短：机制讲完，随手一记，不雕刻。</p>
+  <p class="dir">每个机制段落一记家常短句；段末最长句收尾（9 处：L15/44/51/70/76/99/143/222/240）优先倒过来——长句铺完，短句落地。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>黑体标签降密＋"N 件事"引入句减肥</h3><span class="badge b2">双票</span></header>
+  <p class="why">几乎每个机制段首句都是加粗标签（3.2 四段五步 9 个、3.3 四段加三步加四根因、3.4 八阶段、3.1 孪生"本质是"）——翻页如翻台账。清单引入句也全同形："这一段做四件事：""分四段：""常见根因有几类：""拆成八个阶段""做三件事："——"N 件事："模板 10 处以上。</p>
+  <p class="dir"><b>不去黑体</b>（术语锚点与步骤编号是排版契约），做三件事：孪生段改其一（见 1.2）；一部分段落让场景/问题先行、标签落在段中首次定义处；"N 件事"引入句十处留三四错开句式（"启动要走四段""排障时常见的卡点有这么几类"）。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>三家绕场严重度</b><br><span class="badge bd">两席分歧</span></td>
+      <td>detector 判"高"（全章 11 处点名，导读一段连绕两场）；tech-editor 判"轻"（约 5 处节内绕场，读者中段已能背出轮到谁）</td>
+      <td>密度两席一致，严重度分歧。处置建议采中道：3.5 对比节内绕场正当保留，其余压到每节至多一场（导读／L28／L34／L151／L246 逐处核）。<b>作者裁力度</b></td></tr>
+  <tr><td>播音员冒号</td><td>~10 处（L34/36/42/82/107/119/132/228/236）</td><td>detector 单票（tech-editor 未单列）。冒号行占全章 20%，证据硬，已列 §1.4 建议直接改</td></tr>
+  <tr><td>双胞胎句长／段末最长句收尾</td><td>L66/L162/L187；9 个多句段以最长句收尾</td><td>detector 新型量化发现，tech-editor 以"匀速段落"印象印证但未点名。随 §3 家常短句手术顺带解决</td></tr>
+  <tr><td>图三件套</td><td>6 图中 5 图同款引句（L23/44/57/90/166），仅图 3-5 前没有反而自然</td><td>tech-editor 判"轻、模具可接受，引句句式可错开"。ch2 同款已列整改，ch3 随全书统一处置</td></tr>
+  <tr><td>破立句族（"看似只是…实际上／而非"）</td><td>L5/L240/L191 共 3 处</td><td>detector 自记"低密度不升级"（L191 内容锋芒强）。登记在案，本轮不动</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L5 导读开局</b>："凌晨三点发版，你敲下 `kill -9` 想快速重启服务。我在真实项目里这么干过，第二天发现丢了数据。"——全书校准级的开头，短句在场、第一人称、直接。</li>
+  <li><b>L95 redo/undo 段</b>："一进一退之后，缓冲池里的数据页状态正好停在事务一致点上。MySQL 启动慢，但启动后的状态可信。"——全章唯一有真正节奏落点的机制段：段尾短句是朴素判断而非格言。</li>
+  <li><b>L242 事故复盘段</b>（含作者裁定的后向呼应"开头说的那次事故就是这样"）："Redis 本来是会落盘的，问题出在我没给它落盘的时间。"——全章最好的一句，自责落在具体事实上，不落在情绪上。</li>
+  <li><b>L62 决策句</b>："如果有，直接杀掉，不等它完成——优雅关闭把缩短关闭耗时排在抢救半成品快照前面。"／<b>L97</b>"大事务不许长时间运行，再急也要拆小"（从机理直接长出的私人规矩）／<b>L82</b> 排障实战句／<b>L99</b>／<b>L164</b>"才发现它没了"五个字顶一段／<b>L191</b> 第一人称观察。</li>
+  <li><b>清单编号、术语黑体（步骤名）、表 3-1/3-2、章级分工句（"详见第 4 章"类）</b>——排版与结构契约。</li>
+</ul>
+<p class="why">好句子的共同点：给的是<b>具体事实或具体后果</b>（丢了十几条订单、恢复被打断重来、才发现它没了）；怪句子的共同点：给<b>抽象名词的盖章</b>（一致性边界、交汇点、范式、纪律）。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch3 新增两测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>盖章测试</b></td><td>搜"本质/根源/都指向/规律只有一条/同一个事实/纪律是同一套"——每处问：删掉它，读者少知道一个<b>事实</b>，还是只少了一个"总结感"？后者就是盖章。</td></tr>
+  <tr><td><b>家常短句测试</b><br>（ch3 新增）</td><td>把全章短句（≤10 字）挑出来数：如果全是格言（"完整优先于快"），没有一句随口的短（"没等它完成"），短句槽位就被凿子垄断了。</td></tr>
+  <tr><td><b>清单尾部测试</b><br>（ch3 新增）</td><td>看每个编号清单的最后一项：它和前几项的分量诚实吗？光杆一行的，要么补一句机理，要么大方承认它轻。</td></tr>
+  <tr><td><b>同模起手测试</b></td><td>把各节首句、各段首句并排扫一遍：多少个是"黑体标签＋冒号"开头？多少个清单用"N 件事："引入？同一形状超过三连，模具外露。</td></tr>
+  <tr><td><b>刹车测试</b></td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车，就是"三长无一短"。</td></tr>
+  <tr><td><b>复读测试</b></td><td>同一个论点在本章出现了几次？第三次开口就说"前面反复出现的"，等于文字自报复读——换说法，或者删。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方（如 L130 的 FTS 机理须技术席补，改文笔不得代写）</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；L130 补写的机理属<b>新增技术内容</b>，走技术席而非文风席</li>
+  <li>语义类改动改后验证必须重读合并进来的存量句，不能只查接缝（2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录；ch2 同轮参照：qa_reports/20260908-ch2语言组织层两席诊断.md 与 0908/第二章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

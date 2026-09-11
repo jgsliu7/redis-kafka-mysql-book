@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="第三章独立语言组织修改意见：6项推荐、4项可选、3组待核，原文与完整改稿对照。">
+<title>第三章语言组织修改意见 · GPT 独立审读</title>
+<style>
+:root{color-scheme:light;--paper:#f5f5f1;--surface:#fff;--ink:#26313b;--muted:#64717c;--line:#dce2e6;--blue:#315e80;--red-bg:#f9e9e5;--red-text:#8e4940;--green-bg:#e7f1e8;--green-text:#356347}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}main{max-width:1240px;margin:auto;padding:54px 36px 64px}header{max-width:960px;margin-bottom:30px}.eyebrow{margin:0 0 12px;color:var(--blue);font-size:13px;font-weight:650;letter-spacing:.08em}h1{margin:0 0 18px;font-size:clamp(28px,3vw,38px);font-weight:650;line-height:1.3;letter-spacing:-.03em}.scope{color:var(--muted);font-size:14px;line-height:1.9;margin:0 0 20px}.intro{font-size:16px;line-height:1.9;margin:12px 0}.intro strong{font-weight:650}.legend{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;font-size:13px;color:var(--muted);margin:24px 0 0}.legend span{display:inline-flex;gap:8px;align-items:center}.legend del,.legend ins{font-size:13px;padding:2px 8px}del{background:var(--red-bg);color:var(--red-text);text-decoration-color:#bc8178;text-decoration-thickness:1px;text-underline-offset:3px}ins{background:var(--green-bg);color:var(--green-text);text-decoration:underline;text-decoration-color:#8aaf94;text-decoration-thickness:1px;text-underline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 32px}nav a{border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--blue);text-decoration:none;background:#fafbf9}nav a:hover,nav a:focus-visible{background:#eaf0f5;border-color:#b5c7d4;outline-offset:4px}.case{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:0 0 28px;overflow:hidden;scroll-margin-top:20px}.case-kicker{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--muted);background:#fafbf9}.case-kicker b{color:var(--blue);font-weight:650}.compare{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.version{padding:22px 26px 26px;min-width:0}.version+ .version{border-left:1px solid var(--line)}.version-label{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.06em;font-weight:650;color:var(--muted);margin:0 0 16px}.dot{width:6px;height:6px;border-radius:50%;background:#bd8c82}.after .dot{background:#83a68c}.diff-text{margin:0;font-size:20px;line-height:1.95;overflow-wrap:anywhere;line-break:strict}.notes{border-top:1px solid var(--line);padding:23px 26px 25px;background:#fcfcfa}.notes h2{margin:0 0 10px;font-size:19px;font-weight:650;line-height:1.65}.location{font-size:13px;color:var(--muted);line-height:1.85;margin:0 0 14px}.source-ref{color:var(--blue)}.notes p:not(.location){font-size:15px;line-height:1.95;margin:9px 0}.question{border-left:3px solid #9db4c4;padding:8px 14px;margin:17px 0 0;background:#eff3f6;font-size:15px;line-height:1.85;color:#344f63}.question strong{font-weight:550}.reference{margin-top:40px}.reference h2{font-size:23px;font-weight:650;line-height:1.55;margin:0 0 12px}.good-example{margin:20px 0;padding:22px 26px;background:#edf2ee;border-left:3px solid #94ab98;font-size:22px;line-height:1.85}.reference p{font-size:16px;line-height:1.95;margin:12px 0}.table-wrap{overflow-x:auto;margin:22px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{text-align:left;vertical-align:top;padding:17px 18px;line-height:1.85;font-size:15px;overflow-wrap:anywhere}th{background:#edf1f3;font-weight:600;color:#40596c}th:first-child,td:first-child{width:12%;font-weight:600}th:nth-child(2),td:nth-child(2){width:49%}tbody tr+tr{border-top:1px solid var(--line)}footer{margin-top:38px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;line-height:1.9;color:var(--muted)}
+@media(max-width:720px){main{padding:30px 18px 42px}header{margin-bottom:24px}.intro{font-size:15px}.compare{grid-template-columns:1fr}.version{padding:20px}.version+ .version{border-left:0;border-top:1px solid var(--line)}.diff-text{font-size:18px;line-height:1.95}.case-kicker{padding:13px 20px}.notes{padding:20px}.notes h2{font-size:18px}.notes p:not(.location){font-size:14px}.question{font-size:14px;padding:8px 12px}.reference h2{font-size:21px}.good-example{font-size:20px;padding:18px 20px}nav{gap:8px}nav a{font-size:12px;padding:7px 10px}th,td{font-size:13px;padding:12px 10px}th:first-child,td:first-child{width:16%}th:nth-child(2),td:nth-child(2){width:45%}.reference p{font-size:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4;margin:14mm}html{scroll-behavior:auto}body{background:#fff;color:#111}main{max-width:none;padding:0}header{max-width:none}h1{font-size:25pt}.scope{font-size:9pt}.intro{font-size:10pt}nav{display:none}.legend{margin:12px 0 20px}.case{border-radius:0;margin:0 0 18px;break-inside:avoid}.case-kicker{font-size:9pt;padding:9px 12px}.compare{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.version{padding:13px}.version+ .version{border-left:1px solid #ccc;border-top:0}.version-label{font-size:8pt;margin-bottom:8px}.diff-text{font-size:11pt;line-height:1.85}.notes{padding:12px 14px}.notes h2{font-size:12pt}.location{font-size:8pt}.notes p:not(.location),.question{font-size:9pt;line-height:1.75}.question{padding:5px 9px;margin-top:8px}.reference{margin-top:24px;break-inside:avoid}.reference h2{font-size:14pt}.reference p{font-size:10pt}.good-example{font-size:13pt;padding:12px 15px}.table-wrap{overflow:visible}th,td{font-size:9pt;padding:10px;line-height:1.75}del,ins,.question,th,.good-example{-webkit-print-color-adjust:exact;print-color-adjust:exact}footer{font-size:8pt}}
+
+main{max-width:1460px}.diff-text{font-size:18px;line-height:1.95;white-space:pre-wrap}.group-title{font-size:25px;line-height:1.5;margin:38px 0 18px}.group-intro{font-size:15px;line-height:1.9;color:var(--muted)}.optional .case-kicker{background:#f7f3e9}.notes h3{margin:0 0 10px;font-size:19px;line-height:1.65}.notes ul{padding-left:1.3em;font-size:15px;line-height:1.9}.notes li{margin:6px 0}.technical-note{border-left:3px solid #b7aa82;background:#f7f4eb;padding:8px 13px}.evidence{margin:14px 0;padding:15px 18px;background:#f5f6f3;border-left:3px solid #c4cbc8;white-space:pre-wrap;font-size:16px;line-height:1.9;overflow-wrap:anywhere}.pending .case-kicker{background:#f7f3e9}.pending .notes{border-top:0}.baseline{overflow-wrap:anywhere}.good-example{font-size:20px}@media(max-width:720px){.diff-text{font-size:17px}.group-title{font-size:22px}.notes h3{font-size:18px}.evidence{font-size:15px}}@media print{.diff-text{font-size:10pt}.group-title{font-size:15pt;break-after:avoid}.case{break-inside:auto}.notes{break-inside:avoid}.notes h3{font-size:12pt}.notes li,.evidence{font-size:9pt}.good-example{font-size:11pt}}</style></head><body><main>
+<header><p class="eyebrow">2026-09-08 · 第三章 · GPT 独立审读</p><h1>第三章语言组织修改意见</h1>
+<p class="intro">本次按成分、搭配、信息顺序和逻辑关系通读第三章，整理出 <strong>6 项推荐、4 项可选、3 组待核</strong>，另保留两个正常表达作对照。建议尚未应用到正文。</p>
+<p class="intro"><strong>本报告形成前未读取其他工具第三章意见。</strong>候选由独立视角审读后交叉核验，原文均逐字核对当前正式稿。</p>
+<p class="scope baseline">章节基线：/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md<br>248 行 · SHA256：f74da719d3e90ee9c2b14b437a0674f1a4d59166914b2f25afac27eb6d9be42b</p>
+<p class="scope">“保留信息”表示改稿没有丢失所引范围的内容，不等于所在段所有技术断言已重新验证。局部句子对照均明确标出范围；待核项只列证据，不提供未经核实的替换稿。</p>
+<div class="legend" aria-label="文字变更图例"><span><del>原文删改</del> 原文中将被修改的文字</span><span><ins>建议新增</ins> 建议稿新增或调整的文字</span><span>文字移动与分段另有说明。</span></div></header>
+<nav aria-label="内容导航"><a href="#recommended">推荐 · 6 项</a><a href="#optional">可选 · 4 项</a><a href="#pending">待核 · 3 组</a><a href="#good">保留的好例</a></nav>
+<h2 class="group-title" id="recommended">推荐修改 · 6 项</h2>
+<article class="case" id="R1" aria-labelledby="title-R1"><div class="case-kicker"><b>推荐 R1 · 把清理工作与数据丢失分开表述</b><span>第 15 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">没做完这两件事就退出，<del>这些</del>清理工作<del>要么</del>留给下次启动补做，要么<del>变</del>成永久丢失。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">没做完这两件事就退出，<ins>要么把</ins>清理工作留给下次启动补做，要么<ins>造</ins>成<ins>数据</ins>永久丢失。</p></div></div>
+<div class="notes"><h3 id="title-R1">R1 · 把清理工作与数据丢失分开表述</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:15">第三章第 15 行</span></p>
+<p><strong>为什么调整：</strong>原句让“清理工作”同时承担“留待补做”和“变成永久丢失”两种结果。后半句实际在说数据丢失，主语与结果接不上。</p><p><strong>范围：</strong>只对照这一完整句；同段其余内容不在替换范围。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留退出前未完成工作的条件。</li>
+<li>保留留待下次启动清理与数据永久丢失两类后果，以及原有“要么……要么……”关系。</li>
+</ul>
+</div></article>
+<article class="case" id="R2" aria-labelledby="title-R2"><div class="case-kicker"><b>推荐 R2 · 区分 AOF 与 RDB 两步，并修正漏误字</b><span>第 64 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">第二步刷 AOF 缓冲，把内存里尚未落盘的追加命令刷（flush）出去并 fsync 到磁盘（如果开了 AOF）。第三步<del>刷盘与</del>否由用户决定。 SHUTDOWN SAVE 会触发一次阻塞式 SAVE 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；SHUTDOWN NOSAVE 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。NOSAVE 跳过的只是 RDB 写盘；AOF 已开启的话，第二步已经把 AOF 缓冲区刷出了。这个设计不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定——一套代码就<del>此</del>同时服务两类用户。这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">第二步刷 AOF 缓冲，把内存里尚未落盘的追加命令刷（flush）出去并 fsync 到磁盘（如果开了 AOF）。<ins>
+
+</ins>第三步<ins>是</ins>否<ins>写入 RDB </ins>由用户决定。 SHUTDOWN SAVE 会触发一次阻塞式 SAVE 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；SHUTDOWN NOSAVE 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。NOSAVE 跳过的只是 RDB 写盘；AOF 已开启的话，第二步已经把 AOF 缓冲区刷出了。这个设计不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定——一套代码就<ins>能</ins>同时服务两类用户。这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</p></div></div>
+<div class="notes"><h3 id="title-R2">R2 · 区分 AOF 与 RDB 两步，并修正漏误字</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:64">第三章第 64 行</span></p>
+<p><strong>为什么调整：</strong>第二步已经刷 AOF，第三步却仍笼统写“刷盘与否”，读者需要读到后面的 SAVE/NOSAVE 才确认对象是 RDB。两步连在同段，边界也不醒目；“就此同时”另有漏误字。</p><p><strong>范围：</strong>完整原段改为两段；合并对象补全、分段和一处文字修正。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>顺序说明：</strong>在第二步结束处分段，第三步明确为是否写入 RDB；没有删除存量句。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留 AOF 开启条件、flush 与 fsync。</li>
+<li>保留 SHUTDOWN SAVE、阻塞式 SAVE、主进程写 RDB、不 fork，以及 SHUTDOWN NOSAVE 仅跳过 RDB 的说明。</li>
+<li>保留缓存/主存场景、秒级退出原断言、AOF 第二步已刷出及后文 MySQL 的呼应。</li>
+</ul>
+<p class="technical-note"><strong>技术边界：</strong>RDB 对象直接来自本段已有 SAVE/NOSAVE 解释。本轮不重新验证秒级退出等性能断言。</p>
+</div></article>
+<article class="case" id="R3" aria-labelledby="title-R3"><div class="case-kicker"><b>推荐 R3 · 给两个版本行为分别补出主体</b><span>第 153 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——<del>对新集群</del>自 3.3 起生产可用，4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——<ins>KRaft </ins>自 3.3 起<ins>对新集群达到</ins>生产可用<ins>状态</ins>，<ins>Kafka 自 </ins>4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。</p></div></div>
+<div class="notes"><h3 id="title-R3">R3 · 给两个版本行为分别补出主体</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:153">第三章第 153 行</span></p>
+<p><strong>为什么调整：</strong>破折号后的两个分句都没有明说主体，容易把“生产可用”和“移除 ZooKeeper”都接到 KRaft 上。分别说清 KRaft 与 Kafka，关系更完整。</p><p><strong>范围：</strong>完整原段对照；只补全版本分句的主体和谓语。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留 3.3、4.0 及“对新集群”的限定。</li>
+<li>保留 ZooKeeper、KRaft 与第 7 章 7.4.4 的原引用。</li>
+</ul>
+<p class="technical-note"><strong>技术边界：</strong>这里只整理句子主体；原段“正处在换代中”等时态和版本事实没有在本轮重新核验。</p>
+</div></article>
+<article class="case" id="R4" aria-labelledby="title-R4"><div class="case-kicker"><b>推荐 R4 · 补明任务对象，连续说明响应返回路径</b><span>第 158 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">三层网络的设计意图是把 I/O 密集（收发包）和 CPU 密集（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 num.network.threads）解析协议帧，把请求放入共享的请求队列。Handler 线程池（num.io.threads 控制，默认 8）从请求队列里取请求执行真正的业务（读写日志、副本同步），把响应放回所属 Processor 的响应队列<del>——每个</del> Processor <del>一个——再由它</del>发回客户端。这种&quot;多队列、多线程池&quot;的分层让收发和处理解耦。处理慢不会阻塞收发，收发慢也不会饿死处理线程。第 5 章会从分层架构的角度再次回到这个设计。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">三层网络的设计意图是把 I/O 密集<ins>型任务</ins>（收发包）和 CPU 密集<ins>型任务</ins>（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 num.network.threads）解析协议帧，把请求放入共享的请求队列。<ins>每个 Processor 都有自己的响应队列。</ins>Handler 线程池（num.io.threads 控制，默认 8）从请求队列里取<ins>出</ins>请求<ins>，</ins>执行真正的业务（读写日志、副本同步），<ins>再</ins>把响应放回所属 Processor 的响应队列<ins>，由该</ins> Processor 发回客户端。这种&quot;多队列、多线程池&quot;的分层让收发和处理解耦。处理慢不会阻塞收发，收发慢也不会饿死处理线程。第 5 章会从分层架构的角度再次回到这个设计。</p></div></div>
+<div class="notes"><h3 id="title-R4">R4 · 补明任务对象，连续说明响应返回路径</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:158">第三章第 158 行</span></p>
+<p><strong>为什么调整：</strong>开头省略了分到线程池的对象“任务”；后面的队列数量插语打断“放回响应—发回客户端”的路径，“它”又需要回找。</p><p><strong>范围：</strong>完整原段对照；合并任务对象补全和响应队列说明换序。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>顺序说明：</strong>先说明响应队列按 Processor 分属，再连续说明 Handler 执行业务、放回响应、Processor 发回客户端。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留 Acceptor 1 个、Processor 默认 3 个、Handler 默认 8 个及 num.network.threads、num.io.threads。</li>
+<li>保留共享请求队列、每个 Processor 独立响应队列与所属 Processor 的归属。</li>
+<li>保留读写日志、副本同步、解耦结论与第 5 章引用。</li>
+</ul>
+<p class="technical-note"><strong>技术边界：</strong>原有工作负载分类与“不会阻塞”等断言保留，本轮只核对改稿没有改变这些内容，未作技术新背书。</p>
+</div></article>
+<article class="case" id="R5" aria-labelledby="title-R5"><div class="case-kicker"><b>推荐 R5 · 先说普通关闭的进入条件，再列步骤</b><span>第 164 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before"><del>普通关闭（</del>受控关闭被禁用<del>——</del>即 controlled.shutdown.enable=false<del>——</del>或<del>受控关闭</del>失败时<del>）的</del>步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → 强制刷盘所有日志 → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它不主动告知 Controller 自己要走。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">受控关闭被禁用<ins>（</ins>即 controlled.shutdown.enable=false<ins>）</ins>或<ins>执行</ins>失败时<ins>，Broker 会执行普通关闭。</ins>步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → 强制刷盘所有日志 → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它不主动告知 Controller 自己要走。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。</p></div></div>
+<div class="notes"><h3 id="title-R5">R5 · 先说普通关闭的进入条件，再列步骤</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:164">第三章第 164 行</span></p>
+<p><strong>为什么调整：</strong>原句把两个条件放入括号，又在括号内部用破折号插入配置，读者要跨过两层说明才能接回“步骤是”。</p><p><strong>范围：</strong>完整原段对照；只改首部条件的组织方式。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>顺序说明：</strong>把两个进入条件移到句首，配置仍紧跟禁用条件；步骤另起完整句。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留受控关闭被禁用或执行失败两种进入条件。</li>
+<li>保留 controlled.shutdown.enable=false 与后续全部关闭步骤、步骤顺序和强制刷盘。</li>
+<li>保留不主动通知 Controller、心跳/会话超时发现退出、重新选主及客户端抖动。</li>
+</ul>
+</div></article>
+<article class="case" id="R6" aria-labelledby="title-R6"><div class="case-kicker"><b>推荐 R6 · 把应保证的性质和应完成的动作分别说清</b><span>第 246 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">优雅关闭宁可多花时间，也要<del>把</del>确定性<del>和</del>交接<del>留够</del>。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">优雅关闭宁可多花时间，也要<ins>保证</ins>确定性<ins>、完成职责</ins>交接。</p></div></div>
+<div class="notes"><h3 id="title-R6">R6 · 把应保证的性质和应完成的动作分别说清</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:246">第三章第 246 行</span></p>
+<p><strong>为什么调整：</strong>“留够”通常搭配时间或空间，不能直接同时支配“确定性”和“交接”。原句把两种要求压在一个动词后面。</p><p><strong>范围：</strong>仅本段最后一句的局部语言建议；前一句复杂度排序仍待核。</p><p><strong>诊断判断：</strong>认可上述具体卡顿诊断。<strong>改法判断：</strong>推荐采用本组完整改文。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留宁可多花时间的作者判断。</li>
+<li>保留确定性与职责交接两项要求。</li>
+<li>不改同段前一句，不把复杂度排序视为已经通过。</li>
+</ul>
+<p class="technical-note"><strong>技术边界：</strong>局部句子建议，所在段的复杂度排序尚未通过核验。前句与第 210 行的关系见下方 T3；本组不提供整段替换稿。</p>
+</div></article>
+<h2 class="group-title" id="optional">可选整理 · 4 项</h2><p class="group-intro">这些原句可以成立；分段、补明对象或精简布局说明，主要用于降低阅读负担，依作者偏好取舍。</p>
+<article class="case optional" id="O1" aria-labelledby="title-O1"><div class="case-kicker"><b>可选 O1 · 在初始化动作与预分配取舍之间分段</b><span>第 42 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">第二段：基础设施就位。 这一段做四件事：注册信号处理器、创建事件循环、分配数据库数组、打开监听端口。信号处理器里，SIGTERM/SIGINT 触发优雅关闭，SIGPIPE 则忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收。这里有一个关键的取舍：核心基线结构在启动期就一次性预分配，不做懒加载。启动段就把数据库数组、共享对象（shared objects，例如预创建 0–9999 这 10000 个整数对象供复用）等基线结构分配到位，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">第二段：基础设施就位。 这一段做四件事：注册信号处理器、创建事件循环、分配数据库数组、打开监听端口。信号处理器里，SIGTERM/SIGINT 触发优雅关闭，SIGPIPE 则忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收。<ins>
+
+</ins>这里有一个关键的取舍：核心基线结构在启动期就一次性预分配，不做懒加载。启动段就把数据库数组、共享对象（shared objects，例如预创建 0–9999 这 10000 个整数对象供复用）等基线结构分配到位，留到运行期第一次用到时直接取用。代价是启动即占用基线内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p></div></div>
+<div class="notes"><h3 id="title-O1">O1 · 在初始化动作与预分配取舍之间分段</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:42">第三章第 42 行</span></p>
+<p><strong>为什么调整：</strong>原段先讲初始化动作与信号处理，再讲预分配的取舍。内容可以连读，分段则能更清楚地显示话题转入设计选择。</p><p><strong>范围：</strong>可选；完整原段仅增加一个段落边界，文字不删改。</p><p><strong>诊断判断：</strong>原文可成立，存在可选的阅读改善空间。<strong>改法判断：</strong>可选采用本组完整改文。</p>
+<p><strong>顺序说明：</strong>只在“这里有一个关键的取舍”之前分段，原文全部保留。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留四件初始化工作及 SIGTERM/SIGINT、SIGPIPE 的区别。</li>
+<li>保留 serverCron、waitpid(WNOHANG)、共享对象、0–9999 与 10000 个整数对象。</li>
+<li>保留预分配与懒加载的取舍、内存代价和原有确定性说明。</li>
+</ul>
+</div></article>
+<article class="case optional" id="O2" aria-labelledby="title-O2"><div class="case-kicker"><b>可选 O2 · 明确接收信号的是进程</b><span>第 55 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">关闭有两种触发方式：客户端发 SHUTDOWN 命令<del>、</del>收到 SIGTERM/SIGINT 信号（systemd stop、容器编排的滚动重启最终都落到这条信号路径上）。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">关闭有两种触发方式：客户端发 SHUTDOWN 命令<ins>，或进程</ins>收到 SIGTERM/SIGINT 信号（systemd stop、容器编排的滚动重启最终都落到这条信号路径上）。</p></div></div>
+<div class="notes"><h3 id="title-O2">O2 · 明确接收信号的是进程</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:55">第三章第 55 行</span></p>
+<p><strong>为什么调整：</strong>在“两种触发方式”的框架内，原句可以理解为自然省略；但“收到”也容易顺接到前面的客户端。补出进程可减少回指负担。</p><p><strong>范围：</strong>可选；只对照首个完整句，后续副本等待条件不在替换范围。</p><p><strong>诊断判断：</strong>原文可成立，存在可选的阅读改善空间。<strong>改法判断：</strong>可选采用本组完整改文。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留 SHUTDOWN 命令和 SIGTERM/SIGINT 两条触发路径。</li>
+<li>保留 systemd stop 与容器滚动重启的信号路径说明。</li>
+<li>同段 7.0、shutdown-timeout 默认 10 秒、落后副本与 SHUTDOWN NOW 等内容不动。</li>
+</ul>
+</div></article>
+<article class="case optional" id="O3" aria-labelledby="title-O3"><div class="case-kicker"><b>可选 O3 · 先完成职责迁移动作，再解释两种模式</b><span>第 166 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">受控关闭（Controlled Shutdown）让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，提前把该 Broker 上的 Leader 角色迁移到 ISR（同步副本集合）里还活着的其他副本上。<del>它</del>把新的 Leader 任免传达给这些副本<del>——</del>ZK 模式下向副本发 LeaderAndIsr 请求<del>，</del>KRaft 模式下写进元数据日志由各 Broker 应用<del>——让它们接任 Leader</del>。等所有 Leader 都迁移完，Controller 回复&quot;你可以走了&quot;，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">受控关闭（Controlled Shutdown）让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，提前把该 Broker 上的 Leader 角色迁移到 ISR（同步副本集合）里还活着的其他副本上。<ins>Controller </ins>把新的 Leader 任免传达给这些副本<ins>，让它们接任 Leader。</ins>ZK 模式下向副本发 LeaderAndIsr 请求<ins>；</ins>KRaft 模式下写进元数据日志<ins>，</ins>由各 Broker 应用。等所有 Leader 都迁移完，Controller 回复&quot;你可以走了&quot;，Broker 才走完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。</p></div></div>
+<div class="notes"><h3 id="title-O3">O3 · 先完成职责迁移动作，再解释两种模式</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:166">第三章第 166 行</span></p>
+<p><strong>为什么调整：</strong>原句的“传达—接任”被 ZK 与 KRaft 两种实现说明隔开。移出插语可以让主动作更连贯，原句本身仍能理解。</p><p><strong>范围：</strong>可选；完整原段对照，仅重排其中一处说明。</p><p><strong>诊断判断：</strong>原文可成立，存在可选的阅读改善空间。<strong>改法判断：</strong>可选采用本组完整改文。</p>
+<p><strong>顺序说明：</strong>先说 Controller 传达任免、让副本接任，再展开 ZK/KRaft 两种传达方式；全部实现说明保留。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留退出前请求 Controller、ISR 中其他副本与 Leader 迁移。</li>
+<li>保留 ZK 的 LeaderAndIsr 请求和 KRaft 元数据日志由各 Broker 应用的区别。</li>
+<li>保留迁移全部完成、Controller 回复后才刷盘退出的顺序，以及图 3-6。</li>
+</ul>
+</div></article>
+<article class="case optional" id="O4" aria-labelledby="title-O4"><div class="case-kicker"><b>可选 O4 · 精简表前的固定列序说明</b><span>第 197 行</span></div>
+<div class="compare"><div class="version before"><p class="version-label"><span class="dot" aria-hidden="true"></span>原文</p>
+<p class="diff-text" data-side="before">表 3-2 按六个维度<del>并排</del>对比<del>三家</del>的启动与关闭做法<del>，三栏顺序固定为 Redis | MySQL | Kafka</del>。</p></div><div class="version after"><p class="version-label"><span class="dot" aria-hidden="true"></span>建议改文 · 与左侧等范围</p>
+<p class="diff-text" data-side="after">表 3-2 按六个维度对比<ins> Redis、MySQL、Kafka </ins>的启动与关闭做法。</p></div></div>
+<div class="notes"><h3 id="title-O4">O4 · 精简表前的固定列序说明</h3><p class="location">位置：<span class="source-ref" title="/Users/liu/dev/demos/redis-kafka-books/chapters/03-lifecycle/chapter.md:197">第三章第 197 行</span></p>
+<p><strong>为什么调整：</strong>原句已经说明对比范围，后半句又说明表头直接可见的三栏顺序。这属于可删的排版说明，保留也不构成语病。</p><p><strong>范围：</strong>可选；完整表前句对照，三家名称移入对比对象。</p><p><strong>诊断判断：</strong>原文可成立，存在可选的阅读改善空间。<strong>改法判断：</strong>可选采用本组完整改文。</p>
+<p><strong>保留信息：</strong></p><ul>
+<li>保留表 3-2、六个维度与启动/关闭范围。</li>
+<li>保留 Redis、MySQL、Kafka 的对象及先后顺序；不动表格。</li>
+</ul>
+</div></article>
+<h2 class="group-title" id="pending">待技术核实 · 3 组</h2><p class="group-intro">以下疑点涉及前提、分类或排序，尚不能靠语言改写直接解决。这里保留原文证据，没有右侧定稿。</p>
+<article class="case pending" id="T1" aria-labelledby="title-T1"><div class="case-kicker"><b>待核 T1 · 容器关闭方案中的前提与时间保证</b><span>不提供执行稿</span></div><div class="notes"><h3 id="title-T1">容器关闭方案中的前提与时间保证</h3><p class="location">证据范围：第 185 行完整原段</p>
+<p class="location">第 185 行原文</p><blockquote class="evidence">应对办法是让 preStop hook 先触发 BGSAVE、等它完成、再以 NOSAVE 退出：fork 拷贝页表（小实例几十毫秒、大实例数百毫秒）的成本发生在这一步而不是关闭流程里，且此时 Pod 已摘流、无新写入，写时复制（COW）几乎为零，全量落盘赶在 kill 期限之前真正落成；grace period 也相应调长，作为兜底。</blockquote>
+<p><strong>待核点：</strong>本段把 preStop 中 BGSAVE 完成、Pod 已摘流且无新写入、COW 几乎为零和赶在 kill 期限前落盘接成一条因果链。需先核实这些前提及 grace period 的计时关系是否同时成立，才能判断应补什么条件。</p><p class="technical-note"><strong>本轮边界：</strong>暂不补条件，不删“几乎为零”或改写完成保证，也不提供执行稿。</p></div></article>
+<article class="case pending" id="T2" aria-labelledby="title-T2"><div class="case-kicker"><b>待核 T2 · “推迟”能否概括列出的三种处理方式</b><span>不提供执行稿</span></div><div class="notes"><h3 id="title-T2">“推迟”能否概括列出的三种处理方式</h3><p class="location">证据范围：第 230 行标题、第 232 行完整原段</p>
+<p class="location">第 230 行原文</p><blockquote class="evidence">启示三：&quot;快&quot;的本质是把工作推迟</blockquote>
+<p class="location">第 232 行原文</p><blockquote class="evidence">前面反复出现的那些&quot;快&quot;选项，都是把某部分清理或迁移工作挪到别处：留到下次启动、交给集群其他节点，或直接丢弃。我自己设计系统时，会先想清楚每个&quot;快&quot;背后被推迟的代价由谁承担。让关闭变快的常见做法，是把清理工作全部推到启动期，启动期就变得不可预测，运维反而更难处理。合理的做法是让&quot;快&quot;对应可预测的推迟，避免无限推迟。</blockquote>
+<p><strong>待核点：</strong>留到下次启动改变完成时间，交给其他节点改变执行者，直接丢弃又涉及是否执行。后两项不能仅凭列举关系就等同于“推迟”；“直接丢弃”的对象也需要确定。</p><p class="technical-note"><strong>本轮边界：</strong>先核各项具体指向，再协调标题与后续“被推迟的代价”等表述。语言席不擅自补成工作或数据，不提供右侧定稿。</p></div></article>
+<article class="case pending" id="T3" aria-labelledby="title-T3"><div class="case-kicker"><b>待核 T3 · 两处复杂度排序的方向需要对齐</b><span>不提供执行稿</span></div><div class="notes"><h3 id="title-T3">两处复杂度排序的方向需要对齐</h3><p class="location">证据范围：第 210 行完整原段、第 246 行第一句</p>
+<p class="location">第 210 行原文</p><blockquote class="evidence">第一，复杂度排序与&quot;数据结构 + 一致性保证&quot;强相关。 启动复杂度大致是 MySQL &gt; Kafka &gt; Redis，关闭复杂度的顺序也大致相同。原因是保证越强（事务语义、复制一致性），恢复时要做的工作越多。</blockquote>
+<p class="location">第 246 行原文</p><blockquote class="evidence">启动是状态机重建，关闭是逐项兑现启动时做出的保证，两者的复杂度随保证范围递增：从单线程内存（Redis）、关系型事务（MySQL）到分布式集群（Kafka）。</blockquote>
+<p><strong>待核点：</strong>第 210 行明确写 MySQL &gt; Kafka &gt; Redis；第 246 行在“复杂度随保证范围递增”后依次列 Redis、MySQL、Kafka，读者会读出另一种排序。需先明确比较的是哪种复杂度、适用范围及排列关系。</p><p class="technical-note"><strong>本轮边界：</strong>不直接交换软件顺序，不改强弱断言。上方 R6 只处理第 246 行最后一句的搭配，不能视为整段技术结论已通过。</p></div></article>
+<section class="reference" id="good"><h2>两处建议保留的正常表达</h2><p>以下只判断表达在上下文中的作用，不对所在段全部技术事实作新背书。</p>
+<h3>有具体条件支撑的作者判断</h3><p class="location">第三章第 97 行 · 完整句节选</p><blockquote class="good-example">大事务一旦在崩溃点未提交，启动期的 undo 回滚会非常慢，所以我的规矩是：大事务不许长时间运行，再急也要拆小。</blockquote><p>条件、后果与作者规矩直接相接。不能因“所以”“我的规矩是”或短促收尾就机械删除作者声音。</p>
+<h3>承担操作区别的对照</h3><p class="location">第三章第 191 行 · 完整句节选</p><blockquote class="good-example">慢启动应该交给 startup 探针兜底；恢复期要摘的是流量，不是进程。</blockquote><p>“流量”和“进程”对应两种不同操作，承接前文探针职责与故障后果。这个对照有具体信息，不应按句式一律拆掉。</p>
+</section><footer>本报告依据《语言组织审读方法》与本书写作契约形成。没有用句长比例、CV 或固定短句配额判病；没有修改第三章、其他报告或全书构建产物。后续应用前须重新核对正文版本与替换范围。</footer></main></body></html>

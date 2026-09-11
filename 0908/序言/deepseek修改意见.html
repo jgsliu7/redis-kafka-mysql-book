@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>序言 语言组织层修改意见</title>
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--ink:#1f2328;--muted:#6b7280;--line:#e5e7eb;
+--oldbg:#fff5f5;--oldbd:#f0c2c2;--newbg:#f2fbf4;--newbd:#b7e0c1;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 80px;}
+header h1{font-size:24px;margin:0 0 10px;}
+.meta{color:var(--muted);font-size:13px;line-height:1.95;}
+.meta code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-top:14px;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;}
+.sw.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.sw.new{background:var(--newbg);border:1px solid var(--newbd);}
+h2{font-size:19px;margin:44px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);}
+h3{font-size:16px;margin:28px 0 10px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.item-head{margin-bottom:8px;}
+.badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:6px;
+padding:1px 8px;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+.item-title{font-weight:600;font-size:15.5px;}
+.problem{color:#3f3f46;background:#fafafa;border-left:3px solid #d1d5db;
+padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0 14px;font-size:14px;}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pane{border-radius:8px;padding:10px 12px;font-size:14px;}
+.pane.old{background:var(--oldbg);border:1px solid var(--oldbd);}
+.pane.new{background:var(--newbg);border:1px solid var(--newbd);}
+.pane-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;}
+.pane.old .pane-label{color:#b91c1c;}
+.pane.new .pane-label{color:#15803d;}
+code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:#f3f4f6;font-weight:600;}
+td.num{white-space:nowrap;color:var(--muted);font-family:ui-monospace,monospace;}
+td.old-cell{background:var(--oldbg);}
+td.new-cell{background:var(--newbg);}
+ul.plain{margin:8px 0;padding-left:20px;}
+ul.plain li{margin:5px 0;}
+.note{font-size:13.5px;color:#52525b;margin:10px 0 0;}
+@media(max-width:760px){.diff{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>序言 语言组织层修改意见</h1>
+<div class="meta">
+日期：2026-09-09（基于更新后的正文重审）｜ 范围：<code>chapters/00-preface.md</code>（23 行）<br>
+方法：3 个独立视角 agent 逐行通读（母语者读声 / 篇章信息结构 / 新病理猎手）后交叉验证<br>
+原则：只改表达方式，不增删信息、不动事实与数字、不动术语与命令
+</div>
+<div class="legend"><span><i class="sw old"></i>左：原文</span><span><i class="sw new"></i>右：改后</span></div>
+</header>
+<h2>0. 一句话结论</h2><p>序言篇幅短，问题集中在<strong>搭配悬空 / 主语表语错配</strong>（取舍“是很难外包出去的部分”、这条线“会讲到”）和<strong>并列项不同质 / 多连对仗</strong>；另有三处指代与前向承诺不落点，以及两处段末拔高。</p><h2>1. 建议直接改（多 agent 交叉命中 / 明显硬伤）</h2><h3>1.1 搭配悬空 / 主语表语错配</h3><p class="problem">抽象名词硬做主语或表语，读者读出声会顿一下。</p><div class="card"><div class="item-head"><span class="badge">L3</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">才慢慢看清那是一套可以观察、可以记录的思维方式。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">才慢慢看清背后有一套可以观察、可以记录的方法。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L5</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">但取舍牵涉周期、成本、团队状况等现实约束，恰恰是很难外包出去的部分。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">但取舍牵涉周期、成本、团队状况等现实约束，恰恰是最难外包的。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L11</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">取舍，是架构设计里最难也最值钱的一步。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">取舍，是架构设计里最难的一步。</div></div></div></div><h3>1.2 前指 / 指路不落点</h3><p class="problem">“这三个软件”先出现、点名在后文；“这条线书里会讲到”不给落点，读者无处可查。</p><div class="card"><div class="item-head"><span class="badge">L3</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">当时只觉得这三个软件的设计里有相通的东西，但说不清那是什么。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">当时只觉得 Redis、MySQL、Kafka 这三个软件的设计里有相通的东西，但说不清那是什么。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L15</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">这条线书里会讲到。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">这条线，第 10 章会收拢。</div></div></div></div><h3>1.3 段末拔高 / 归一收束</h3><p class="problem">段末从具体讨论跳到“价值/核心能力”的抽象概括，删掉后段落信息不变。</p><div class="card"><div class="item-head"><span class="badge">L5</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">架构师的价值就在判断和取舍上，这份判断直接决定系统的复杂度、上线进度、运维难度和健壮性。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">架构师的价值就体现在这类判断和取舍上：它们直接决定系统的复杂度、运维难度和健壮性，也决定项目多久能上线。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L13</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">掌握具体方案是基础，在复杂约束下做对决策才是核心能力。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">具体方案要掌握，难的是在复杂约束下做对决策。</div></div></div></div><h3>1.4 逐句硬伤</h3><table><thead><tr><th>行号</th><th>原文</th><th>改后</th><th>说明</th></tr></thead><tbody><tr><td class="num">L11</td><td class="old-cell">还要从这些软件的设计里看出“为什么这么取、为什么那么舍”。</td><td class="new-cell">还要从这些软件的设计里看出“为什么这样选、为什么不那样选”。</td><td>“这么取/那么舍”把单字当动词用</td></tr><tr><td class="num">L13</td><td class="old-cell">排列组合下来就是几乎无限的可能性。</td><td class="new-cell">排列组合下来，可能性几乎无限。</td><td>“就是……可能性”宾语抽象发飘</td></tr><tr><td class="num">L13</td><td class="old-cell">什么时候上线、跑在什么机器上、团队什么情况、遗留系统怎么处理、公司有什么硬性约束。</td><td class="new-cell">什么时候上线、跑在什么机器上、团队是什么情况、遗留系统怎么处理、公司有什么硬性约束。</td><td>“团队什么情况”缺谓语</td></tr><tr><td class="num">L13</td><td class="old-cell">常态是非核心环节向核心目标妥协</td><td class="new-cell">常见做法是让非核心环节向核心目标妥协</td><td>“常态是”是 the norm is 直译腔</td></tr><tr><td class="num">L15</td><td class="old-cell">Redis、MySQL、Kafka 是全书最顺手的观察样本：问题足够硬。</td><td class="new-cell">Redis、MySQL、Kafka 是全书最顺手的观察样本：问题足够难、足够有代表性。</td><td>“问题足够硬”口语江湖腔</td></tr><tr><td class="num">L15</td><td class="old-cell">但样本只是样本，我真正想记录的是观察的方法。</td><td class="new-cell">但它们只是样本，我想记录的是观察的方法。</td><td>“样本只是样本”同义反复</td></tr><tr><td class="num">L19</td><td class="old-cell">多用 AI 工具补齐，这正是它的用武之地。</td><td class="new-cell">多用 AI 工具把它们补齐，这正是 AI 擅长的。</td><td>“补齐”缺宾语；“用武之地”贴标签</td></tr><tr><td class="num">L21</td><td class="old-cell">能下意识地权衡不同方案的取舍。</td><td class="new-cell">能自然地比较不同方案的取舍。</td><td>“权衡取舍”语义重复；“下意识”反直觉</td></tr></tbody></table><h2>2. 改前需复核（单 agent 命中，按铁律需二次核对再改）</h2><h3>2.1 多连对仗 / 并列不同质</h3><p class="problem">五组“A还是B”结构完全同构、连接词零变化，机械感强；并列项词性不齐。</p><div class="card"><div class="item-head"><span class="badge">L17</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">速度还是持久、一致还是可用、空间还是时间、简单还是灵活、通用还是专用</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">速度还是持久、一致还是可用，空间与时间、简单与灵活、通用与专用</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L5</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">这份判断直接决定系统的复杂度、上线进度、运维难度和健壮性。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">这份判断直接决定系统的复杂度、运维难度和健壮性，也决定项目多久能上线。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L13</span><span class="item-title">2.2 论据倒置</span></div><p class="problem">“非核心环节向核心目标妥协”是论点，Redis/Kafka 的核心目标是支撑它的例子，例子却排在论点前面。</p><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">在这些条件下如何作出架构决策，没有万能公式。Redis 的重点是内存访问，Kafka 的重点是顺序追加和批量消费，它们各自的优化围绕这些核心目标展开。优秀的设计并不要求所有环节都取局部最优，常态是非核心环节向核心目标妥协：要么降低要求，要么加上兜底措施。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">在这些条件下如何作出架构决策，没有万能公式。优秀的设计并不要求所有环节都取局部最优，常见做法是让非核心环节向核心目标妥协：要么降低要求，要么加上兜底措施。比如 Redis 的重点是内存访问，Kafka 的重点是顺序追加和批量消费，它们各自的优化都围绕这些核心目标展开。</div></div></div></div><h3>2.3 无人称祈使 / 情态副词冲突</h3><p class="problem">“多用……补齐”是隐含“你”的祈使；“下意识地权衡”里副词与动作语义冲突（权衡本是主动思考）。</p><div class="card"><div class="item-head"><span class="badge">L19</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">如果你对某些知识点不熟悉，多用 AI 工具补齐，这正是它的用武之地。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">对不熟悉的知识点，AI 工具正好用来补齐。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L21</span></div><div class="diff"><div class="pane old"><div class="pane-label">原文</div><div class="pane-body">设计自己的系统时，能下意识地权衡不同方案的取舍。</div></div><div class="pane new"><div class="pane-label">改后</div><div class="pane-body">设计自己的系统时，能习惯性地权衡不同方案的取舍。</div></div></div></div><div class="card"><div class="item-head"><span class="badge">L7 / L15 / L17</span><span class="item-title">2.4 承诺与落点 / 名实不符</span></div><p class="problem">第 7 行承诺“记的是三层东西”，第 15 行又说“真正想记录的是观察的方法”，主题定位摇摆；“有两个约定”后文实际是两条不同性质的事，末尾又追加版本说明。</p><ul class="plain"><li><strong>L7 / L15</strong>：建议把关系接上——“这三层不是谁教我的，是我在这三个软件里一层一层看出来的；而比这三层内容更值得记录的，是那套观察的方法。”</li><li><strong>L17</strong>：<code>有两个约定先说清楚。</code> → <code>先说清楚两件事。</code></li></ul></div><h2>3. 新病理候选（建议补进 docs/去ai味道自查方法.md §1.3）</h2><table><thead><tr><th>候选名</th><th>定义</th><th>判定方法</th><th>序言实例</th></tr></thead><tbody><tr><td>多连取舍对仗枚举</td><td>五组以上“A还是B”结构完全同构、连接词零变化</td><td>抽任一组放进任何技术书是否成立；句式与连接词完全复制即中招</td><td>L17</td></tr><tr><td>情态副词与动作语义冲突</td><td>副词与所修饰的动作语义相反（下意识地权衡）</td><td>把副词换成人专属动作读一遍，不成立即中招</td><td>L21</td></tr><tr><td>指路不落点</td><td>“书里会讲到”等前向承诺不给章节或定位词</td><td>读到这句能否立刻翻到目标？不能即空指针</td><td>L15</td></tr><tr><td>无人称祈使建议</td><td>隐含“你”的祈使句给读者布置学习方式</td><td>主语是隐含“你”、谓语是祈使即中招</td><td>L19</td></tr></tbody></table><h2>4. 可复用的检查方法</h2><ul class="plain"><li><strong>主谓单读</strong>：把主语和谓语单独拎出来读一遍，问“这个东西能不能做这个动作、当这个身份”。</li><li><strong>并列项套同一谓语</strong>：给每个并列项套同一个谓语或词性，看哪些套不通。</li><li><strong>指代回看</strong>：读到“这/那/它们”往前找先行词；找不到、要往下文找的即前指悬空。</li><li><strong>承诺对账</strong>：数出“三层/两个约定”的承诺数量与性质，逐条对照后文。</li></ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+报告已写入 `/Users/liu/dev/demos/redis-kafka-books/0909/m3/B2-术语全书稳定审查员.md`。
+
+**核心发现摘要：**
+
+**总评：🟡 有问题需修复**，23 项核心术语合规率 91%（21/23），发现 14 个问题。
+
+**最严重的 2 个 P0 问题（必须修复）：**
+1. **ch7 L65**：`quorum` 首次出现未标注为 `quorum（多数派）`，而 book-bible §7 规定 `quorum → 多数派`
+2. **ch7 L90**：`epoch` 首次出现未标注为 `epoch（任期）`，而 book-bible §7 规定 `epoch / term → 任期`；同一章节 ch9 L231 已正确标注 `leader epoch（单调递增的任期号）`，ch7 的首次出现反而缺失
+
+**P1 问题 4 个：**
+- ch3 L130 和 ch9 L179：MySQL 语境下用了"从库/主库"，应统一为 book-bible 标准词"从节点/主节点"
+- ch9 L252：`Controller quorum` 未标注
+- ch9 L233：同章内"epoch"一会有标注、一会无标注，标注程度不均
+
+**P2 问题 8 个：**包括 Flush List 格式不一致、LSN 未展开、ch9 epoch/任期 冗余表达等。

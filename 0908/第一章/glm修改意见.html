@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第一章 语言组织层修改意见 · glm</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#ffffff; --ink:#2b2a27; --muted:#8a867d; --line:#e4e1da;
+    --before-bg:#faf1f0; --before-bd:#c07a70; --cut:#c0392b;
+    --after-bg:#eef4ec; --after-bd:#7ba177; --add:#2e7d32;
+    --accent:#8a5a2e; --chip:#efece5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1b19; --panel:#232321; --ink:#d8d5ce; --muted:#8f8b81; --line:#37362f;
+      --before-bg:#2a2220; --before-bd:#a05f55; --cut:#e2796a;
+      --after-bg:#1f2820; --after-bd:#5f8a5a; --add:#8fce8a;
+      --accent:#d0a06a; --chip:#2d2c28;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.85 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px}
+  h2{font-size:19px;margin:52px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+  h2 .sub{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px}
+  h3{font-size:16px;margin:0}
+  p{margin:10px 0}
+  code{font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--chip);
+    padding:1px 5px;border-radius:4px;word-break:break-all}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;margin:22px 0;font-size:13.5px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .stat .t{font-size:13px;color:var(--muted);margin-top:4px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin:16px 0}
+  .item>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ln{font:12px ui-monospace,Menlo,monospace;background:var(--chip);border:1px solid var(--line);
+    padding:1px 8px;border-radius:99px;color:var(--accent);white-space:nowrap}
+  .badge{font-size:12px;padding:1px 9px;border-radius:99px;white-space:nowrap}
+  .b2{background:var(--after-bg);color:var(--add);border:1px solid var(--after-bd)}
+  .b1{background:var(--chip);color:var(--muted);border:1px solid var(--line)}
+  .bd{background:var(--before-bg);color:var(--cut);border:1px solid var(--before-bd)}
+  .why{font-size:13.5px;color:var(--muted);margin:6px 0 12px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:760px){.cmp{grid-template-columns:1fr}}
+  .panel{border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.9}
+  .panel .tag{font-size:11.5px;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+  .before{background:var(--before-bg);border:1px solid var(--before-bd)}
+  .after{background:var(--after-bg);border:1px solid var(--after-bd)}
+  .cut{background:rgba(192,57,43,.14);border-bottom:2px solid var(--cut);padding:0 2px;border-radius:2px}
+  .add{background:rgba(46,125,50,.14);border-bottom:2px solid var(--add);padding:0 2px;border-radius:2px}
+  .dir{font-size:13.5px;margin:10px 0 0;color:var(--muted)}
+  .dir b{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip);font-weight:600}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第一章 语言组织层修改意见 · glm</h1>
+<div class="meta">2026-09-08 ｜ 依据：两席独立通读交叉验证（ai-writing-detector 量化 + tech-editor 阅读节奏，互不通气）｜ 对象：<code>chapters/01-introduction/chapter.md</code>（220 行版）</div>
+<div class="meta">范围：只动语言组织（骨架＋节奏）。词汇层不动，技术事实／数字／版本口径／表格内容／作者第一人称故事与判断锋芒不动。后章确诊模式在本章为<b>源头版</b>者标「模板源头」。两席引文 70+ 处经总调度对文件逐字复核，0 失配，1 处计数校正（det 席称 L36"一句三对"中英对照括号，实为<b>四对</b>：MVCC／clustered index／WAL／MGR）。</div>
+
+<div class="legend">
+  <b>怎么读这一页</b>：左栏＝原文（红色划线＝建议动的那一段文字），右栏＝<b>示意改稿（草案，绿色＝新文字）</b>。
+  示意稿只代表方向——正式改文须 plain-rewriter 出候选 → detector 混编盲评 → 技术席事实核对 → <b>作者终判</b>。
+  引文对 2026-09-08 版 chapter.md，修复前须核对席逐字对账（铁律 3）。改字词不改意思；示意稿丢掉的技术事实均已注明。
+</div>
+
+<h2>0 · 一句话结论<span class="sub">入口章的特殊性：这里是全书模板的源头，改一章管九章</span></h2>
+<p>tech-editor 的判词值得整句引用：<b>「这是一章'会讲故事的人写的教科书'——故事段落是全书入口章该有的样子，但 MySQL 那两页术语墙和 1.4 的说明书死区，把两次'读者决定要不要继续'的窗口都押上了赌桌。」</b>detector 给 6.5/10（与 ch8/ch9 并列全书最高）：「骨架是全套标准件拼的……人味只活在五六个第一人称孤岛上，而全章最重的一段（导读）恰好最死。」两席合流的病灶按危害排序三件：<b>①入口两堵墙</b>——L76 MVCC 巨句与 L80 代价账目背靠背（tech 判 L76 为「全章最高弃书单点」，恰在读者沉没成本最薄的 1.2.2）；<b>②模板源头</b>——"X 的代价："三连播、"三"报数 10 处、1.2 三节同款代价段，第一章立的模板后面八章原样继承（tech-editor 特别警告这条：源头不松，后面每章都要重犯）；<b>③一稿多盖与段落克隆 4 组</b>——MySQL 演化线三讲、1.4.2⇄1.4.5 两稿并存、L5⇄L220 首尾环、L15–19 三胞胎。节奏底子：207 句、CV 0.68 达标但家常短句仅 2 句（L58/L175），≤7 字槽位被黑体标签与报数垄断；首人称荒漠 L11–L118（口径 det ~90／tech ~108 行）；账房 34 处。</p>
+<div class="stats">
+  <div class="stat"><div class="n">6.5 / 8</div><div class="t">总分 6.5（与 ch8/ch9 并列全书最高）；分节最重导读 8 分、1.5 小结 7.5——入口与收束两头最重，1.3.3（三层追问）6 分里节奏最好</div></div>
+  <div class="stat"><div class="n">2 句</div><div class="t">家常短句仅 L58「Redis 的起点很朴素。」与 L175「前置要求并不高。」；L74–L80 最长坡约一页四段无一个 &lt;15 字节拍——呼吸全在段落边界，中段无短句</div></div>
+  <div class="stat"><div class="n">10 处 · 4 组</div><div class="t">"三"报数 8–10 处（三问/三类/三方法/三层次/三路径/三节点…）＋三胞胎 4 组：L15–19 句长拍型 [8,55,10]/[8,37,17]/[11,41,15]、L47–49"用X换Y，代价是Z"×3、路径三段、演化线三讲</div></div>
+  <div class="stat"><div class="n">34 处</div><div class="t">账房词族（代价/取舍/换/权衡）约每 190 字一笔；1.2 三节各配一段同款"代价段"＋一句盖棺——这个结构被后章整章继承，是全书账房与盖棺句的源头</div></div>
+</div>
+
+<h2>1 · 建议直接改<span class="sub">证据确凿（多为结构铁证），方向明确，最小 diff</span></h2>
+
+<div class="item">
+  <header><span class="ln">L36 / L72 / L149</span><h3>MySQL 演化线一稿三讲：同一条 MyISAM→InnoDB→MGR 说了三遍</h3><span class="badge b1">tech-editor · 结构铁证</span></header>
+  <p class="why">L36「从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR……）」→ L72「也经历了存储引擎从 MyISAM 到 InnoDB 默认化的更迭」→ L149「MySQL 从 MyISAM 到 InnoDB 默认化再到 MGR，是因为业务对事务与高可用的要求不断抬高」。tech-editor 判定：<b>第三次（L149）带因果，是有效讲法，保留</b>；前两次是纯预告。同一事实三讲，读者第二遍就开始跳。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L72 段内半句）</div>
+      <p>这个发展过程并不顺利：它经历过商业化收购的震荡、催生了 MariaDB 这样的分支，<span class="cut">也经历了存储引擎从 MyISAM 到 InnoDB 默认化的更迭。</span>但至今它仍是……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>这个发展过程并不顺利：它经历过商业化收购的震荡、催生了 MariaDB 这样的分支。<span class="add">存储引擎那一跤摔得最疼，1.3.2 讲演化时再展开。</span>但至今它仍是……<span class="add">（L36 同法压半句：演化线线索留"演化史"三个字，具体线索留给 L149 首次展开处）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>处置</b>：L149 全句保留（因果版）；L36 压半句；L72 删「也经历了……更迭」半句。两处卸掉的只是预告，读者不少知道任何事实。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">L188 ⇄ L216</span><h3>1.4.2 与 1.4.5 两稿并存：依赖链讲了两遍，第二遍更短却更晚</h3><span class="badge b1">tech-editor · 结构铁证</span></header>
+  <p class="why">L188（1.4.2 内）已完整讲过"第 2–4 章打底 / 5–7 章组织 / 8–9 章落盘搬运、分组顺序就是依赖顺序"；L216（1.4.5 全书脉络）再讲一遍"第 2 章输入 / 第 4 章核心命题 / 第 9 章收束"。两节职能重叠——1.4.5 的存在感只剩"换个说法再说一次"。两稿测试（§6.2）：删掉任何一遍，读者不少知道任何事实。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L216 全段）</div>
+      <p><span class="cut">八章连成一条依赖链，有三个节点最要紧：第 2 章的数据结构与协议，是后面所有讨论的输入；第 4 章"内存与磁盘"处理"快"与"不丢"这对矛盾，是存储系统的核心命题；第 9 章"数据同步"把副本、日志、一致性这条线索收束起来。</span>八章的内容汇到第 10 章，提炼成共性规律和取舍方法。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">八章连成一条依赖链，有三个节点最要紧：第 2 章、第 4 章、第 9 章。</span>八章的内容汇到第 10 章，提炼成共性规律和取舍方法。<span class="add">（三个节点的理由 L188 已给过，此处点名即可；若作者倾向反向处置——删 L188 依赖链段、留 1.4.5 展开——也成立，二选一，两头只留一头）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L64 / L80 / L94</span><h3>"X 的代价："播音员三连播：1.2 三节同款代价段起手</h3><span class="badge b2">双票</span><span class="badge b1">模板源头</span></header>
+  <p class="why">「这种选择的代价：」（L64，Redis）、「这套取向的代价，……摆在明面上：」（L80，MySQL）、「只追加的代价：」（L94，Kafka）——三节同一个冒号主持人。tech-editor 的警告要原样立下：<b>"第一章立的这个模板，后面九章原样继承"</b>（ch4 取舍三连、ch6/ch7/ch8 账房节拍的祖先就是这里）。三节三种进场即可解。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L94 起手）</div>
+      <p><span class="cut">只追加的代价：</span>随机查询不是它的强项；批量与顺序优先……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">随机查询不是它的强项——这是"只追加"的直接后果。</span>批量与顺序优先……<span class="add">（L64 保留——首家用冒号起手成立；L80 的冒号随 §2.2 拆账自然卸；三节三种进场）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L126 ＋ L192</span><h3>两处确定要卸的加粗：61 字名词墙与版本基线串</h3><span class="badge b2">双票</span></header>
+  <p class="why">L126 整句加粗是一堵名词墙（tech 判重症、det 判第 4 绊脚）：四个名词短语用"以及"串成一整句加粗，读者只能扫不能读。L192 版本串加粗（中症）——三个版本号连括号整体加粗，重音给了一串配置项。两处都不是术语首现（术语契约不涉及），是 verdict 级加粗通胀。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L126 后半）</div>
+      <p>架构师追问的是：<span class="cut">**单线程反而更快的原因、多线程 I/O 的嵌入方式、这套设计在什么规模下开始吃亏以及换成多线程执行需要付出的代价。**</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>架构师追问的是：<span class="add">单线程为什么反而快？多线程 I/O 是怎么嵌进来的？这套设计到什么规模开始吃亏、换成多线程要付什么代价？</span><span class="add">（名词墙改回问句——本章 1.3 的方法论本来就是"反复追问为什么"，问句才是这里的本色；加粗卸）</span></p>
+    </div>
+  </div>
+  <p class="dir"><b>L192</b>：「**Redis 7.x、MySQL 8.0.x、Kafka 3.x（……）**」去粗保文——版本号自己醒目，不需要重音。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">1.3.2（L147）</span><h3>绕场缺一角："看约束"只有 Redis 与 MySQL 的例子，Kafka 缺席</h3><span class="badge b1">tech-editor · 结构铁证</span></header>
+  <p class="why">1.3.2 讲"看约束"，给了 Redis（单线程的约束还原）与 MySQL（B+ 树的约束还原）两个例子，Kafka 没有第三个——同节的"看演化"（L149）与"看抽象"（L151）三家齐整，唯独"看约束"两家。对比书的骨架件缺一角，读者会自己注意到。tech-editor 判这是全章绕场唯一的失格处（顺序锁与定语都是健康的，见 §4.3）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L147 段内）</div>
+      <p>……MySQL 用 B+ 树而不是哈希索引做主索引，背后的约束是"要支持范围查询和排序，磁盘随机访问昂贵，需要一种能批量读相邻键的结构"。<span class="cut">不问约束就评价设计好坏，等于白评；……</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>……MySQL 用 B+ 树而不是哈希索引做主索引，背后的约束是"要支持范围查询和排序，磁盘随机访问昂贵，需要一种能批量读相邻键的结构"。<span class="add">［Kafka 角补位：一句话还原"只追加"面对的约束——吞吐优先于灵活查询、顺序 I/O 的物理特性。具体表述属技术内容，由技术席出例，文风席不得代写］</span>不问约束就评价设计好坏，等于白评；……</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L32 ⇄ L40 ＋ L115 / L118</span><h3>同义首尾环＋维度名四行两遍：各留一</h3><span class="badge b1">tech-editor</span></header>
+  <p class="why">L32「Redis、MySQL、Kafka 恰好各居其一」与 L40「三种范式最终落到这三个软件上」相隔 8 行互为翻译。1.2.4 内：表 1-1 已列六个维度，L115 雷达散文再念一遍五维度、L118 图注第三次重列五维度名——同一串名词四行之内出现两遍（图表三遍计费，力度分歧见 §4.2）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（两处）</div>
+      <p>L32：三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。<span class="cut">Redis、MySQL、Kafka 恰好各居其一。</span></p>
+      <p>L40：<span class="cut">三种范式最终落到这三个软件上。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>L32：保留（首立）。</p>
+      <p>L40：<span class="add">（整句删——L32 已说完，L34–L38 三段就是它的展开；单句成段的"落章"仪式不需要）</span></p>
+      <p>L118 图注：<span class="add">维度名重列删，只留「图 1-2　三个软件在五个维度上的定位雷达（评分为我主观的量级判断，仅作示意）」——"作者主观"改"我"，语域归位（第一人称的书，图题不该突然出现第三人称的"作者"）</span></p>
+    </div>
+  </div>
+</div>
+
+<h2>2 · 走流水线重手术<span class="sub">最差位置；正式候选由 plain-rewriter 出，此处示意方向</span></h2>
+
+<div class="item">
+  <header><span class="ln">L76（1.2.2）</span><h3>全章最高弃书单点：MVCC 巨句——"一句话说清"承诺了一句 150 字</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">tech-editor 绊脚点第 1 名：读者翻阅率最高的入门章、沉没成本最薄的 1.2.2，一句「MVCC 的原理一句话说清」之后跟着约 150 字（口径 det 130／tech 140）——90 字括号内含分号，句末还有分号续行。承诺"一句话"，交付的是全章最难读的一句：读者在这里对自己的阅读能力产生误判，然后弃书。修法＝<b>要么真的兑现"一句话"，要么撤回承诺</b>＋括号出栈。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前</div>
+      <p>MVCC 的原理<span class="cut">一句话说清：改一行时保留旧版本，读事务持有一个 Read View 判断哪些版本对它可见（Read View 在事务首次读时拍下快照，记下当时的活跃事务集合；判断方式是沿 undo log 串起的版本链从新到旧，找第一个对自己可见的版本），于是读不加锁、不阻塞写，写也不阻塞读；undo log（回滚日志）里串起来的那条旧版本链，就是它的载体。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">MVCC 的原理拆开就三步。改一行时保留旧版本，读事务持有一个 Read View，判断哪个版本对自己可见——于是读不加锁、不阻塞写，写也不阻塞读。</span></p>
+      <p><span class="add">Read View 在事务首次读时拍下快照，记下当时的活跃事务集合；判断可见性时，沿 undo log 串起的版本链从新到旧，找第一个对自己可见的版本。那条旧版本链，就串在 undo log（回滚日志）里。</span>（150 字一句 → 三句；90 字括号出栈成正文；Read View 语义属技术内容，走技术席核对）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L80（1.2.2）</span><h3>代价账目墙：与 L76 背靠背的约 200 字四笔账</h3><span class="badge b2">双票 · 最重</span></header>
+  <p class="why">tech-editor 绊脚点第 2 名：L76 刚过，L80 又是一整面墙——四笔账（fsync／两阶段提交／旧版本链／调优门槛）各带大括号，一个句号包到底（口径 det 159／tech ~200 字）。两堵墙背靠背立在 1.2.2，"MySQL 那两页术语墙"由此得名。修法＝四账目各起一句＋两处括号出栈＋段中给一脚歇拍（对齐 L162 的呼吸）。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>这套取向的代价，从提交延迟到调优门槛都摆在明面上：为保证持久性，事务提交要做日志落盘<span class="cut">（fsync，把缓冲的写强制刷到磁盘的系统调用）</span>；为保证一致性，写操作伴随 redo log 与 binlog 的内部两阶段提交开销<span class="cut">（两份日志分属存储层和服务层，提交时按 prepare、commit 两步对齐，保证崩溃后两边一致）</span>；为支持 MVCC 保留的旧版本链，让长事务拖累性能；调优门槛高……</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">这套取向的账都摆在明面上，一笔一笔看。持久性一头：事务提交要做日志落盘——fsync，把缓冲的写强制刷到磁盘的系统调用。一致性一头：redo log 与 binlog 分属存储层和服务层，提交时按 prepare、commit 两步对齐，崩溃后两边才对得上，每个写操作都付这份两阶段提交的开销。</span></p>
+      <p><span class="add">MVCC 一头：为读保留的旧版本链，让长事务拖累性能。调优门槛也高：缓冲池、刷新策略、隔离级别都要按负载细调。此外，单机扩展有上限，纵向加内存、加 CPU 容易，横向分库分表则代价不菲。</span>（四账各一句；两括号出栈；fsync 与两阶段提交语义属技术内容，走技术席）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L5（导读）</span><h3>导读重构：一段四职能——两次面试场景＋立题＋目录腔收尾</h3><span class="badge b2">双票 · det 最差 #1</span></header>
+  <p class="why">211 字一段四句（33/66/64/48），detector 判全章最差第 1 位：同一阶段内两次进场同一面试场景（第 1–2 句"面试数百名候选人"、第 3 句又一次"在面试一些架构师岗位的候选人时"），收尾「这一章先讲清三个问题：……」是目录配音，且与 L220 小结「这一章讲清了三个问题」构成首尾复印（§6.3 弹匣测试）。钩子本身成立（tech 给导读 4/5）——动的不是素材是缝合。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（骨架）</div>
+      <p>我面试过数百名高级开发和架构师候选人，……这些问题很多人都答不清楚。<span class="cut">在面试一些架构师岗位的候选人时，无论是谈自己对某个优秀软件的了解，还是谈自己的架构设计思路，很少有人提及"取舍"和"平衡"，而本书就是为此而写的。</span>这一章先讲清三个问题：<span class="cut">为什么选这三个软件、它们各自是什么样，以及"架构视角"和"使用视角"看到的到底有什么不同。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（拆三段）</div>
+      <p><span class="add">段一（合并两次面试为一场景）：我面试过数百名高级开发和架构师候选人，大多数都能熟练使用 Redis、MySQL 和 Kafka；但当问题从"怎么用"换成"为何如此设计"——Redis 为什么单线程执行命令、MySQL 为什么用 B+ 树、Kafka 为什么只追加不能修改——答得清楚的人很少。更少被提及的是"取舍"和"平衡"这两个词，无论谈对某个优秀软件的了解，还是谈自己的设计思路。这本书就是为此写的。</span></p>
+      <p><span class="add">段二（张力落地，不新增经历）："取舍"不玄：每个设计都在特定约束下放弃了什么。能用好与能评判之间隔着这道缝，本书选三个把"放弃"做到了极端的样本来填。</span></p>
+      <p><span class="add">段三（收束软化、与 L220 解耦）：接下来三件事：为什么是这三个软件、它们各自什么样、架构视角与使用视角差在哪。</span>（正式稿走流水线；示意只给分工不给定稿）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L196（1.4.3）</span><h3>版本 changelog 巨句：三家分号串＋五对括号，走神型绊脚</h3><span class="badge b2">双票</span></header>
+  <p class="why">tech-editor 绊脚点第 3 名（~190 字，det 口径 127）：一段塞下三个软件六七年的版本演进史，五对中英括号（ACL／Function／MGR／ZooKeeper 部署／Tiered Storage）全是版本考证——读者在这里不需要这些细节，需要的是"版本差异我会显式说明"这个契约（L192 已给）。表格化是现成解：ch2 起后文有多处版本小表先例。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（节录）</div>
+      <p>几处与版本相关的演进包括：<span class="cut">Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（新集群自此可不依赖 ZooKeeper 部署），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意（三行小表）</div>
+      <p><span class="add">几处与版本相关的演进如下表：</span></p>
+      <p><span class="add">Redis：6.0 多线程 I/O、ACL；7.x Function、Sharded Pub/Sub｜MySQL：8.0.x 原子 DDL、新版 redo log、降序索引、直方图，MGR 走向成熟｜Kafka：3.3 KRaft 生产可用；3.9 Tiered Storage GA；幂等与事务 0.11 已引入</span></p>
+      <p><span class="add">（正式排版为三行小表一家一行，括号全数吸收进表；L194 版本状态提示段保留原样——那段有判断，不是 changelog）</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L47–L49</span><h3>"用X换Y，代价是Z"三胞胎：三条 bullet 一副账房语法</h3><span class="badge b1">detector · 逐字模板</span></header>
+  <p class="why">detector 单票但属逐字级模板：三条 bullet 全部"用X换Y，代价是Z"，连标点节奏都一致。这是全书"账房句"的第一窝（ch4 取舍总结三连、ch5 天平收秤的共同祖先）。内容与顺序不动，动谓语动词与拍型。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（三条 bullet）</div>
+      <p>- **Redis**：<span class="cut">用"内存 + 单线程命令执行"换极简与低延迟，代价是</span>复杂聚合要靠客户端多次网络往返拼出来。<br>
+      - **MySQL**：<span class="cut">用"B+ 树 + WAL + MVCC"换强一致与通用查询，代价是</span>写放大（同一份数据被物理写入多次）、事务开销和调优门槛。<br>
+      - **Kafka**：<span class="cut">用"追加写日志 + 顺序 I/O + 分区并行"换高吞吐与线性扩展，代价是</span>延迟偏高、不适合随机查询。</p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p>- **Redis**：<span class="add">"内存 + 单线程命令执行"省出极简与低延迟；复杂聚合只能推给客户端，多次网络往返拼出来。</span><br>
+      - **MySQL**：<span class="add">"B+ 树 + WAL + MVCC"顶住强一致与通用查询，背上的是写放大（同一份数据被物理写入多次）、事务开销和调优门槛。</span><br>
+      - **Kafka**：<span class="add">"追加写日志 + 顺序 I/O + 分区并行"把吞吐和线性扩展抬起来，让渡掉的是低延迟和随机查询。</span>（换／省出／顶住＋让渡；拍型各缺一拍）</p>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <header><span class="ln">L15–L19</span><h3>三类能力三胞胎：句长拍型 [8,55,10] / [8,37,17] / [11,41,15] 完全同构</h3><span class="badge b2">拍型双票</span></header>
+  <p class="why">detector 给出逐句字数：三段全是"黑体标签一句＋枚举展开一句＋收尾短句"，拍型几乎重合（段末 10/17/15 字三连短收）。tech-editor 从加粗编号节拍侧印证。黑体标签是术语契约<b>不去</b>；动的是第三段的起手与中段的拍型——三连里留两连立骨架，第三连变形。</p>
+  <div class="cmp">
+    <div class="panel before"><div class="tag">改 前（L19 第三段）</div>
+      <p><span class="cut">第三类是**异步解耦与流转**。系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都需要一个中间介质把生产者和消费者解耦。这类能力的关键在吞吐和可扩展性。</span></p>
+    </div>
+    <div class="panel after"><div class="tag">改后 · 示意</div>
+      <p><span class="add">第三类管**异步解耦与流转**：系统之间的通知、事件的分发、日志的汇聚、数据的搬运，都得有个中间介质，把生产者和消费者隔开。吞吐和可扩展性，是它的命门。</span>（起手从"是"字判断改为"管"字动词；枚举句拆一脚逗拍；段尾换词收——三段拍型就此拉开）</p>
+    </div>
+  </div>
+</div>
+
+<h2>3 · 全章性手术<span class="sub">源头章的杠杆：这里立的模板后章都在抄，预算要立得最严</span></h2>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>"三"报数 8–10 处 → 3–4 处：框架件只留承重的</h3><span class="badge b2">双票</span><span class="badge b1">模板源头</span></header>
+  <p class="why">全录：L5 三问／L13 三类能力／L46"集中在这几条上"／L102 六个维度／L115 五个维度／L145 三个方法／L157 三个层次／L173 三类读者／L204 三条路径／L216 三个节点／L220 三问题。第一章每个框架都预分好三格，后章照此办理（ch4"三"预分格 22+ 处的祖先）。读者分类与阅读路径最不必预分格——直呼读者即可。</p>
+  <p class="dir"><b>留</b>：L13（三类能力是全书骨架）、L157（三层追问是 1.3.3 的教学主体）、L145（三方法，紧凑）。<b>改</b>：L173 三类读者改直呼（"如果你是 2 年以上经验的后端开发者……；如果你负责技术选型……"）；L204 三路径不报数直接分节；L5/L220 随 §2.3 手术；L102/L115 随 §4.2。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>整句加粗清单：确定卸 2、待裁 5</h3><span class="badge b2">族内双票</span></header>
+  <p class="why">全章 verdict 级整句加粗 7 处：L62（用最少的机制……）、L68、L74 内（页 16KB，术语首现不在此列）、L84、L98、L126、L167（顺序写的日志保证……）、L192。§1.4 已处理 L126/L192；L68/L84/L98 两席相反见 §4.1；L62/L167 为 det 单票（tech 视 L167 主线句为短语级路标可留）。</p>
+  <p class="dir"><b>判据</b>（盖章尺的加粗版）：这句加粗删掉后，读者少知道一个<b>事实</b>还是只少一个"重音提示"？L167「顺序写的日志保证故障后可恢复，落盘粒度调节安全与吞吐的平衡」是全章主线定律、跨章复用（第 4/9 章），值得留；L62 与小节内容同义复述，卸。全章收敛到 ≤3 处后，1.2 三节末的盖棺句才有区分度。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>绕场：顺序锁保留，复述计费降次</h3><span class="badge b2">处置合流（定性分歧见 §4.3）</span></header>
+  <p class="why">全章 R→M→K 整队出场 7 处（L9 钥匙／L23 对应关系／L46–49 核心设计／L62–98 概览三节／L102 表 1-1／L115 雷达／L220 小结）。tech-editor 的裁定：对比书顺序该稳定，这是契约不是病；定语也未锁死（1.2 三节起手形状各异是做对的）；病在<b>职能重叠的复述计费</b>——L115 雷达散文与表 1-1 同一内容两次收费（§1.6 最小案）。</p>
+  <p class="dir"><b>保留</b>：L9、1.2 三节（本职概览）、表 1-1、L220（变奏后）。<b>降次</b>：L23 对应关系段与 L21 电商例合并收一句；L115 压一句半；L46–49 随 §2.5 动词多样化。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>反射词减半："这些X"×17、"最X"×10+、"恰好"×4</h3><span class="badge b1">detector</span></header>
+  <p class="why">「这些场景／这些数据／这些选择／这些短板／这些机制／这些约束」——指示代词开头的小结句成了段落标配（17 处）；「最广泛／最核心／最有价值／最彻底／最推荐／最要紧」颁奖 10+；「恰好」4 处（L9/L28/L32/L66 附近）稀释了真正偶然的那个。</p>
+  <p class="dir">"这些X"留承重的 8 处（如「这些场景错不起」，后面有硬判断）；"最"逐处过尺——「最彻底」(L165 Kafka) 是真判断留，「最难得的是」(L36) 这类仪式性最字去 5；"恰好"只留 L9（选样的偶然与必然），L28 改「正好」或直陈（§5 已列其内容）。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>短句排班：家常短句 2 → 8–10；荒漠区两条路线</h3><span class="badge b2">双票</span></header>
+  <p class="why">全章只有 L58/L175 两句家常短句；最长坡 L74–L80 约一页四段（tech 节奏地图）没有一个 &lt;15 字的节拍；呼吸全靠段落边界硬切。章内好样子已在：L58「Redis 的起点很朴素。」、L162「三家各用了一套方案。」、L175「前置要求并不高。」——机制收口式，不雕刻。</p>
+  <p class="dir">补土落点：L60 抽象段尾、L88–92 Kafka 机制段、L120–126 视角节、L158–160 三问各层——各补一记（仿 L162 句式，措辞作者定）。§2 四处手术顺带补 6–8 句。荒漠 L11–L118：<b>a)</b> 优先用"你"与拆句恢复在场（1.2 概览节本就面向读者）；<b>b)</b> 若要"我"的颗粒（踩坑、选型回忆），<b>素材须作者本人出，改文笔不得代写（不造经历，ch6 立规沿用）</b>。</p>
+</div>
+
+<div class="item">
+  <header><span class="ln">全章</span><h3>账房 34 处：源头解锁</h3><span class="badge b2">双票</span><span class="badge b1">模板源头</span></header>
+  <p class="why">1.2 三节各配"代价段"（L64/L80/L94）＋每节盖棺句里各记一笔（L68/L84/L98）——「代价／取舍／换」作为固定零件装进每个概览节。后章账房（ch4 12 处、ch6 19、ch7 35、ch8 45）都是这个模板的加密版。源头把"每个软件必须结一笔账"改成"哪里疼结哪里"，后章的病根就松了一半。</p>
+  <p class="dir">章内好例：L82「一笔错账的代价远高于一次慢查询」（代价落在具体事上，不是抽象记账）、L66「这些场景该交给别的系统」（直陈分工）。§1.3 三连播解掉后，剩余账房词逐处换成后果直陈。</p>
+</div>
+
+<h2>4 · 分歧与待裁<span class="sub">不默认动，上作者</span></h2>
+<table>
+  <tr><th style="width:18%">项</th><th style="width:44%">内容</th><th>分歧/悬置原因</th></tr>
+  <tr><td><b>L68 / L84 / L98 三连盖棺</b><br><span class="badge bd">两席相反</span></td>
+      <td>detector：1.2 三节"场景段→整句加粗盖棺"收束架构完全一致，双凿子叠加 ×3，列重灾；tech-editor：这 三句"一句话鉴定"是<b>收获系统值得保留</b>——每节末给读者一句可带走的话，是教科书的好设计，重症只有 L126</td>
+      <td>相容案：三句鉴定<b>全留</b>（内容与位置不动）；若动，只把三段收束节奏改一处非对称（如 L84 已有破折号收尾，L68/L98 中的一句换成别的方式落地）。<b>上作者</b></td></tr>
+  <tr><td><b>L115 图表三遍计费</b><br><span class="badge bd">力度分歧</span></td>
+      <td>detector 列全章最差第 4 位（表 1-1＋雷达散文＋图注，五维度名四行两遍）；tech-editor 判轻度（表格之后的散文重述是 1.2.4 的本职工况，只是图回指半句多余）</td>
+      <td>最小案已入 §1.6：删 L115 末句图回指＋L118 图注重列；雷达散文本体去留<b>上作者</b>裁力度</td></tr>
+  <tr><td><b>绕场定性</b><br><span class="badge bd">定性分歧</span></td>
+      <td>detector：高浓绕场 7 处是病理（套用后章判据）；tech-editor：入口章整队出场是对比书的本职工况，顺序锁是对的、定语未锁死、唯一失格是 1.3.2 缺 Kafka 角（§1.5 已补）</td>
+      <td>两尺不同源：det 拿中段章的尺量入口章。tech 的裁定更贴本书体裁（对比书需要稳定阵容）。处置采 §3.3（复述降次不动顺序），登记不改文。<b>上作者</b>知悉即可</td></tr>
+  <tr><td>鉴定句与"最X"族</td>
+      <td>"这是/就是"起手与颁奖词族：L60「Redis 则走了相反的路」、L62「这些选择都围绕同一个目标」、L167「三种方案，一条共同主线」、L181 内多处；"最"字 10+ 处</td>
+      <td>det 单票（tech 以盖棺句收获系统部分印证）。逐处过尺：删掉后少一个<b>事实</b>的留（L167 主线句），只少"总结感"的删。<b>上作者</b>逐处裁</td></tr>
+  <tr><td>行政插入句 L38 / L44 / L74</td>
+      <td>「单分区吞吐的量级见第 7 章关键数字。」（L38，嵌在 LinkedIn 叙事动量段中）／「并发怎么控，MySQL 用的是 MVCC。锁与隔离级别的深入细节则不在本书范围。」（L44）／「InnoDB 是默认引擎，本书讨论 MySQL 时以它为主」（L74，嵌在核心抽象段中）</td>
+      <td>tech-editor 单票：元信息插进叙事动量段，读者被拽出场景。两选：挪到节末/脚注 vs 压成半句嵌进。三处力度不一（L38 最该挪，L74 可短化）。<b>上作者</b>裁形式</td></tr>
+  <tr><td>巨句字数与行数口径差</td>
+      <td>L80：det 159／tech ~200；L196：det 127／tech ~190；荒漠：det ~90 行／tech ~108 行；句数 det 207／tech 未报</td>
+      <td>口径差异登记（切分与去标记规则不同），非方向分歧。两席 Top 集合一致锁定 <b>L76/L80/L196/L126</b> 为手术位</td></tr>
+  <tr><td>1.5 小结轻重<br><span class="badge bd">评分相反</span></td>
+      <td>detector 给 1.5 全章次高 7.5 分（「这一章讲清了三个问题」与 L5 首尾复印＋三问重列）；tech-editor 给末句 5/5（「具体方案换个软件就过时，追问的方式不过时」过收获核查）</td>
+      <td>相容：det 扣的分全来自与 L5 的复印，§2.3 手术后小结自动不再是复读；末句与小结骨架不动。登记不改文</td></tr>
+</table>
+
+<h2>5 · 明确不动<span class="sub">好样子＋豁免，手术对齐这些</span></h2>
+<ul>
+  <li><b>L181 结构自述段</b>（tech-editor 判全章人味基准）——「这个结构是我试出来的。起初我按软件逐个整理笔记，写完发现不行：共性讲不出来，Redis 的持久化和 Kafka 的持久化隔着好几章，看不出它们在对付同一个问题。」写作决策的一手复盘，改一个字都亏。</li>
+  <li><b>L9</b>（两席共举）——「这三个软件，我做了十几年系统，几乎天天在用。看得久了发现一件事：它们面对的是同一批问题，采用的方案却常常相反。」资历＋反差，两句话立起全书的观察者位置。</li>
+  <li><b>L96 段尾</b>——「——还是 1.1 节那笔订单，履约、推荐、风控同时收到通知，谁也不等谁。」后向呼应的教科书用法（回指前文兑现，不是前向路标）。</li>
+  <li><b>L162–L165</b>（tech 判全章最佳教学节奏）——「逻辑日志紧凑……又快又稳。<b>三家各用了一套方案。</b>」9 字急刹后接三家三段，一段一拍；§3.5 补短句的对齐基准。</li>
+  <li><b>L82</b>——「这些场景错不起：数据价值高、查询模式复杂，一笔错账的代价远高于一次慢查询。」"这些X"族里承重的那处（后面跟着硬判断）。</li>
+  <li><b>L28</b>——「每一家舍弃的东西，恰好落在别家的强项里。」全章最好的一句压缩（"恰好"在此处几乎成立；§3.4 的处理以不伤这句为准）。</li>
+  <li><b>L147 段尾</b>——「不问约束就评价设计好坏，等于白评；同一个选择换个约束，可能就成了灾难。」判断锋芒，1.3.2 补 Kafka 角时这句原样不动。</li>
+  <li><b>L58 / L175 家常短句</b>——「Redis 的起点很朴素。」「前置要求并不高。」全章仅有的两处自然呼吸，是 §3.5 排班的母本。</li>
+  <li><b>L220 末句</b>（tech 5/5）——「具体方案换个软件就过时，追问的方式不过时。」一句话收获核查满分；1.5 小结只解与 L5 的复印，不动这句。</li>
+  <li><b>1.4.1 直呼"你"</b>（L173/L175 第二人称透气孔，全书"你"的密度基准之一）、<b>表 1-1／表 1-2 内容、术语黑体首现（数据结构服务器／追加写日志／页 等）、图注编号</b>——排版与结构契约。</li>
+</ul>
+<p class="why">共同点校准：好句子＝一手经历（L5/L9/L181）或一句压得住的判断（L28/L82/L147 尾/L220 末）；怪句子＝<b>承诺一句话却交付 150 字（L76）、同一事实三讲（演化线／两稿）、每个框架预分三格、每节配一笔账</b>。tech-editor 的总尺：这章的故事与判断是全书入口该有的样子，要拆的是标准件流水线——尤其记得它是源头，这里松一寸，后面九章松一尺。</p>
+
+<h2>6 · 可复用的自检方法<span class="sub">不需要语文基础；含 ch1 新增两测试</span></h2>
+<table>
+  <tr><th style="width:18%">测试</th><th>做法</th></tr>
+  <tr><td><b>段落同构测试</b><br>（ch1 新增）</td><td>把相邻的平行段首句与逐句字数抄下来并排：三段起手同形＋句长拍型相近（如 [8,55,10]/[8,37,17]/[11,41,15]）＝段级克隆。句长统计抓不住它（每段均值正常），只有拍型并排才看得见。修法：三连里留两连，第三连起手变形或拍型拉开。</td></tr>
+  <tr><td><b>两稿测试</b><br>（ch1 新增）</td><td>同一论点在两节各讲一遍（本章标本：依赖链 L188⇄L216、MySQL 演化线 L36/L72/L149）——逐处问"删掉哪一遍，读者会少知道任何事实？"答"不会"的那遍是草稿残留，删。带因果、带新信息的版本总是留到最后讲的那遍。</td></tr>
+  <tr><td><b>弹匣（复读）测试</b><br>（沿用）</td><td>同一措辞画线计数：L5「这一章先讲清三个问题」⇄L220「这一章讲清了三个问题」首尾复印；「MyISAM 到 InnoDB」三进三出。≥2 次即上桌，留首现或最有力的一现。</td></tr>
+  <tr><td><b>刹车测试</b><br>（沿用）</td><td>读出声，数两次句号之间喘了几口气。超过三口气没有一脚刹车＝三长无一短（本章最长坡 L74–L80 约一页四段；L76/L80 两堵墙为最）。</td></tr>
+  <tr><td><b>账单测试</b><br>（沿用）</td><td>数"代价／取舍／换"（本章 34 处）。第一章特有的检查：1.2 三节是否各配了一段同款"代价段"——是的话，这就是后章账房的源头，源头解锁优先级最高。</td></tr>
+  <tr><td><b>书签测试</b><br>（ch7 沿用）</td><td>把"我"标在行号轴上：L5/L9 之后 L11–L118 无人称（荒漠），回场在 L149（演化判断）与 L181（结构自述）。入口章的"我"密度是全书基准，荒漠越长，后章越冷。</td></tr>
+</table>
+
+<h2>7 · 执行约束<span class="sub">项目铁律，随单生效</span></h2>
+<ul>
+  <li>流程：plain-rewriter 候选 → detector 混编盲评（新旧混排不告知身份）→ 技术席事实核对 → <b>作者终判</b>（及格线 ≈2/10；分数当向导、耳朵终判）</li>
+  <li>改字词不改意思；允许丢信息换朴实，丢了的技术事实须登记接管方</li>
+  <li>修复前核对席对本页所有引文逐字对账（铁律 3）；本页已登记 1 处计数校正：det 席称 L36"一句三对"中英对照括号，实为四对（MVCC／clustered index／WAL／MGR）</li>
+  <li>以下属<b>技术内容</b>，动到即走技术席：L34/L36（InnoDB 四件套、演化线）、L38（LinkedIn 2014 基准：3 台廉价机约 200 万写/秒，Kafka 0.8.1、100 字节消息）、L44（MVCC 与并发）、L58（antirez 2009 起家史）、L62、L72（1995 MySQL AB／2008 Sun／2010 Oracle 沿革）、L74（页默认 16KB、B+ 树聚簇）、L76（Read View 语义与版本链）、L78（redo／undo／binlog 分工、缓冲池）、L80（fsync 语义、两阶段提交 prepare/commit）、L88–L96（分区／offset／ISR／sendfile／compaction）、L115/L118（雷达五维度口径）、L126（单线程与多线程 I/O 事实）、L147（单线程约束推理、B+ 树 vs 哈希）、L149（Sentinel／Cluster／KRaft 演化）、L158–L165（WAL／逻辑 vs 物理／redo 混合日志详见第 8 章）、L167、L192/L194/L196（版本基线与各版本事实）、L204–L210（三条路径内容）、表 1-1／表 1-2 全部行</li>
+  <li><b>1.3.2 补 Kafka 角属新增技术内容</b>：约束反例的一句话由技术席出，文风席不得代写；L147 现有 Redis／MySQL 两例一字不动</li>
+  <li><b>不造经历</b>（ch6 立规沿用）：荒漠区若补"我"的颗粒（踩坑、选型回忆）须作者本人出；无真事则走 a 路线（"你"＋拆句）</li>
+  <li>L196 表格化后与 L194 版本状态提示的分工须重读一遍（语义类改动改后验证必须重读合并进来的存量句，不能只查接缝——2026-09-03 教训）</li>
+  <li>改后重建 <code>python3 scripts/build_html.py</code> ＋ <code>build_pages.py</code> 并入库</li>
+</ul>
+
+<footer>glm 修改意见 · 2026-09-08 ｜ 两席完整原始报告见本轮会话记录（detector 207 句量化＋分节评分＋三胞胎拍型；tech-editor 签名病理 7 项＋绊脚点 Top5＋标杆 6 处＋节奏地图＋四步修法）；同轮参照：0908/第二至九章/ ｜ 右栏均为示意草案，终稿以流水线为准</footer>
+
+</div>
+</body>
+</html>

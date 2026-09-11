@@ -1,0 +1,29 @@
+报告已完整写入 `/Users/liu/dev/demos/redis-kafka-books/0909/m3/D2-参数与默认值核验员.md`（258 行）。
+
+---
+
+## 核验结论摘要
+
+### 总评：🟢 正文合格，可出版
+
+**正文（13 个 chapter.md）零 P0 硬伤，零拼写错误，零默认值错误。**
+
+### 核心发现
+
+**✅ 亮点（通过项）**
+- 全书 **48 个参数**，拼写全部正确（含下划线、点号、大小写精确无误）
+- 所有默认值与基线（Redis 7.x / MySQL 8.0.x / Kafka 3.x）完全吻合
+- MySQL 8.0.26 的 `master`→`source` 重命名在正文（ch9:163）中标注正确
+- MySQL 8.0.27 的 `slave`→`replica` 重命名在正文（ch7:115）中标注正确
+- 版本敏感参数（`caching_sha2_password`、`binlog_encryption`、`innodb_redo_log_encrypt`）均标注了引入版本
+
+**⚠️ P1 缺陷（5 处，均为"默认值语境标注不足"，不影响正确性）**
+1. ch7 关键数字框：Kafka 单分区吞吐 ~10,000 条/秒缺少消息大小前提（应注明以小消息为例）
+2. ch2:110：`batch.size` 未标默认值约 16384 字节
+3. ch2:110：`linger.ms` 未标默认值 0ms
+4. ch9:266：`log.flush.*` 未标注"Kafka 3.x 默认不开启，由 OS 控制"
+5. ch9:243：`unclean.leader.election.enable` 默认 false 的版本来源应补充（0.11 起，KIP-106）
+
+**📝 outline.md 备注**：ch7 outline.md 中两处用了旧参数名（`slave_parallel_type`、`rpl_semi_sync_master_wait_for_slave_count`），正文主文本均已正确更新，outline.md 是草稿文件不影响出版。
+
+**✅ 无历史版本坑**：全书未引用已废弃参数，无旧版本参数混用于新基线的情况。
