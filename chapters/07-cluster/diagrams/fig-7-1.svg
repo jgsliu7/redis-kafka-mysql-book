@@ -53,7 +53,7 @@
   <rect x="335" y="245" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="460" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② 半同步复制</text>
   <text x="460" y="290" text-anchor="middle" font-size="12" fill="#374151">主等 ≥1 个从 ACK 才返回</text>
-  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">副本日志落盘确认；超时可降级</text>
+  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">副本写入 relay log 后回 ACK；超时可降级</text>
 
   <line x1="460" y1="315" x2="460" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
   <text x="470" y="340" font-size="11" fill="#EF4444">故障转移仍需另行协调</text>

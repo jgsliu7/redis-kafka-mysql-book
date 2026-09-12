@@ -62,7 +62,7 @@
 
 © 2026 本书作者。本书采用知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议（CC BY-NC-ND 4.0）授权，未经许可不得用于商业用途。
 
-2026 年 7 月第 1 版
+2026 年 9 月第 1 版
 
 商标声明：Redis 是 Redis Ltd. 的商标；MySQL 是 Oracle Corporation 及其关联公司的商标或注册商标；Apache Kafka、Kafka 是 Apache Software Foundation 的商标。本书对上述名称的使用仅作技术讨论，不代表各商标权属方对本书内容的认可。
 

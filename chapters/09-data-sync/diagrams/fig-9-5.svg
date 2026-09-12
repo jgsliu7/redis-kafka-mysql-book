@@ -68,7 +68,7 @@
   <path d="M 690 289 L 680 289 L 680 421 L 687 421" fill="none" stroke="#059669" stroke-width="1.2" marker-end="url(#arrowGreen)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
+  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 文件）</text>
   <text x="790" y="374" text-anchor="middle" font-size="11" fill="#374151">不等本地回放完成</text>
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>

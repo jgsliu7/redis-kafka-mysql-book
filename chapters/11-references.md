@@ -28,7 +28,7 @@
 
 ## 第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层
 
-[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"的说法的直接学术渊源。
+[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"这一说法的直接学术渊源。
 [14] MySQL. MySQL 8.0.36 源码（handler 与 THD）[EB/OL]. [2026-09-09]. https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/handler.h；https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/sql_class.h. —— 存储引擎接口与连接上下文的定义，可对照第 5 章查看 handler 的虚函数接口及 THD 保存的跨层状态。
 [15] Apache Kafka. Kafka Documentation: Design / Implementation[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Design 与 Implementation 部分介绍网络请求处理、批量传输和存储组织，可对照第 5 章理解线程交接与对象调用的分工。
 
@@ -73,7 +73,7 @@
 [35] 同 [1]。—— 跨系统架构取舍的入门读物，本书反复与之呼应的核心参照。
 [36] 同 [2]。—— 将日志当作统一抽象的精炼论述，适合快速建立数据系统统一视角。
 [37] Bailis P, Hellerstein J M, Stonebraker M. Readings in Database Systems: 5th Edition[M/OL]. (2015)[2026-08-14]. http://www.redbook.io/. —— 数据库经典论文（社群通称 Red Book）按主题组织的导读索引，适合有论文阅读需求的读者。
-[38] Botros S, Tinley J. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2021. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
+[38] Botros S, Tinley J. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2022. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
 [39] Kreps J, Narkhede N, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. Athens, 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，可用于理解日志追加、分区和批量传输等早期设计选择，并与后续复制及元数据架构的演进对照。
 
 ---
