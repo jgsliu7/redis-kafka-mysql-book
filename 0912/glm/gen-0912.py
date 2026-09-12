@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """0912/glm/items-agg.json → 汇总结果.html（四列批注对照 + 状态列）
 
-状态来源（可选）：0912/glm/statuses.json  {id: {"status": "done|split|author|pending", "note": "..."}}
-- pending 待核（初始） / done 三席一致·已修改 / split 分歧·未修改 / author 留作者裁决·未修改
+状态来源（可选）：0912/glm/statuses.json  {id: {"status": "done|split|author|pending|converged", "note": "..."}}
+- pending 待核（初始） / done 三席一致·已修改 / split 分歧·未修改 / author 留作者裁决·未修改 / converged 作者修订轮亲改·已收敛
 """
 import html, json, pathlib, re
 
@@ -23,6 +23,7 @@ ST_META = {
     "done": ("三席一致 · 已修改", "st-done"),
     "split": ("分歧 · 未修改", "st-split"),
     "author": ("留作者裁决 · 未修改", "st-author"),
+    "converged": ("作者修订 · 已收敛", "st-converged"),
 }
 
 
@@ -135,11 +136,13 @@ td.loc{font-size:12.5px;}
 .st-split-note{background:var(--split-bg);color:var(--split-ink);border:1px solid var(--split-line);}
 .st-author-note{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line);}
 .st-done-note{background:var(--accent-soft);color:var(--ink);}
+.st-converged-note{background:var(--accent-soft);color:var(--ink);}
 .st-pending-note{background:var(--surface);color:var(--muted);border:1px solid var(--line);}
 .st-pending{color:var(--muted);background:var(--surface);border:1px solid var(--line);}
 .st-done{color:var(--ok-ink);background:var(--ok-bg);border:1px solid var(--ok-line);font-weight:600;}
 .st-split{color:var(--split-ink);background:var(--split-bg);border:1px solid var(--split-line);font-weight:600;}
 .st-author{color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);}
+.st-converged{color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent);font-weight:600;}
 .src,.dst{font-family:"Noto Serif SC","Songti SC",serif;font-size:15px;line-height:1.9;
   word-break:break-word;}
 .lbl{color:var(--muted);}
@@ -186,12 +189,14 @@ HTML = f"""<meta charset="utf-8">
   <p><b>执行规则</b>：每行经 3 席独立核实（技术事实 / 书内一致性 / 源码与版本），<b>三席全部判定「问题存在＋认可改法」才由调度修改书稿</b>；未达三席一致的只在本表标记，不改。行号均需执行前重新定位。</p>
   <p><b>施工提醒</b>：V01 五处须一次改齐；V15a/V15b 孪生句补句须两处逐字一致；W08 仓库地址按实际 remote 写为 <code>redis-kafka-mysql-v2</code>（书内原 URL 为 <code>redis-kafka-books</code>），3 席若一致认可则照改；V01c fig-7-1 标签宽度余量小，改后须复查；MF-15 与 MF-45 三处同批次。</p>
   <p><b>执行结果（2026-09-12）</b>：36 项三席一致已落地，经双席改后独立验证（一致性核对席 36/36 逐字落地＋17 项未执行零误动；技术复核席 36/36 技术成立、红线零命中、V01 家族四处口径一致）。15 项分歧与 2 项留作者未动，各席立场见行内备注。遗留口径分叉（均为未达一致侧，待作者裁决后收口）：表 1-1「写性能」（V12a）；ch1:64/ch5:45 的 io-threads 读写方向（MF-15）；ch7:100「接收并刷盘」与 ch10:78「刷入 relay log」（V01a 组，本轮已改四处与之不构成新矛盾）。</p>
+  <p><b>作者修订轮复核（2026-09-12 · 284a5a8）</b>：作者提交修订后，双席对照（逐条判定席＋落地完整性席）复核 17 项未执行项与上段遗留分叉。结论：V01a 两处残点（ch7:100、ch10:78）作者亲改收敛，全书 14 处 relay log 口径一致（ACK＝写入 relay log 文件即回、fsync 归 sync_relay_log）；MF-15 部分收敛（ch5 段重写与 ch10 同向，残点仅 ch1:65「加速网络读写」）；36 项已落地改文零回退——31 项逐字在位，5 处被作者后续改写但技术要点经复核仍成立。其余 15 项分歧与 2 项留作者未动，表 1-1「写性能」（V12a）与 ch1:65 仍分叉待作者裁决。fig-3-3 已同步补上作者新增的「首次 AOF 重写未完成」例外注记。</p>
 </div>
 </header>
 <div class="stats">
   <div class="stat"><b>{len(rows)}</b>总条目</div>
   <div class="stat"><b>{n_status['pending']}</b>待核</div>
   <div class="stat"><b>{n_status['done']}</b>三席一致 · 已修改</div>
+  <div class="stat"><b>{n_status['converged']}</b>作者修订 · 已收敛</div>
   <div class="stat"><b>{n_status['split']}</b>分歧 · 未修改</div>
   <div class="stat"><b>{n_status['author']}</b>留作者裁决</div>
 </div>

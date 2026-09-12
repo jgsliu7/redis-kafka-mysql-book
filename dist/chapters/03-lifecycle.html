@@ -276,8 +276,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="300" y="166" width="280" height="76" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="440" y="192" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">① RDB / AOF 重写子进程在跑？</text>
-  <text x="316" y="214" font-size="12" fill="#374151">是 → 直接杀掉，不等它完成</text>
+  <text x="316" y="214" font-size="12" fill="#374151">是 → 终止子进程，不等它完成</text>
   <text x="316" y="232" font-size="12" fill="#374151">否 → 直接进入下一步</text>
+
+  
+  <rect x="620" y="172" width="250" height="76" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
+  <text x="745" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">例外</text>
+  <text x="632" y="222" font-size="12" fill="#374151">首次 AOF 重写未完成（尚无正本）</text>
+  <text x="632" y="240" font-size="12" fill="#374151">→ 普通关闭被拒绝，FORCE 可跳过</text>
 
   
   <path d="M440 246 L440 270" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#fig_3_3_arrow)"/>
