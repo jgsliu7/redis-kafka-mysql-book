@@ -50,7 +50,7 @@
   <line x1="400" y1="244" x2="410" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
   <line x1="560" y1="244" x2="574" y2="244" stroke="#EF4444" stroke-width="2.2" marker-end="url(#arrow-red)"/>
 
-  <text x="60" y="292" font-size="12" fill="#374151">一个元素变长，可能逐个撑大后面所有元素的 prevlen 字段 → 最坏退化成 <tspan font-weight="700" fill="#B91C1C">O(n²)</tspan></text>
+  <text x="60" y="292" font-size="12" fill="#374151">一个元素变长，可能连锁扩大后续 prevlen；早期实现累计搬移最坏为 <tspan font-weight="700" fill="#B91C1C">O(n²)</tspan></text>
 
   <!-- 分隔线 -->
   <line x1="60" y1="312" x2="820" y2="312" stroke="#E5E7EB" stroke-width="1.2"/>
@@ -74,5 +74,5 @@
   <line x1="403" y1="366" x2="407" y2="390" stroke="#059669" stroke-width="2"/>
   <line x1="407" y1="366" x2="403" y2="390" stroke="#059669" stroke-width="2"/>
 
-  <text x="60" y="426" font-size="12" fill="#374151">元素不再记前一个是谁 → 从根上消除连锁，写复杂度回到 <tspan font-weight="700" fill="#065F46">O(n)</tspan>，内存密度不降</text>
+  <text x="60" y="426" font-size="12" fill="#374151">元素只记自身长度，消除连锁；插入时仍可能搬移后缀： <tspan font-weight="700" fill="#065F46">O(n)</tspan></text>
 </svg>

@@ -302,7 +302,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这减少了写入等待副本确认的延迟，但复制仍消耗主节点的 CPU、网络与缓冲空间，慢副本也可能因输出缓冲超限而被断开。代价同样明确：故障转移时，新主可能尚未收到老主已向客户端确认的写，因而丢失这些写。Redis 把副本追赶放在异步路径上，以数据丢失风险换取较少的确认等待；具体风险还受持久化、可写门槛和故障转移条件影响。</p>
 <h3 id="s213">全量同步：fork 出 RDB，传完补增量</h3>
 <p>副本第一次连上来，或者增量同步无法进行时，就要做全量同步。流程是：</p>
-<ol><li>副本首次连接时发送内部复制协议请求 <code>PSYNC ? -1</code>，表示没有可用于续传的复制 ID 与偏移量。主节点安排后台保存，fork 子进程生成 RDB。采用有盘同步时，先生成 RDB 文件再传输；采用无盘同步时，子进程直接向副本连接写出 RDB 数据。Redis 7.0 默认启用 <code>repl-diskless-sync</code>。</li><li>在 RDB 生成和传输期间，主节点继续处理写入，并保留此后产生的复制流。Redis 7.0 让副本输出和 backlog 引用<strong>同一组共享复制缓冲块</strong>，各副本保留自己的发送进度；两者职责不同，底层字节却不必各存一份。</li><li>副本加载 RDB 后，得到主节点 fork 时的数据快照。</li><li>主节点继续发送快照之后保留的复制流，副本执行这些增量，逐步追赶。</li></ol>
+<ol><li>副本首次连接时发送内部复制协议请求 <code>PSYNC ? -1</code>，表示没有可用于续传的复制 ID 与偏移量。主节点安排后台保存，fork 子进程生成 RDB。采用有盘同步时，先生成 RDB 文件再传输；采用无盘同步时，子进程直接向副本连接写出 RDB 数据。Redis 7.0 默认启用 <code>repl-diskless-sync</code>（6.x 及以前默认为有盘同步）。</li><li>在 RDB 生成和传输期间，主节点继续处理写入，并保留此后产生的复制流。Redis 7.0 让副本输出和 backlog 引用<strong>同一组共享复制缓冲块</strong>，各副本保留自己的发送进度；两者职责不同，底层字节却不必各存一份。</li><li>副本加载 RDB 后，得到主节点 fork 时的数据快照。</li><li>主节点继续发送快照之后保留的复制流，副本执行这些增量，逐步追赶。</li></ol>
 <p>这里的关键在第二步：fork 是一个时间点，同步过程却会持续一段时间，期间产生的新写也需要传给副本。缓冲保留的是快照之后的复制流，直到副本完成相应的接收。</p>
 <p>全量同步还有两项代价：fork 要复制页表，可能造成短暂停顿；子进程运行期间，父进程修改内存页会触发写时复制（COW），额外内存随被修改的页增加，并非 fork 瞬间就复制全部数据。RDB 的网络传输还会消耗主节点出口带宽。全量同步越频繁，这些开销越明显，所以 Redis 重点设计增量同步，减少反复全量。Redis 全量同步与部分重同步的完整分支见<a class="xref" href="#fig-9-3">图 9-3</a>。</p>
 <figure class="fig" id="fig-9-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 66 880 554" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -567,7 +567,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <path d="M 690 289 L 680 289 L 680 421 L 687 421" fill="none" stroke="#059669" stroke-width="1.2" marker-end="url(#fig_9_5_arrowGreen)"/>
 
   <rect x="690" y="336" width="200" height="50" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 并落盘）</text>
+  <text x="790" y="356" text-anchor="middle" font-size="10.5" font-weight="600" fill="#EF4444">回 ACK 给主（已写 relay log 文件）</text>
   <text x="790" y="374" text-anchor="middle" font-size="11" fill="#374151">不等本地回放完成</text>
 
   <rect x="690" y="396" width="200" height="50" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
@@ -593,7 +593,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s221">异步复制：本地提交不等待副本</h3>
 <p>默认配置下，MySQL 复制是异步的：主节点完成本地事务提交后就给客户端返回 OK，不等任何副本。半同步增加副本确认，组复制则增加组内事务协调与一致性选项（见下文“半同步复制”一节、<a class="xref" href="07-cluster.html">第 7 章</a>）。异步方式省去了提交时等待副本的延迟，代价是故障转移时可能缺少已提交事务。</p>
 <h3 id="s222">半同步复制：可降级的副本确认</h3>
-<p>半同步（semi-sync）在本地提交路径上增加了副本确认：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 并落盘后即回 ACK，不等本地回放）才返回成功。它有两档等待时点。<code>AFTER_SYNC</code>（8.0 默认）是主节点先将 binlog 刷盘，等副本 ACK 后再提交到存储引擎。<code>AFTER_COMMIT</code> 则先在引擎层提交，再等 ACK。这一档有个危险窗口：事务先在引擎层提交，其他会话已经能读到它；若此刻副本 ACK 还没回来主就崩了，晋升的新主可能没有这笔事务；之前读到它的会话，等于看见数据消失。这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
+<p>半同步（semi-sync）在本地提交路径上增加了副本确认：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 文件后即回 ACK，不等本地回放）才返回成功。这份 ACK 只保证事件已写入 relay log 文件，是否 fsync 由副本的 <code>sync_relay_log</code> 决定（默认 10000，即每累计一万条事件才强制同步一次；设为 1 才是确认即持久）。它有两档等待时点。<code>AFTER_SYNC</code>（8.0 默认）是主节点先将 binlog 刷盘，等副本 ACK 后再提交到存储引擎。<code>AFTER_COMMIT</code> 则先在引擎层提交，再等 ACK。这一档有个危险窗口：事务先在引擎层提交，其他会话已经能读到它；若此刻副本 ACK 还没回来主就崩了，晋升的新主可能没有这笔事务；之前读到它的会话，等于看见数据消失。这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
 <p>半同步还可降级：等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 <code>rpl_semi_sync_source_wait_for_replica_count</code> 控制（默认 1）。</p>
 <p>半同步仍有适用边界：超时降级后，提交不再等待副本确认；故障转移时，也必须选择持有已确认事务的副本，并保留、应用其 relay log。事务还未在副本上回放，并不等于它已经丢失。<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.3.2">7.3.2 节</a>从集群拓扑角度也提到了这些条件。</p>
 <p>从同步的视角看，半同步的一个设计要点是：副本确认可以因超时而暂时取消，但这种降级必须可观测。如果降级默默发生，你以为在半同步其实在异步，故障时才发现缺少数据，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>正常状态与降级状态同等重要，都得可观测</strong>。Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩虽然采取了不同动作，也都需要让运维知道保护条件发生了什么变化。</p>
@@ -739,7 +739,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这一点和<a class="xref" href="05-layered-architecture.html">第 5 章</a> Kafka 存储层的 Log 抽象直接呼应：每个分区的日志都提供一条有序序列，可以作为副本共同复制的输入。不同分区之间并没有由 offset 建立的统一顺序。</p>
 <h3 id="s230">拉模式：复用本地日志读取逻辑</h3>
 <p>Kafka 复制用的是<strong>拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis、MySQL"副本发起后主端流推"都不同。</p>
-<p><strong>Follower 与消费者的 FETCH 复用本地日志的读取逻辑</strong>，但 Leader 会区分请求角色。Follower 可以拉取到 LEO，其请求还用于更新副本进度；消费者的读取受 HW 约束，使用 <code>read_committed</code> 时还受事务稳定边界 LSO 约束。请求中的 <code>replica_id</code> 可区分副本与普通消费者：Follower 填自己的 broker id，普通消费者填 -1。两类请求可以共享页缓存、批量读取等底层优化；本地文件传输在条件满足时还能使用零拷贝。<a class="xref" href="05-layered-architecture.html">第 5 章</a>的分层思想在这里体现为：上层职责不同，底层日志读取仍可复用。</p>
+<p><strong>Follower 与消费者的 FETCH 复用本地日志的读取逻辑</strong>，但 Leader 会区分请求角色。Follower 可以拉取到 LEO，其请求还用于更新副本进度；消费者的读取受 HW 约束，使用 <code>read_committed</code> 时还受 LSO（Last Stable Offset，最后稳定偏移量）这一事务稳定边界约束。请求中的 <code>replica_id</code> 可区分副本与普通消费者：Follower 填自己的 broker id，普通消费者填 -1。两类请求可以共享页缓存、批量读取等底层优化；本地文件传输在条件满足时还能使用零拷贝。<a class="xref" href="05-layered-architecture.html">第 5 章</a>的分层思想在这里体现为：上层职责不同，底层日志读取仍可复用。</p>
 <p>拉模式让 Follower 自己掌握追赶节奏，但副本数量多时，大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一批日志）和页缓存（命中时可从内存读取，未命中时仍需磁盘 I/O）。3.9 的 Tiered Storage 已可用于生产，冷段可卸载到远程存储。消费者可以读取远程段；Follower 的 FETCH 仍由 Leader 的本地日志提供消息。若所需数据已移到远程层，副本会从远程段恢复 leader epoch、生产者快照等辅助状态，再从对应远程段之后继续拉取本地日志（详见<a class="xref" href="08-storage-format.html">第 8 章</a> <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。本地保留窗口覆盖副本的落后量，有助于避免这条较复杂的追赶路径。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
 <p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.2">7.4.2 节</a>展开；LEO 与 HW 的语义定义就在这里给出。</p>
@@ -854,7 +854,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 用 <strong>leader epoch</strong>（单调递增的任期号）标识日志的任期边界。分区的 <code>leader-epoch-checkpoint</code> 文件记录任期号和该任期的起始偏移量。副本重新追随时，可以在 FETCH 请求中带上最后已获取记录的任期和下一次拉取的偏移量；Leader 检查是否分叉，必要时返回 <code>diverging_epoch</code> 中的任期及结束偏移量。副本据此定位共同日志的边界，截断不一致尾部，再继续拉取。任期边界也可通过 <code>OffsetsForLeaderEpoch</code> 请求查询。</p>
 <p>leader epoch 补充了 offset 所没有的历史信息：相同偏移量在不同任期可能对应不同的日志内容。Redis 的 replid 也用于区分复制历史；MySQL 的 GTID 则标识事务来源和事务身份。它们都让位点带上了可核对的来源信息，但各自标识的对象不同。</p>
 <h3 id="s233">acks 参数：生产者的写入确认要求</h3>
-<p>Kafka 通过生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档）设置写入确认要求。<code>acks=all</code> 等待当前 ISR 中的副本确认，并配合 <code>min.insync.replicas</code> 检查 ISR 是否达到最低数量；达到最低数量后，<code>all</code> 仍要求当前 ISR 全部确认。确认复制也不等于各副本已逐条执行 fsync。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
+<p>Kafka 通过生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档）设置写入确认要求。<code>acks=all</code> 等待当前 ISR 中的副本确认，并配合 <code>min.insync.replicas</code> 检查 ISR 是否达到最低数量；达到最低数量后，<code>all</code> 仍要求当前 ISR 全部确认。<code>min.insync.replicas=1</code> 时，ISR 收缩到只剩 Leader 后写入仍被放行，<code>acks=all</code> 实际只等 Leader 本地确认，语义退化接近 <code>acks=1</code>。确认复制也不等于各副本已逐条执行 fsync。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
 <p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步确认超时后可降级为异步；Kafka 在 ISR 不足最低要求时会拒绝这类写入。两款软件在确认条件无法满足时，采取了不同的处理方式。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。一个常见的配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>：它可在一个副本故障后继续写入；保留已确认数据还要求始终有同步副本存活，并避免从缺少这些数据的副本选主。</p>
 <h3 id="s234">unclean leader 选举：数据保留与恢复可用性的取舍</h3>
 <p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。没有可用的 ISR 成员时，这个开关决定是否接受从落后日志恢复服务的风险：</p>
@@ -894,7 +894,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>原因在于重建副本可能代价很大。Redis 全量同步需要 fork 和 RDB 传输；MySQL 可通过备份或克隆建立基线，再回放此后的 binlog；Kafka 需要取得分区保留范围内的日志及相关状态。频繁重建会消耗主节点资源和带宽，延长恢复时间。所以设计原则是：<strong>能增量就别全量</strong>。这要求复制历史能够核对，所需日志的保留窗口足够覆盖常见断线时间。</p>
 <h3 id="s246">启示四：把延迟预算与确认要求一起确定</h3>
 <p><a class="xref" href="07-cluster.html">第 7 章</a>从集群选型讨论过可用性和数据保留的取舍，这里把它落到复制设计上。MySQL 的半同步超时参数（默认 10 秒）限制的是副本确认等待；超时后降级为异步，它不是整个事务响应时间的上限。我自己设计复制系统时，会把保证与等待放在一起考虑：业务需要保留什么数据、允许看到多旧的结果，以及为这些保证能承受多少等待。确认条件无法满足时，还要明确是失败、继续等待，还是允许降级。</p>
-<h3 id="s247">启示五：故障恢复是同步的反向问题</h3>
+<h3 id="s247">启示五：故障恢复复用日志与历史检查</h3>
 <p>同步传递持续发生的变化，恢复则需要先确认落后副本可以从哪里继续。二者会复用日志、位点和历史检查：Redis 故障转移后重连，用 PSYNC2 核对 replid 与 offset；MySQL 组复制成员按 GTID 补差，在日志不可用或达到配置阈值等条件下可选择克隆；Kafka 副本检查任期分叉，再继续 FETCH 追赶。</p>
 <p>一套设计良好的同步机制，通常也构成恢复机制的坚实基础。日志能够重放、位点能够核对、分叉有处理依据，恢复就可以复用已有路径；实际恢复还需要可用的数据来源。反过来，同步机制没有处理好的历史冲突和日志缺失，往往也会在故障恢复时暴露出来。</p>
 <h3 id="s248">反模式提醒</h3>

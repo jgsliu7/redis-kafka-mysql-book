@@ -127,7 +127,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>很多人接手过越改越乱的老项目：改一个小功能会牵连出三个模块的 bug，加一个新特性要在五六个地方重复改动，甚至想换底层存储时，调用方和实现已经耦合紧密、无法分离。这种痛，归根到底都指向同一件事：系统没有分好层。"对外收发消息、内部决定逻辑、底层存数据"这三件事混在一起写，系统就必然随着规模增长越来越难维护，修改风险越来越大。分层，就是把它们切开，让每一层只做自己的事。</p>
 <p>我接手过一个运营后台，需求只是加一个导出按钮。我改了 Controller 三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我动的那几行不小心改了 SQL 拼接的顺序。我只动了三行，但影响的边界根本不在这三行里。</p>
 <p>但分层是有代价的。每多一层，就多一笔层间开销、多一个接口要维护。分多深、层之间靠什么通信、谁可以替换，每一项都是实打实的取舍。Redis、MySQL、Kafka 分别侧重单机最低延迟、标准化生态、分布式水平扩展，展示了分层设计中不同的取舍。</p>
-<p>分层能做多薄，就看一件事：这次抽象带来的延迟，你愿不愿意付。我们用交互层、逻辑层、存储层三段式主线，把这三个软件放在一起对比。</p>
+<p>分层深度要权衡抽象收益、调用开销与接口维护成本。我们用交互层、逻辑层、存储层三段式主线，把这三个软件放在一起对比。</p>
 <h2 id="sec-5.1">5.1 问题的本质：为什么必须分层</h2>
 <p>"分层"这个词被提得太多，以至于快要失去意义。要把它从口号还原成工程问题，得先看不分会出什么问题。</p>
 <p>一个把所有事情混在一起写的服务是这样的：直接监听 TCP，收到字节后就地解析命令、就地读数据库、就地拼成报文发回去。这种代码在原型阶段跑得很快，但只要复杂度上来一点，它就会从四个方面同时出问题。一是改任何一行都要同时理解协议、SQL 和内存模型，认知负担重；二是换网络库或改存储格式会牵动整个文件，爆炸半径大；三是可测试性差，业务逻辑没法脱离网络做单元测试；最严重的是难以演进，升级存储格式时会发现协议处理代码里到处是针对旧格式的硬编码假设。</p>
@@ -144,8 +144,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="sec-5.2.1">5.2.1 交互层：RESP 与单线程多路复用</h3>
 <p>Redis 与客户端之间用 RESP（REdis Serialization Protocol，Redis 序列化协议）通信。RESP 的设计极简：每段数据用前缀字符区分类型（<code>+</code> 简单字符串、<code>-</code> 错误、<code>:</code> 整数、<code>$</code> 批量字符串、<code>*</code> 数组），用 <code>\r\n</code> 分隔。这种结构让解析器可以<strong>边读边解析</strong>。读到一行就处理一行，不需要等整个命令到齐。对 <code>SET key value</code> 这种短命令，协议处理几乎是一次零成本的拼接。</p>
 <p>承载这套协议的是单线程 Reactor 模型（Reactor 是事件驱动 I/O 模式的统称）。在 6.0 之前，Redis 的网络 I/O 和命令执行在同一个线程里：主线程用 epoll/kqueue 多路复用监听所有客户端连接，有事件就处理，处理完再回到事件循环。这套设计的关键是"没有跨层线程切换"。交互层和逻辑层在同一线程中运行，命令从解析到执行到写回，全程不用锁、不用队列，也没有上下文切换。Redis 看起来分层薄，根子就在这里。</p>
-<p>6.0 引入、7.x 沿用的多线程 I/O 只动了一件东西：把协议的<strong>读写</strong>（<code>read</code>/<code>write</code> 系统调用和大块 buffer 拷贝）拆给一组 I/O 线程，<strong>命令执行依然在主线程串行</strong>。Redis 在分层上很灵活，但绝不放开逻辑层并发：整个内存模型（无锁数据结构、惰性删除、对象共享）都建立在"单线程修改"的前提上，一旦放开并发，要么大面积加锁牺牲延迟，要么重写全部数据结构。这一句话也解释了为什么 7.x 默认仍然关闭多线程 I/O。它是个可选优化。</p>
-<p>交互层还有一个容易被忽视的细节：<strong>客户端输出缓冲区（client output buffer）</strong>。每个客户端连接有两个写缓冲区，一个固定大小（默认 16KB），一个动态增长。固定区吸收小响应，避免每次回复都 malloc。动态区承接大响应，但有上限（可配置 <code>client-output-buffer-limit</code>），超限就强制关闭连接。交互层和逻辑层在内存里本来就贴在一起，能拿出来的解耦手段就只有这一块缓冲区，靠它防止一个慢客户端把整个进程的内存拖垮。</p>
+<p>6.0 引入、7.x 沿用的多线程 I/O，可以把网络 I/O 工作分配给一组线程，<strong>命令执行依然在主线程串行</strong>。启用多个 I/O 线程后，默认只辅助处理响应发送；读取与协议解析还需开启 <code>io-threads-do-reads</code>。串行执行使键空间更新不必在多个命令执行线程之间加锁；若引入命令并发，则需要重新处理共享对象和数据结构的同步。7.x 默认仍只使用主线程完成这些 I/O 工作，多线程 I/O 是需要显式启用的可选优化，启用它也不会改变命令串行执行的前提。</p>
+<p>交互层还有一个容易被忽视的细节：<strong>客户端输出缓冲区（client output buffer）</strong>。每个客户端连接有两个写缓冲区，一个是初始约 16KB 的回复缓冲区，另一个用链表承接放不下的响应。前者吸收小响应，避免每次回复都 malloc。<code>client-output-buffer-limit</code> 可按客户端类型设置硬限制、软限制和持续时间；普通客户端默认不设上限，只有配置了有效限制，超限才会触发关闭连接。输出缓冲把命令执行与后续网络发送分开；合理配置输出缓冲限制，可以降低慢客户端持续占用内存的风险。</p>
 <p><strong>Redis 的分层极薄，目标就是低延迟</strong>。跨层不花任何抽象成本，副作用是交互层和逻辑层也没法独立演进。你不可能像换 MySQL 引擎那样换掉 Redis 的网络层。</p>
 <h3 id="sec-5.2.2">5.2.2 逻辑层：命令表 + robj 统一抽象</h3>
 <p>逻辑层是 Redis 里执行命令的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 <code>redisCommandTable</code>，6.x 及更早版本定义在 <code>server.c</code> 里，每条命令占一行。Redis 7.0 重构后，命令表改由 <code>commands/</code> 目录下的 JSON 描述文件自动生成到 <code>commands.c</code>，处理函数仍分布在 <code>server.c</code>、<code>t_string.c</code>、<code>t_list.c</code> 等文件中。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。</p>
@@ -229,7 +229,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 5-1　Redis 命令处理流水线：交互层与逻辑层用 client 结构体衔接，全程无序列化。</figcaption></figure>
 <p>图里右边那个贯穿全程的虚线框是 <code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针等会话状态。整个会话上下文都在这一个对象里。交互层往里写、逻辑层从里面读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路。在 Redis 的单线程执行路径中，交互层和逻辑层在同一线程内共享这个对象。</p>
-<p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里注册新命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。加一个新标志位意味着要改遍所有命令的声明。</p>
+<p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里注册新命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。新增一类横切标志要逐一审定受影响命令的元数据；6.x 时代加结构体字段才需动全表，7.0 的 JSON 化正是为消除这一代价。</p>
 <p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 统一表示所有数据类型的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义：这个对象是字符串、列表、哈希、集合还是有序集合，决定了它能执行哪些命令；encoding 决定内存表示。同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。</p>
 <figure class="fig" id="fig-5-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 488" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -317,14 +317,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="80" y="527" font-size="12" fill="#111827">关键决策：换 encoding 不动 type。</text>
 </svg>
 </div><figcaption>图 5-2　redisObject 的 type / encoding 解耦：type 标明类型语义，encoding 标明内存表示。</figcaption></figure>
-<p><strong>type 标明数据类型，encoding 标明内存表示。</strong> 命令对外仍按类型提供语义，例如对列表执行 LPUSH；内部实现则需要处理具体编码，引入新编码时还需要适配相关代码。换 encoding 不必改变 type，也不必改变命令对外的语义。7.0 起 listpack 全面取代了 ziplist 的内部用途（旧格式代码保留兼容），成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码，消除了 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的"连锁更新"（O(n²) 级联搬移），也进一步省内存。</p>
+<p><strong>type 标明数据类型，encoding 标明内存表示。</strong> 命令对外仍按类型提供语义，例如对列表执行 LPUSH；内部实现则需要处理具体编码，引入新编码时还需要适配相关代码。换 encoding 不必改变 type，也不必改变命令对外的语义。7.0 起 listpack 全面取代了 ziplist 的内部用途（旧格式代码保留兼容），成为哈希、列表（作为 quicklist 的节点）、有序集合这三种小集合场景的紧凑编码，消除了 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的"连锁更新"及其相邻元素长度依赖，也进一步省内存。</p>
 <h3 id="sec-5.2.3">5.2.3 存储层：内存管理 + 持久化双轨</h3>
 <p>Redis 的存储层走了一条和 MySQL 截然相反的路线：<strong>它不抽象出"可插拔引擎"</strong>。它围绕内存数据结构组织存储。换不同的内存分配器（jemalloc / tcmalloc）是优化，不是抽象引擎；它不会像把 InnoDB 换成 MyISAM 那样改变语义、改变事务支持。</p>
-<p>存储层的实际职责有三块。第一是内存分配，Redis 默认用 jemalloc，配合引用计数管理对象生命周期。第二是淘汰策略，当内存达到 <code>maxmemory</code> 上限时，按配置的策略（<code>noeviction</code>、<code>allkeys-lru</code>、<code>volatile-lru</code>、<code>allkeys-lfu</code> 等）选出该被清理的键。LRU 用近似采样实现、LFU 用计数加衰减，机制<a class="xref" href="04-memory-disk.html">第 4 章</a>拆过。第三是惰性删除（lazy free），4.0 引入：删除大对象（比如一个百万元素的集合）时不在主线程里同步释放内存，而是把它交给后台 BIO 线程异步释放，避免阻塞主线程。</p>
+<p>存储层的实际职责有三块。第一是内存分配，Redis 默认用 jemalloc，配合引用计数管理对象生命周期。第二是内存达到 <code>maxmemory</code> 上限后的处理策略：<code>noeviction</code> 拒绝会增加内存的写入，<code>allkeys-lru</code>、<code>volatile-lru</code>、<code>allkeys-lfu</code> 等策略则选择已有键进行淘汰。LRU 用近似采样实现、LFU 用计数加衰减，机制<a class="xref" href="04-memory-disk.html">第 4 章</a>拆过。第三是惰性删除（lazy free），4.0 引入：对大对象（比如一个百万元素的集合）使用 <code>UNLINK</code>，或启用相应的 lazyfree 选项时，可以把耗时的内存释放交给后台 BIO 线程。默认配置下，普通 <code>DEL</code> 仍可能在主线程同步释放大对象。</p>
 <p>持久化是存储层的"可选职责"，这是另一个 Redis 与传统数据库的根本差异。RDB（快照文件）做全量快照，AOF（仅追加文件）做增量日志，4.0 起支持混合重写（重写时把当前快照作为 AOF 的开头）。关键是：<strong>两者都可以关闭</strong>。你可以把 Redis 跑成纯内存、重启即丢的缓存，也可以开启 AOF，通过重放日志恢复数据；使用 <code>appendfsync everysec</code> 时，可能在故障中丢失最近约一秒的写入。Redis 把持久化当作附加项，而不是内建的强约束。这与"存储是数据库第一公民"的传统观念正相反。</p>
 <p>代价是 Redis 无法像 MySQL 那样换后端。你不能给 Redis 配一个"磁盘引擎"让它变成磁盘数据库（Redis on Flash、Pika 这类项目想补的正是这个空缺，但它们是 Redis 生态的外部方案，不是 Redis 内建能力）。</p>
 <h3 id="sec-5.2.4">5.2.4 层间通信</h3>
-<p>Redis 三层的通信机制可以概括成一句：<strong>全程无序列化、无虚函数</strong>。交互层到逻辑层走 <code>client</code> 结构体加直接函数调用；逻辑层到存储层走 <code>robj</code> 指针加直接内存访问。命令分派用的是函数指针（<code>cmd-&gt;proc(client)</code>），就是一张静态表里的一次跳转。这种"零抽象"的层间通信，正是 Redis 能把延迟降到亚毫秒的原因。</p>
+<p>Redis 三层的通信机制可以概括成一句：<strong>全程无序列化、无虚函数</strong>。交互层到逻辑层走 <code>client</code> 结构体加直接函数调用；逻辑层到存储层走 <code>robj</code> 指针加直接内存访问。命令分派用的是函数指针（<code>cmd-&gt;proc(client)</code>），就是一张静态表里的一次跳转。这种低开销的层间通信保留了模块抽象，避免了为层间通信重新编码数据，有助于降低常见命令的执行开销。</p>
 <h2 id="sec-5.3">5.3 MySQL 的做法</h2>
 <p>MySQL 的分层目标与 Redis 相反：它的核心目标是<strong>用一套标准化接口把存储层做成可插拔</strong>。连接层用 <code>THD</code> 贯穿三层、服务层把 SQL 处理切成解析/优化/执行三段、存储引擎层用 Handler API 定义"行操作"契约。</p>
 <h3 id="sec-5.3.1">5.3.1 交互层：连接、认证与线程模型</h3>
@@ -415,7 +415,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>解析器（Parser）</strong> 由 bison 生成（语法文件 <code>sql_yacc.yy</code>）。它先把 SQL 文本切成词法 token，再按 SQL 语法规则建出解析树，然后进入预处理阶段做语义检查（表存不存在、列存不存在、权限够不够），最终生成一个预处理查询树。这一段不做任何执行决策，只检查语法对不对、语义清不清楚。</p>
 <p><strong>优化器（Optimizer）</strong> 是 MySQL 挑选执行策略的组件。它接收查询树，输出一个执行计划。优化手段包括常量折叠、范围优化、直方图辅助索引选择、JOIN 顺序搜索等。8.0 引入的直方图让优化器能根据没有索引的列的数据分布作出判断。这个执行计划是一组结构化的"该按什么顺序、用什么索引、走什么 JOIN 策略"的指令，不是 SQL，也不是机器码。</p>
 <p><strong>执行器（Executor）</strong> 拿到执行计划后开始真正工作。以逐行执行路径为例：调用 handler 接口读一行 → 评估 WHERE 条件 → 聚合或返回 → 再读下一行。handler 的逐行访问接口通过虚函数调用引擎实现，会产生间接调用开销。但 SQL 的声明式语义并不要求只能逐行访问。MySQL 8.0 也支持批量访问机制，例如 BKA（批量键访问）可以通过 MRR（多范围读）接口，把一批查找键交给存储引擎。</p>
-<p><strong>查询缓存（Query Cache）</strong> 是分层失败的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。设计意图是好的，但它在 8.0 被彻底移除。失败的原因正是分层的错位：缓存做在服务层，而数据失效的源头在引擎层。任何一张表的任何一次写，都要去检查所有引用了这张表的缓存项并使之失效；加之整个缓存由一把全局互斥锁保护，高并发下锁竞争本身就是瓶颈；在高写入负载下，缓存维护的开销远超它带来的收益。缓存本应做在引擎层内部（InnoDB 的缓冲池就是），而不是跨在服务层。</p>
+<p><strong>查询缓存（Query Cache）</strong> 是缓存失效协调成本的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。设计意图是好的，但它在 8.0 被彻底移除。服务层维护查询结果缓存，底层表发生修改后，引用该表的缓存项需要失效；加上全局互斥锁的协调，在高并发、高写入负载下，维护开销可能抵消结果复用的收益。这个案例说明，缓存的失效粒度与协调方式必须匹配负载。InnoDB 的缓冲池缓存的是数据页，与服务层的查询结果缓存承担不同工作，不能仅凭这一案例判定缓存都应放在引擎层。</p>
 <p>服务层内的这三段，通过<strong>结构化中间表示（IR，解析树、执行计划）在子层之间的传递</strong>来衔接。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这和 Redis 的"直接函数调用"是两种路子。</p>
 <h3 id="sec-5.3.3">5.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约，用一套方法签名规定了"引擎必须能做什么"。接口包含表级方法（<code>open</code> / <code>close</code>）、行级方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）和事务相关方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。其中，<code>commit</code> 和 <code>rollback</code> 由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行。</p>
@@ -614,11 +614,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="sec-5.4.2">5.4.2 逻辑层（API 层）：请求类型分派</h3>
 <p>Kafka 的"逻辑层"在源码里叫 <code>KafkaApis</code>，这一层比 MySQL 的服务层要薄得多。它不做解析（解析在 Processor 完成），也不做优化（Kafka 没有"查询优化"这回事），就只做<strong>协议适配加请求分派</strong>。</p>
 <p>Kafka 把所有请求类型枚举成 ApiKeys：PRODUCE、FETCH、LIST_OFFSETS、METADATA、LEADER_AND_ISR 等。每一种有自己的版本号，Broker 要兼容新旧版本。<code>KafkaApis.handle()</code> 拿到一个 <code>RequestChannel.Request</code>，按 ApiKeys 走 switch 分派到对应的 <code>handleXxx</code> 方法。</p>
-<p>这一层还处理横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。配额机制限制单个客户端每秒产生的数据量（按字节计）或请求数，防止单一客户端压垮集群。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
+<p>这一层还处理横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。带宽配额按字节速率限制生产与消费流量；请求配额按网络线程和 I/O 线程的处理时间占比计量。配额可以按用户、<code>client-id</code> 或两者组合共享，并在每个 Broker 上执行，以减少单组客户端占满资源的风险。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
 <p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢、动一次影响面大，副本管理算法可能半年调一次，绑在一起改一处就得动两处。</p>
 <h3 id="sec-5.4.3">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
 <p>存储层是 Kafka 最具特色的一层。它的核心抽象是 <strong><code>Log</code></strong>，一个非常具体的对象，指一组顺序追加的日志段（LogSegment），不是泛指的"日志"。每个分区对应一个 Log，每个 Log 由多个 LogSegment 组成，每个 LogSegment 在磁盘上是三个文件：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>）。这套字节布局会在<a class="xref" href="08-storage-format.html">第 8 章</a>详讲，这里只看它作为"存储层抽象"的形态。</p>
-<p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。没有 B 树、没有索引重建、没有写放大。追加写是磁盘上最快的写法。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以保持默认设置，依靠 OS 和 Kafka 的后台刷盘完成落盘。副本机制的数据保护还取决于确认与故障条件：<code>acks=all</code> 等待当前 ISR 确认，并受 <code>min.insync.replicas</code> 限制；在不启用非同步副本选主、且始终至少有一个同步副本存活的前提下，Kafka 能保证已提交消息不丢。增加副本数本身不等于满足这些条件。</p>
+<p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。常规追加无需维护 B+ 树，也避免了逐条原地更新；副本复制和日志压实仍会带来额外写入。顺序追加便于批量 I/O，在机械盘上还能减少寻道。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以保持默认设置，依靠 OS 和 Kafka 的后台刷盘完成落盘。副本机制的数据保护还取决于确认与故障条件：<code>acks=all</code> 等待当前 ISR 确认，并受 <code>min.insync.replicas</code> 限制；在不启用非同步副本选主、且始终至少有一个同步副本存活的前提下，Kafka 能保证已提交消息不丢。增加副本数本身不等于满足这些条件。</p>
 <p><strong>读取路径</strong>有一个关键技巧：按偏移量二分定位日志段，再在段内用稀疏索引找具体位置。索引是稀疏的。每隔一段距离（默认 4KB）记一项，这把索引大小控制得很小，常驻内存。命中索引后，从消息文件里读出一段连续数据返回。如果数据已经在页缓存里（追得上生产者的消费者读近期数据时基本命中），读取就是一次内存拷贝，不需要真去磁盘。</p>
 <p>Kafka 高吞吐的另一个来源是<strong>零拷贝（sendfile）</strong>。传统路径要把数据拷贝四次。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉的正是两次拷贝和两次上下文切换。对追着日志尾部消费、数据还在页缓存里的场景，这点收益尤为明显。</p>
 <p>但零拷贝还有一个硬前提：<strong>数据必须是从文件到 socket 的纯转发，中间不能被修改</strong>。Kafka 直接转发本地日志且不需要修改字节时，可以满足这个前提；需要 TLS 加密等额外处理的路径则不能直接这样转发。</p>
@@ -832,7 +832,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s117">启示四：警惕分层的反模式</h3>
 <p>真正的分层应当引入新的抽象并收窄关注点。典型的反模式有三种。</p>
 <p>第一，<strong>镜像分层</strong>：每一层只是给上一层改个名字。比如 Service 层调用 Manager 层、Manager 层调用 Dao 层、Dao 层调用 Mapper，但每一层都只是把参数原样转交。这种"分层"没有引入任何抽象，只是增加了认知负担和调用栈深度。</p>
-<p>第二，<strong>空洞透传</strong>：一层只做转发不加价值。比如一个 API 网关收到请求后，不做任何鉴权、限流、转换，直接转发给后端，这一层就没有任何职责。</p>
+<p>第二，<strong>空洞透传</strong>：一层只做转发，却没有承担独立的职责。比如某个转发层既不负责统一入口、路由或隔离后端，也不做鉴权、限流、转换，只是把请求原样交给下一层，就需要判断这层是否还有保留价值。</p>
 <p>第三，<strong>循环依赖</strong>：A 层依赖 B 层、B 层又依赖 A 层。这破坏了分层的封闭性。本意是"修改局部化"，循环依赖却把两个层的修改耦合在了一起。</p>
 <p>检验分层是否合理的三问，在 5.1 开头已经列过。这里补一个判据：“有没有引入新的抽象边界”是硬门槛——没引入新抽象的层，即使能独立测试、替换实现不牵动别层，也不合格。前两问只要有一问不合格（不能独立测试，或换实现会牵动别层），这层多半该并掉。</p>
 <p>我评审分层方案时必问一句：这一层挡住了什么变化？答不上来的层，就是我下一步要删的层；为"将来可能需要"预留的扩展点，我至今没见几个真用上的。</p>
@@ -846,7 +846,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三条经验可以收成一句：</p>
 <p><strong>分层的价值，是让每次修改都有明确的改动位置。</strong></p>
 <p>好分层下，加新功能、换实现、修 bug 各有各的落点；坏分层下，任何修改都牵动全局。区分好坏的标准，是边界画得准不准。</p>
-<p>本章把边界画清楚了，下一章（<a class="xref" href="06-security.html">第 6 章</a> 安全机制）就看这些边界怎么守住。认证、授权、加密、审计四个层面各管一段，分出来的每一层都对应其中一组安全关注点。再往后，<a class="xref" href="07-cluster.html">第 7 章</a>集群架构会展开 Kafka 的协调层、Redis Cluster 的槽路由、MySQL MGR 的多数派。</p><nav class="page-nav"><a href="04-memory-disk.html">← 第 4 章 内存与磁盘 — 速度与持久化的平衡</a><a href="06-security.html">第 6 章 安全机制 — 权限、加密、审计 →</a></nav></article>
+<p>本章把边界画清楚了，下一章（<a class="xref" href="06-security.html">第 6 章</a> 安全机制）就看这些边界怎么守住。认证、授权、加密、审计分别处理身份、操作范围、数据保护与事件记录；这些措施分布在请求链路和存储路径中。再往后，<a class="xref" href="07-cluster.html">第 7 章</a>集群架构会展开 Kafka 的协调层、Redis Cluster 的槽路由、MySQL MGR 的多数派。</p><nav class="page-nav"><a href="04-memory-disk.html">← 第 4 章 内存与磁盘 — 速度与持久化的平衡</a><a href="06-security.html">第 6 章 安全机制 — 权限、加密、审计 →</a></nav></article>
 </main>
 </div>
 <script>

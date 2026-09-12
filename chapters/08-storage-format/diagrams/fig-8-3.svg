@@ -58,7 +58,7 @@
 
   <!-- step 5: child done signal -->
   <line x1="470" y1="370" x2="170" y2="370" stroke="#4B5563" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="320" y="362" text-anchor="middle" font-size="12" fill="#111827">⑤ 子进程完成，发信号通知父进程</text>
+  <text x="320" y="362" text-anchor="middle" font-size="12" fill="#111827">⑤ 子进程退出，父进程检查退出状态</text>
 
   <!-- step 6: flush rewrite buffer to temp file -->
   <rect x="400" y="390" width="140" height="44" rx="4" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>

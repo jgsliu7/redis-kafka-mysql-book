@@ -134,7 +134,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第二个是<strong>授权（Authorization）</strong>，界定"你能做什么"。它把一个已认证身份映射到一组可执行的操作集合，集合的边界越精细，越能控制误操作和越权带来的伤害。</p>
 <p>第三个是<strong>加密（Encryption）</strong>，分为传输加密和存储加密：传输加密保证数据在传输过程中的机密性与完整性不被破坏，存储加密保证数据落盘后即使磁盘被盗也无法直接读取。</p>
 <p>第四个是<strong>审计（Audit）</strong>，对应的问题是"事后能否查清谁在什么时候做了什么"。审计记录是合规取证和事后复盘的依据。</p>
-<p>这四个层面在一次"客户端发起请求到数据落盘"的链路上各覆盖一段，审计则贯穿全程。</p>
+<p>在一次"客户端发起请求到数据落盘"的链路上，认证确认会话身份，授权约束具体操作，加密保护传输与存储中的数据，审计记录关键事件。</p>
 <p><a class="xref" href="#fig-6-1">图 6-1</a> 把四维模型落在一次请求链路上，展示了各自的分工。</p>
 <figure class="fig" id="fig-6-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 108 880 352" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -232,8 +232,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <text x="225" y="138" text-anchor="middle" font-size="10" fill="#EF4444" font-weight="600">数据流方向 →</text>
 </svg>
-</div><figcaption>图 6-1　从客户端发起请求到数据落盘，认证、授权、加密各覆盖链路中的一段，审计以旁路贯穿全程。</figcaption></figure>
-<p>客户端的请求先穿过传输加密建立的 TLS 隧道，进入服务端后由认证确认身份，由授权界定这条命令或 SQL 能不能执行，执行结果写入磁盘时由存储加密保护，而整个过程的关键事件由审计留痕。四维在一条请求上依次接力，缺了哪一段，攻击面就开在哪一段。</p>
+</div><figcaption>图 6-1　从客户端发起请求到数据落盘，认证与授权检查身份和操作权限，加密保护传输与存储，审计记录关键事件。</figcaption></figure>
+<p>客户端的请求先穿过传输加密建立的 TLS 隧道，进入服务端后由认证确认身份，由授权界定这条命令或 SQL 能不能执行，执行结果写入磁盘时由存储加密保护，而整个过程的关键事件由审计留痕。这四个层面的覆盖范围相互交叠，需要沿实际请求路径检查是否存在防护缺口。</p>
 <p>数据系统和普通的 Web 应用在安全上有几个特殊约束。一是<strong>长连接加高频小操作</strong>。Redis 单条 GET、MySQL 单条主键查询的耗时在亚毫秒级，如果每条操作都走完整的认证握手，性能会被拖垮。于是它们都在"会话级认证一次、每操作级授权一次"的模型上做缓存与简化。二是<strong>多租户共享存储</strong>。同一个 Redis 实例、同一个 MySQL 实例、同一个 Kafka 集群往往承载多个应用的不同键、表、主题，授权必须做到细粒度的资源隔离。三是<strong>复制与分布式协调</strong>。主从之间、Broker 之间、Broker 与 KRaft 控制面之间也要互相认证，身份不止"客户端对服务端"这一种，节点对节点、控制面对数据面都要做身份认证。</p>
 <p>这三个软件因先天约束差异，走出了不同的安全路线。Redis 的内核追求极简和单核十万级 QPS（小包 GET/SET 场景），因为长期假设部署在内网，安全特性一直往后排。MySQL 面向企业市场，权限模型强调列级、多层级和可审计。Kafka 天生分布式、多跳通信，安全设计必须可组合，于是它选了 SASL（Simple Authentication and Security Layer，简单认证与安全层）框架加监听器分层这条路。</p>
 <h2 id="sec-6.2">6.2 认证</h2>
@@ -445,8 +445,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 6-3　会话级认证一次，每条命令都走"命令类别加键模式"二维授权检查。</figcaption></figure>
 <p>连接建立时客户端先用 <code>AUTH alice &lt;密码&gt;</code> 走一次完整认证，服务端校验 SHA-256 通过后把这条连接绑定到用户 alice。这是阶段一，整个会话只做一次。之后每条命令进入阶段二的授权检查：服务端根据当前用户绑定的规则，分别检查命令类别（GET 属于 @read）和键模式（<code>keys:1</code> 匹配 <code>~keys:*</code>）两个维度，两项都命中才放行。图中 alice 执行 <code>GET keys:1</code> 通过，但执行 <code>FLUSHALL</code> 会被拒绝：<code>FLUSHALL</code> 属于 @dangerous，alice 的规则里没有授予。</p>
 <p>这个"认证一次、每命令授权"的设计，是 Redis 在性能和安全之间找的平衡点：认证握手开销大，因此按会话摊销；授权检查开销小，可以每条命令都执行。</p>
-<p>6.2 起，通道（channel）权限也独立出来，Pub/Sub 的订阅权限和键空间的读写权限分离，避免一个客户端既能写数据又能订阅敏感事件。</p>
-<p>Redis 的默认策略仍然偏向兼容。7.x 里 <code>default</code> 用户的内置规则是 <code>user default on nopass ~* &amp;* +@all</code>：启用、无密码、全键、全通道、全命令，客户端无需显式认证就能以 default 身份操作。<code>protected-mode</code>（保护模式，3.2.0 起引入，默认开启）提供另一道限制：在 Redis 7.0 的实现中，保护模式开启且 default 用户带有 nopass 标记时，会拒绝非本地连接，是否绑定全部网卡不是这一判断的条件。保护模式不替代账号和权限配置。加固时仍需显式给 default 设置密码，或用 <code>ACL SETUSER default off</code> 禁止新的 default 用户认证；也可用 <code>ACL SETUSER default resetpass</code> 清空密码并移除 nopass 标记，此后要重新设置密码才能以密码认证为 default。</p>
+<p>6.2 起，通道（channel）权限也独立出来，Pub/Sub 的订阅权限和键空间的读写权限分离，使同一用户的键空间写权限与通道订阅权限可以分别配置；是否同时授予这两类权限，由 ACL 规则决定。</p>
+<p>Redis 的默认策略仍然偏向兼容。7.x 里 <code>default</code> 用户的内置规则是 <code>user default on nopass ~* &amp;* +@all</code>：启用、无密码、全键、全通道、全命令，客户端无需显式认证就能以 default 身份操作。<code>protected-mode</code>（保护模式，3.2.0 起引入，默认开启）提供另一道限制：在 Redis 7.0 的实现中，保护模式开启、default 用户带有 nopass 标记、对端连接不来自回环地址（loopback），三个条件同时满足即拒绝该连接。6.2 及更早版本此判定还要求未显式 bind，显式 bind 后保护模式整体失效；7.0 起移除该条件。保护模式不替代账号和权限配置。加固时仍需显式给 default 设置密码，或用 <code>ACL SETUSER default off</code> 禁止新的 default 用户认证；也可用 <code>ACL SETUSER default resetpass</code> 清空密码并移除 nopass 标记，此后要重新设置密码才能以密码认证为 default。</p>
 <h3 id="s129">MySQL：多层级权限表加 8.0 RBAC</h3>
 <p>MySQL 的授权模型是三个软件里粒度最细的。权限按作用域分五层：全局、数据库、表、列、存储程序。这套层级对应 <code>mysql.user</code>、<code>mysql.db</code>、<code>mysql.tables_priv</code>、<code>mysql.columns_priv</code>、<code>mysql.procs_priv</code> 多张权限表。授权检查时，从全局到列逐层收窄，命中即停。</p>
 <figure class="fig" id="fig-6-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 73 880 513" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">

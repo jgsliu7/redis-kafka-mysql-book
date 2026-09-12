@@ -124,12 +124,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <main class="content">
 <article class="chapter"><h1 id="s42">第 3 章 生命周期管理 — 优雅启动与关闭</h1>
 <h2 id="s43">本章导读</h2>
-<p>凌晨三点发版，你敲下 <code>kill -9</code> 想快速重启服务。我在真实项目里这么干过，第二天发现丢了数据。启动和关闭看似只是"开关"，实际上包含最危险的状态转换。进程从"可执行文件"到"可对外服务"中间要恢复内存状态、重放未完成的事务、重建连接；进程关闭时则要保证正在处理的请求不丢、内存里的数据落盘、该移交的职责交接清楚。一次粗暴的断电式停机，丢的可能是几秒数据，也可能是整整一批事务。</p>
-<p>同样是 <code>kill -9</code>，对 Redis 通常只是丢掉最近一小段时间的数据（丢多少取决于持久化配置，详见<a class="xref" href="04-memory-disk.html">第 4 章</a>），对 MySQL 可能要做崩溃恢复（crash recovery），对 Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。差别来自这三个软件不同的启动与关闭设计：Redis 只影响自己，MySQL 要保住事务语义，Kafka 还会影响整个集群。</p>
+<p>凌晨三点发版，你敲下 <code>kill -9</code> 想快速重启服务。我在真实项目里这么干过，第二天发现丢了数据——<code>kill -9</code> 发的是 SIGKILL，操作系统立即终止进程，不给进程任何清理机会，没来得及落盘的写入就此丢失。启动和关闭看似只是"开关"，实际上包含最危险的状态转换。进程从"可执行文件"到"可对外服务"中间要恢复内存状态、重放未完成的事务、重建连接；进程关闭时则要保证正在处理的请求不丢、内存里的数据落盘、该移交的职责交接清楚。一次粗暴的断电式停机，丢的可能是几秒数据，也可能是整整一批事务。</p>
+<p>同样是 <code>kill -9</code>，Redis 可能丢失尚未持久化的数据（丢多少取决于持久化配置，详见<a class="xref" href="04-memory-disk.html">第 4 章</a>），MySQL 可能要做崩溃恢复（crash recovery），Kafka 则可能触发分区的 Leader 重选、让上游业务短暂抖动。影响范围还取决于部署方式：单机实例需要恢复本地状态，Redis、MySQL 的复制或集群部署也可能触发故障转移，Kafka Broker 下线则会影响它承载的分区。</p>
 <p>根源是它们各自保证的一致性边界不同。</p>
 <h2 id="sec-3.1">3.1 问题的本质</h2>
 <p><strong>启动的本质是状态机重建。</strong> 进程一旦重启，内存里的状态全部归零。启动要做的，是把"上次崩溃或关闭时落到磁盘的那份不完整状态"重建为"一个一致、可对外服务的新状态"。一个数据库启动后如果你还能看到崩溃前那一刻已经提交的事务，是因为它在启动期重放了日志。一个缓存启动后你看到的是几秒前的数据，那是它接受了"快但不全"。所以判断启动有没有"成功"，要看它恢复出来的状态是否可信。</p>
-<p><strong>关闭的本质是状态机快照加上资源释放。</strong> 关闭要面对两个问题：当前内存里哪些状态必须落盘？对外占用（连接、文件锁、集群成员身份）怎么干净地交还？没做完这两件事就退出，要么把清理工作留给下次启动补做，要么造成数据永久丢失。Redis 的 <code>kill -9</code> 之所以"只是丢几秒数据"，是因为它本来就把内存当主存储，磁盘只是辅助。MySQL 在 <code>kill -9</code> 之后之所以要做崩溃恢复，是因为必须在启动期把"崩溃那一刻到底有哪些事务"搞清楚。</p>
+<p><strong>关闭的本质是状态机快照加上资源释放。</strong> 关闭要面对两个问题：当前内存里哪些状态必须落盘？对外占用（连接、文件锁、集群成员身份）怎么干净地交还？没做完这两件事就退出，要么把清理工作留给下次启动补做，要么造成数据永久丢失。Redis 的 <code>kill -9</code> 之所以"只是丢几秒数据"，是因为它本来就把内存当主存储，磁盘只是辅助——“几秒”是有前提的：AOF 开启、<code>appendfsync=everysec</code> 时窗口约一秒；出厂默认（AOF 关闭、只有 <code>save 3600 1</code> 这类快照点），自上次快照起丢满一小时也不罕见。MySQL 在 <code>kill -9</code> 之后之所以要做崩溃恢复，是因为必须在启动期把"崩溃那一刻到底有哪些事务"搞清楚。</p>
 <p>贯穿全章的有三对共同矛盾，它们会在后文中多次出现：</p>
 <ol><li><strong>一致性 vs 可用性。</strong> 启动时如果多恢复一些数据会更安全，但用户等得更久。关闭时多刷一页硬盘会更安全，但停服时间也更长。</li><li><strong>速度 vs 确定性。</strong> 是追求快速就绪（懒加载、跳过校验），还是追求启动后处于"已知的确定状态"（全量校验、预分配）。</li><li><strong>单机视角 vs 分布式视角。</strong> 单机软件的关闭只影响自身。分布式组件的关闭是一个集群事件，要让 Leader 迁移、让副本同步可见。</li></ol>
 <p><a class="xref" href="#fig-3-1">图 3-1</a> 把启动与关闭画成一对"对称"的过程：启动是重建，关闭是快照，中间任何一次崩溃或 <code>kill -9</code> 都会把系统重新拉回"不完整状态"，下次启动就需要做一些恢复工作。</p>
@@ -186,7 +186,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第一段：先设默认值，再逐层覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数，逐层覆盖。好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这一类 bug。很多线上事故就出在某个配置项忘了初始化。</p>
 <p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器、创建事件循环、分配数据库数组、打开监听端口。信号处理器里，SIGTERM/SIGINT 触发优雅关闭，SIGPIPE 则忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收。</p>
 <p>这里有一个关键的取舍：<strong>核心基础结构在启动期就一次性预分配，不做懒加载</strong>。启动段就把数据库数组、共享对象（shared objects，例如预创建 0–9999 这 10000 个整数对象供复用）等结构分配到位，留到运行期第一次用到时直接取用。代价是启动时就会占用相应的内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
-<p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果 AOF（仅追加文件）开启且存在，Redis 就加载 AOF；否则加载 RDB（快照文件，二进制格式，快但只到上次快照点）。<a class="xref" href="#fig-3-2">图 3-2</a> 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF）：AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件。所以"加载 AOF"分两步：先按 RDB 二进制快速加载 base，再重放 incr 里的命令。这种"RDB 打底、增量重放"的混合格式在 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多。</p>
+<p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果启用了 AOF（仅追加文件），Redis 就按 AOF 配置恢复；未启用 AOF 时，才尝试加载独立的 RDB（快照文件，二进制格式，快但只到上次快照点）。AOF 文件缺失时不会自动回退到独立 RDB：初始目录没有 AOF 数据与清单引用的文件丢失，分别可能导致空数据启动和启动报错。<a class="xref" href="#fig-3-2">图 3-2</a> 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF）：AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件。所以"加载 AOF"分两步：先按 RDB 二进制快速加载 base，再重放 incr 里的命令。这种"RDB 打底、增量重放"的混合格式在 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多。</p>
 <figure class="fig" id="fig-3-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 900 438" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -213,7 +213,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="600" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="720" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 数据恢复（AOF 优先）</text>
-  <text x="616" y="120" font-size="12" fill="#374151">AOF 开启且存在？</text>
+  <text x="616" y="120" font-size="12" fill="#374151">是否启用 AOF？</text>
   <text x="616" y="138" font-size="12" fill="#374151">是 → 加载 AOF（base=RDB + incr 重放）</text>
   <text x="616" y="156" font-size="12" fill="#374151">否 → 加载 RDB（二进制快照）</text>
 
@@ -336,7 +336,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="752" y="438" font-size="12" fill="#EF4444">连接先于身份</text>
 </svg>
 </div><figcaption>图 3-3　Redis 关闭流程：先处理 RDB/AOF 重写子进程，刷 AOF 缓冲，再按 SAVE/NOSAVE 决定 RDB 落盘与否。</figcaption></figure>
-<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 如果有，直接杀掉，不等它完成——优雅关闭优先缩短关闭耗时，不等待尚未完成的快照。RDB 和 AOF 都用"写临时文件再 rename"的方式落盘，子进程被杀意味着临时文件还在磁盘上；这不会破坏正确性（rename 不会发生，正本不受影响），留下的垃圾随后会被清理。</p>
+<p><strong>第一步先看后台有没有 RDB 或 AOF 重写子进程在跑。</strong> 一般会终止这些子进程，不等它们完成。但如果首次 AOF 重写尚未完成、还没有可用的 AOF 正本，普通关闭会被拒绝，以免退出后无法恢复数据；<code>SHUTDOWN FORCE</code> 可以跳过这项保护。已有持久化正本时，终止未完成的后台生成任务不会把临时结果切换为正本。</p>
 <p><strong>第二步刷 AOF 缓冲</strong>，把内存里尚未落盘的追加命令刷（flush）出去并 fsync 到磁盘（如果开了 AOF）。</p>
 <p><strong>第三步是否写入 RDB 由用户决定。</strong> <code>SHUTDOWN SAVE</code> 会触发一次阻塞式 <code>SAVE</code> 落盘（主进程直接写 RDB，不 fork 子进程），适合 Redis 当主存用的场景；<code>SHUTDOWN NOSAVE</code> 直接跳过 RDB 落盘，适合 Redis 当缓存用的场景，能做到秒级退出。NOSAVE 跳过的只是 RDB 写盘；AOF 已开启的话，第二步已经把 AOF 缓冲区刷出了。这个设计不预设你是缓存还是主存，而是由你通过 SHUTDOWN SAVE / NOSAVE 显式指定——一套代码就能同时服务两类用户。这种由用户显式指定并承担后果的思路，在后文 MySQL 那里会以另一种形式出现。</p>
 <p><strong>第四步关闭所有客户端连接</strong>，通知对端、释放连接资源。<strong>第五步释放资源并 exit</strong>，交还文件锁、内存、进程身份。</p>
@@ -345,8 +345,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这种用信号触发优雅关闭的做法，MySQL 也一样；Kafka 稍有不同，它的进程跑在 JVM 里，SIGTERM 先由 JVM 的 Shutdown Hook 捕获，再交给应用代码走清理流程。思路相通，只是实现的层次不同。</p>
 <h2 id="sec-3.3">3.3 MySQL 的做法</h2>
 <p>MySQL 的生命周期管理需要保住事务语义（ACID）。这使它在启动期需要处理崩溃恢复，在关闭期需要权衡：同一批数据清理工作，是关机时做完，还是留到以后处理。</p>
-<h3 id="s50">启动链路：多了"恢复"这一关键环节</h3>
-<p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层与权限系统、服务循环。第二段最耗时，也是 MySQL 与 Redis 的本质区别所在。</p>
+<h3 id="s50">启动链路：事务恢复是关键环节</h3>
+<p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层与权限系统、服务循环。第二段涉及事务恢复。Redis 主要重建内存键空间，InnoDB 还需要确定事务的提交状态，并处理重做与回滚。</p>
 <p><strong>配置加载段</strong>按固定顺序读取多个 my.cnf 路径（Unix 上从 <code>/etc/my.cnf</code> 读到 <code>~/.my.cnf</code>，同名选项后读的覆盖先读的），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是改的配置后面还有一层在覆盖：<code>~/.my.cnf</code> 里的旧值、SET PERSIST（8.0 起把参数改动持久化写进配置文件的命令）写进 <code>mysqld-auto.cnf</code> 的持久化值，或启动命令行参数。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
 <ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（库表列等系统元数据的集合）。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
@@ -426,14 +426,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>redo 重放和 undo 回滚是两个方向相反的动作，分工也不同。redo 重放是"往前补"，把已经写入 redo 但还没刷到数据页的修改无差别补回去，恢复出崩溃瞬间的物理页状态（这一步不区分事务是否提交，redo 本身只记录页级物理修改）；undo 回滚是"往后撤"，它根据事务提交状态，把尚未 commit 的事务对数据做的修改撤销掉。一进一退之后，缓冲池里的数据页状态正好停在事务一致点上。MySQL 启动后的状态可信。</p>
 <p>崩溃恢复的耗时取决于崩溃那一刻 redo log 里有多少未落盘的修改、有多少未提交的事务。大事务一旦在崩溃点未提交，启动期的 undo 回滚会非常慢，所以我的规矩是：大事务不许长时间运行，再急也要拆小。</p>
 <p>这批恢复工作里，有一块不必赶在对外服务之前完成。InnoDB 做完必要的 redo 恢复、定下事务边界之后，未提交事务的逐条回滚可以留给后台线程，实例不必等它走完。期间新事务可能遇到回滚中的记录持有的锁，要等锁释放。等到 <code>ready for connections</code> 打印出来、连接开始进来，后台的回滚可能仍在进行：里程碑之后还有收尾工作，进程存活、连接成功，还不等于业务延迟已经恢复正常。</p>
-<p><strong>网络层与权限系统段</strong>建立 Unix 和 TCP 监听 socket，从 mysql 系统表加载用户权限到内存。<code>GRANT</code>/<code>REVOKE</code> 本身立即生效；只有绕过它们，直接用 <code>INSERT</code>/<code>UPDATE</code> 改权限表时才需要执行 <code>FLUSH PRIVILEGES</code>，因为内存里的权限快照和磁盘表对不上，需要重新加载。</p>
+<p><strong>网络层与权限系统段</strong>建立 Unix 和 TCP 监听 socket，从 mysql 系统表加载用户权限到内存。<code>GRANT</code>/<code>REVOKE</code> 会自动刷新内存中的授权信息，但已有连接何时采用新权限还取决于权限级别，例如静态全局权限要等重新连接才生效；只有绕过它们，直接用 <code>INSERT</code>/<code>UPDATE</code> 改权限表时才需要执行 <code>FLUSH PRIVILEGES</code>，因为内存里的权限快照和磁盘表对不上，需要重新加载。</p>
 <p><strong>服务循环段</strong>进入"每连接一线程"（或线程池）的连接处理模式。至此 MySQL 才对外打印 <code>ready for connections</code>。</p>
 <h3 id="s51">innodb_fast_shutdown：把清理工作在关机与开机之间分摊</h3>
-<p>MySQL 把"关闭时做多少清理"做成一个可配置参数 <code>innodb_fast_shutdown</code>，取 0、1、2 三档。三档之间要权衡的就是一致性和可用性：多清理一步，关闭更安全，但停服时间更长。<a class="xref" href="#table-3-1">表 3-1</a> 把三档的取舍并排放出来。</p>
+<p>MySQL 把"关闭时做多少清理"做成一个可配置参数 <code>innodb_fast_shutdown</code>，取 0、1、2 三档。三档之间主要权衡清理工作的时机：关闭前做得越少，下次启动可能需要完成的恢复工作就越多。三档都以保留已提交事务为前提，不能把更慢的关闭直接等同于更高的一致性。<a class="xref" href="#table-3-1">表 3-1</a> 把三档的取舍并排放出来。</p>
 <p class="tab-label"><strong>表 3-1　innodb_fast_shutdown 三档对比</strong></p>
-<div class="table-wrap"><table id="table-3-1"><thead><tr><th>维度</th><th>0 = 完全关闭</th><th>1 = 快速关闭（默认）</th><th>2 = 模拟崩溃</th></tr></thead><tbody><tr><td>关闭时做什么</td><td>刷所有脏页 + 完整 purge（清理已无用的 undo 记录）+ 修改缓冲合并 + 完整 checkpoint</td><td>刷脏页但跳过完整 purge 与修改缓冲合并，留给下次启动或后台线程处理</td><td>只刷 redo 不刷数据页，近乎 <code>kill -9</code></td></tr><tr><td>启动时做什么</td><td>几乎不需要崩溃恢复，启动快</td><td>少量恢复工作（清理上一次关闭遗留项）</td><td>完整崩溃恢复，启动慢</td></tr><tr><td>适用场景</td><td>升级、大版本切换前，确保下次启动不出问题</td><td>日常关闭重启</td><td>仅紧急停服，能接受较长启动恢复</td></tr><tr><td>关闭速度</td><td>慢</td><td>中等</td><td>快</td></tr><tr><td>启动速度</td><td>快</td><td>中等</td><td>慢</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-3-1"><thead><tr><th>维度</th><th>0 = 完全关闭</th><th>1 = 快速关闭（默认）</th><th>2 = 模拟崩溃</th></tr></thead><tbody><tr><td>关闭时做什么</td><td>刷所有脏页 + 完整 purge（清理已无用的 undo 记录）+ 修改缓冲合并 + 完整 checkpoint</td><td>刷脏页但跳过完整 purge 与修改缓冲合并，留给下次启动或后台线程处理</td><td>只刷 redo 不刷数据页，近乎 <code>kill -9</code>，但 server 层仍有序收尾、redo 已刷、已提交事务不丢</td></tr><tr><td>启动时做什么</td><td>几乎不需要崩溃恢复，启动快</td><td>少量恢复工作（清理上一次关闭遗留项）</td><td>完整崩溃恢复，启动慢</td></tr><tr><td>适用场景</td><td>升级、大版本切换前，确保下次启动不出问题</td><td>日常关闭重启</td><td>仅紧急停服，能接受较长启动恢复</td></tr><tr><td>关闭速度</td><td>慢</td><td>中等</td><td>快</td></tr><tr><td>启动速度</td><td>快</td><td>中等</td><td>慢</td></tr></tbody></table></div>
 <p>这是 MySQL 专属参数，另外两家没有对应概念。三档对比下来，规律只有一条：<strong>每种"快"的做法，都是把一部分工作推迟到别的时刻完成</strong>。</p>
-<p>默认设为 1 而不是 0：档位 0 要求的完整 purge 和修改缓冲合并，在繁忙库上可能耗时几十分钟甚至更久（修改缓冲把对二级索引页的修改先缓存在内存，等页读入时再补写回去，<a class="xref" href="04-memory-disk.html">第 4 章</a>详述）。这些工作对正确性没有任何贡献，启动后由后台线程在日常运行中逐步完成即可。用"关闭时间不可控"去换"零正确性收益的清理工作"显然不划算，所以默认档把这些工作推迟到运行期，让关闭耗时有个可预期的上界。只有升级、大版本切换这类希望下次启动干干净净的场景，才值得提前用档位 0 关一次。</p>
+<p>默认设为 1 而不是 0：档位 0 要求的完整 purge 和修改缓冲合并，在繁忙库上可能耗时几十分钟甚至更久（修改缓冲暂存尚未读入缓冲池的二级索引页变更，并可保存在系统表空间；相关页读入时再合并，<a class="xref" href="04-memory-disk.html">第 4 章</a>详述）。这些工作不必在关闭前全部完成，可以留到启动后由后台线程逐步处理。为了提前做完它们而延长关闭时间，日常重启时通常不划算，所以默认档把这部分工作推迟到运行期，减少关闭前必须完成的清理量；实际退出时间仍受脏页刷盘和事务回滚等工作影响。只有升级、大版本切换这类希望下次启动干干净净的场景，才值得提前用档位 0 关一次。</p>
 <h3 id="s52">关闭慢的常见根因</h3>
 <p>实际运维中"为什么 mysqld 关不掉"是高频排障问题，常见根因有几类：</p>
 <ol><li><strong>大量脏页待刷。</strong> 缓冲池大、写入密集，刷盘是随机 I/O，吞吐有上限。</li><li><strong>长事务在跑。</strong> 关闭时这些事务会被回滚。回滚通过 undo log 的逻辑逆操作逐条撤销修改，通常比正向写入更慢，事务越长越慢。</li><li><strong>从库要等复制线程退出。</strong> 从库关闭要等 SQL 线程回放完当前事件组再停；主库关闭则直接断开 dump 线程，并不等从库把 binlog 拉完。</li><li><strong>全文检索（FTS）索引优化在跑。</strong></li></ol>
@@ -633,16 +633,16 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 3-6　受控关闭：Broker 先告知 Controller，Controller 提前迁移 Leader 后才放行；对照普通关闭的抖动窗口。</figcaption></figure>
 <p>两条路径的差别在客户端感受：普通关闭快，代价是选举期间的分区抖动；受控关闭慢，要等 Leader 迁移完成，但抖动窗口小得多。Kafka 默认走的是后者，拿关闭速度换集群稳定。Broker 退出前多做一段协调工作，换来的是上游业务少经历一次突兀的 Leader 重选。Kafka 是面向高可用的中间件，这个交换是划算的。</p>
-<p>受控关闭也有前提：Controller 必须可达，且 Leader 迁移要在超时阈值内完成。否则 Broker 会退化为普通关闭，不再死等。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制重试次数与退避间隔（这些参数名在 KRaft 与 ZK 模式下保持一致）。</p>
+<p>受控关闭也有前提：Controller 必须可达，且 Leader 迁移要在超时阈值内完成。否则 Broker 会退化为普通关闭，不再死等。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；在 ZooKeeper 模式下，<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制请求重试。KRaft 使用 Broker 生命周期心跳请求受控关闭，并在关闭期限内等待 Controller 批准，不使用这两个参数安排重试。</p>
 <h3 id="s56">追加写日志对恢复的影响</h3>
 <p>Kafka 的日志是 append-only（仅追加）的，这一性质决定了它的恢复语义。恢复时，Kafka 会检查日志、截断残缺尾部，并恢复索引及生产者等辅助状态，不需要像 MySQL 那样把日志修改重放到数据页或回滚数据页上的事务。一条日志要么完整写入，要么在恢复时整体作废：写了一半的残缺尾部靠 CRC 找出来直接截掉，不存在 MySQL 事务那种"已部分生效、需要回滚"的中间状态。这种日志结构省去了重建另一套业务数据结构的工作；实际恢复耗时仍取决于待检查的日志与辅助状态。</p>
 <h3 id="s57">容器化环境下的生命周期</h3>
 <p>容器的约束不分软件。多数生产部署如今跑在 Kubernetes（K8s）上。K8s 用 <code>terminationGracePeriodSeconds</code>（默认 30 秒）限制整个终止过程：倒计时开始后先执行 preStop hook（如果配置了），再发送 SIGTERM；进程未在宽限期内退出，最终会收到 SIGKILL。SIGKILL 即 <code>kill -9</code>，跳过一切清理。</p>
-<p><strong>Redis</strong> 的优雅关闭不等 AOF/RDB 重写子进程，第一步就把它们杀掉，关闭时不用等待重写完成。真正吃掉 grace period 的，是它自己的最后一次落盘——只要配了 save 点（出厂默认就配）且不走 NOSAVE，主进程就会在退出前同步做一次全量 RDB 落盘，就是 <a class="xref" href="#sec-3.2">3.2 节</a>那种不 fork 的阻塞式 SAVE，耗时随数据量线性上涨。大实例可能越过 30 秒 grace period 被 SIGKILL，半成品临时文件作废；如果只依赖 RDB 恢复，丢的是最近一次成功快照所记录时点之后的写入。</p>
+<p><strong>Redis</strong> 的优雅关闭通常会终止后台 RDB/AOF 重写子进程；但首次 AOF 尚未生成时，普通关闭会被拒绝，需要先处理这一状态。真正吃掉 grace period 的，是它自己的最后一次落盘——只要配了 save 点（出厂默认就配）且不走 NOSAVE，主进程就会在退出前同步做一次全量 RDB 落盘，就是 <a class="xref" href="#sec-3.2">3.2 节</a>那种不 fork 的阻塞式 SAVE，耗时随数据量线性上涨。大实例可能越过 30 秒 grace period 被 SIGKILL，半成品临时文件作废；如果只依赖 RDB 恢复，丢的是最近一次成功快照所记录时点之后的写入。</p>
 <p>preStop hook 可以先触发 <code>BGSAVE</code>，确认本次快照成功完成后再执行 <code>SHUTDOWN NOSAVE</code>。<code>BGSAVE</code> 返回成功只表示后台保存已启动。若要靠这份 RDB 保存退出前的数据，就必须在 fork 前停写、处理完已接受的写入，并保持停写直到退出；Pod 摘流不会自动关闭已有连接，不能据此认定没有新写入。AOF 已开启时，NOSAVE 仍要完成 AOF 刷盘。</p>
 <p>fork 拷贝页表与保存本身都耗时，写时复制（COW）开销取决于保存期间的内存页修改。grace period 在 preStop hook 执行前已开始计时，应覆盖停写、fork、保存和退出的总耗时并留出余量。把 <code>BGSAVE</code> 放进 hook，并不能保证全量落盘赶在 SIGKILL 之前完成。</p>
 <p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，受控关闭时刷脏页但跳过完整 purge 与 change buffer 合并；一旦被 SIGKILL 强杀，连快速关闭流程都没机会走，只能交给下次启动的崩溃恢复。容器里我会保留默认 <code>innodb_fast_shutdown=1</code>（它已包含脏页刷盘），grace period 给到 120 秒以上；只有升级、大版本切换等需要干净下线的场景才设 0，按 <a class="xref" href="#sec-3.3">3.3 节</a>的提示，为档位 0 预留几分钟到几十分钟甚至更久的时间。</p>
-<p><strong>Kafka</strong> 受控关闭要等 Controller 迁移 Leader，Controller 负载高时，默认的重试预算（<code>controlled.shutdown.max.retries=3</code>、退避 5 秒）十几秒就会耗尽，退化为普通关闭。我会同步调大重试次数与退避间隔（<code>controlled.shutdown.retry.backoff.ms</code>），把 grace period 设到 60–120 秒。</p>
+<p><strong>Kafka</strong> 受控关闭要等 Controller 迁移 Leader，Controller 负载高时可能超时并转入普通关闭。ZooKeeper 模式下可以检查受控关闭请求的重试次数与退避间隔；KRaft 的等待由另一条生命周期流程管理，调大这两个旧参数并不能延长它的关闭预算。我会根据分区数、迁移耗时和本地刷盘耗时设置 grace period，并用滚动重启演练验证。</p>
 <p>K8s 的探针（probe）有三类，职责各不相同：startup 探针在成功之前抑制另外两类，给慢启动的数据库留出整段恢复时间；liveness 失败触发容器重启；readiness 失败只摘流量、不重启。把"数据库还在恢复"当成存活失败，我见过不止一次：编排系统反复重启它，恢复一次次被打断重来。慢启动应该交给 startup 探针兜底；恢复期要摘的是流量，不是进程。</p>
 <p><strong>实践清单：</strong> preStop hook 主动检查条件而非 sleep；grace period 给到刷盘/迁移耗时加 30 秒余量。</p>
 <h2 id="sec-3.5">3.5 横向对比</h2>

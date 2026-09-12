@@ -185,7 +185,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">MySQL</text>
   <text x="440" y="252" text-anchor="middle" font-size="12.5" fill="#374151">关系库（表/行 + SQL + 引擎）</text>
   <text x="440" y="272" text-anchor="middle" font-size="12" fill="#D97706">追求：强一致 · 不丢不错</text>
-  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：写入性能</text>
+  <text x="440" y="288" text-anchor="middle" font-size="12" fill="#6B7280">舍弃：提交延迟、调优门槛</text>
 
   
   <rect x="600" y="204" width="240" height="92" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.8"/>
@@ -244,7 +244,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>三种范式各有不少候选实现，但能同时满足"成熟、典型"的并不多。Redis、MySQL、Kafka 分别是这三种范式中成熟而典型的实现。</p>
 <p>在内存数据结构存储领域，<strong>Redis</strong> 是最广泛使用的实现之一，独到之处是"数据结构服务器（data structure server）"这一抽象：一套结构化类型加原子命令。</p>
 <p><strong>MySQL</strong> 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的标准实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引（clustered index）、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。</p>
-<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。LinkedIn 2014 年公开的基准里，3 台廉价机测到约 200 万次写入/秒（Kafka 0.8.1、100 字节消息），作为历史参考足够了。单分区吞吐的量级见<a class="xref" href="07-cluster.html">第 7 章</a>关键数字。它把整个系统构建在追加写日志（append-only log）之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
+<p><strong>Kafka</strong> 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。LinkedIn 2014 年公开的基准里，3 台廉价机测到约 200 万次写入/秒（Kafka 0.8.1、100 字节消息），作为历史参考足够了。单分区吞吐的评估方法见<a class="xref" href="07-cluster.html">第 7 章</a>。它把整个系统构建在追加写日志（append-only log）之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。</p>
 <h3 id="sec-1.1.3">1.1.3 从它们身上能学到什么</h3>
 <p>面对架构难题，它们采用的方案不同，代价也不同。数据怎么不丢、副本怎么同步、系统怎么扩展，这些是后端系统普遍会面对的问题，后面八章逐个深讲。并发控制方面，本书以 MySQL 的 MVCC 为例，锁与隔离级别的深入细节则不在本书范围。</p>
 <p>这三个软件的核心设计，集中在这几条上：</p>
@@ -566,7 +566,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 1-3　全书章节结构：第 2 章数据结构与协议打底，从第 3 章起按"启动与关闭 → 内存与磁盘 → 分层 → 安全 → 集群 → 存储格式 → 数据同步"递进，第 10 章总结。</figcaption></figure>
 <p>每一章讨论的是同一个底层问题在不同软件里的不同实现，章与章之间是递进的关系。图里的三个分组体现了这一递进关系。第 2–4 章讲系统内部的基础问题——数据用什么结构表示、进程启停怎么保住状态、内存与磁盘怎么分工。有了这个底子，第 5–7 章才谈系统的组织：层怎么切、谁能访问、容量怎么扩。第 8–9 章处理落盘与搬运：数据在磁盘上存成什么格式、副本之间怎么同步。分组顺序就是依赖顺序——前面的结论是后面讨论的输入。</p>
 <h3 id="sec-1.4.3">1.4.3 版本基线与阅读约定</h3>
-<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（分层存储 Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。</p>
+<p>凡涉及具体行为、参数或默认值的地方，都以这个版本基线为准：<strong>Redis 7.x、MySQL 8.0.x、Kafka 3.x（分层存储 Tiered Storage 相关讨论以 3.9+ 为准）</strong>。涉及版本差异时我会显式说明。全书信息核对截止 2026 年 9 月；Redis 许可证变更与 Valkey 分叉等新版本差异不在本书展开范围，请读者自行对照。</p>
 <p><strong>版本状态提示（2026 年 9 月）</strong>：MySQL 8.0 已于 2026 年 4 月转入 Oracle Sustaining Support，官方建议升级至 8.4 LTS 或 9.7 LTS；Kafka 从 4.0 起只支持 KRaft，已移除 ZooKeeper 模式；Redis Open Source 的 7.2、7.4 分支仍列在官方支持范围内。本书保留上述分析基线，借 B+ 树、WAL、状态机复制、CAP 等主题讨论架构取舍；具体参数默认值和命令行为，请以所用版本的官方文档为准。</p>
 <p>几处与版本相关的演进包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（新集群自此可不依赖 ZooKeeper 部署），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。</p>

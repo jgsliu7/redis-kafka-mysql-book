@@ -25,7 +25,7 @@
   <!-- Stage 3: 数据恢复 -->
   <rect x="600" y="70" width="240" height="96" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="720" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">③ 数据恢复（AOF 优先）</text>
-  <text x="616" y="120" font-size="12" fill="#374151">AOF 开启且存在？</text>
+  <text x="616" y="120" font-size="12" fill="#374151">是否启用 AOF？</text>
   <text x="616" y="138" font-size="12" fill="#374151">是 → 加载 AOF（base=RDB + incr 重放）</text>
   <text x="616" y="156" font-size="12" fill="#374151">否 → 加载 RDB（二进制快照）</text>
 

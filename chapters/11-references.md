@@ -19,24 +19,24 @@
 
 [8] Redis. Redis Persistence (RDB / AOF / Multi-Part AOF)[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/. —— 启动时状态重建（RDB/AOF 加载）与关闭时持久化（SAVE/NOSAVE 两条路径）的官方规范，对应本章"状态机重建与快照"模型。
 [9] Mohan C, Haderle D, Lindsay B, et al. ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking and Partial Rollbacks Using Write-Ahead Logging[J]. ACM Transactions on Database Systems, 1992, 17(1): 94-162. —— 关于 WAL、细粒度锁与部分回滚的经典论文，可用于对照理解第 3 章的重做与回滚恢复机制。
-[10] Apache Kafka. Controlled Shutdown（Kafka Documentation）[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。
+[10] Apache Kafka. Controlled Shutdown（Kafka Documentation）[EB/OL]. [2026-09-12]. https://kafka.apache.org/39/operations/basic-kafka-operations/#graceful-shutdown. —— 优雅关闭时分区 Leader 主动迁移的协议说明，体现分布式系统停止时需额外协调责任的特殊挑战。
 
 ## 第 4 章 内存与磁盘 — 速度与持久化的平衡
 
 [11] MySQL. InnoDB Buffer Pool[EB/OL]. [2026-09-09]. https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool.html. —— 缓冲池中的页缓存、改良 LRU、预读与后台刷盘的官方说明，对应第 4 章内存缓存与磁盘 I/O 的取舍。
-[12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等 MySQL 之外另一类存储引擎的共同理论基础；本书三个软件均未采用 LSM，但在依赖顺序写这一点上与它相同。
+[12] O'Neil P, Cheng E, Gawlick D, et al. The Log-Structured Merge-Tree (LSM-Tree)[J]. Acta Informatica, 1996, 33(4): 351-385. —— LSM-Tree 的理论论文，是 RocksDB、LevelDB、HBase 等系统与组件的共同理论基础；本书讨论的 Redis 持久化机制、MySQL 默认的 InnoDB 引擎与 Kafka 分区日志均未采用 LSM，但都利用了顺序写。
 
 ## 第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层
 
 [13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"这一说法的直接学术渊源。
 [14] MySQL. MySQL 8.0.36 源码（handler 与 THD）[EB/OL]. [2026-09-09]. https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/handler.h；https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/sql_class.h. —— 存储引擎接口与连接上下文的定义，可对照第 5 章查看 handler 的虚函数接口及 THD 保存的跨层状态。
-[15] Apache Kafka. Kafka Documentation: Design / Implementation[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/. —— Design 与 Implementation 部分介绍网络请求处理、批量传输和存储组织，可对照第 5 章理解线程交接与对象调用的分工。
+[15] Apache Kafka. Kafka Documentation: Design / Implementation[EB/OL]. [2026-09-12]. https://kafka.apache.org/39/design/design/；https://kafka.apache.org/39/implementation/network-layer/. —— Design 与 Implementation 部分介绍网络请求处理、批量传输和存储组织，可对照第 5 章理解线程交接与对象调用的分工。
 
 ## 第 6 章 安全机制 — 权限、加密、审计
 
 [16] Redis. Redis ACL[EB/OL]. [2026-08-14]. https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/. —— 从全局 `requirepass` 到基于命令类别与键模式细粒度 ACL 的演进设计，在性能优先的既有架构中补入安全机制的案例。
 [17] MySQL. Security Features (Pluggable Authentication / RBAC / TDE)[EB/OL]. [2026-08-14]. https://dev.mysql.com/doc/refman/8.0/en/security.html. —— 五级权限体系、基于系统表的 RBAC 在 8.0 的落地，以及表空间与日志加密的企业级安全分层。
-[18] Apache Kafka. Security (SASL / Delegation Tokens / Listener Separation)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#security. —— SASL 认证、委托令牌与监听器配置的官方入口，可对照第 6 章区分身份认证、授权和不同网络连接的保护。
+[18] Apache Kafka. Security (SASL / Delegation Tokens / Listener Separation)[EB/OL]. [2026-09-12]. https://kafka.apache.org/39/security/security-overview/. —— SASL 认证、委托令牌与监听器配置的官方入口，可对照第 6 章区分身份认证、授权和不同网络连接的保护。
 
 ## 第 7 章 集群架构 — 从单点到分布式
 
@@ -47,7 +47,7 @@
 
 ## 第 8 章 磁盘存储格式 — 文件结构的设计哲学
 
-[23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-08-14]. https://kafka.apache.org/documentation/#messageformat. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。
+[23] Apache Kafka. Message Format (RecordBatch V2)[EB/OL]. [2026-09-12]. https://kafka.apache.org/39/implementation/message-format/. —— 批量元数据共享、偏移量与时间戳增量编码、幂等与事务字段的存储格式规范，Kafka 把日志当作数据本身这一设计落进字节布局的依据。
 [24] MySQL. The Physical Structure of an InnoDB Index[EB/OL]. [2026-09-09]. https://dev.mysql.com/doc/refman/8.0/en/innodb-physical-structure.html. —— 索引页、默认 16KB 页大小和页空间利用的官方说明，可作为理解第 8 章索引页组织方式的入口。
 [25] Redis. Redis 7.0 源码（RDB 文件编码）[EB/OL]. [2026-09-09]. https://github.com/redis/redis/blob/7.0.0/src/rdb.c. —— RDB 对象与长度编码、CRC64 校验及保存/加载流程的源码，可对照第 8 章查看快照文件的具体字节布局。
 [26] Apache Kafka. KIP-405: Kafka Tiered Storage[EB/OL]. (2018)[2026-08-14]. https://cwiki.apache.org/confluence/display/KAFKA/KIP-405%3A+Kafka+Tiered+Storage. —— Kafka 将符合条件的已关闭日志段复制到远程存储、分别管理本地与远程保留策略的架构设计，是第 8 章 Tiered Storage 一节的关键参考。

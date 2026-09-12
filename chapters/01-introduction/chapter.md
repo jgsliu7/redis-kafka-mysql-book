@@ -37,7 +37,7 @@
 
 **MySQL** 是全球使用最广的开源关系型数据库之一。它的 InnoDB 引擎几乎成了关系型存储的标准实现：事务、MVCC（多版本并发控制，Multi-Version Concurrency Control）、B+ 树聚簇索引（clustered index）、WAL（预写日志，Write-Ahead Log）。更难得的是它的演化史就是一部关系库架构演进史，从早期的 MyISAM 到 InnoDB 默认化，再到组复制（MGR，MySQL Group Replication），每一步都是为应对真实需求而做的迭代。顺着这条演化线看下来，关系库在"怎么把数据存对"上反复权衡的脉络也就清楚了。
 
-**Kafka** 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。LinkedIn 2014 年公开的基准里，3 台廉价机测到约 200 万次写入/秒（Kafka 0.8.1、100 字节消息），作为历史参考足够了。单分区吞吐的量级见第 7 章关键数字。它把整个系统构建在追加写日志（append-only log）之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。
+**Kafka** 从 LinkedIn 内部的日志采集系统起步，逐步演化为一个分布式流平台。LinkedIn 2014 年公开的基准里，3 台廉价机测到约 200 万次写入/秒（Kafka 0.8.1、100 字节消息），作为历史参考足够了。单分区吞吐的评估方法见第 7 章。它把整个系统构建在追加写日志（append-only log）之上，这种设计影响了后面的 Pulsar、各种事件溯源（Event Sourcing）方案和 CDC（Change Data Capture）管道等一大批系统。
 
 
 

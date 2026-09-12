@@ -140,7 +140,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第三，故障怎么发现与转移。</strong> 一个节点多久没心跳算"死"？是单点判定（主观下线）还是多数派投票（客观下线）？选新主按什么规则（优先级、日志进度、ID）？分区时少数派该怎么办：继续写（可能脑裂：两个主各自接受写入、数据分叉）还是停服（宁可不可用）？这套机制决定了集群在故障时的表现。</p>
 <p><strong>第四，元数据怎么管理。</strong> 哪个节点承载哪些分片？谁是当前的主？副本同步到哪了？这些元数据（metadata）由谁维护：是由 Controller 统一协调，并用复制或共识协议保存状态，还是用 Gossip（闲谈协议：节点间交换并传播状态）分散更新各节点的视图？统一协调便于组织决策，Gossip 则把传播工作分散出去；状态能否一致、故障后能否继续工作，还取决于各自的复制和决策规则。这是集群架构的另一条主线。</p>
 <p>这四个难题之上，还有一条约束：<strong>CAP 定理</strong>。当网络分区（Partition）使节点之间无法通信时，系统不能同时保证原子一致性（Consistency）和所有非故障节点上的请求都能得到响应（Availability）。这里的一致性要求操作表现得像在一个节点上按顺序完成，并保留真实时间先后。它不是“数据是否落盘”，也不能直接换算成产品的快慢排序。下文重点比较分区时哪些请求还能执行，以及已确认数据在故障转移时如何保留。</p>
-<blockquote><strong>关键数字</strong>  <strong>Redis Cluster：16384 个槽</strong>，槽位 bitmap 为 2KB。官方建议的最大规模约为 1000 个节点；实际部署仍需评估 Gossip 流量、CPU 开销和故障恢复时间。  <strong>MySQL MGR：组大小可取 3/5/7/9 个成员</strong>，当前实现最多支持 9 个。奇数规模在多数派容错下更节省副本：3 个成员可容忍 1 个故障，5 个可容忍 2 个。跨 AZ 或 Region 的通信会增加协调等待，具体延迟取决于网络、负载和配置，需要在目标环境中测量。  <strong>Kafka 分区容量要按负载实测。</strong> 单分区吞吐受消息大小、批量、压缩、确认条件和硬件影响。KIP-500 把支持数十万乃至百万分区列为元数据架构的扩展目标；实际集群容量仍需结合元数据规模与恢复时间验证。</blockquote>
+<blockquote><strong>关键数字</strong>  <strong>Redis Cluster：16384 个槽</strong>，槽位 bitmap 为 2KB。官方建议的最大规模约为 1000 个节点；实际部署仍需评估 Gossip 流量、CPU 开销和故障恢复时间。  <strong>MySQL MGR：组成员数最多 9 个（1–9 任取），生产上通常取 3/5/7/9 等奇数规模</strong>，偶数不增加容错数（4 个成员仍只容忍 1 个故障）。奇数规模在多数派容错下更节省副本：3 个成员可容忍 1 个故障，5 个可容忍 2 个。跨 AZ 或 Region 的通信会增加协调等待，具体延迟取决于网络、负载和配置，需要在目标环境中测量。  <strong>Kafka 分区容量要按负载实测。</strong> 单分区吞吐受消息大小、批量、压缩、确认条件和硬件影响。KIP-500 把支持数十万乃至百万分区列为元数据架构的扩展目标；实际集群容量仍需结合元数据规模与恢复时间验证。</blockquote>
 <figure class="fig" id="fig-7-1"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 920 474" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_7_1_arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -195,7 +195,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="335" y="245" width="250" height="70" rx="6" fill="#FEF3C7" stroke="#D97706"/>
   <text x="460" y="270" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">② 半同步复制</text>
   <text x="460" y="290" text-anchor="middle" font-size="12" fill="#374151">主等 ≥1 个从 ACK 才返回</text>
-  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">副本日志落盘确认；超时可降级</text>
+  <text x="460" y="306" text-anchor="middle" font-size="12" fill="#374151">副本写入 relay log 后回 ACK；超时可降级</text>
 
   <line x1="460" y1="315" x2="460" y2="355" stroke="#4B5563" stroke-width="1.5" marker-end="url(#fig_7_1_arrow-gray)"/>
   <text x="470" y="340" font-size="11" fill="#EF4444">故障转移仍需另行协调</text>
@@ -240,7 +240,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-7.2">7.2 Redis 的做法</h2>
 <h3 id="sec-7.2.1">7.2.1 主从复制：高可用的基础，但还不是集群</h3>
 <p>Redis 最朴素的集群化，是主从复制（replication）。在从节点上执行 <code>REPLICAOF host port</code>（旧版叫 <code>SLAVEOF</code>），从节点发起连接，建立后由主节点把数据推送过来。首次同步时，主节点 fork 子进程生成 RDB 快照；快照可以先写文件再传输，也可以通过无盘同步直接传给副本。期间产生的写命令保留在复制缓冲中，快照传完后再补发。Redis 7.0 让副本输出与复制积压区（replication backlog）引用共享缓冲块，各副本维护自己的发送进度；backlog 为断线后的续传保留近期历史。短暂断线后，如果复制 ID 仍能匹配相应历史，所需字节也还在 backlog 中，就可以只补差量，这叫部分重同步（partial resync）。这里只看它在集群中扮演的角色。</p>
-<p>主从复制解决了一个问题：读可以分担到从节点，主节点坏了可以从从节点恢复数据。但它有三个根本性的局限。第一，复制是<strong>异步</strong>的：主节点写完立即返回客户端，不等从节点确认。这是 Redis 的默认取舍：不把副本确认放到请求的等待路径上。代价是主节点刚确认的写、从节点还没收到时主节点宕机，故障转移后这笔写可能丢失。第二，<strong>写仍然集中在单主</strong>。主从复制解决了读扩展和高可用，但没有解决写扩展：所有写还是落在一个主节点上，单机内存仍然是容量上限。第三，<strong>故障转移要人工</strong>。主节点宕了，运维得手动把某个从节点提升为主、再让其他从节点改连新主。对"高可用"这个目标，人工转移不够格。</p>
+<p>主从复制解决了一个问题：读可以分担到从节点，主节点坏了还能靠从节点恢复数据。但它有三个根本性的局限。第一，复制是<strong>异步</strong>的：主节点写完立即返回客户端，不等从节点确认。这是 Redis 的默认取舍：不把副本确认放到请求的等待路径上。代价是主节点刚确认的写、从节点还没收到时主节点宕机，故障转移后这笔写可能丢失。第二，<strong>写仍然集中在单主</strong>。主从复制解决了读扩展和高可用，但没有解决写扩展：所有写还是落在一个主节点上，单机内存仍然是容量上限。第三，<strong>故障转移要人工</strong>。主节点宕了，运维得手动把某个从节点提升为主、再让其他从节点改连新主。对"高可用"这个目标，人工转移不够格。</p>
 <h3 id="sec-7.2.2">7.2.2 Sentinel：把人工故障转移自动化</h3>
 <blockquote><strong>共识算法一分钟直觉</strong>：这类算法要解决的是，几台机器如何对同一项决定达成一致，并在后续故障和换主中保留已经确认的结果。以 Raft 为例，<strong>任期号（term）</strong> 用来区分领导者任期，节点拒绝过期任期的请求；<strong>日志复制</strong>把决定传播给副本；<strong>多数派确认、选举限制和日志规则</strong>共同保证新领导者继承已经提交的记录。任期增加并不会让旧任期已提交的决定失效。Sentinel 借鉴了任期号和多数派选举，但不复制完整的业务日志；MGR 的 XCom 与 Kafka 的 KRaft 则用共识协议维护相应的组通信或元数据。想深究这些规则，可以读 Raft 的原始论文。</blockquote>
 <p>Sentinel（哨兵）就是来做自动故障转移的。Sentinel 本身是一组独立进程（通常部署 3 个或更多，奇数个便于投票），它们专门盯着主从节点，在主节点宕机时自动完成故障转移。机制分几步：每个 Sentinel 周期性地给主从节点发心跳，超过 <code>down-after-milliseconds</code> 没回应，这个 Sentinel 把主节点标记为<strong>主观下线</strong>（SDOWN，subjectively down）：这只是单个 Sentinel 基于本节点视角的判定。然后它通过 <code>SENTINEL is-master-down-by-addr</code> 直接询问其他 Sentinel 投票，如果认为主节点挂了的 Sentinel 数量达到配置的 quorum（quorum 是人工设定的判定票数，不必是多数派），就升级为<strong>客观下线</strong>（ODOWN，objectively down）：这是达到 quorum 数量后集群层面的共识判定。</p>
@@ -342,7 +342,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>最小拓扑 3 主 3 从是工程惯例：3 个主是为了能在 1 个主宕机时仍有 2 个主凑成多数派完成选举，每个主配 1 个从是为了主宕了有人顶替。这是可用性、容错能力、资源成本三者之间的实践平衡，不是 Redis 强制的硬约束。</p>
 <h2 id="sec-7.3">7.3 MySQL 的做法</h2>
 <p>理解 MySQL 的集群，得先看清它的基本拓扑。MySQL 集群最核心的机制是<strong>主从复制</strong>：一台主节点（Master，8.0.22/8.0.23 起官方改称 source，新增 START REPLICA、CHANGE REPLICATION SOURCE TO 等语句别名）处理所有写请求，把每一条数据变更记进 binlog（二进制日志）；一台或多台从节点（Slave，同期改称 replica）通过订阅主节点的 binlog 来保持数据同步。从节点将网络接收和本地回放分开：I/O 线程接收 binlog 事件并写入中继日志，回放线程再从中读取执行。单线程回放时由一个 SQL 线程执行；多线程复制则由协调器和 worker 分工。中继日志缓冲了接收与回放的速度差，回放慢时可以逐步追赶，但接收仍会受缓冲空间等资源限制。</p>
-<p>从这个基础拓扑出发，MySQL 逐步提供了异步复制、半同步复制和组复制 MGR：异步复制默认不等副本，故障转移时可能缺少已提交事务；半同步等待指定数量的副本将日志接收并刷盘；MGR 则在提交前加入组内事务协调。新增的确认和协调需要等待，但三种方案的区别不能只用一个“一致性强度”概括。</p>
+<p>从这个基础拓扑出发，MySQL 逐步提供了异步复制、半同步复制和组复制 MGR：异步复制默认不等副本，故障转移时可能缺少已提交事务；半同步等待指定数量的副本确认已接收日志，副本是否已将 relay log 同步到磁盘还受 <code>sync_relay_log</code> 控制；MGR 则在提交前加入组内事务协调。新增的确认和协调需要等待，但三种方案的区别不能只用一个“一致性强度”概括。</p>
 <figure class="fig" id="fig-7-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 800 341" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_7_3_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -399,7 +399,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>老式复制靠 file + position 定位复制位点：从节点记录“我同步到了 mysql-bin.000003 的第 1580 字节”。文件滚动本身不会让位点失效，但换主时，新主的日志文件和位置可能不同，人工对齐容易出错。MySQL 5.6 引入了全局事务标识（GTID，Global Transaction Identifier），格式是 <code>source_id:transaction_id</code>，给事务一个全局唯一 ID。启用 GTID 自动定位后，从节点报告已接收或提交的 GTID 集合，新主据此补发缺少的事务。所需日志如果已经清理，仍要从其他源补齐，或用新备份重建副本。GTID 让切换复制源更容易管理，不再依赖人工对齐文件位点。</p>
 <p>异步复制的代价是：主节点不等从节点，主节点宕机后转移到从节点时，可能缺少已经提交、但还没来得及传过去的事务。回放也可能遇到瓶颈：单 SQL 线程只能串行重做，主节点并发写入速度持续超过回放速度时，复制延迟就会增长。MySQL 的多线程复制（MTS，Multi-Threaded Slave；8.0.27 起默认开启，<code>replica_parallel_workers</code> 默认 4，更早版本默认 0 即单线程回放）利用 binlog 中的依赖标记 <code>last_committed</code> / <code>sequence_number</code> 调度并行回放。默认 <code>COMMIT_ORDER</code> 根据事务提交窗口是否重叠来生成依赖，不只限于同一次组提交；<code>WRITESET</code> 还可利用写集识别更多互不冲突的事务。并行回放能缓解延迟，收益仍受事务依赖和回放资源限制。存储格式与回放机制见第 8、9 章。</p>
 <h3 id="sec-7.3.2">7.3.2 半同步复制：在异步与全同步之间</h3>
-<p>半同步复制（semi-sync replication）在异步复制上增加了副本确认。默认等待点下，主节点将 binlog 刷盘后，至少等一个从节点确认，再提交到存储引擎并向客户端返回成功。这里必须分清从节点确认的是哪一步：从节点 I/O 线程把 binlog 事件写入 relay log 并落盘后就回 ACK，不等 SQL 线程回放完毕。它缩小了“binlog 还没传到副本、主就没了”的风险，但确认超时会降级为异步；故障转移时还必须选择持有已确认事务的副本，保留并应用其 relay log。事务暂时停留在 relay log 中，并不等于已经丢失。</p>
+<p>半同步复制（semi-sync replication）在异步复制上增加了副本确认。默认等待点下，主节点将 binlog 刷盘后，至少等一个从节点确认，再提交到存储引擎并向客户端返回成功。这里必须分清从节点确认的是哪一步：从节点 I/O 线程把 binlog 事件写入 relay log 文件后即回 ACK，不等 SQL 线程回放完毕。它缩小了“binlog 还没传到副本、主就没了”的风险，但确认超时会降级为异步；故障转移时还必须选择持有已确认事务的副本，保留并应用其 relay log。事务暂时停留在 relay log 中，并不等于已经丢失。</p>
 <h3 id="sec-7.3.3">7.3.3 Group Replication：多数派协调与冲突认证</h3>
 <p>组复制（MGR，MySQL Group Replication）在复制链路中加入组内事务协调。它在 MySQL 5.7.17 首次作为 GA 特性提供，8.0 又做了大量增强（更完善的成员管理、更好的并发写性能）。它的核心是基于 Paxos 的组通信组件 XCom。以单主模式的读写事务为例：客户端把事务发给主节点，事务准备提交时，主节点向组内广播行变更及写集；XCom 建立全序消息传递，各成员按这个顺序做冲突认证。通过认证后，主节点才真正提交，并向客户端返回成功，其他成员也在认证后应用这笔事务。</p>
 <p>XCom 需要多数派才能继续作出决定。容错能力是经典的 ⌊(N-1)/2⌋：3 个成员能容忍 1 个故障，5 个能容忍 2 个，只要剩余成员仍能形成多数派，组就能继续运行。成员故障或加入会触发 View Change，组内更新成员视图；重新加入的成员则借助 GTID 确定缺少的事务，再通过分布式恢复追赶数据。</p>
@@ -671,7 +671,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>网络分区时，业务能接受请求失败，还是能接受读取陈旧数据，得由业务角色倒推。缓存是否可以降级或回源，要看主流程的容错方式；交易记录还必须单独考虑已确认写入的持久性，数据丢失可能带来法律和财务责任；流系统则需要按日志采集或关键业务事件的要求设定确认与选主条件。我选型前会先确定业务能接受哪些故障后果：选错定位，比选错参数严重得多。反过来想，只因为“我手里有个 Redis”就拿它存交易记录，却不检查故障转移和数据保留的保证，往往就是事故的开端。</p>
 <h2 id="sec-7.7">7.7 小结</h2>
 <p>单点故障可以通过分布式部署缓解，但分布式也带来新的复杂度。集群要同时解决数据怎么切、副本怎么一致、故障怎么转移、元数据谁说了算这四个问题，三个软件各给出了一套不同的方案：Redis Cluster 用槽分片、Gossip 状态传播与异步复制，故障转移仍有丢写窗口；MySQL 提供基于 binlog 的复制，并由 MGR 增加组内排序与认证；Kafka 以分区组织并行处理，用 ISR 和确认参数管理副本写入，由 KRaft 协调元数据。三个软件的共性是一套基本结构：分片用于扩容，副本用于容错，并可支持读扩展，协调机制管理成员与状态变更；只是在这套结构上，各自按自己的定位做了不同的取舍。</p>
-<p>集群里的数据以什么格式保存到磁盘（日志段、RDB/AOF），是<a class="xref" href="08-storage-format.html">第 8 章</a>的内容；节点之间的数据如何精确同步、字节级的复制流怎么走，则是<a class="xref" href="09-data-sync.html">第 9 章</a>的主题。而 Router、Controller 这类协调层如何嵌入整体分层架构，可以回看<a class="xref" href="05-layered-architecture.html">第 5 章</a>。本章建立的"分片—副本—共识"这条线，后面几章会反复用到。</p><nav class="page-nav"><a href="06-security.html">← 第 6 章 安全机制 — 权限、加密、审计</a><a href="08-storage-format.html">第 8 章 磁盘存储格式 — 文件结构的设计哲学 →</a></nav></article>
+<p>集群里的数据以什么格式保存到磁盘（日志段、RDB/AOF），是<a class="xref" href="08-storage-format.html">第 8 章</a>的内容；节点之间的数据如何精确同步、字节级的复制流怎么走，则是<a class="xref" href="09-data-sync.html">第 9 章</a>的主题。Controller 的协调职责如何嵌入整体分层架构，可以回看<a class="xref" href="05-layered-architecture.html">第 5 章</a>；Router 的连接路由职责见本章第 <a class="xref" href="#sec-7.3.5">7.3.5 节</a>。本章建立的"分片—副本—共识"这条线，后面几章会反复用到。</p><nav class="page-nav"><a href="06-security.html">← 第 6 章 安全机制 — 权限、加密、审计</a><a href="08-storage-format.html">第 8 章 磁盘存储格式 — 文件结构的设计哲学 →</a></nav></article>
 </main>
 </div>
 <script>
