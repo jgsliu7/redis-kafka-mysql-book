@@ -46,6 +46,14 @@ h1{font-family:"Noto Serif SC","Songti SC",serif;font-weight:700;font-size:27px;
 .notes p{margin:4px 0;}
 .notes b{color:var(--ink);font-weight:600;}
 .stats{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px;}
+.method{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:16px 22px 14px;margin:0 0 22px;}
+.method h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:16px;font-weight:700;
+  color:var(--accent);margin:0 0 6px;letter-spacing:.02em;}
+.method .mlead{font-size:12.5px;color:var(--muted);margin:0 0 8px;line-height:1.7;}
+.method ol{margin:0;padding-left:20px;}
+.method li{font-size:12.8px;line-height:1.72;margin:5px 0;color:var(--ink);}
+.method li b{font-weight:600;}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;
   padding:8px 18px;font-size:13px;color:var(--muted);}
 .stat b{display:block;font-size:21px;color:var(--ink);font-weight:700;
@@ -135,6 +143,18 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);}
   <div class="stat"><b>14</b>分歧 · 未修改</div>
   <div class="stat"><b>2</b>留作者裁决</div>
 </div>
+<section class="method">
+<h2>这轮工作沉淀下的方法论</h2>
+<p class="mlead">把「改不改」的裁决权从发现者手里拿走，交给正交视角的独立投票；把每一步状态留下来，让作者修订回流进同一闭环。53 项从两目录读者意见到收敛回写的全过程，可复用的规则六条。</p>
+<ol>
+<li><b>线索与结论分离。</b>两批 150 名读者与 AI 检查的发现只当线索；逐条经三席独立核实（技术事实 / 书内一致性 / 源码与版本三个正交视角），三票全部「问题存在＋认可改法」才改稿。发现者的置信度不构成修改依据。</li>
+<li><b>判、改、验三分离。</b>判定多人投票、施工单人精准替换、改后另派双席独立验证；「36 项逐字落地」与「17 项未执行零误动」都要独立证明，不允许施工者自证。</li>
+<li><b>分歧即分层，不是失败。</b>全票项是事实错误，可以改；分歧项几乎全是口径与取舍（V06a 公司史两派互斥、V12a 表格措辞、T1+N11 改文本身有错），归作者裁决。流程自动把「对错」与「裁量」分开，宁可漏改不可错改。</li>
+<li><b>状态即文档。</b>statuses.json 是唯一事实源，每项带 status 与各席立场；本页由脚本从状态生成并 assert（行数 53、状态计数），表可复算、不手编漂移。</li>
+<li><b>作者修订回流同一闭环。</b>作者按本表自主修订（284a5a8）后不重开审查，只做对照复核：36 项零回退＋清单外修正抽查属实；收敛以状态迁移记录（split → converged），历史不删。对照复核代替重新审查，是人工修订融入机器流程的关键一步。</li>
+<li><b>产物必过验证门。</b>SVG 双门（svg_audit 0 HIGH＋渲染真看图）、构建 PASS（183 交叉引用零未解析）、本页计数 assert——生成物不验证不交付。</li>
+</ol>
+</section>
 <div class="table-scroll">
 <table>
 <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
