@@ -1,0 +1,112 @@
+[
+ {
+  "id": "R2-01",
+  "group": "G1",
+  "title": "rehash 扩容后的桶号不可能任意散开",
+  "tags": "机制、推导",
+  "location": "chapters/02-data-structures-protocols/chapter.md:63",
+  "original": "搬迁不是整桶平移：旧表桶 2 里的 k7、k3、k9 搬过去之后分别落在 `ht[1]` 不同的桶里，键要按新表的尺寸重新散列。这笔重新散列的开销和搬移一起，摊在每次操作顺带的那一小步里。",
+  "revised": "搬迁不是整桶平移：旧表从 4 个桶扩到 8 个桶时，桶 2 里的 k7、k3、k9 只能落在新表的桶 2 或桶 6。键要用同一个哈希值和新表的掩码重新计算桶号，原来在同一桶里的键可能因此分开。这部分计算和搬移一起，摊在每次操作顺带的那一小步里。",
+  "reason": "原文与图把旧表同一个桶的三个键分到三个不同的新桶。Redis 的桶号由 hash & (size-1) 得到。旧桶号为 2 时，哈希低两位固定为 10；新表尺寸为 8，只多取一位，所以结果只可能是 2 或 6，不能是 1、3、5。建议保留渐进搬迁和重新计算桶号的解释，修正可到达的桶集合。\n同一个哈希值与新表掩码相与得到新桶号；结合旧表掩码可推导 4→8 扩容时旧桶 2 只可能分到新桶 2 或 6。"
+ },
+ {
+  "id": "R2-02",
+  "group": "G1",
+  "title": "图 2-3 的迁移落点与哈希掩码不符",
+  "tags": "图文、机制",
+  "location": "chapters/02-data-structures-protocols/diagrams/fig-2-3.svg:39",
+  "original": "ht[1]　新表（size=8，更大）\n0\nk1\n1\nk7\n2\n3\nk3\n4\n5\nk9\n6\n \n7\nk…",
+  "revised": "新表标题：ht[1]　新表（size=8，更大）\n新表 8 个桶的示例内容：\n桶 0：k1\n桶 1：空\n桶 2：k9 → k7\n桶 3：空\n桶 4：空\n桶 5：空\n桶 6：k3\n桶 7：k…\n将旧桶 2 的迁移箭头分接到新桶 2 和新桶 6，并标注“本次搬迁的前后对照；落点为一种示例”。旧桶 2 保留 k7 → k3 → k9 作为搬迁前状态。",
+  "reason": "已查看实际渲染：旧表 size=4 的桶 2 指向新表 size=8，而 k7、k3、k9 被画在新桶 1、3、5。源码约束决定它们只可能进入桶 2 或 6。建议给出合法分配示例，并把箭头分向两个目标桶；若沿旧链逐个头插，分到桶 2 的 k7、k9 的链序应为 k9 → k7。前后对照标注避免读者把同一键同时画在两表理解为同一时刻的重复存储。\n同一个哈希值与新表掩码相与得到新桶号；结合旧表掩码可推导 4→8 扩容时旧桶 2 只可能分到新桶 2 或 6。"
+ },
+ {
+  "id": "R2-10",
+  "group": "G1",
+  "title": "图 2-3 改为前后对照时须同步图注",
+  "tags": "图文、时序",
+  "location": "chapters/02-data-structures-protocols/chapter.md:61",
+  "original": "图 2-3　渐进式 rehash 的双表搬迁过程：搬迁进行到一半的一个时刻。",
+  "revised": "图 2-3　渐进式 rehash 的双表搬迁过程：以旧表桶 2 的一次搬迁作前后对照。",
+  "reason": "图示建议保留旧桶中的键和新表中的迁移结果，并明确改为一次搬迁的前后对照。正文图注若仍称“一个时刻”，就会与该图示冲突。这里须与同组图示、正文桶号说明一并采用；新图注保留图号、双表搬迁主题及本次旧桶 2 的搬迁范围。\n同一个哈希值与新表掩码相与得到新桶号；结合旧表掩码可推导 4→8 扩容时旧桶 2 只可能分到新桶 2 或 6。"
+ },
+ {
+  "id": "R2-03a",
+  "group": "G2",
+  "title": "功能分组图被称为完整字段排布",
+  "tags": "图文、读者理解",
+  "location": "chapters/02-data-structures-protocols/chapter.md:129",
+  "original": "头部之后是实际的消息记录。**每条记录不存绝对偏移量和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见图 2-7。\n\n![图 2-7 Kafka RecordBatch V2 字段布局](diagrams/fig-2-7.svg)\n图 2-7　RecordBatch V2 字段布局：61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。",
+  "revised": "头部之后是实际的消息记录。**每条记录不存绝对偏移量和绝对时间戳**，而是存它和 `baseOffset` / `baseTimestamp` 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，字段的功能分组见图 2-7。\n\n![图 2-7 Kafka RecordBatch V2 字段分组](diagrams/fig-2-7.svg)\n图 2-7　RecordBatch V2 字段分组：按功能分组，不表示磁盘字节顺序。61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。",
+  "reason": "实际渲染把 lastOffsetDelta 排在两个时间戳之后，又把 recordsCount 放在 Producer 状态之前，这不是磁盘字节顺序。正文却称“完整的字段排布”，图注称“字段布局”，容易让读者将功能分组当作编码顺序。该图作为功能分组仍有解释价值，因此完整建议保留图中分组，明确其不代表磁盘顺序。真实顺序在 attributes 后为 lastOffsetDelta、baseTimestamp、maxTimestamp、producerId、producerEpoch、baseSequence、recordsCount，再到 records。\n官方按磁盘顺序列出头部；lastOffsetDelta 位于 baseTimestamp 前，Producer 状态位于记录数组之前。\n精确验证 recordsCount 在 baseSequence 后、records 前；固定头部合计 61 字节。"
+ },
+ {
+  "id": "R2-03b",
+  "group": "G2",
+  "title": "功能分组图被称为完整字段排布",
+  "tags": "图文、读者理解",
+  "location": "chapters/02-data-structures-protocols/diagrams/fig-2-7.svg:11",
+  "original": "RecordBatch（Magic = 2）",
+  "revised": "RecordBatch（Magic = 2，按功能分组）",
+  "reason": "实际渲染把 lastOffsetDelta 排在两个时间戳之后，又把 recordsCount 放在 Producer 状态之前，这不是磁盘字节顺序。正文却称“完整的字段排布”，图注称“字段布局”，容易让读者将功能分组当作编码顺序。该图作为功能分组仍有解释价值，因此完整建议保留图中分组，明确其不代表磁盘顺序。真实顺序在 attributes 后为 lastOffsetDelta、baseTimestamp、maxTimestamp、producerId、producerEpoch、baseSequence、recordsCount，再到 records。\n官方按磁盘顺序列出头部；lastOffsetDelta 位于 baseTimestamp 前，Producer 状态位于记录数组之前。\n精确验证 recordsCount 在 baseSequence 后、records 前；固定头部合计 61 字节。"
+ },
+ {
+  "id": "R2-04",
+  "group": "G3",
+  "title": "KRaft 启动八阶段与实际依赖顺序不符",
+  "tags": "时序、版本、机制",
+  "location": "chapters/03-lifecycle/chapter.md:139",
+  "original": "### 启动链路：八阶段\n\nKafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段最要紧。\n\n1. **日志与配置初始化。** 加载 `server.properties`，初始化日志目录。\n2. **元数据管理初始化（KRaft 核心）。** 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft：一种多数派共识算法，第 7 章有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群由哪个 Controller 协调。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据由 Kafka 内部的 Controller 组维护，使用独立的 Raft 元数据日志。\n3. **日志管理器启动（恢复的主要环节）。** 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 `num.recovery.threads.per.data.dir` 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有\"批量恢复\"这种捷径，只能靠多线程把工作分摊开。\n4. **三层网络架构**：Acceptor/Processor/Handler 三层线程模型，把收发包与业务处理分开（下面单独展开）。\n5. **副本管理器启动**，开始拉取数据，或等待副本同步。\n6. **控制器启动**（如果该节点是 Controller 候选），接管集群元数据的协调。\n7. **注册到集群**，对外宣告\"我在线了\"。\n8. **后台线程启动**，进入服务态。\n\n以 Kafka 3.9 的 KRaft 模式、`node.id=0` 为例，启动完成后会打印 `[KafkaRaftServer nodeId=0] Kafka Server started`。它和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 一样，都可用来识别启动完成。\n\n第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。",
+  "revised": "### 启动链路：服务就绪前的依赖\n\n以 Kafka 3.9 的 KRaft 模式为例，启动过程里最要紧的是元数据、日志恢复和网络服务之间的依赖，部分准备工作会交错进行。\n\n1. **配置、日志目录与角色初始化。** 加载 `server.properties` 并检查日志目录。如果一个进程同时承担 Controller 和 Broker 两种角色，会先启动 Controller 组件，再启动 Broker；只承担 Broker 角色的进程则连接独立的 Controller 组。KRaft 把元数据保存在用 Raft 复制的日志中（Raft：一种多数派共识算法，第 7 章有一分钟直觉讲解）。旧 ZooKeeper（ZK）模式下，这些集群元数据由外部 ZooKeeper 集群保存。\n2. **日志恢复依赖可用的元数据。** Broker 先创建日志管理器，把正式启动延后到首次元数据发布时。注册、心跳和元数据追赶也在启动期间进行。取得元数据后，日志管理器加载本地 TopicPartition（主题分区）的日志，并按需要校验、恢复日志段和重建索引，再启动副本管理器及协调器。分区数很大、恢复工作较多时，这一段可能成为启动瓶颈，`num.recovery.threads.per.data.dir` 用于增加每个数据目录的恢复并行度。\n3. **准备网络组件不等于开始服务。** Broker 会在前段准备 SocketServer 和后台调度器。对外服务前，还要等 Controller 确认元数据已追上、首次元数据发布完成、Broker 解除隔离，以及相应监听端点的授权组件就绪，然后开启请求处理。Acceptor/Processor/Handler 三层线程模型负责把收发包与业务处理分开，下面单独展开。\n\n以 Kafka 3.9 的 KRaft 模式、`node.id=0` 为例，启动完成后会打印 `[KafkaRaftServer nodeId=0] Kafka Server started`。它和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 一样，都可用来识别启动完成。\n\nKRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。",
+  "reason": "原顺序把 Controller 启动放在 Broker 日志恢复、副本管理器之后，又把注册和后台线程启动放到最后；Kafka 3.9 KRaft 的调用链不支持这一顺序。Controller/Broker 合并进程先启动 Controller，后台调度器在 Broker 初始化前段已启动，注册与元数据追赶在初次发布和日志管理器启动前已展开。建议改为解释真正的就绪依赖，保留元数据来源、恢复并行度、三层网络、完成日志和版本背景；恢复动作限定为按需，避免把每次启动写成所有分区都必须重建索引。\n同进程承担两种角色时，Controller 先于 Broker 启动；只承担 Broker 的进程不在中途启动 Controller。\n后台调度器在前段启动；SocketServer 先创建；生命周期注册启动在初次元数据发布前；末段等待追赶、发布、unfence 与授权，然后启用请求处理。\n首次元数据发布时启动日志管理器（按需做异常关闭恢复），随后启动副本管理器和协调器。"
+ },
+ {
+  "id": "R2-05",
+  "group": "G3",
+  "title": "图 3-5 复用了错误的固定启动阶段号",
+  "tags": "图文、交叉复用",
+  "location": "chapters/03-lifecycle/diagrams/fig-3-5.svg:86",
+  "original": "三层网络在启动链路中的位置（KRaft 模式）\n三层网络是启动八阶段的第 4 阶段",
+  "revised": "三层网络在启动链路中的位置（KRaft 模式）\n网络组件先准备；元数据、恢复与授权就绪后开启请求处理",
+  "reason": "该图把三层网络固定为“八阶段的第 4 阶段”，直接复用了正文不成立的线性顺序。修改正文后需同步修正此处。建议保留图的网络结构，只替换底部对启动依赖的两行说明。\n同进程承担两种角色时，Controller 先于 Broker 启动；只承担 Broker 的进程不在中途启动 Controller。\n后台调度器在前段启动；SocketServer 先创建；生命周期注册启动在初次元数据发布前；末段等待追赶、发布、unfence 与授权，然后启用请求处理。\n首次元数据发布时启动日志管理器（按需做异常关闭恢复），随后启动副本管理器和协调器。"
+ },
+ {
+  "id": "R2-06",
+  "group": "G4",
+  "title": "普通关闭不保证处理完所有在途请求",
+  "tags": "时序、保证范围",
+  "location": "chapters/03-lifecycle/chapter.md:163",
+  "original": "Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于\"是否提前告知 Controller 自己要走\"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。\n\n受控关闭被禁用（即 `controlled.shutdown.enable=false`）或执行失败时，Broker 会执行**普通关闭**。步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → **强制刷盘所有日志** → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它**不主动告知 Controller 自己要走**。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。",
+  "revised": "Kafka 的关闭分两种路径，普通关闭和受控关闭；受控关闭在退出前协调 Leader 迁移，并等待 Controller 批准。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。\n\n受控关闭被禁用（即 `controlled.shutdown.enable=false`）或执行失败时，Broker 会执行**普通关闭**。以 Kafka 3.9 的 KRaft 模式为例，Broker 先停止网络请求处理并关闭连接，再关闭请求处理线程、协调器和副本管理等组件，由日志管理器刷盘并收尾后退出。这里不保证所有在途请求都能完成并把结果返回客户端；连接中断时，客户端可能无法确定某个请求的执行结果。如果同一进程还承担 Controller 角色，会在 Broker 关闭后再关闭 Controller。普通关闭没有提前完成 Leader 迁移的保证；对于尚未迁移的 Leader 分区，Controller 检测到 Broker 不可用后再选举 Leader，期间分区可能短暂不可用。",
+  "reason": "“关网络层（处理完在途请求）”给出了源码没有提供的排空保证。SocketServer 停止处理时关闭处理器、清理请求队列与连接，之后才关闭 Handler 线程池；在途请求可能已执行而尚未回包，也可能尚未执行。合并角色时 Controller 在 Broker 之后关闭。受控关闭等待失败也不代表此前从未通知 Controller，因此须连同 L163 的分类句一起替换。完整建议保留 JVM Hook、组件收尾与日志刷盘，并将故障后选举限定为尚未迁移的 Leader 分区。\n先停止 SocketServer 请求处理，随后关闭请求线程池、协调器、副本管理器和日志管理器。\n停止接入器/处理器并清理请求队列，不是承诺排空全部在途请求。\n关闭 selector 与现有连接；不能保证客户端收到所有在途请求的结果。\n合并角色的进程先关闭 Broker，再关闭 Controller，原文把停 Controller 放在副本/日志之前不成立。"
+ },
+ {
+  "id": "R2-07",
+  "group": "G5",
+  "title": "LRU 图把当轮样本与持续候选池混为一物",
+  "tags": "图文、机制",
+  "location": "chapters/04-memory-disk/diagrams/fig-4-2.svg:45",
+  "original": "采样池（maxmemory-samples，默认 5）\nk3\nk7\nk11\nk2\nk9\n← 随机抽 N 个\n淘汰：采样池中空闲时间最长者\nk11（最久未用）\n→ DEL 释放内存",
+  "revised": "本轮采样（maxmemory-samples，默认 5）\nk3　k7　k11　k2　k9\n← 随机抽取最多 N 个键\n↓ 将样本加入持续维护的淘汰候选池\n淘汰候选池：最多 16 项（Redis 7.0）\n保留本轮样本与此前候选中空闲时间较长的键\n↓ 从候选池中选择仍存在、空闲时间估计值最大的键\n本例选中 k11 → 删除键并释放内存\n布局：在本轮样本与淘汰结果之间补出候选池框，箭头依次连接三个框；k11 只作为本例结果。",
+  "reason": "正文已说明持续维护的淘汰池，图却把 maxmemory-samples=5 标为“采样池”，直接选其中最久未用的键，省掉了会改变决策结果的持久候选池。这不只是省略实现细节：以前采到、当前未再次采中的键仍可能成为淘汰目标。建议明确“本轮样本→持续候选池→选取目标”三步，并用删除键而非固定 DEL 命令描述内存释放，以免绑定具体 lazyfree 配置。\nEVPOOL_SIZE 为 16，与 maxmemory-samples 不是同一个参数。\n每轮采样结果按空闲时间插入既有候选池，保留优质旧候选。\n填充候选池后从池尾找尚存键，选择目标；不是只在本轮 5 个样本中决胜。"
+ },
+ {
+  "id": "R2-08",
+  "group": "G6",
+  "title": "Flush List 顺序被误写为磁盘顺序写",
+  "tags": "机制、图文",
+  "location": "chapters/04-memory-disk/diagrams/fig-4-4.svg:85",
+  "original": "后台线程按此队列做 Checkpoint：顺序刷盘 → 磁盘\n---\nCheckpoint 把脏页顺序写回；崩溃靠 redo log 重放补齐",
+  "revised": "后台线程刷回脏页，使 Checkpoint 可以向前推进\n---\n脏页写回各自的表空间位置；崩溃恢复按需重放 redo log",
+  "reason": "Flush List 按脏页最早修改的 LSN 排序，不等于按文件偏移排序。各脏页要写回各自的数据页位置，不能承诺“顺序刷盘”“顺序写回”；邻页刷盘配置只是特定条件下减少寻道。图中把 WAL 的顺序日志写优势错误延伸到了脏页写回，与正文对数据页随机写的说明也不一致。两处标签应一并改。\ninnodb_flush_neighbors 的 0/1/2 区别说明逐页刷回与同 extent 邻页合并，机械盘场景才可能通过邻页合并减少寻道；Flush List 的顺序不保证物理顺序 I/O。"
+ },
+ {
+  "id": "R2-09",
+  "group": "G7",
+  "title": "ACL 键前缀不构成完整的租户隔离",
+  "tags": "权限边界、推导",
+  "location": "chapters/06-security/chapter.md:99",
+  "original": "键模式控制作用范围。`~keys:*` 限定用户只能访问匹配该模式的键，这让多租户场景下不同应用可以按前缀隔离。",
+  "revised": "键模式限制命令参数中声明的键。对 GET、SET 这类命令，`~keys:*` 限定用户只能读写匹配该模式的键；它不会按此前缀过滤 SCAN 返回的键名，也不能限制没有键参数的全库操作。多租户按前缀限制数据读写时，还需要通过命令权限单独限制键名枚举和全库操作。",
+  "reason": "原文从“对键参数的模式检查”直接推出应用之间按前缀隔离，范围超出了 ACL 键模式的实际能力。前段的 +@read -@dangerous 并不意味着 SCAN 的返回值自动受 ~keys:* 过滤。建议保留前缀限制读写这一有效作用，同时补出无键参数命令和键名枚举的边界，避免读者据此误配置多租户权限。\n文档指出键模式只作用于显式接受键参数的命令；全库命令需靠命令权限控制。作为说明性资料，版本行为另由 Redis 7.0.0 源码核定。\n通过命令 keyspec 提取键参数并逐个校验；没有键参数的 SCAN 不按结果逐键授权。\nSCAN 按 MATCH、TYPE、过期状态过滤结果，没有用 ACL 键模式过滤返回的键名。\nSCAN 是只读键空间命令，参数含 cursor/MATCH/COUNT/TYPE，无键参数。"
+ }
+]

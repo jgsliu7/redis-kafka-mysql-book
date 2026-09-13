@@ -58,13 +58,13 @@
   <text x="440" y="436" text-anchor="middle" font-size="12" font-weight="700" font-family="ui-monospace, monospace" fill="#92400E">listpack</text>
   <text x="650" y="436" text-anchor="middle" font-size="12" font-weight="700" font-family="ui-monospace, monospace" fill="#4F46E5">hashtable</text>
 
-  <!-- Set 路径一：混入非整数先转 listpack，元素数超过 128 再升哈希表 -->
+  <!-- Set 路径一：符合 listpack 阈值的非整数成员可进入 listpack，超限转哈希表 -->
   <line x1="271" y1="432" x2="392" y2="432" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
   <line x1="488" y1="432" x2="599" y2="432" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <text x="331.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">混入非整数成员</text>
-  <text x="543.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">元素数 > 128</text>
+  <text x="331.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">非整数且满足阈值</text>
+  <text x="543.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">>128 个或成员 >64B</text>
 
-  <!-- Set 路径二：纯整数集合元素数超过 512（set-max-intset-entries）直达 hashtable，绕过 listpack -->
+  <!-- Set 路径二：纯整数超出 intset 数量限制，或混入非整数后不满足 listpack 限制，均可直达 hashtable -->
   <path d="M 230 448 Q 230 470 320 470 L 560 470 Q 650 470 650 457 L 650 447" fill="none" stroke="#4B5563" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <text x="440" y="485" text-anchor="middle" font-size="10.5" fill="#374151">纯整数 · 元素数 > 512（set-max-intset-entries）不经 listpack</text>
+  <text x="440" y="485" text-anchor="middle" font-size="10.5" fill="#374151">纯整数 >512 个，或非整数不满足 listpack 阈值：直接转哈希表</text>
 </svg>

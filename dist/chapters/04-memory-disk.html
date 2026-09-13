@@ -322,11 +322,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="560" y="158" width="150" height="48" rx="4" fill="#FFFFFF" stroke="#4F46E5"/>
-  <text x="635" y="178" text-anchor="middle" font-size="12" fill="#111827">高 8 位</text>
+  <text x="635" y="178" text-anchor="middle" font-size="12" fill="#111827">低 8 位</text>
   <text x="635" y="196" text-anchor="middle" font-size="11" fill="#374151">Morris 对数计数器</text>
 
   <rect x="710" y="158" width="150" height="48" rx="4" fill="#FFFFFF" stroke="#4F46E5"/>
-  <text x="785" y="178" text-anchor="middle" font-size="12" fill="#111827">低 16 位</text>
+  <text x="785" y="178" text-anchor="middle" font-size="12" fill="#111827">高 16 位</text>
   <text x="785" y="196" text-anchor="middle" font-size="11" fill="#374151">上次访问时间（分钟）</text>
 
   
@@ -717,7 +717,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>修改缓冲（change buffer）</strong>：InnoDB 的二级索引是 B+ 树，更新一个二级索引项可能要修改一个当前不在缓冲池的页。如果每次都把这个页从磁盘读入，就是一次随机 I/O。修改缓冲的做法是：先把这次修改记下来（缓存），等这个页因为别的原因被读入缓冲池时，再把缓存的修改合并（merge）进去。这样就把"为改一个索引项触发一次随机读"延迟成了"等页自然读入时顺便合并"。修改缓冲只对非唯一的二级索引生效，因为唯一索引必须立刻检查约束。</p>
 <p><strong>自适应哈希索引（AHI）</strong>：InnoDB 监控热点访问模式，如果发现某些 B+ 树路径被频繁遍历，就自动给这些路径建哈希，把 3 到 4 次页访问减少到 1 次。它无需配置、对用户透明，但只在负载稳定、热点集中时才有收益；负载剧烈变化时它反而可能成为开销。这是"在通用引擎里嵌入专用优化"的取舍。</p>
 <h3 id="s78">取舍总结</h3>
-<p>MySQL 的取舍：它用"复杂的缓冲池 + redo log + 三个辅助结构"换来"大容量 + ACID 可靠 + 通用 SQL 查询能力"。它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式撑不了这个容量，Kafka 的顺序日志范式给不了随机查询，剩下能选的就是 MySQL 这种"磁盘为主、内存加速"的复杂系统。</p>
+<p>MySQL 的取舍：它用"复杂的缓冲池 + redo log + 三个辅助结构"换来"大容量 + ACID 可靠 + 通用 SQL 查询能力"。它的复杂度极高，调优参数上百个，但这是通用 OLTP 数据库必须付的代价。你要存几十 TB 数据、要事务、要复杂查询，Redis 的全内存范式需要为这个容量配置足够的内存与分片，Kafka 的顺序日志范式不提供按业务 key 点查或通用条件查询，这些需求同时存在时，MySQL 这种"磁盘为主、内存加速"的复杂系统更合适。</p>
 <p>MySQL 把磁盘当主、内存当缓存，Kafka 则直接把"自己管内存"都省掉。</p>
 <h2 id="sec-4.4">4.4 Kafka 的做法</h2>
 <p>Kafka 的定位是分布式事件流平台，核心职责是高吞吐地搬运消息。它的访问模式很纯粹：生产者只追加写，消费者只顺序读，几乎不存在随机点查。从这个访问模式倒推，Kafka 做了一个直接的决定：不在进程里维护自己的缓冲池，把加速几乎全部交给操作系统的 PageCache。顺序读可以充分利用 OS 预读，顺序写由内核积累后批量刷盘，两者共同提高吞吐；内存也交给内核管理，进程无需另行维护缓存。</p>
@@ -830,7 +830,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="618" font-size="11" font-weight="700" fill="#059669">收益：拷贝数减半 · 切换数减半 · 内存冗余为零 · 消费者按内存速度读已缓存数据</text>
 </svg>
 </div><figcaption>图 4-6　Kafka 消费路径的零拷贝（sendfile）</figcaption></figure>
-<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；在支持 scatter-gather DMA 的现代网卡上（生产环境基本默认满足），剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；它生效的前提是数据已经缓存在 PageCache 里，冷数据仍要先等磁盘 I/O。</p>
+<p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；在支持 scatter-gather DMA 的现代网卡上（生产环境基本默认满足），剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；页缓存命中可以省去磁盘读取；冷数据仍需先等磁盘 I/O，但也可以沿这条路径传输。</p>
 <h3 id="s83">可靠性参数</h3>
 <p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（积累多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后吞吐会大幅下跌（强 fsync 下常掉到原来的几分之一），通常只在特殊合规要求下使用。</p>
 <p>更常用的可靠性参数是生产者端的 <code>acks</code>（0/1/all 三档）。它也涉及可靠性与性能的取舍，但控制的是写入确认，不能与 <code>appendfsync</code>、<code>innodb_flush_log_at_trx_commit</code> 的本地刷盘档位等同——完整语义与 3.0 默认值调整（KIP-679）见<a class="xref" href="07-cluster.html">第 7 章</a>，与 <code>min.insync.replicas</code> 的精确交互见<a class="xref" href="09-data-sync.html">第 9 章</a> acks 参数一节。</p>

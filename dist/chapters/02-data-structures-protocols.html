@@ -131,7 +131,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>任何一个有客户端和服务端的软件，都绕不过这两个问题：</p>
 <p>第一，数据用什么格式来组织。这个问题直接关系到操作复杂度、内存开销以及"哪些查询快、哪些查询慢"。跳表适合范围扫描和有序操作，哈希表适合 O(1) 点查，B+ 树为磁盘页对齐和范围扫描而设计，紧凑列表胜在内存密度。</p>
 <p>第二，客户端和服务端怎么对话。有三个关键点：发纯文本还是紧凑二进制（可读 vs 紧凑），每条消息独立处理还是批量打包（简单 vs 效率），协议固定还是带版本号可演进。</p>
-<p>Redis 要的是<strong>极低延迟</strong>。所以它的数据结构全部在内存里，常用的点查和有序定位可分别做到 O(1) 和 O(log N)，内存紧凑是第二考量。协议选了 RESP，类型和长度使用可读的前缀，参数也能包含二进制数据，服务端解析几乎不费 CPU。 MySQL 的核心目标是<strong>通用可靠</strong>。它要支持任意 SQL、事务 ACID、磁盘持久化，所以它的核心数据结构 B+ 树必须对齐磁盘的 16KB 页，让一次磁盘 I/O 读到的每一页都装满了索引键，而不是半页索引半页无用数据。协议选了二进制封帧——经典查询的结果行走文本，减少传输体积的收益，要到预编译语句的二进制结果集才体现出来；预编译也让 SQL 解析只做一次。 Kafka 把<strong>高吞吐</strong>当成第一目标。所以它的核心数据结构 RecordBatch 把多条消息打成一个包，压缩、传输、落盘都以 Batch 为单位，批量化成了格式本身的内置属性。协议选了带版本号的请求/响应模型。统一头部 + 逐 API 版本化，让不同版本客户端可以和同一个 Broker 对话，演进能力直接靠版本号字段实现。</p>
+<p>Redis 要的是<strong>极低延迟</strong>。所以它的数据结构全部在内存里，常用的点查和有序定位可分别做到 O(1) 和 O(log N)，内存紧凑是第二考量。协议选了 RESP，类型和长度使用可读的前缀，参数也能包含二进制数据，服务端解析几乎不费 CPU。 MySQL 的核心目标是<strong>通用可靠</strong>。它要支持任意 SQL、事务 ACID、磁盘持久化，所以 InnoDB 用 B+ 树组织索引，以默认 16KB 的页为单位读写。内部节点在一页内保存多个键和子页指针，提高分支数、减少查找需要访问的页；页内仍有管理信息和供后续写入使用的空闲空间。协议选了二进制封帧——经典查询的结果行走文本，减少传输体积的收益，要到预编译语句的二进制结果集才体现出来；重复执行预编译语句通常还可以复用解析结果。 Kafka 把<strong>高吞吐</strong>当成第一目标。所以它的核心数据结构 RecordBatch 把多条消息打成一个包，压缩、传输、落盘都以 Batch 为单位，批量化成了格式本身的内置属性。协议选了带版本号的请求/响应模型。统一头部 + 逐 API 版本化，让不同版本客户端可以和同一个 Broker 对话，演进能力直接靠版本号字段实现。</p>
 <h2 id="sec-2.2">2.2 内部数据结构：为核心目标而设计</h2>
 <h3 id="sec-2.2.1">2.2.1 Redis：驻留内存的简洁数据结构</h3>
 <p>Redis 的数据结构都受同一个约束限制：<strong>全部驻留内存</strong>。内存意味着随机访问几乎免费、对 CPU 开销比对 I/O 更敏感、容量有物理上限，所以数据结构要尽量省内存、尽量少 CPU 操作。下面五个结构都是对这条约束的回应：SDS、跳表、字典（dict）偏重查询效率，ziplist/listpack 和 intset 偏重内存密度。</p>
@@ -458,7 +458,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>触发点在 254 这个长度上（0xFF 留作整个 ziplist 的结束标记，0xFE 用作 5 字节编码的信号，1 字节能自由编码的长度只有 0–253）：比它短的长度用 1 字节就装得下，跨过它，字段要从 1 字节扩成 5 字节。连锁只向后传播，因为每个元素只依赖前一个元素的长度。</p>
 <p><strong>整数集合（intset）</strong> 是 Redis 集合类型在小数据且全为整数时的底层编码。它是一块连续的有序整数数组，查找用二分。intset 的升级有两条路径。</p>
 <p>第一条是<strong>编码升级</strong>。intset 内部用统一的整数编码存储所有元素：能存 int16 就不上 int32，能存 int32 就不上 int64。但一旦插入一个值越过了当前编码的范围（比如当前所有元素都是 int16，突然插入一个 50000），intset 不会报错，而是把整个数组的所有元素统一升级到更宽的编码（int16→int32 或 int32→int64），然后插入新值。升级后旧的窄编码数组被释放。编码只升不降：哪怕后来所有大值都被删了，编码仍然是宽的。因为降级要多出一次全量重分配，而"删掉大值"的概率太低，不值得。</p>
-<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动升级：7.2 起小集合先转 listpack，超过阈值（默认 128 个元素）再升级为哈希表；7.2 之前直接升级为哈希表。</p>
+<p>第二条是<strong>类型升级</strong>。当集合里插入一个非整数元素时，intset 作为纯整数结构装不下，会自动转换编码：7.2 起，只有插入后元素数与成员长度都满足 listpack 阈值时才转为 listpack，默认限制分别为 128 个元素和每个成员 64 字节；否则直接转为哈希表。listpack 后续写入超出这些限制时也会转为哈希表。7.2 之前，intset 遇到非整数元素直接转为哈希表。</p>
 <p>纯整数集合另有元素数量阈值——元素数超过 set-max-intset-entries（默认 512）时直接转哈希表，不经 listpack，与 listpack 的 128 个元素阈值对应不同的转换路径。</p>
 <p>listpack → hashtable 的转换，和 Hash 类型小数据编码的升级是同一套逻辑。<strong>数据量小时用紧凑结构省内存，膨胀后自动切换到复杂结构</strong>。所有升级对上层命令透明。五种结构与它们的切换关系，汇总在<a class="xref" href="#fig-2-5">图 2-5</a>。</p>
 <figure class="fig" id="fig-2-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 48 880 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -523,12 +523,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <line x1="271" y1="432" x2="392" y2="432" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_5_arrow)"/>
   <line x1="488" y1="432" x2="599" y2="432" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_5_arrow)"/>
-  <text x="331.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">混入非整数成员</text>
-  <text x="543.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">元素数 > 128</text>
+  <text x="331.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">非整数且满足阈值</text>
+  <text x="543.5" y="424" text-anchor="middle" font-size="10.5" fill="#374151">>128 个或成员 >64B</text>
 
   
   <path d="M 230 448 Q 230 470 320 470 L 560 470 Q 650 470 650 457 L 650 447" fill="none" stroke="#4B5563" stroke-width="1.2" marker-end="url(#fig_2_5_arrow)"/>
-  <text x="440" y="485" text-anchor="middle" font-size="10.5" fill="#374151">纯整数 · 元素数 > 512（set-max-intset-entries）不经 listpack</text>
+  <text x="440" y="485" text-anchor="middle" font-size="10.5" fill="#374151">纯整数 >512 个，或非整数不满足 listpack 阈值：直接转哈希表</text>
 </svg>
 </div><figcaption>图 2-5　Redis 五种底层结构与升级路径：五种结构各成卡片，底部标出小数据编码的升级去向，其中 Set 是两条独立路径。</figcaption></figure>
 <p>升级路径的方向一致：起点都是紧凑编码，终点都是面向查询的结构。</p>
@@ -560,7 +560,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="565" y="75" width="70" height="70" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="600" y="105" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">1 页</text>
   <text x="600" y="120" text-anchor="middle" font-size="9" fill="#92400E">16KB</text>
-  <text x="600" y="135" text-anchor="middle" font-size="9" fill="#92400E">装满键</text>
+  <text x="600" y="135" text-anchor="middle" font-size="9" fill="#92400E">键与指针</text>
 
   
   <line x1="390" y1="145" x2="230" y2="195" stroke="#2563EB" stroke-width="1.5" marker-end="url(#fig_2_6_arrow-blue)"/>
@@ -682,7 +682,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>每个分区有多份副本，同一时刻只有一台 Broker 当 Leader、写入都落在它身上；Leader 宕机就换任，<code>partitionLeaderEpoch</code> 随换任加一，标记的是这批数据出自哪一任。</p>
 <p>从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p class="tab-label"><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
-<div class="table-wrap"><table id="table-2-1"><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>这批消息的时间范围</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-2-1"><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>时间戳差值的基准 / 批内最大时间戳（CreateTime）；LogAppendTime 模式下后者记录 Broker 的追加时间</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
 <p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
 <figure class="fig" id="fig-2-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 414" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -723,7 +723,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="60" y="175" width="200" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="160" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">baseTimestamp</text>
-  <text x="160" y="218" text-anchor="middle" font-size="10" fill="#6B7280">8B · 批最早时间戳</text>
+  <text x="160" y="218" text-anchor="middle" font-size="10" fill="#6B7280">8B · 时间戳差值基准</text>
 
   <rect x="270" y="175" width="200" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
   <text x="370" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">maxTimestamp</text>
@@ -780,7 +780,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的协议和 Redis 正相反。它选了<strong>二进制封帧</strong>：握手、长度前缀、整数编码是二进制的，但经典查询返回的结果行缺省是文本——非 NULL 值以长度编码的字符串传输，其中数值用文本表示，字符列受结果字符集控制，二进制列仍可包含任意字节；真正紧凑的二进制行格式要走预编译语句。收益集中在高并发 OLTP（联机事务处理）：预编译通常可复用解析结果，元数据变化等情形仍会触发重新预处理；二进制结果集则可减少部分数据类型的传输开销。</p>
 <p>MySQL 协议分为几个阶段：握手（服务端发送能力标志和认证随机数、客户端回传加密后的凭证）、命令（客户端发送 SQL 或预编译语句 ID）、响应（服务端返回结果集或 OK/ERR）。</p>
 <p>报文里的整数编码分两套。定长小端整数低字节在前，类型为 int&lt;1&gt;/int&lt;2&gt;/int&lt;4&gt;/int&lt;8&gt;。另一套是首字节分档的变长整数（<code>LengthEncodedInteger</code>）：首字节小于 0xFB 时，它就是值本身，占 1 字节；0xFC/0xFD/0xFE 前缀分别后跟 2/3/8 字节，总长 1/3/4/9 字节。</p>
-<p>字符串用长度前缀（<code>LengthEncodedString</code>）。结果集先发列数和每列的类型/长度元数据，再发送各行数据。0xFB 不是长度编码，在结果集行里它标记 NULL。接收方在收到第一个字节时就知道后面还有多少字节。</p>
+<p>字符串用长度前缀（<code>LengthEncodedString</code>）。结果集先发列数和每列的类型/长度元数据，再发送各行数据。0xFB 不是长度编码，在结果集行里它标记 NULL。接收方先按首字节确定长度字段的编码，再读出字符串长度，随后按该长度接收内容。</p>
 <p><strong>预编译语句</strong> 是 MySQL 协议在"效率"上的关键设计。客户端先用 <code>COM_STMT_PREPARE</code> 把一条带占位符 <code>?</code> 的 SQL 模板发给服务端，服务端完成解析与语义检查、返回一个 <code>statement_id</code>。此后每次执行只需发 <code>COM_STMT_EXECUTE</code> + <code>statement_id</code> + 占位符的值。解析只做一次，执行计划则在每次执行时按当时的统计信息重新生成，反复执行时省掉的是逐次解析的 CPU 开销。这和 Redis Pipeline 不同：Pipeline 省的是网络往返（RTT，Round-Trip Time），预编译语句省的是服务端 CPU。同一类效率问题，两种解法对应两个不同的瓶颈。</p>
 <p><strong>二进制结果集</strong> 让行数据以紧凑的二进制格式传输，比同等数据的文本表示体积更小（数值与日期时间列越密集、值越长，省得越多；字符串列两种编码几乎一样大）。可读性在这里丢了：每一字节都是编码过的，不对照协议文档，无法直接从字节流里辨读内容。这是为省下 OLTP 场景的带宽和解析开销而支付的代价。</p>
 <h3 id="sec-2.3.3">2.3.3 Kafka 请求/响应协议：统一头部、版本化、批量优先</h3>

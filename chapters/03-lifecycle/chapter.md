@@ -130,7 +130,7 @@ MySQL 把"关闭时做多少清理"做成一个可配置参数 `innodb_fast_shut
 3. **从库要等复制线程退出。** 从库关闭要等 SQL 线程回放完当前事件组再停；主库关闭则直接断开 dump 线程，并不等从库把 binlog 拉完。
 4. **全文检索（FTS）索引优化在跑。**
 
-这些根因都指向同一个事实：**关闭是事务、复制、后台任务的交汇点**。`SHOW PROCESSLIST` 在关闭期的输出，对着这四类根因看，就能定位卡点。
+这些根因都指向同一个事实：**关闭是事务、复制、后台任务的交汇点**。发起关闭前，`SHOW PROCESSLIST` 可以帮助检查活动会话和长事务；关闭开始后，服务器会停止接入并断开已有连接，后续进度需要结合错误日志和存储 I/O 状态判断。
 
 ## 3.4 Kafka 的做法
 
@@ -149,7 +149,7 @@ Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日�
 7. **注册到集群**，对外宣告"我在线了"。
 8. **后台线程启动**，进入服务态。
 
-八个阶段全部走完，Kafka 才对外打印 `[KafkaServer id=0] started` 这条就绪日志，和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 是同一类信号。
+以 Kafka 3.9 的 KRaft 模式、`node.id=0` 为例，启动完成后会打印 `[KafkaRaftServer nodeId=0] Kafka Server started`。它和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 一样，都可用来识别启动完成。
 
 第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。
 
