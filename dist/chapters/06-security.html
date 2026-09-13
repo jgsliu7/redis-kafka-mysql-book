@@ -359,7 +359,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s128">Redis：键模式加命令类别的二维控制</h3>
 <p>Redis 的授权把权限直接绑到用户，不做角色继承。授权是两个维度的组合：命令类别和键模式。</p>
 <p>命令类别是关键抽象。Redis 把上百条命令归成二十来个类别：既有 <code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code> 这类语义组，也有 <code>@fast</code>、<code>@slow</code> 这类按性能划分的类别。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分类"的命名让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
-<p>键模式控制作用范围。<code>~keys:*</code> 限定用户只能访问匹配该模式的键，这让多租户场景下不同应用可以按前缀隔离。</p>
+<p>键模式限制命令参数中声明的键。对 GET、SET 这类命令，<code>~keys:*</code> 限定用户只能读写匹配该模式的键；它不会按此前缀过滤 SCAN 返回的键名，也不能限制没有键参数的全库操作。多租户按前缀限制数据读写时，还需要通过命令权限单独限制键名枚举和全库操作。</p>
 <p><a class="xref" href="#fig-6-3">图 6-3</a> 展示了一次完整连接里 Redis ACL 的工作流程。</p>
 <figure class="fig" id="fig-6-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 479" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>

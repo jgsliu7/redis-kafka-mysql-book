@@ -314,7 +314,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这套机制把搬迁工作分摊到后续操作里，减少一次性搬迁造成的长停顿；但一次搬迁需要处理一个桶中的全部元素，并不构成单次操作延迟的硬上限。命令触发的只是其中一路，定时任务还会为数据库的键字典和过期字典推进 rehash，每次调用以约 1ms 为目标；这个时间按批次检查，也不是每个字典每周期都能得到的预算。生成 RDB/AOF 的子进程运行期间，定时搬迁暂停。这与前文 SDS 的做法是同一个思想：<strong>把省不掉的工作分摊到后续每次操作里</strong>。这套双表搬迁画出来就是<a class="xref" href="#fig-2-3">图 2-3</a>。</p>
 <figure class="fig" id="fig-2-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 407" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
@@ -345,23 +345,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="150" y="378" text-anchor="middle" font-size="11" fill="#6B7280">本次只搬这一个桶，然后 +1</text>
 
   
-  <line x1="234" y1="246" x2="486" y2="246" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_3_arrow-red)"/>
-  <text x="360" y="238" text-anchor="middle" font-size="11.5" fill="#B91C1C">搬迁桶2的键到新表</text>
+  <text x="360" y="126" text-anchor="middle" font-size="11.5" fill="#B91C1C">本次搬迁的前后对照；</text>
+  <text x="360" y="146" text-anchor="middle" font-size="11.5" fill="#B91C1C">落点为一种示例</text>
+  <text x="360" y="174" text-anchor="middle" font-size="11.5" fill="#B91C1C">搬迁桶2的键到新表</text>
+  <path d="M234 246 L300 246 L300 194 L486 194" fill="none" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_3_arrow-red)"/>
+  <path d="M234 246 L280 246 L280 282 L842 282 L842 206 L824 206" fill="none" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_3_arrow-red)"/>
 
   
   <text x="590" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">ht[1]　新表（size=8，更大）</text>
 
   
-  
   <rect x="490" y="100" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="123" text-anchor="end" font-size="11" fill="#6B7280">0</text><text x="570" y="123" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k1</text>
-  <rect x="490" y="144" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="167" text-anchor="end" font-size="11" fill="#6B7280">1</text><text x="570" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k7</text>
-  <rect x="490" y="188" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="211" text-anchor="end" font-size="11" fill="#6B7280">2</text>
-  <rect x="490" y="232" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="255" text-anchor="end" font-size="11" fill="#6B7280">3</text><text x="570" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k3</text>
-  
+  <rect x="490" y="144" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="167" text-anchor="end" font-size="11" fill="#6B7280">1</text>
+  <rect x="490" y="188" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="211" text-anchor="end" font-size="11" fill="#6B7280">2</text><text x="570" y="211" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k9 → k7</text>
+  <rect x="490" y="232" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="255" text-anchor="end" font-size="11" fill="#6B7280">3</text>
   <rect x="670" y="100" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="123" text-anchor="end" font-size="11" fill="#6B7280">4</text>
-  <rect x="670" y="144" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="167" text-anchor="end" font-size="11" fill="#6B7280">5</text><text x="745" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k9</text>
-  <rect x="670" y="188" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="211" text-anchor="end" font-size="11" fill="#6B7280">6</text>
-  <rect x="670" y="232" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="255" text-anchor="middle" font-size="11" fill="#6B7280"> </text><text x="662" y="255" text-anchor="end" font-size="11" fill="#6B7280">7</text><text x="745" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k…</text>
+  <rect x="670" y="144" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="167" text-anchor="end" font-size="11" fill="#6B7280">5</text>
+  <rect x="670" y="188" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="211" text-anchor="end" font-size="11" fill="#6B7280">6</text><text x="745" y="211" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k3</text>
+  <rect x="670" y="232" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="255" text-anchor="end" font-size="11" fill="#6B7280">7</text><text x="745" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k…</text>
 
   <text x="655" y="300" text-anchor="middle" font-size="11.5" fill="#6B7280">新写入的键直接进 ht[1]</text>
 
@@ -374,8 +375,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="640" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065F46">搬完之后</text>
   <text x="640" y="440" text-anchor="middle" font-size="11.5" fill="#374151">rehashidx 走到底 → ht[1] 变 ht[0]，旧表释放</text>
 </svg>
-</div><figcaption>图 2-3　渐进式 rehash 的双表搬迁过程：搬迁进行到一半的一个时刻。</figcaption></figure>
-<p>搬迁不是整桶平移：旧表桶 2 里的 k7、k3、k9 搬过去之后分别落在 <code>ht[1]</code> 不同的桶里，键要按新表的尺寸重新散列。这笔重新散列的开销和搬移一起，摊在每次操作顺带的那一小步里。</p>
+</div><figcaption>图 2-3　渐进式 rehash 的双表搬迁过程：以旧表桶 2 的一次搬迁作前后对照。</figcaption></figure>
+<p>搬迁不是整桶平移：旧表从 4 个桶扩到 8 个桶时，桶 2 里的 k7、k3、k9 只能落在新表的桶 2 或桶 6。键要用同一个哈希值和新表的掩码重新计算桶号，原来在同一桶里的键可能因此分开。这部分计算和搬移一起，摊在每次操作顺带的那一小步里。</p>
 <p><strong>压缩列表（ziplist）与紧凑列表（listpack）</strong> 是 Redis 用来提高内存密度的数据结构。ziplist 是一块连续内存，所有元素紧挨着存，没有指针开销。每个元素存的是"前一个元素长度 + 自己的编码 + 自己的数据"。这带来较高的内存密度，但也带来连锁更新问题：一个元素变长后，下一个元素里记录"前一个元素长度"的字段可能从 1 字节扩成 5 字节，再后面的元素又因此逐个跟着扩。早期实现（如 Redis 6.0）每扩一个字段都搬移后方字节，最坏会出现 O(n²) 的累计搬移；6.2 已改为先统计扩张量，再集中扩容和搬移，但元素之间的长度依赖仍在。listpack（7.0 起取代了 ziplist 的全部内部用途，旧格式代码保留兼容）把"前一个元素长度"改成了"自己的长度"。每个元素只自记长度，不再管前面是谁，连锁更新从根上消除；插入时仍可能搬移后方字节。连锁怎么发生、怎么被消除，并排画在<a class="xref" href="#fig-2-4">图 2-4</a> 里。</p>
 <figure class="fig" id="fig-2-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 43 880 427" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -683,7 +684,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p class="tab-label"><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
 <div class="table-wrap"><table id="table-2-1"><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>时间戳差值的基准 / 批内最大时间戳（CreateTime）；LogAppendTime 模式下后者记录 Broker 的追加时间</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
-<p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
+<p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，字段的功能分组见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
 <figure class="fig" id="fig-2-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 414" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -693,7 +694,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="70" width="800" height="390" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
+  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2，按功能分组）</text>
 
   
   <rect x="60" y="110" width="180" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
@@ -766,7 +767,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
   <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
 </svg>
-</div><figcaption>图 2-7　RecordBatch V2 字段布局：61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
+</div><figcaption>图 2-7　RecordBatch V2 字段分组：按功能分组，不表示磁盘字节顺序。61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
 <p>这套设计的取舍摆在明面上。相似消息聚成一批，压缩收益通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2–6 倍）；差值编码把每条记录的元数据开销降到个位数字节；CRC（循环冗余校验）对整批只计算一个校验值，省掉逐条校验的 CPU 开销；<code>magic</code> 字段标明格式版本，新旧格式可以共存。代价同样直接：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远按序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
 <h2 id="sec-2.3">2.3 通信协议：客户端和服务端怎么对话</h2>
 <p>三个软件的协议走了三条路：Redis 用带可读前缀的 RESP，MySQL 用二进制封帧，Kafka 用带版本号的请求/响应。先从最"原始"的 RESP 看起——在二进制协议正当红的年代，这个选择背后是一个判断：优先保持协议实现简单。</p>

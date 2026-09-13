@@ -136,22 +136,17 @@ MySQL 把"关闭时做多少清理"做成一个可配置参数 `innodb_fast_shut
 
 Kafka 的生命周期管理围绕分布式追加写日志展开。**关闭是一个集群事件。** 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 关闭设计的核心是"怎么把 Broker 下线对集群的冲击降到最小"，关闭时刷盘只是最基础的一步。
 
-### 启动链路：八阶段
+### 启动链路：服务就绪前的依赖
 
-Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段最要紧。
+以 Kafka 3.9 的 KRaft 模式为例，启动过程里最要紧的是元数据、日志恢复和网络服务之间的依赖，部分准备工作会交错进行。
 
-1. **日志与配置初始化。** 加载 `server.properties`，初始化日志目录。
-2. **元数据管理初始化（KRaft 核心）。** 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft：一种多数派共识算法，第 7 章有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群由哪个 Controller 协调。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据由 Kafka 内部的 Controller 组维护，使用独立的 Raft 元数据日志。
-3. **日志管理器启动（恢复的主要环节）。** 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 `num.recovery.threads.per.data.dir` 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。
-4. **三层网络架构**：Acceptor/Processor/Handler 三层线程模型，把收发包与业务处理分开（下面单独展开）。
-5. **副本管理器启动**，开始拉取数据，或等待副本同步。
-6. **控制器启动**（如果该节点是 Controller 候选），接管集群元数据的协调。
-7. **注册到集群**，对外宣告"我在线了"。
-8. **后台线程启动**，进入服务态。
+1. **配置、日志目录与角色初始化。** 加载 `server.properties` 并检查日志目录。如果一个进程同时承担 Controller 和 Broker 两种角色，会先启动 Controller 组件，再启动 Broker；只承担 Broker 角色的进程则连接独立的 Controller 组。KRaft 把元数据保存在用 Raft 复制的日志中（Raft：一种多数派共识算法，第 7 章有一分钟直觉讲解）。旧 ZooKeeper（ZK）模式下，这些集群元数据由外部 ZooKeeper 集群保存。
+2. **日志恢复依赖可用的元数据。** Broker 先创建日志管理器，把正式启动延后到首次元数据发布时。注册、心跳和元数据追赶也在启动期间进行。取得元数据后，日志管理器加载本地 TopicPartition（主题分区）的日志，并按需要校验、恢复日志段和重建索引，再启动副本管理器及协调器。分区数很大、恢复工作较多时，这一段可能成为启动瓶颈，`num.recovery.threads.per.data.dir` 用于增加每个数据目录的恢复并行度。
+3. **准备网络组件不等于开始服务。** Broker 会在前段准备 SocketServer 和后台调度器。对外服务前，还要等 Controller 确认元数据已追上、首次元数据发布完成、Broker 解除隔离，以及相应监听端点的授权组件就绪，然后开启请求处理。Acceptor/Processor/Handler 三层线程模型负责把收发包与业务处理分开，下面单独展开。
 
 以 Kafka 3.9 的 KRaft 模式、`node.id=0` 为例，启动完成后会打印 `[KafkaRaftServer nodeId=0] Kafka Server started`。它和 Redis 的 `Ready to accept connections`、MySQL 的 `ready for connections` 一样，都可用来识别启动完成。
 
-第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。
+KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见第 7 章 7.4.4）。
 
 ![图 3-5 Kafka 三层网络架构](diagrams/fig-3-5.svg)
 图 3-5　Kafka 三层网络架构：Acceptor 接连接、Processor 解析协议、Handler 线程池执行，请求与响应走队列。
@@ -160,9 +155,9 @@ Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日�
 
 ### 关闭：普通关闭 vs 受控关闭
 
-Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。
+Kafka 的关闭分两种路径，普通关闭和受控关闭；受控关闭在退出前协调 Leader 迁移，并等待 Controller 批准。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。
 
-受控关闭被禁用（即 `controlled.shutdown.enable=false`）或执行失败时，Broker 会执行**普通关闭**。步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → **强制刷盘所有日志** → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它**不主动告知 Controller 自己要走**。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。
+受控关闭被禁用（即 `controlled.shutdown.enable=false`）或执行失败时，Broker 会执行**普通关闭**。以 Kafka 3.9 的 KRaft 模式为例，Broker 先停止网络请求处理并关闭连接，再关闭请求处理线程、协调器和副本管理等组件，由日志管理器刷盘并收尾后退出。这里不保证所有在途请求都能完成并把结果返回客户端；连接中断时，客户端可能无法确定某个请求的执行结果。如果同一进程还承担 Controller 角色，会在 Broker 关闭后再关闭 Controller。普通关闭没有提前完成 Leader 迁移的保证；对于尚未迁移的 Leader 分区，Controller 检测到 Broker 不可用后再选举 Leader，期间分区可能短暂不可用。
 
 **受控关闭（Controlled Shutdown）**让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，**提前把该 Broker 上的 Leader 角色迁移到 ISR（同步副本集合）里还活着的其他副本上**。Controller 将新的 Leader 分配结果传达给这些副本，使它们接任 Leader。ZK 模式下向副本发 LeaderAndIsr 请求；KRaft 模式下写进元数据日志，由各 Broker 应用。等所有 Leader 都迁移完，Controller 返回迁移完成的响应，Broker 才执行完整的刷盘退出流程。图 3-6 把这条时序和普通关闭画在一起做对照。
 

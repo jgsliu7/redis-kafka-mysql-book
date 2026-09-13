@@ -8,7 +8,7 @@
 
   <!-- Outer batch box -->
   <rect x="40" y="70" width="800" height="390" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
+  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2，按功能分组）</text>
 
   <!-- Batch-level header fields -->
   <rect x="60" y="110" width="180" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>

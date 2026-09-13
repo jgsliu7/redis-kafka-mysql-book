@@ -886,7 +886,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这套机制把搬迁工作分摊到后续操作里，减少一次性搬迁造成的长停顿；但一次搬迁需要处理一个桶中的全部元素，并不构成单次操作延迟的硬上限。命令触发的只是其中一路，定时任务还会为数据库的键字典和过期字典推进 rehash，每次调用以约 1ms 为目标；这个时间按批次检查，也不是每个字典每周期都能得到的预算。生成 RDB/AOF 的子进程运行期间，定时搬迁暂停。这与前文 SDS 的做法是同一个思想：<strong>把省不掉的工作分摊到后续每次操作里</strong>。这套双表搬迁画出来就是<a class="xref" href="#fig-2-3">图 2-3</a>。</p>
 <figure class="fig" id="fig-2-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 407" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
-    <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <marker id="fig_2_3_arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#EF4444"/>
     </marker>
   </defs>
@@ -917,23 +917,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="150" y="378" text-anchor="middle" font-size="11" fill="#6B7280">本次只搬这一个桶，然后 +1</text>
 
   
-  <line x1="234" y1="246" x2="486" y2="246" stroke="#EF4444" stroke-width="2.4" marker-end="url(#fig_2_3_arrow-red)"/>
-  <text x="360" y="238" text-anchor="middle" font-size="11.5" fill="#B91C1C">搬迁桶2的键到新表</text>
+  <text x="360" y="126" text-anchor="middle" font-size="11.5" fill="#B91C1C">本次搬迁的前后对照；</text>
+  <text x="360" y="146" text-anchor="middle" font-size="11.5" fill="#B91C1C">落点为一种示例</text>
+  <text x="360" y="174" text-anchor="middle" font-size="11.5" fill="#B91C1C">搬迁桶2的键到新表</text>
+  <path d="M234 246 L300 246 L300 194 L486 194" fill="none" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_3_arrow-red)"/>
+  <path d="M234 246 L280 246 L280 282 L842 282 L842 206 L824 206" fill="none" stroke="#EF4444" stroke-width="2.2" marker-end="url(#fig_2_3_arrow-red)"/>
 
   
   <text x="590" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">ht[1]　新表（size=8，更大）</text>
 
   
-  
   <rect x="490" y="100" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="123" text-anchor="end" font-size="11" fill="#6B7280">0</text><text x="570" y="123" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k1</text>
-  <rect x="490" y="144" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="167" text-anchor="end" font-size="11" fill="#6B7280">1</text><text x="570" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k7</text>
-  <rect x="490" y="188" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="211" text-anchor="end" font-size="11" fill="#6B7280">2</text>
-  <rect x="490" y="232" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="255" text-anchor="end" font-size="11" fill="#6B7280">3</text><text x="570" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k3</text>
-  
+  <rect x="490" y="144" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="167" text-anchor="end" font-size="11" fill="#6B7280">1</text>
+  <rect x="490" y="188" width="160" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="480" y="211" text-anchor="end" font-size="11" fill="#6B7280">2</text><text x="570" y="211" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k9 → k7</text>
+  <rect x="490" y="232" width="160" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="480" y="255" text-anchor="end" font-size="11" fill="#6B7280">3</text>
   <rect x="670" y="100" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="123" text-anchor="end" font-size="11" fill="#6B7280">4</text>
-  <rect x="670" y="144" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="167" text-anchor="end" font-size="11" fill="#6B7280">5</text><text x="745" y="167" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k9</text>
-  <rect x="670" y="188" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="211" text-anchor="end" font-size="11" fill="#6B7280">6</text>
-  <rect x="670" y="232" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="255" text-anchor="middle" font-size="11" fill="#6B7280"> </text><text x="662" y="255" text-anchor="end" font-size="11" fill="#6B7280">7</text><text x="745" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k…</text>
+  <rect x="670" y="144" width="150" height="36" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.1"/><text x="662" y="167" text-anchor="end" font-size="11" fill="#6B7280">5</text>
+  <rect x="670" y="188" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="211" text-anchor="end" font-size="11" fill="#6B7280">6</text><text x="745" y="211" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k3</text>
+  <rect x="670" y="232" width="150" height="36" rx="5" fill="#ECFDF5" stroke="#10B981" stroke-width="1.3"/><text x="662" y="255" text-anchor="end" font-size="11" fill="#6B7280">7</text><text x="745" y="255" text-anchor="middle" font-size="11.5" font-family="ui-monospace, monospace" fill="#065F46">k…</text>
 
   <text x="655" y="300" text-anchor="middle" font-size="11.5" fill="#6B7280">新写入的键直接进 ht[1]</text>
 
@@ -946,8 +947,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="640" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065F46">搬完之后</text>
   <text x="640" y="440" text-anchor="middle" font-size="11.5" fill="#374151">rehashidx 走到底 → ht[1] 变 ht[0]，旧表释放</text>
 </svg>
-</div><figcaption>图 2-3　渐进式 rehash 的双表搬迁过程：搬迁进行到一半的一个时刻。</figcaption></figure>
-<p>搬迁不是整桶平移：旧表桶 2 里的 k7、k3、k9 搬过去之后分别落在 <code>ht[1]</code> 不同的桶里，键要按新表的尺寸重新散列。这笔重新散列的开销和搬移一起，摊在每次操作顺带的那一小步里。</p>
+</div><figcaption>图 2-3　渐进式 rehash 的双表搬迁过程：以旧表桶 2 的一次搬迁作前后对照。</figcaption></figure>
+<p>搬迁不是整桶平移：旧表从 4 个桶扩到 8 个桶时，桶 2 里的 k7、k3、k9 只能落在新表的桶 2 或桶 6。键要用同一个哈希值和新表的掩码重新计算桶号，原来在同一桶里的键可能因此分开。这部分计算和搬移一起，摊在每次操作顺带的那一小步里。</p>
 <p><strong>压缩列表（ziplist）与紧凑列表（listpack）</strong> 是 Redis 用来提高内存密度的数据结构。ziplist 是一块连续内存，所有元素紧挨着存，没有指针开销。每个元素存的是"前一个元素长度 + 自己的编码 + 自己的数据"。这带来较高的内存密度，但也带来连锁更新问题：一个元素变长后，下一个元素里记录"前一个元素长度"的字段可能从 1 字节扩成 5 字节，再后面的元素又因此逐个跟着扩。早期实现（如 Redis 6.0）每扩一个字段都搬移后方字节，最坏会出现 O(n²) 的累计搬移；6.2 已改为先统计扩张量，再集中扩容和搬移，但元素之间的长度依赖仍在。listpack（7.0 起取代了 ziplist 的全部内部用途，旧格式代码保留兼容）把"前一个元素长度"改成了"自己的长度"。每个元素只自记长度，不再管前面是谁，连锁更新从根上消除；插入时仍可能搬移后方字节。连锁怎么发生、怎么被消除，并排画在<a class="xref" href="#fig-2-4">图 2-4</a> 里。</p>
 <figure class="fig" id="fig-2-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 43 880 427" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -1255,7 +1256,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>从 V2（KIP-98，0.11 引入）起，一个 Batch 的头部字段如下：</p>
 <p class="tab-label"><strong>表 2-1　Kafka RecordBatch V2 头部字段</strong></p>
 <div class="table-wrap"><table id="table-2-1"><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>baseOffset</code> / <code>batchLength</code></td><td>这批消息的起始偏移量 / 整个 Batch 除最前 12 字节（<code>baseOffset</code> 与 <code>batchLength</code> 自身）外的字节长度（用于快速跳到下一个 Batch）</td></tr><tr><td><code>partitionLeaderEpoch</code> / <code>magic</code></td><td>哪一任 Leader 写了这批 / 格式版本号（V2 = 2）</td></tr><tr><td><code>CRC</code></td><td>整批一条校验，而非每条消息各自 CRC</td></tr><tr><td><code>attributes</code></td><td>压缩类型 + 时间戳类型 + 事务标记</td></tr><tr><td><code>lastOffsetDelta</code></td><td>最后一条消息距离 baseOffset 的差值</td></tr><tr><td><code>baseTimestamp</code> / <code>maxTimestamp</code></td><td>时间戳差值的基准 / 批内最大时间戳（CreateTime）；LogAppendTime 模式下后者记录 Broker 的追加时间</td></tr><tr><td><code>producerId</code> / <code>producerEpoch</code> / <code>baseSequence</code></td><td>幂等 + 事务所需的 Producer 状态（Broker 按序列号对重试去重）</td></tr><tr><td><code>recordsCount</code></td><td>这批有几条记录</td></tr></tbody></table></div>
-<p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，完整的字段排布见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
+<p>头部之后是实际的消息记录。<strong>每条记录不存绝对偏移量和绝对时间戳</strong>，而是存它和 <code>baseOffset</code> / <code>baseTimestamp</code> 的差值。V0 每条消息存绝对偏移量、带独立的 CRC，V1 在此之上给每条消息加上了时间戳；V2 把这些冗余全部消除，字段的功能分组见<a class="xref" href="#fig-2-7">图 2-7</a>。</p>
 <figure class="fig" id="fig-2-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 58 880 414" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_7_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1265,7 +1266,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="70" width="800" height="390" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2）</text>
+  <text x="440" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">RecordBatch（Magic = 2，按功能分组）</text>
 
   
   <rect x="60" y="110" width="180" height="55" rx="6" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/>
@@ -1338,7 +1339,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="840" y="320" text-anchor="end" font-size="11" fill="#4F46E5">消费者</text>
   <line x1="825" y1="350" x2="825" y2="325" stroke="#6B7280" stroke-width="1.5" marker-end="url(#fig_2_7_arrow)"/>
 </svg>
-</div><figcaption>图 2-7　RecordBatch V2 字段布局：61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
+</div><figcaption>图 2-7　RecordBatch V2 字段分组：按功能分组，不表示磁盘字节顺序。61 字节头部共享整批元数据，每条 Record 只存与 base 的差值。</figcaption></figure>
 <p>这套设计的取舍摆在明面上。相似消息聚成一批，压缩收益通常可达数倍（zstd，压缩比取决于消息内容相似度与压缩级别，基准测试中常见 2–6 倍）；差值编码把每条记录的元数据开销降到个位数字节；CRC（循环冗余校验）对整批只计算一个校验值，省掉逐条校验的 CPU 开销；<code>magic</code> 字段标明格式版本，新旧格式可以共存。代价同样直接：消费必须按 Batch 边界来，随机按 key 点查完全做不到。但 Kafka 根本不需要随机点查，写入永远追加、消费永远按序，Batch 恰好和顺序写入、批量拉取这两条最常走的路径对齐。</p>
 <h2 id="sec-2.3">2.3 通信协议：客户端和服务端怎么对话</h2>
 <p>三个软件的协议走了三条路：Redis 用带可读前缀的 RESP，MySQL 用二进制封帧，Kafka 用带版本号的请求/响应。先从最"原始"的 RESP 看起——在二进制协议正当红的年代，这个选择背后是一个判断：优先保持协议实现简单。</p>
@@ -1756,11 +1757,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这些根因都指向同一个事实：<strong>关闭是事务、复制、后台任务的交汇点</strong>。发起关闭前，<code>SHOW PROCESSLIST</code> 可以帮助检查活动会话和长事务；关闭开始后，服务器会停止接入并断开已有连接，后续进度需要结合错误日志和存储 I/O 状态判断。</p>
 <h2 id="sec-3.4">3.4 Kafka 的做法</h2>
 <p>Kafka 的生命周期管理围绕分布式追加写日志展开。<strong>关闭是一个集群事件。</strong> 一个 Broker 下线，意味着它承载的那些分区副本从集群里消失，需要 Controller（Kafka 的集群控制器角色）重新计算谁是 Leader、哪些副本要补数据。所以 Kafka 关闭设计的核心是"怎么把 Broker 下线对集群的冲击降到最小"，关闭时刷盘只是最基础的一步。</p>
-<h3 id="s54">启动链路：八阶段</h3>
-<p>Kafka Broker 的启动可以拆成八个阶段，其中元数据初始化、日志恢复、三层网络这三段最要紧。</p>
-<ol><li><strong>日志与配置初始化。</strong> 加载 <code>server.properties</code>，初始化日志目录。</li><li><strong>元数据管理初始化（KRaft 核心）。</strong> 在 KRaft 模式下，元数据本身变成了一份用 Raft 复制的日志（Raft：一种多数派共识算法，<a class="xref" href="#ch7">第 7 章</a>有一分钟直觉讲解）。节点启动时要先追上这份元数据日志，才能确定当前节点要承载哪些分区，以及当前集群由哪个 Controller 协调。这是 KRaft 模式与旧 ZooKeeper（ZK）模式启动流程的最大差别：旧模式下这些信息来自外部 ZooKeeper 集群，KRaft 模式下元数据由 Kafka 内部的 Controller 组维护，使用独立的 Raft 元数据日志。</li><li><strong>日志管理器启动（恢复的主要环节）。</strong> 加载每个数据目录，为每个 TopicPartition（主题分区）恢复日志：校验日志段（segment），恢复活跃段，重建索引。当集群分区数巨大时（比如上万分区），这一阶段是启动瓶颈，靠 <code>num.recovery.threads.per.data.dir</code> 并行加速。分区恢复之所以是瓶颈，是因为每个分区都要单独校验、单独重建索引，没有"批量恢复"这种捷径，只能靠多线程把工作分摊开。</li><li><strong>三层网络架构</strong>：Acceptor/Processor/Handler 三层线程模型，把收发包与业务处理分开（下面单独展开）。</li><li><strong>副本管理器启动</strong>，开始拉取数据，或等待副本同步。</li><li><strong>控制器启动</strong>（如果该节点是 Controller 候选），接管集群元数据的协调。</li><li><strong>注册到集群</strong>，对外宣告"我在线了"。</li><li><strong>后台线程启动</strong>，进入服务态。</li></ol>
+<h3 id="s54">启动链路：服务就绪前的依赖</h3>
+<p>以 Kafka 3.9 的 KRaft 模式为例，启动过程里最要紧的是元数据、日志恢复和网络服务之间的依赖，部分准备工作会交错进行。</p>
+<ol><li><strong>配置、日志目录与角色初始化。</strong> 加载 <code>server.properties</code> 并检查日志目录。如果一个进程同时承担 Controller 和 Broker 两种角色，会先启动 Controller 组件，再启动 Broker；只承担 Broker 角色的进程则连接独立的 Controller 组。KRaft 把元数据保存在用 Raft 复制的日志中（Raft：一种多数派共识算法，<a class="xref" href="#ch7">第 7 章</a>有一分钟直觉讲解）。旧 ZooKeeper（ZK）模式下，这些集群元数据由外部 ZooKeeper 集群保存。</li><li><strong>日志恢复依赖可用的元数据。</strong> Broker 先创建日志管理器，把正式启动延后到首次元数据发布时。注册、心跳和元数据追赶也在启动期间进行。取得元数据后，日志管理器加载本地 TopicPartition（主题分区）的日志，并按需要校验、恢复日志段和重建索引，再启动副本管理器及协调器。分区数很大、恢复工作较多时，这一段可能成为启动瓶颈，<code>num.recovery.threads.per.data.dir</code> 用于增加每个数据目录的恢复并行度。</li><li><strong>准备网络组件不等于开始服务。</strong> Broker 会在前段准备 SocketServer 和后台调度器。对外服务前，还要等 Controller 确认元数据已追上、首次元数据发布完成、Broker 解除隔离，以及相应监听端点的授权组件就绪，然后开启请求处理。Acceptor/Processor/Handler 三层线程模型负责把收发包与业务处理分开，下面单独展开。</li></ol>
 <p>以 Kafka 3.9 的 KRaft 模式、<code>node.id=0</code> 为例，启动完成后会打印 <code>[KafkaRaftServer nodeId=0] Kafka Server started</code>。它和 Redis 的 <code>Ready to accept connections</code>、MySQL 的 <code>ready for connections</code> 一样，都可用来识别启动完成。</p>
-<p>第 2 阶段的 KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见<a class="xref" href="#ch7">第 7 章</a> 7.4.4）。</p>
+<p>KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见<a class="xref" href="#ch7">第 7 章</a> 7.4.4）。</p>
 <figure class="fig" id="fig-3-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 456" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -1846,14 +1847,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="40" y="420" width="850" height="92" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.2"/>
   <text x="60" y="446" font-size="14" font-weight="700" fill="#111827">三层网络在启动链路中的位置（KRaft 模式）</text>
-  <text x="60" y="472" font-size="12.5" fill="#374151">三层网络是启动八阶段的第 4 阶段</text>
+  <text x="60" y="472" font-size="12.5" fill="#374151">网络组件先准备；元数据、恢复与授权就绪后开启请求处理</text>
   <text x="60" y="500" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
 </svg>
 </div><figcaption>图 3-5　Kafka 三层网络架构：Acceptor 接连接、Processor 解析协议、Handler 线程池执行，请求与响应走队列。</figcaption></figure>
 <p>三层网络的设计意图是把 I/O 密集型任务（收发包）和 CPU 密集型任务（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 <code>num.network.threads</code>）解析协议帧，把请求放入共享的请求队列。每个 Processor 都有自己的响应队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取出请求，执行真正的业务（读写日志、副本同步），再把响应放回所属 Processor 的响应队列，由该 Processor 发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。队列可以缓冲收发与处理的速度差；请求队列填满时，仍会通过阻塞入队向网络线程施加背压。<a class="xref" href="#ch5">第 5 章</a>会从分层架构的角度再次回到这个设计。</p>
 <h3 id="s55">关闭：普通关闭 vs 受控关闭</h3>
-<p>Kafka 的关闭分两种路径，普通关闭和受控关闭，区别在于"是否提前告知 Controller 自己要走"。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
-<p>受控关闭被禁用（即 <code>controlled.shutdown.enable=false</code>）或执行失败时，Broker 会执行<strong>普通关闭</strong>。步骤是：标记停服（停收新请求）→ 关网络层（处理完在途请求）→ 停控制器 → 停副本管理 → <strong>强制刷盘所有日志</strong> → 清临时文件和锁 → 退出。此时 Broker 自己该做的清理都做了，但它<strong>不主动告知 Controller 自己要走</strong>。Controller 是在 Broker 退出后通过心跳 / 会话超时才发现它没了，这时候才去为那些原本由它当 Leader 的分区重新选主。选举期间分区短暂不可用，客户端会看到抖动。</p>
+<p>Kafka 的关闭分两种路径，普通关闭和受控关闭；受控关闭在退出前协调 Leader 迁移，并等待 Controller 批准。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
+<p>受控关闭被禁用（即 <code>controlled.shutdown.enable=false</code>）或执行失败时，Broker 会执行<strong>普通关闭</strong>。以 Kafka 3.9 的 KRaft 模式为例，Broker 先停止网络请求处理并关闭连接，再关闭请求处理线程、协调器和副本管理等组件，由日志管理器刷盘并收尾后退出。这里不保证所有在途请求都能完成并把结果返回客户端；连接中断时，客户端可能无法确定某个请求的执行结果。如果同一进程还承担 Controller 角色，会在 Broker 关闭后再关闭 Controller。普通关闭没有提前完成 Leader 迁移的保证；对于尚未迁移的 Leader 分区，Controller 检测到 Broker 不可用后再选举 Leader，期间分区可能短暂不可用。</p>
 <p><strong>受控关闭（Controlled Shutdown）</strong>让 Broker 在真正退出之前，先发请求给 Controller，通知它自己即将退出。Controller 收到后，<strong>提前把该 Broker 上的 Leader 角色迁移到 ISR（同步副本集合）里还活着的其他副本上</strong>。Controller 将新的 Leader 分配结果传达给这些副本，使它们接任 Leader。ZK 模式下向副本发 LeaderAndIsr 请求；KRaft 模式下写进元数据日志，由各 Broker 应用。等所有 Leader 都迁移完，Controller 返回迁移完成的响应，Broker 才执行完整的刷盘退出流程。<a class="xref" href="#fig-3-6">图 3-6</a> 把这条时序和普通关闭画在一起做对照。</p>
 <figure class="fig" id="fig-3-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 940 536" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -2106,7 +2107,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>LFU 看频率、LRU 看时间，这是两者的本质差异。举个具体场景：你跑一次全表扫描把一批冷数据读进 Redis，过几秒又来一波真正的热点查询。LRU 下，刚被扫到的冷数据"最新"，会淘汰前面的热数据；LFU 下，冷数据的计数器还是低值，热数据的计数器则因高频访问而爬高，被淘汰的会是冷数据。所以全表扫描后再来热点查询，LFU 能保住热数据不被冷数据淘汰。</p>
 <p>Redis 把淘汰策略做成八种，可以归成三组。<code>noeviction</code> 是内存满了直接报错、不淘汰，适合"数据不能丢"的场景。<code>allkeys-lru</code> / <code>allkeys-lfu</code> / <code>allkeys-random</code> 在全部键里挑淘汰对象。<code>volatile-lru</code> / <code>volatile-lfu</code> / <code>volatile-random</code> / <code>volatile-ttl</code> 只在设置了过期时间（TTL）的键里挑淘汰对象。第三组的存在是为了混合场景：同一份 Redis 既当缓存（带 TTL，可淘汰）又当小型持久存储（不带 TTL，永不淘汰）。</p>
 <p>下图把内存淘汰的真实实现画出来，看清近似 LRU 的采样淘汰与 LFU 计数器衰减的内存布局。</p>
-<figure class="fig" id="fig-4-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 453" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<figure class="fig" id="fig-4-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 72 940 602" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_4_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -2151,7 +2152,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="40" y="315" width="380" height="70" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="60" y="338" font-size="13" font-weight="700" fill="#111827">采样池（maxmemory-samples，默认 5）</text>
+  <text x="60" y="338" font-size="13" font-weight="700" fill="#111827">本轮采样（maxmemory-samples，默认 5）</text>
   <g font-size="11" fill="#111827">
     <rect x="60" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="83" y="368" text-anchor="middle">k3</text>
     <rect x="112" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="135" y="368" text-anchor="middle">k7</text>
@@ -2159,21 +2160,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <rect x="216" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="239" y="368" text-anchor="middle">k2</text>
     <rect x="268" y="350" width="46" height="28" rx="4" fill="#FFFFFF" stroke="#D97706"/><text x="291" y="368" text-anchor="middle">k9</text>
   </g>
+  <path d="M83 295 L83 311" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_4_2_arrowInd)"/>
+  <path d="M239 295 L239 311" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_4_2_arrowInd)"/>
+  <text x="250" y="309" font-size="11" fill="#374151">随机抽取最多 N 个键</text>
 
   
-  <path d="M 83 295 L 83 315" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_4_2_arrowInd)"/>
-  <path d="M 239 295 L 239 315" fill="none" stroke="#4F46E5" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#fig_4_2_arrowInd)"/>
-  <text x="425" y="358" font-size="11" fill="#374151">← 随机抽 N 个</text>
+  <path d="M400 387 L400 420" fill="none" stroke="#4F46E5" stroke-width="1.6" marker-end="url(#fig_4_2_arrowInd)"/>
+  <text x="60" y="407" font-size="11.5" fill="#374151">将样本加入持续维护的淘汰候选池</text>
+  <rect x="40" y="424" width="380" height="82" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.6"/>
+  <text x="60" y="449" font-size="13" font-weight="700" fill="#111827">淘汰候选池：最多 16 项（Redis 7.0）</text>
+  <text x="60" y="477" font-size="11.5" fill="#374151">保留本轮样本与此前候选中空闲时间较长的键</text>
 
   
-  <rect x="40" y="410" width="380" height="76" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="60" y="432" font-size="13" font-weight="700" fill="#111827">淘汰：采样池中空闲时间最长者</text>
-  <rect x="60" y="444" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.6"/>
-  <text x="120" y="463" text-anchor="middle" font-size="12" fill="#EF4444" font-weight="700">k11（最久未用）</text>
-  <text x="195" y="463" font-size="11" fill="#374151">→ DEL 释放内存</text>
-  <path d="M 187 380 L 120 406" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_2_arrowRed)"/>
-
-  <text x="220" y="510" text-anchor="middle" font-size="11" fill="#6B7280">精度换性能：采样数越大越接近真 LRU，但每次淘汰成本越高</text>
+  <path d="M400 508 L400 568" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_2_arrowRed)"/>
+  <text x="60" y="533" font-size="11.5" fill="#374151">从候选池中选择仍存在、</text>
+  <text x="60" y="551" font-size="11.5" fill="#374151">空闲时间估计值最大的键</text>
+  <rect x="40" y="572" width="380" height="58" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
+  <text x="60" y="606" font-size="13" fill="#B91C1C" font-weight="700">本例选中 k11 → 删除键并释放内存</text>
+  <text x="220" y="657" text-anchor="middle" font-size="11" fill="#6B7280">精度换性能：采样数越大越接近真 LRU，但每次淘汰成本越高</text>
 
   
   <text x="720" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#4F46E5">LFU（Morris 近似计数器 + 衰减）</text>
@@ -2423,7 +2427,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
     <rect x="620" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="652" y="383" text-anchor="middle">...</text>
   </g>
   <text x="340" y="416" font-size="11" fill="#374151">页被修改 → 进入 Flush List（同时仍在 LRU List 中，两链表交叉）</text>
-  <text x="340" y="436" font-size="11" fill="#374151">后台线程按此队列做 Checkpoint：顺序刷盘 → 磁盘</text>
+  <text x="340" y="436" font-size="11" fill="#374151">后台线程刷回脏页，使 Checkpoint 可以向前推进</text>
   <text x="340" y="458" font-size="11" fill="#6B7280">刷盘后从 Flush List 移除（仍留 LRU 直到被淘汰或换出）</text>
 
   
@@ -2437,7 +2441,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="320" y="520" width="600" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / redo log）</text>
-  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠 redo log 重放补齐</text>
+  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">脏页写回各自的表空间位置；崩溃恢复按需重放 redo log</text>
 
   
   <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_4_arrowRed)"/>
@@ -3698,7 +3702,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s128">Redis：键模式加命令类别的二维控制</h3>
 <p>Redis 的授权把权限直接绑到用户，不做角色继承。授权是两个维度的组合：命令类别和键模式。</p>
 <p>命令类别是关键抽象。Redis 把上百条命令归成二十来个类别：既有 <code>@read</code>、<code>@write</code>、<code>@admin</code>、<code>@dangerous</code> 这类语义组，也有 <code>@fast</code>、<code>@slow</code> 这类按性能划分的类别。运维一眼就能配出一个"只读且不含危险命令"的用户：<code>+@read -@dangerous</code>。这种"按风险分类"的命名让常见的安全意图（只读、不可破坏）能被一行表达，而不必逐条列举几十个命令。</p>
-<p>键模式控制作用范围。<code>~keys:*</code> 限定用户只能访问匹配该模式的键，这让多租户场景下不同应用可以按前缀隔离。</p>
+<p>键模式限制命令参数中声明的键。对 GET、SET 这类命令，<code>~keys:*</code> 限定用户只能读写匹配该模式的键；它不会按此前缀过滤 SCAN 返回的键名，也不能限制没有键参数的全库操作。多租户按前缀限制数据读写时，还需要通过命令权限单独限制键名枚举和全库操作。</p>
 <p><a class="xref" href="#fig-6-3">图 6-3</a> 展示了一次完整连接里 Redis ACL 的工作流程。</p>
 <figure class="fig" id="fig-6-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 880 479" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>

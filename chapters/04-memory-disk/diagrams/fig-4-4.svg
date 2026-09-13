@@ -82,7 +82,7 @@
     <rect x="620" y="362" width="64" height="34" rx="4" fill="#FEE2E2" stroke="#EF4444"/><text x="652" y="383" text-anchor="middle">...</text>
   </g>
   <text x="340" y="416" font-size="11" fill="#374151">页被修改 → 进入 Flush List（同时仍在 LRU List 中，两链表交叉）</text>
-  <text x="340" y="436" font-size="11" fill="#374151">后台线程按此队列做 Checkpoint：顺序刷盘 → 磁盘</text>
+  <text x="340" y="436" font-size="11" fill="#374151">后台线程刷回脏页，使 Checkpoint 可以向前推进</text>
   <text x="340" y="458" font-size="11" fill="#6B7280">刷盘后从 Flush List 移除（仍留 LRU 直到被淘汰或换出）</text>
 
   <!-- Free -> LRU arrow -->
@@ -96,7 +96,7 @@
   <!-- Disk -->
   <rect x="320" y="520" width="600" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
   <text x="620" y="548" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">磁盘（表空间 / redo log）</text>
-  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">Checkpoint 把脏页顺序写回；崩溃靠 redo log 重放补齐</text>
+  <text x="620" y="568" text-anchor="middle" font-size="12" fill="#374151">脏页写回各自的表空间位置；崩溃恢复按需重放 redo log</text>
 
   <!-- Flush -> Disk -->
   <path d="M 620 484 L 620 516" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#arrowRed)"/>
