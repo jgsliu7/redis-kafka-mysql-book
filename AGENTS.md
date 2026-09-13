@@ -10,7 +10,7 @@
 
 - **内容**：`chapters/` 下 10 章 + 序言 + 后记 + 参考文献
 - **插图**：57 张手绘 SVG（`chapters/*/diagrams/`）
-- **构建**：`scripts/build_html.py`（单页）、`scripts/build_pages.py`（分章）
+- **构建**：`scripts/build_html.py`（单页）、`scripts/build_pages.py`（分章）；`scripts/build_pdf.py`（A4 打印校样 PDF——**按需手动执行**，非常规构建，产物 11 MB 不提交 git）
 - **规范**：见 §3 参考文档索引
 
 ---

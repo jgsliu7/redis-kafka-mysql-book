@@ -71,6 +71,16 @@ chapters/
 
 每章目录下包含：`chapter.md`（正文）、`diagrams/`（SVG 配图）、`outline.md`（写作大纲）。全书配图均为可独立渲染的自包含 SVG。
 
+## 构建工具
+
+| 脚本 | 产物 | 执行时机 |
+|------|------|----------|
+| `python3 scripts/build_html.py` | `架构之道.html`（单页，git tracked） | 常规构建：每次改动 `chapters/` 后必跑 |
+| `python3 scripts/build_pages.py` | `dist/`（分章 HTML，git tracked） | 常规构建：每次改动 `chapters/` 后必跑 |
+| `python3 scripts/build_pdf.py` | `dist/print/架构观察笔记-A4校样.pdf` | **按需执行**：仅在需要纸面打印校对时手动生成，平时不跑，产物不提交 git |
+
+PDF 管线复用 `build_html.py` 的转换器（内容与正式构建同源、交叉引用一致），经 Playwright/Chromium 输出 A4 版式（每章新页起、目录自动回填真实页码、跨页表格重复表头）。排版参数（字号、边距、缩进）在脚本顶部的 `CSS` / `MARGIN` 常量里调，重跑即生效。中间产物 `build/print-book.html` 可在浏览器里预览打印效果。
+
 ---
 
 理解一个系统的关键，不是记住它怎么做，而是还原它为什么这么做。
