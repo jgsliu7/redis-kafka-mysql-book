@@ -382,7 +382,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 9-3　PSYNC2 同时核对复制历史与续传位置：复制 ID 有效且所需字节仍在 backlog 中，才能部分重同步，否则退回全量。</figcaption></figure>
 <h3 id="s214">增量同步：PSYNC2 与复制积压缓冲区</h3>
-<p>PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线重连能不能不重头"的问题。它靠两个东西：</p>
+<p>PSYNC2（Redis 4.0 引入，是对 2.8 版 PSYNC 的加固）解决的是"断线重连能不能不从头同步"的问题。它靠两个东西：</p>
 <p><strong>第一是 replication offset。</strong> 主节点用 <code>master_repl_offset</code> 记录复制流推进到的字节位置；副本用自己的已处理偏移量记录执行进度，<code>INFO replication</code> 中对应 <code>slave_repl_offset</code>。位点按复制流的字节计数，需要与复制 ID 一起解释，不能只比较不同复制历史下的数字大小。</p>
 <p><strong>第二是复制积压缓冲区（backlog）。</strong> 主节点为断线续传保留最近一段复制流，保留规模由 <code>repl-backlog-size</code> 控制，默认约 1MB。Redis 7.0 用共享缓冲块维护这段历史，并逐步回收不再需要的旧块。逻辑上它仍是滑动窗口，实际保留内存还会受到副本引用和块粒度的影响。</p>
 <p>副本断线重连时，通过 <code>PSYNC &lt;replid&gt; &lt;offset&gt;</code> 发送已知的复制 ID 和希望接收的下一个字节位置。主节点先验证复制历史是否匹配，再检查所需字节是否仍在 backlog 中。</p>
@@ -865,7 +865,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s236">幂等与事务：处理重试与跨分区提交</h3>
 <p>生产者幂等（<code>enable.idempotence=true</code>）处理重试导致的重复追加，事务则把多项 Kafka 写入纳入同一提交单元。</p>
 <p>幂等使用 ProducerId、ProducerEpoch 和按分区维护的序列号，消息批次携带 BaseSequence。Broker 据此识别生产者的重复重试，避免在日志中再次追加同一批数据。它不负责识别应用重新发送的相同业务内容，也不保证消费处理只执行一次。开启事务（设置 <code>transactional.id</code>）会隐含启用幂等；反过来，仅开幂等不会自动启动事务。</p>
-<p>事务由 transaction coordinator 协调，可以包含跨分区写入及消费 offset 的更新。提交或中止结果通过控制记录传播。使用 <code>read_committed</code> 的消费者只返回已提交事务的记录，并跳过中止事务；默认的 <code>read_uncommitted</code> 仍可能返回未提交或已中止事务的记录。事务提交结果与消费者的隔离级别共同决定哪些记录能被返回。</p>
+<p>事务由 transaction coordinator 协调，可以包含跨分区写入及消费 offset 的更新。提交或中止结果通过控制记录传播。对于事务消息，使用 <code>read_committed</code> 的消费者只返回已提交事务的记录，并跳过中止事务。非事务消息也可以返回，但同样不能越过 LSO；默认的 <code>read_uncommitted</code> 仍可能返回未提交或已中止事务的记录。事务提交结果与消费者的隔离级别共同决定哪些记录能被返回。</p>
 <p>事务甚至能把消费 offset 纳入同一个提交单元，纳入不了的是外部系统的处理结果。消费端需要区分三件事：当前读取位置、已提交的 offset、业务系统里这条记录的处理结果；前两种由客户端管理，第三种在 Kafka 之外。因此，提交位置必须遵守一条规则：能提交的只有已交付记录中处理完成的前缀。并行处理时后一条先完成，不能越过前面还没处理完的记录去提交，否则重启后那条消息会被直接跳过。我写消费者默认按分区顺序处理完再提交，接受消费并行度降低，换来这条规则自动成立。</p>
 <h3 id="s237">取舍总结</h3>
 <p>Kafka 的取舍思路是：<strong>把写入确认、准入条件和故障选主要求分别交给配置控制</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值各有作用，组合起来决定相应场景下的等待、失败和数据保留行为。</p>

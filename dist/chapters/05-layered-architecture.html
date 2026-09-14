@@ -416,7 +416,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>优化器（Optimizer）</strong> 是 MySQL 挑选执行策略的组件。它接收查询树，输出一个执行计划。优化手段包括常量折叠、范围优化、直方图辅助索引选择、JOIN 顺序搜索等。8.0 引入的直方图让优化器能根据没有索引的列的数据分布作出判断。这个执行计划是一组结构化的"该按什么顺序、用什么索引、走什么 JOIN 策略"的指令，不是 SQL，也不是机器码。</p>
 <p><strong>执行器（Executor）</strong> 拿到执行计划后开始真正工作。以逐行执行路径为例：调用 handler 接口读一行 → 评估 WHERE 条件 → 聚合或返回 → 再读下一行。handler 的逐行访问接口通过虚函数调用引擎实现，会产生间接调用开销。但 SQL 的声明式语义并不要求只能逐行访问。MySQL 8.0 也支持批量访问机制，例如 BKA（批量键访问）可以通过 MRR（多范围读）接口，把一批查找键交给存储引擎。</p>
 <p><strong>查询缓存（Query Cache）</strong> 是缓存失效协调成本的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。设计意图是好的，但它在 8.0 被彻底移除。服务层维护查询结果缓存，底层表发生修改后，引用该表的缓存项需要失效；加上全局互斥锁的协调，在高并发、高写入负载下，维护开销可能抵消结果复用的收益。这个案例说明，缓存的失效粒度与协调方式必须匹配负载。InnoDB 的缓冲池缓存的是数据页，与服务层的查询结果缓存承担不同工作，不能仅凭这一案例判定缓存都应放在引擎层。</p>
-<p>服务层内的这三段，通过<strong>结构化中间表示（IR，解析树、执行计划）在子层之间的传递</strong>来衔接。这是 SQL 系统的特征。SQL 是声明式语言，必须有一个"中间表示"来承载语义，所以分层就分成了"生成 IR → 变换 IR → 消费 IR"三段。这和 Redis 的"直接函数调用"是两种路子。</p>
+<p>服务层内的这三段，通过<strong>结构化中间表示（IR，解析树、执行计划）在子层之间的传递</strong>来衔接。SQL 是声明式语言，解析器生成查询表示，优化器将其转换为执行计划，执行器按计划执行，因此可以概括为“生成 IR → 变换 IR → 消费 IR”。Redis 的常见命令则按命令表分派到相应处理函数。这里的差别在于查询表示需要逐步转换；MySQL 这些阶段之间同样可以通过函数或方法调用衔接。</p>
 <h3 id="sec-5.3.3">5.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约，用一套方法签名规定了"引擎必须能做什么"。接口包含表级方法（<code>open</code> / <code>close</code>）、行级方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）和事务相关方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。其中，<code>commit</code> 和 <code>rollback</code> 由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行。</p>
 <p>只要实现了这套接口，就能作为一个引擎挂进来。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池（Buffer Pool）、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一个数据库里，不同表可以挂不同引擎。下面这张图把这套可插拔结构画了出来。</p>
@@ -595,8 +595,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="716" y="293" font-size="10" fill="#6B7280">对象方法调用</text>
 
   
-  <line x1="705" y1="320" x2="540" y2="320" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#fig_5_5_arr46r)"/>
-  <text x="657" y="314" text-anchor="middle" font-size="10" fill="#EF4444">响应入队</text>
+  <rect x="300" y="320" width="140" height="60" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.3"/>
+  <text x="370" y="343" text-anchor="middle" font-size="12" font-weight="600" fill="#EF4444">响应队列</text>
+  <text x="370" y="363" text-anchor="middle" font-size="10" fill="#374151">每个 Processor 独立</text>
+  <line x1="640" y1="350" x2="442" y2="350" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#fig_5_5_arr46r)"/>
+  <text x="535" y="342" text-anchor="middle" font-size="10" fill="#EF4444">响应入队</text>
+  <path d="M 300 350 L 280 350 L 280 278 L 360 278 L 360 258" fill="none" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#fig_5_5_arr46r)"/>
+  <text x="370" y="300" text-anchor="middle" font-size="10" fill="#EF4444">交回所属 Processor</text>
 
   
   <rect x="270" y="408" width="500" height="4" rx="2" fill="#059669" opacity="0.4"/>
@@ -617,7 +622,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这一层还处理横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。带宽配额按字节速率限制生产与消费流量；请求配额按网络线程和 I/O 线程的处理时间占比计量。配额可以按用户、<code>client-id</code> 或两者组合共享，并在每个 Broker 上执行，以减少单组客户端占满资源的风险。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
 <p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢、动一次影响面大，副本管理算法可能半年调一次，绑在一起改一处就得动两处。</p>
 <h3 id="sec-5.4.3">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
-<p>存储层是 Kafka 最具特色的一层。它的核心抽象是 <strong><code>Log</code></strong>，一个非常具体的对象，指一组顺序追加的日志段（LogSegment），不是泛指的"日志"。每个分区对应一个 Log，每个 Log 由多个 LogSegment 组成，每个 LogSegment 在磁盘上是三个文件：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>）。这套字节布局会在<a class="xref" href="08-storage-format.html">第 8 章</a>详讲，这里只看它作为"存储层抽象"的形态。</p>
+<p>存储层是 Kafka 最具特色的一层。它的核心抽象是分区日志；在 Kafka 3.9 源码中，由 <strong><code>UnifiedLog</code></strong> 统一呈现本地与远程日志段，本地部分由 <code>LocalLog</code> 管理。下文用 Log 统称这一日志抽象，每个分区副本有自己的日志实例，由多个 LogSegment 组成。每个 LogSegment 的三类主要文件是：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>），另有事务索引（<code>.txnindex</code>）等辅助文件。这套字节布局会在<a class="xref" href="08-storage-format.html">第 8 章</a>详讲，这里只看它作为"存储层抽象"的形态。</p>
 <p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。常规追加无需维护 B+ 树，也避免了逐条原地更新；副本复制和日志压实仍会带来额外写入。顺序追加便于批量 I/O，在机械盘上还能减少寻道。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以保持默认设置，依靠 OS 和 Kafka 的后台刷盘完成落盘。副本机制的数据保护还取决于确认与故障条件：<code>acks=all</code> 等待当前 ISR 确认，并受 <code>min.insync.replicas</code> 限制；在不启用非同步副本选主、且始终至少有一个同步副本存活的前提下，Kafka 能保证已提交消息不丢。增加副本数本身不等于满足这些条件。</p>
 <p><strong>读取路径</strong>有一个关键技巧：按偏移量二分定位日志段，再在段内用稀疏索引找具体位置。索引是稀疏的。每隔一段距离（默认 4KB）记一项，这把索引大小控制得很小，常驻内存。命中索引后，从消息文件里读出一段连续数据返回。如果数据已经在页缓存里（追得上生产者的消费者读近期数据时基本命中），读取就是一次内存拷贝，不需要真去磁盘。</p>
 <p>Kafka 高吞吐的另一个来源是<strong>零拷贝（sendfile）</strong>。传统路径要把数据拷贝四次。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉的正是两次拷贝和两次上下文切换。对追着日志尾部消费、数据还在页缓存里的场景，这点收益尤为明显。</p>
@@ -715,7 +720,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>需要这一层，是因为 Kafka 是分布式系统。分区的 Leader 在哪台 Broker 上、ISR（同步副本集合）里有谁、Controller 怎么协调全集群，这些不属于交互层、不属于 API 层、也不属于存储层。它要解决的是一个独立的问题：<strong>保证多个 Broker 上的副本数据一致</strong>。</p>
 <p>在本章的功能视角下，Kafka 分为"交互 + API + 存储 + 协调"四段，比三段式多列一组协调职责。Redis Cluster 的槽路由、MySQL 组复制（MGR）的多数派投票也属于类似的关注点；本章在 Kafka 一节单独展开这些职责。</p>
 <h3 id="sec-5.4.5">5.4.5 层间通信</h3>
-<p>Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配。交互层到 API 层是 RequestChannel 队列，<strong>跨线程</strong>但同一 JVM 内。API 层到存储/协调层是对象方法调用，<strong>同 JVM 内</strong>直接调用，无网络、无序列化。Broker 之间的通信永远使用<strong>网络协议</strong>，无论 ReplicaManager 找另一个 Broker 的 Leader 拉数据，还是 Controller 下 STOP_REPLICA 指令，都封装成 Kafka 协议请求走 TCP。</p>
+<p>Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配。交互层到 API 层是 RequestChannel 队列，<strong>跨线程</strong>但同一 JVM 内。API 层到存储/协调层是对象方法调用，<strong>同 JVM 内</strong>直接调用，无网络、无序列化。Broker 之间的通信永远使用<strong>网络协议</strong>，无论 ReplicaManager 找另一个 Broker 的 Leader 拉数据，还是 ZooKeeper 模式下 Controller 下 STOP_REPLICA 指令，都封装成 Kafka 协议请求走 TCP。</p>
 <p>这种"层间通信机制跟着部署形态走"是 Kafka 分层最明显的特征：同一 JVM 内既有跨线程的队列交接，也有直接的对象方法调用；跨 Broker 则使用网络协议。</p>
 <p>SocketServer、KafkaApis、Log、ReplicaManager/Controller 分别承担不同职责；跨 Broker 协议则负责连接分布在不同进程中的组件。<strong>功能职责与部署边界需要分别考虑，分层要为水平扩展服务</strong>。</p>
 <h2 id="sec-5.5">5.5 横向对比</h2>

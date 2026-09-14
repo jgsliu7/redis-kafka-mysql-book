@@ -368,7 +368,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>LRU 一侧，淘汰逻辑从键空间随机取若干样本，比较的是最近访问时间戳；LFU 一侧，每个对象记录的是带衰减的对数频次，淘汰时比较这个频次。两者共享同一个"采样 + 比较最差者"的淘汰机制，只是比较维度从时间换成了频率。</p>
 <h3 id="s71">持久化的两种方式</h3>
 <p>内存淘汰解决的是"满了怎么办"，持久化解决的是"断电了还在不在"。Redis 给了两种方式：RDB 和 AOF。</p>
-<p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程专心写快照，父子进程通过 COW 隔离，互不干扰。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了。生产环境里这种卡顿通常表现为一波客户端超时告警，排查时若发现告警间隔正好等于 <code>save</code> 规则的触发周期，基本就能确定根因是 fork。这就是大实例要控制容量的核心原因之一。</p>
+<p><strong>RDB（快照文件）</strong> 是某一时刻内存数据的全量二进制快照。生成方式是 <code>fork</code> 一个子进程，子进程拿到父进程内存的副本（依赖操作系统的写时复制 COW 机制），把这份副本序列化写盘。fork 之后父进程继续接写请求，子进程专心写快照，父子进程通过 COW 隔离，互不干扰。这套机制在理想路径上确实不阻塞主线程，但有一个真实代价：fork 本身在父进程这一侧是同步的，实例内存越大，fork 拷贝页表的时间越长。一个几十 GB 的实例 fork 一次可能阻塞主线程数百毫秒，期间整个实例看上去像卡住了。生产环境里这种卡顿通常表现为一波客户端超时告警。排查时若发现告警间隔与 <code>save</code> 规则的触发周期一致，可以优先检查快照相关开销，再结合 fork 耗时确认卡顿是否发生在 fork 阶段。这就是大实例要控制容量的核心原因之一。</p>
 <p><strong>AOF（仅追加文件）</strong> 走另一条路：它不存数据本身，而是把每一条写命令追加到日志末尾。恢复时按顺序重放这些命令重建内存状态。AOF 的核心参数是 <code>appendfsync</code>，它决定了日志什么时候真正落到磁盘：</p>
 <ul><li><code>always</code>：每批已执行命令追加后执行 <code>fsync</code>（落盘），相应回复要等待刷盘完成；多个命令可以共用一次刷盘（“批”指同一事件循环迭代内执行的命令，如一次 pipeline 发来的多条，也可以只有 1 条），代价是增加同步等待。</li><li><code>everysec</code>：每秒 <code>fsync</code> 一次，默认值。崩溃时约丢最近 1 秒量级的数据（取决于后台 fsync 周期与崩溃时点），性能与可靠性平衡；后台刷盘受阻时，实际丢失窗口可能更长。</li><li><code>no</code>：把刷盘时机完全交给操作系统。Redis 不主动 <code>fsync</code>，由 OS 决定什么时候把 PageCache 写回磁盘。最快，但崩溃可能丢较多数据。</li></ul>
 <p>这三档本质上是同一个取舍的三个落点：可靠性 vs 性能。很多生产环境会选择 <code>everysec</code>，代价只是每秒一次的 <code>fsync</code>。<code>appendfsync</code> 的默认值确实是 <code>everysec</code>，但 Redis 7.x 出厂默认并不开启 AOF（<code>appendonly no</code>，即 RDB-only）；只有显式打开 AOF 后，<code>appendfsync</code> 才以 <code>everysec</code> 为默认档（详见<a class="xref" href="08-storage-format.html">第 8 章</a>）。</p>
@@ -425,24 +425,24 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="360" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（7.x 多部分 AOF）</text>
 
   
-  <rect x="620" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="740" y="276" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">混合持久化（4.0+）</text>
+  <rect x="620" y="250" width="240" height="160" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="5 3"/>
+  <text x="740" y="276" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">AOF 混合格式（4.0+）</text>
   <line x1="640" y1="288" x2="840" y2="288" stroke="#C7D2FE" stroke-width="1"/>
   <text x="640" y="308" font-size="12" fill="#374151">• base = RDB 全量快照</text>
   <text x="640" y="326" font-size="12" fill="#374151">　+ incr = AOF 增量命令</text>
-  <text x="640" y="348" font-size="12" fill="#374151">• 恢复快、丢失少</text>
-  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ base 默认为 RDB（行为等效）</text>
+  <text x="640" y="348" font-size="12" fill="#374151">• 恢复快；丢失窗口由刷盘决定</text>
+  <text x="640" y="368" font-size="12" fill="#374151">• 7.0+ base 默认为 RDB</text>
   <text x="640" y="392" font-size="11" fill="#6B7280">产物：appendonlydir/（base + incr）</text>
 
   
   <path d="M 380 164 Q 380 210 180 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_4_3_arrow)"/>
   <path d="M 420 164 L 420 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_4_3_arrow)"/>
-  <path d="M 460 164 Q 460 210 660 246" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_4_3_arrow)"/>
+  <line x1="580" y1="330" x2="618" y2="330" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#fig_4_3_arrow)"/>
 
   
   <text x="200" y="220" font-size="11" fill="#374151" text-anchor="middle">触发 BGSAVE / 定时</text>
   <text x="436" y="220" font-size="11" fill="#374151">每条命令</text>
-  <text x="680" y="220" font-size="11" fill="#374151">BGREWRITEAOF 触发</text>
+  <text x="740" y="235" font-size="11" fill="#374151" text-anchor="middle">BGREWRITEAOF 生成基线</text>
 
   
   <rect x="260" y="470" width="400" height="60" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
@@ -452,7 +452,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <path d="M 180 412 L 320 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_3_arrowRed)"/>
   <path d="M 460 412 L 460 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_3_arrowRed)"/>
-  <path d="M 740 412 L 600 466" fill="none" stroke="#EF4444" stroke-width="1.6" marker-end="url(#fig_4_3_arrowRed)"/>
 
   
   <g transform="translate(60,560)">
@@ -473,7 +472,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 默认的存储引擎是 InnoDB。InnoDB 的核心假设与 Redis 几乎相反：数据最终必须落盘，内存只是减少磁盘 I/O 的缓冲。以磁盘为主可以容纳超过内存规模的数据；ACID 则依靠事务与恢复机制保证。访问延迟仍受缓冲池命中率影响。一旦缓存未命中（cache miss），延迟立刻从内存级升到磁盘级。</p>
 <h3 id="s74">核心假设</h3>
 <p>InnoDB 假设数据量会远超内存。这意味着任何一个时刻，磁盘上的大部分页都不在内存里。一次查询命中内存里的页很快，没命中就要读磁盘，延迟会高出两三个数量级。所以 InnoDB 的一切设计都围绕一个目标：尽量让访问命中内存，尽量减少对磁盘的随机 I/O。</p>
-<p>由于这个假设，MySQL 的延迟不是常数，它取决于"你访问的页此刻在不在内存里"。一个刚启动的实例缓冲池是空的，所有访问都打磁盘，延迟很高。跑稳之后热数据进了内存，延迟降下来。某次大扫描把热数据替换出去了，延迟又会显著上升。在生产里这种现象很常见：平时几十毫秒的查询，某天有人跑了一个大报表，之后整体延迟明显上升，要等热数据被重新访问、重新加载进内存才慢慢回落。这就是缓冲池被污染：延迟跟着命中率一起起伏，没有稳定值。</p>
+<p>由于这个假设，MySQL 的延迟不是常数，它取决于"你访问的页此刻在不在内存里"。如果启动后所需页尚未载入缓冲池，访问就需要读入这些页，延迟可能升高。MySQL 8.0 默认开启缓冲池页清单的保存与启动预热；有可用清单时，可以提前重新加载部分热点页，默认缓冲 I/O 下还可能命中操作系统的 PageCache。跑稳之后热数据进了内存，延迟降下来。某次大扫描把热数据替换出去了，延迟又会显著上升。在生产里这种现象很常见：平时几十毫秒的查询，某天有人跑了一个大报表，之后整体延迟明显上升，要等热数据被重新访问、重新加载进内存才慢慢回落。这就是缓冲池被污染：延迟跟着命中率一起起伏，没有稳定值。</p>
 <h3 id="s75">缓冲池的三分链表</h3>
 <p>缓冲池（Buffer Pool）是 InnoDB 在内存里缓存磁盘页的地方。它由三条链表管理，不是简单的页数组：</p>
 <ul><li><strong>Free List</strong>：空闲页池。需要从磁盘读入新页时，从这里申请一个空闲页。</li><li><strong>LRU List</strong>：活跃页链表，按访问热度排序。这是缓冲池的主体。</li><li><strong>Flush List</strong>：脏页链表。被改过但还没刷盘的页按最早修改时间排队，后台线程依此做 checkpoint 刷盘。</li></ul>
@@ -588,7 +587,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="548" y="74" text-anchor="middle" font-size="10" fill="#6B7280">淘汰页归还 Free List（Old 区尾部）</text>
 </svg>
 </div><figcaption>图 4-4　InnoDB 缓冲池三分链表（Free / LRU 新老分区 / Flush）</figcaption></figure>
-<p>midpoint 这道门槛挡住的是一次性的批量读，挡不住的是另一件事：真正的热数据总量超过热区容量（约 5/8）时，页照样在热区内互相替换，这时只能加大缓冲池。停留时间之外还有第二个可调参数 <code>innodb_old_blocks_pct</code>（冷区占比）。前面"核心假设"一节里"跑一次大报表，之后整体延迟上升"的现象，有了这道门槛会缓和，但不会消失：扫描占用的磁盘 I/O 带宽还在。</p>
+<p>midpoint 这道门槛挡住的是一次性的批量读，挡不住的是另一件事：真正的热数据总量超过热区容量（约 5/8）时，页照样在热区内互相替换，这时可以评估是否加大缓冲池，或调整冷热区比例。停留时间之外还有第二个可调参数 <code>innodb_old_blocks_pct</code>（冷区占比）。前面"核心假设"一节里"跑一次大报表，之后整体延迟上升"的现象，有了这道门槛会缓和，但不会消失：扫描占用的磁盘 I/O 带宽还在。</p>
 <h3 id="s76">WAL 与崩溃恢复</h3>
 <p>把修改后的数据页刷到磁盘之前，InnoDB 先保证记录"这页要怎么改"的 <strong>redo log（重做日志）</strong> 已经落盘。redo log 是顺序追加写的。崩溃之后，InnoDB 用 redo log 重放，把缓冲池里没来得及刷盘的修改补回磁盘的数据页。这就是 <strong>WAL</strong> 的核心：先保证日志落盘，再把修改后的数据页刷盘。</p>
 <p>InnoDB 用顺序日志替代直接随机写数据页，因为顺序写远快于随机写。一个事务的修改可能散落在表空间的多个页上，直接刷这些页是大量随机 I/O；而把这些修改先打包成顺序日志追加写，只产生顺序 I/O。日志落盘后这个事务就算"持久了"，脏页可以慢慢往后刷。这个设计把"事务提交"的延迟从"随机写一堆页"降到了"顺序写一条日志"。</p>
@@ -734,7 +733,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 不在用户态造缓冲池，有三个理由。</p>
 <p>第一，访问模式简单且顺序。Kafka 不需要 InnoDB 那种"新老分区 + 抗扫描污染"的复杂 LRU，因为它的读本身就是顺序的，操作系统预读机制能把"消费者将要读的下一段数据"提前加载进 PageCache（默认预读窗口约 128KB，调优后可到 MB 级），命中率天然就高。</p>
 <p>第二，自己管内存会和 PageCache 形成"双份缓存"。如果 Kafka 在用户态也缓存一份数据，那同一份数据就在内核 PageCache 和用户态各占一份内存。</p>
-<p>第三，进程重启后 PageCache 仍在。这是把内存交给 OS 才有的好处。Redis 重启后内存是空的、MySQL 重启后缓冲池是空的，都要经历一段冷启动；Kafka 重启后，只要操作系统没重启，PageCache 里之前缓存的数据还在，消费者继续按内存速度读。MySQL 有个小例外：默认缓冲 I/O 下数据文件也过 PageCache，进程重启后页若还在，缓冲池回温会快些；配了 <code>O_DIRECT</code> 则连这层便利也没有。Kafka 重启后能继续利用 PageCache，这对运维极友好。升级 Kafka 不等于让读性能掉回冷启动水平。</p>
+<p>第三，进程重启不会直接清空 PageCache。这是把内存交给 OS 才有的好处。Redis 重启后要重新加载数据，MySQL 重启后也要重新载入缓冲池页；Kafka 重启后，只要操作系统没重启、相关缓存页也未被回收，消费者就可以继续从 PageCache 读取这些数据。MySQL 8.0 默认还会根据停机前保存的页清单预热缓冲池；默认缓冲 I/O 下数据文件也过 PageCache，进程重启后页若还在，缓冲池回温会快些。配了 <code>O_DIRECT</code> 就不能借助数据文件的这层页缓存，但页清单预热仍可使用。Kafka 重启后能继续利用 PageCache，这对运维极友好。升级 Kafka 不等于让读性能掉回冷启动水平。</p>
 <p>下图把 Kafka 消费路径的零拷贝（sendfile）画出来，对比传统拷贝路径。</p>
 <figure class="fig" id="fig-4-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 960 594" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -835,11 +834,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 4-6　Kafka 消费路径的零拷贝（sendfile）</figcaption></figure>
 <p>传统路径：磁盘 → 内核缓冲 → 用户缓冲 → Socket 缓冲 → 网卡，4 次拷贝加 4 次上下文切换，数据要穿过用户空间。零拷贝路径（基于 <code>sendfile</code> / Java NIO <code>transferTo</code>）：磁盘 → 内核 PageCache → 网卡（由 DMA 完成实际搬运），数据全程不进用户空间，只剩 2 次上下文切换；在支持 scatter-gather DMA 的现代网卡上（生产环境基本默认满足），剩余的 2 次拷贝（磁盘到 PageCache、PageCache 到网卡）都由 DMA 完成，CPU 不参与数据搬运，因此被称为零拷贝；页缓存命中可以省去磁盘读取；冷数据仍需先等磁盘 I/O，但也可以沿这条路径传输。</p>
 <h3 id="s83">可靠性参数</h3>
-<p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（积累多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），但开启后吞吐会大幅下跌（强 fsync 下常掉到原来的几分之一），通常只在特殊合规要求下使用。</p>
+<p>Kafka 默认不强制每条消息 <code>fsync</code>，刷盘时机交给操作系统。这是又一次"相信操作系统"的选择。要更强的本地持久性，可以显式配置 <code>log.flush.interval.messages</code>（积累多少条消息刷一次）和 <code>log.flush.interval.ms</code>（多久刷一次），频繁强制刷盘可能降低吞吐，影响大小取决于刷盘间隔、批量大小、负载和存储设备，需要结合特殊合规等本地持久性要求实测。</p>
 <p>更常用的可靠性参数是生产者端的 <code>acks</code>（0/1/all 三档）。它也涉及可靠性与性能的取舍，但控制的是写入确认，不能与 <code>appendfsync</code>、<code>innodb_flush_log_at_trx_commit</code> 的本地刷盘档位等同——完整语义与 3.0 默认值调整（KIP-679）见<a class="xref" href="07-cluster.html">第 7 章</a>，与 <code>min.insync.replicas</code> 的精确交互见<a class="xref" href="09-data-sync.html">第 9 章</a> acks 参数一节。</p>
 <p>下表列出一个 Kafka 日志段相关的几类文件及其职责。</p>
 <p class="tab-label"><strong>表 4-2　Kafka 日志段（segment）与索引文件布局</strong></p>
-<div class="table-wrap"><table id="table-4-2"><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>偏移量索引，记录"偏移量 → 物理偏移"的稀疏映射</td><td>每写入 <code>log.index.interval.bytes</code>（默认 4KB）追加一条索引项</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 偏移量"的稀疏映射</td><td>与 <code>.index</code> 同步追加，支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>日志段滚动时及 Broker 干净关闭时写入，记录快照位点之前各生产者的序列号状态；段被删除/压实时，对应的旧快照一并清理</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-4-2"><thead><tr><th>文件</th><th>职责</th><th>触发条件 / 何时写入</th></tr></thead><tbody><tr><td><code>.log</code></td><td>实际消息数据，追加写</td><td>生产者每条消息追加到当前活跃段末尾</td></tr><tr><td><code>.index</code></td><td>偏移量索引，记录"偏移量 → 物理偏移"的稀疏映射</td><td>累计写入量超过 <code>log.index.interval.bytes</code>（默认 4KB）后，在后续批次追加时建立索引项；实际间隔受批量边界影响</td></tr><tr><td><code>.timeindex</code></td><td>时间戳索引，记录"时间戳 → 偏移量"的稀疏映射</td><td>追加偏移量索引项时，以及日志段转为非活跃或正常关闭时，会尝试写入；只有最大时间戳向前推进才新增条目，因此并不与 <code>.index</code> 一一对应；支持按时间消费</td></tr><tr><td><code>.snapshot</code></td><td>生产者状态快照（事务与幂等）</td><td>日志段滚动时及 Broker 干净关闭时写入，记录快照位点之前各生产者的序列号状态；段被删除/压实时，对应的旧快照一并清理</td></tr></tbody></table></div>
 <p>这张表说明了 Kafka 的存储是"数据 + 两套稀疏索引"的组合。索引是稀疏的（不是每条消息都建索引项），是为了让索引文件本身也保持紧凑、能放进 PageCache；消费者按偏移量定位消息时，先用索引二分找到最近的索引项，再在 <code>.log</code> 里顺序扫描到目标偏移量。</p>
 <h3 id="s84">取舍总结</h3>
 <p>Kafka 的取舍：它用"不提供按 key 点查 + 接受默认不强制落盘"换来"高吞吐与简单的内存管理"。没有按主键点查、没有复杂过滤，只能按偏移量区间顺序消费。这是流式日志与通用数据库的边界。一旦你的场景从"流式搬运"变成了"按主键点查或按条件检索"，就需要 MySQL 或别的检索系统提供这类能力。</p>
@@ -847,7 +846,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>导读里那次选型争论，核心是让存储方式匹配访问模式与业务约束。<a class="xref" href="#table-4-3">表 4-3</a> 从六个维度比较 Redis、MySQL、Kafka 的内存与磁盘分工。</p>
 <p class="tab-label"><strong>表 4-3　三个软件"内存-磁盘"哲学横向对比</strong></p>
 <div class="table-wrap"><table id="table-4-3"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据存放在哪里</td><td>内存为主，磁盘做备份</td><td>磁盘为主，内存做加速</td><td>磁盘顺序日志为主，PageCache 加速</td></tr><tr><td>持久化机制</td><td>RDB 快照 + AOF 日志 + 混合持久化</td><td>redo log + 脏页刷盘 + 双写缓冲</td><td>本地：OS 异步刷盘；跨节点：生产者 <code>acks</code> + 副本兜底</td></tr><tr><td>内存管理主体</td><td>进程内（jemalloc + 淘汰策略）</td><td>进程内（缓冲池三分链表）</td><td>操作系统内核（PageCache）</td></tr><tr><td>随机访问能力</td><td>原生支持，复杂度依命令与编码</td><td>原生支持（B+ 树）</td><td>支持按偏移量定位，再局部顺序扫描</td></tr><tr><td>崩溃恢复代价</td><td>加载 RDB / 重放 AOF（大实例数分钟）</td><td>重放 redo log + 恢复脏页</td><td>检查日志并恢复索引等状态，耗时受分区与日志规模影响；PageCache 冷热另影响读性能</td></tr><tr><td>典型故障模式</td><td>fork 阻塞、OOM、淘汰风暴</td><td>缓冲池抖动、磁盘 I/O 打满</td><td>消费者追不上（fetch 落到磁盘）</td></tr></tbody></table></div>
-<p><strong>持久化机制</strong>。它们的持久化都是"日志 + 某种全量"的组合，但日志的形态不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是"物理到页、逻辑到操作"的混合日志（记到页号与物理偏移，页内记的操作语义），Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1–2 秒量级的数据窗口（出厂默认不开 AOF），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘、本地可能丢但靠副本兜底。</p>
+<p><strong>持久化机制</strong>。它们都提供基于日志的持久化机制，但日志与其他持久化状态的关系不同。Redis 的 AOF 是命令日志，MySQL 的 redo log 是"物理到页、逻辑到操作"的混合日志（记到页号与物理偏移，页内记的操作语义），Kafka 的日志就是数据本身（消息序列）。这三种日志形态决定了崩溃后的风险边界。Redis 开启 AOF 后默认 <code>everysec</code>，约 1–2 秒量级的数据窗口（出厂默认不开 AOF），MySQL 默认（<code>innodb_flush_log_at_trx_commit=1</code>）保护已提交事务，Kafka 默认依赖 OS 刷盘，本地日志可能丢失尚未持久化的尾部；副本能否保留已确认数据，还取决于确认条件、同步副本存活及选主策略。</p>
 <p><strong>内存管理主体</strong>。这是它们最大的差异。Redis 和 MySQL 都在进程内管内存，调优对象是进程参数（Redis 的淘汰策略、MySQL 的缓冲池大小与链表策略）。Kafka 把内存管理交给操作系统，调优对象变成了 OS 参数（脏页比例、预读大小、Swap 策略）。这意味着 Kafka 运维的重心在某种程度上从"调 Kafka 参数"转到了"调操作系统参数"，这点常被忽略。</p>
 <p><strong>随机访问能力</strong>。这条最好记：需要按主键查一行数据，Kafka 直接出局。</p>
 <p><strong>崩溃恢复代价</strong>。Redis 大实例加载 RDB 或重放 AOF 可能要数分钟，这段时间实例不可用，是 Redis 高可用方案必须面对的冷启动问题。MySQL 重放 redo log 较快（redo log 设计上就是为了快速恢复），但缓冲池冷启动要慢慢预热。Kafka 无须将消息日志重放成另一套业务数据结构，但仍要校验日志并恢复索引等状态；分区数巨大时（如上万分区），这些工作可能需要数分钟。PageCache 是否还热，则影响恢复服务后的读取性能。</p>

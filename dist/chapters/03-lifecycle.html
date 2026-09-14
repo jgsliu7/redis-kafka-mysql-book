@@ -183,7 +183,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>理解 Redis 的生命周期，得先理解一个基本事实：<strong>Redis 的全部数据都在内存里。</strong> 一旦进程重启，所有键值对全部消失。不像 MySQL 有磁盘上的数据文件兜底，也不像 Kafka 有磁盘上的日志段做持久化。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条加载回内存，重建整个键空间。数据量越大，这个过程越久。一个几十 GB 的实例从加载到就绪可能要几分钟，这期间整个实例不可用。所以 Redis 的启动链路把能省的步骤都省掉，能并行的就并行。</p>
 <p>同样，Redis 的关闭也要快。但快的同时还必须考虑一个核心问题：退出前要不要把内存里的最新数据再落一次盘？还是接受丢掉最近几秒的写入？这个选择取决于Redis是作为缓存还是主存。</p>
 <h3 id="s46">启动四阶段</h3>
-<p><strong>第一段：先设默认值，再逐层覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数，逐层覆盖。好处是任何参数在任何时刻都有合法值，整个生命周期里都不会出现"未初始化"这一类 bug。很多线上事故就出在某个配置项忘了初始化。</p>
+<p><strong>第一段：先设默认值，再逐层覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数，逐层覆盖。好处是未显式配置的参数也有默认值，后续初始化阶段不必依赖未初始化的配置项。很多线上事故就出在某个配置项忘了初始化。</p>
 <p><strong>第二段：基础设施就位。</strong> 这一段做四件事：注册信号处理器、创建事件循环、分配数据库数组、打开监听端口。信号处理器里，SIGTERM/SIGINT 触发优雅关闭，SIGPIPE 则忽略；RDB/AOF 子进程的退出不由信号驱动，serverCron 每轮用非阻塞 waitpid(WNOHANG) 轮询回收。</p>
 <p>这里有一个关键的取舍：<strong>核心基础结构在启动期就一次性预分配，不做懒加载</strong>。启动段就把数据库数组、共享对象（shared objects，例如预创建 0–9999 这 10000 个整数对象供复用）等结构分配到位，留到运行期第一次用到时直接取用。代价是启动时就会占用相应的内存，换来的是运行期内存行为的确定性：核心路径上不会因为首次分配而出现意外的延迟毛刺。</p>
 <p><strong>第三段：数据恢复。AOF 优先于 RDB。</strong> 如果启用了 AOF（仅追加文件），Redis 就按 AOF 配置恢复；未启用 AOF 时，才尝试加载独立的 RDB（快照文件，二进制格式，快但只到上次快照点）。AOF 文件缺失时不会自动回退到独立 RDB：初始目录没有 AOF 数据与清单引用的文件丢失，分别可能导致空数据启动和启动报错。<a class="xref" href="#fig-3-2">图 3-2</a> 完整呈现了这段流程。Redis 7.0 引入了多部分 AOF（Multi-Part AOF）：AOF 目录里的 base 文件默认是 RDB 格式，后面才跟着记录增量写命令的 incr 文件。所以"加载 AOF"分两步：先按 RDB 二进制快速加载 base，再重放 incr 里的命令。这种"RDB 打底、增量重放"的混合格式在 4.0 引入、5.0 起默认开启，比此前默认的"纯命令重放"快很多。</p>
@@ -355,7 +355,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的启动分四段：配置加载、InnoDB 存储引擎启动、网络层与权限系统、服务循环。第二段涉及事务恢复。Redis 主要重建内存键空间，InnoDB 还需要确定事务的提交状态，并处理重做与回滚。</p>
 <p><strong>配置加载段</strong>按固定顺序读取多个 my.cnf 路径（Unix 上从 <code>/etc/my.cnf</code> 读到 <code>~/.my.cnf</code>，同名选项后读的覆盖先读的），再叠加命令行覆盖。取舍：多文件叠加方便运维，代价是"配置到底在哪生效"成了常见的排障点。一个排查了一下午的"参数没生效"问题，根因往往是改的配置后面还有一层在覆盖：<code>~/.my.cnf</code> 里的旧值、SET PERSIST（8.0 起把参数改动持久化写进配置文件的命令）写进 <code>mysqld-auto.cnf</code> 的持久化值，或启动命令行参数。</p>
 <p><strong>InnoDB 存储引擎启动段</strong>是启动耗时的大头，分三步：</p>
-<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），拿到数据字典（库表列等系统元数据的集合）。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
+<ol><li>初始化缓冲池（Buffer Pool），这是 InnoDB 缓存数据页的内存区；页读进内存后被改过、还没刷回磁盘的版本称为脏页（dirty page）。</li><li>加载系统表空间（ibdata 文件），并读取数据字典（库表列等系统元数据的集合）。MySQL 8.0 起数据字典已迁移到独立的 <code>mysql.ibd</code> 文件，undo log 也固定存放在独立的 undo 表空间，<code>ibdata1</code> 里剩下的主要是修改缓冲（change buffer）；5.7 及更早版本，数据字典和 undo log 默认都还在 <code>ibdata1</code> 里。</li><li><strong>崩溃恢复</strong>。读 checkpoint 对应的 LSN（日志序号），checkpoint 标记"此位点之前的脏页都已刷回数据文件"。从该位置扫描 redo log，重放其中的页修改，再用 undo log 回滚未提交事务。</li></ol>
 <p>第三步会增加 MySQL 的启动工作量。MySQL 必须把"崩溃那一刻内存里未持久化的页修改"和"事务的提交状态"分开处理，最终恢复出严格的事务一致性：已提交的全部保留，未提交的全部回滚。<a class="xref" href="#fig-3-4">图 3-4</a> 把崩溃恢复画成时序图。</p>
 <figure class="fig" id="fig-3-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 52 880 490" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -540,7 +540,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="500" font-size="12.5" fill="#EF4444">红色箭头 = 请求 / 响应数据流方向；灰色箭头 = 连接 / 控制流。</text>
 </svg>
 </div><figcaption>图 3-5　Kafka 三层网络架构：Acceptor 接连接、Processor 解析协议、Handler 线程池执行，请求与响应走队列。</figcaption></figure>
-<p>三层网络的设计意图是把 I/O 密集型任务（收发包）和 CPU 密集型任务（业务处理）分到不同的线程池，避免互相拖累。最外层 Acceptor（1 个）接收新连接，轮询分发给 Processor。Processor（默认 3 个，对应 <code>num.network.threads</code>）解析协议帧，把请求放入共享的请求队列。每个 Processor 都有自己的响应队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取出请求，执行真正的业务（读写日志、副本同步），再把响应放回所属 Processor 的响应队列，由该 Processor 发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。队列可以缓冲收发与处理的速度差；请求队列填满时，仍会通过阻塞入队向网络线程施加背压。<a class="xref" href="05-layered-architecture.html">第 5 章</a>会从分层架构的角度再次回到这个设计。</p>
+<p>三层网络的设计意图是把 I/O 密集型任务（收发包）和 CPU 密集型任务（业务处理）分到不同的线程池，避免互相拖累。每个数据监听端点各有 1 个 Acceptor 接收新连接，轮询分发给该端点的 Processor。每个端点的 Processor 默认 3 个，对应 <code>num.network.threads</code>，它们解析协议帧，把请求放入共享的请求队列。每个 Processor 都有自己的响应队列。Handler 线程池（<code>num.io.threads</code> 控制，默认 8）从请求队列里取出请求，执行真正的业务（读写日志、副本同步），再把响应放回所属 Processor 的响应队列，由该 Processor 发回客户端。这种"多队列、多线程池"的分层让收发和处理解耦。队列可以缓冲收发与处理的速度差；请求队列填满时，仍会通过阻塞入队向网络线程施加背压。<a class="xref" href="05-layered-architecture.html">第 5 章</a>会从分层架构的角度再次回到这个设计。</p>
 <h3 id="s55">关闭：普通关闭 vs 受控关闭</h3>
 <p>Kafka 的关闭分两种路径，普通关闭和受控关闭；受控关闭在退出前协调 Leader 迁移，并等待 Controller 批准。JVM 进程收到 SIGTERM 后，先触发 JVM Shutdown Hook，Hook 内部再走应用层的关闭流程。</p>
 <p>受控关闭被禁用（即 <code>controlled.shutdown.enable=false</code>）或执行失败时，Broker 会执行<strong>普通关闭</strong>。以 Kafka 3.9 的 KRaft 模式为例，Broker 先停止网络请求处理并关闭连接，再关闭请求处理线程、协调器和副本管理等组件，由日志管理器刷盘并收尾后退出。这里不保证所有在途请求都能完成并把结果返回客户端；连接中断时，客户端可能无法确定某个请求的执行结果。如果同一进程还承担 Controller 角色，会在 Broker 关闭后再关闭 Controller。普通关闭没有提前完成 Leader 迁移的保证；对于尚未迁移的 Leader 分区，Controller 检测到 Broker 不可用后再选举 Leader，期间分区可能短暂不可用。</p>
@@ -639,7 +639,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 3-6　受控关闭：Broker 先告知 Controller，Controller 提前迁移 Leader 后才放行；对照普通关闭的抖动窗口。</figcaption></figure>
 <p>两条路径的差别在客户端感受：普通关闭快，代价是选举期间的分区抖动；受控关闭慢，要等 Leader 迁移完成，但抖动窗口小得多。Kafka 默认走的是后者，拿关闭速度换集群稳定。Broker 退出前多做一段协调工作，换来的是上游业务少经历一次突兀的 Leader 重选。Kafka 是面向高可用的中间件，这个交换是划算的。</p>
-<p>受控关闭也有前提：Controller 必须可达，且 Leader 迁移要在超时阈值内完成。否则 Broker 会退化为普通关闭，不再死等。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；在 ZooKeeper 模式下，<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制请求重试。KRaft 使用 Broker 生命周期心跳请求受控关闭，并在关闭期限内等待 Controller 批准，不使用这两个参数安排重试。</p>
+<p>受控关闭也有前提：Controller 必须可达；要完成 Leader 迁移，相关分区还需有位于其他 Broker 上、可接替的存活副本，并在超时阈值内完成迁移。否则 Broker 会退化为普通关闭，不再死等。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；在 ZooKeeper 模式下，<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制请求重试。KRaft 使用 Broker 生命周期心跳请求受控关闭，并在关闭期限内等待 Controller 批准，不使用这两个参数安排重试。</p>
 <h3 id="s56">追加写日志对恢复的影响</h3>
 <p>Kafka 的日志是 append-only（仅追加）的，这一性质决定了它的恢复语义。恢复时，Kafka 会检查日志、截断残缺尾部，并恢复索引及生产者等辅助状态，不需要像 MySQL 那样把日志修改重放到数据页或回滚数据页上的事务。一条日志要么完整写入，要么在恢复时整体作废：写了一半的残缺尾部靠 CRC 找出来直接截掉，不存在 MySQL 事务那种"已部分生效、需要回滚"的中间状态。这种日志结构省去了重建另一套业务数据结构的工作；实际恢复耗时仍取决于待检查的日志与辅助状态。</p>
 <h3 id="s57">容器化环境下的生命周期</h3>
@@ -668,7 +668,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s62">启示三：快速关闭省下了哪些工作</h3>
 <p>前面那些缩短关闭时间的选项，处理未完成工作的方式并不相同。MySQL 可以把部分清理留到以后完成，档位 2 还把崩溃恢复留给下次启动；Kafka 普通关闭后，由集群检测退出并重新选举 Leader；Redis 的 NOSAVE 则省略本次 RDB 快照，启用 AOF 时仍要刷盘。我自己设计系统时，会先想清楚每个"快"省去了哪一步，后续工作何时完成、由谁承担，省略操作又会改变什么保证。如果把清理工作全部推到启动期，却没有控制遗留的工作量，启动耗时就更难预测，运维也更难处理。需要延后的工作，应当有可预测的完成条件，不能无限推迟。</p>
 <h3 id="s63">启示四：分层 + 依赖先行</h3>
-<p>这三个软件的启动都遵循"配置 → 基础设施 → 核心服务 → 数据恢复 → 对外服务"的顺序。三家分段粒度不同——MySQL 的崩溃恢复就嵌在 InnoDB 启动段里——但每段都能对到这条线上，先后不乱。这个顺序是依赖关系的硬约束：配置要先有默认值，未指定的参数才有定义；存储引擎要先读配置，才知道数据目录在哪；对外处理请求要等存储引擎就绪，否则客户端可能拿到一个莫名其妙的报错。违反这个顺序，比如在存储初始化完成前就开始处理客户端请求，请求就会进入一个半初始化的系统，行为不可预测。</p>
+<p>这三个软件的启动都要满足配置、基础设施、核心服务、数据恢复与对外服务之间的依赖，但这些工作不一定排成互不重叠的五段。MySQL 的崩溃恢复嵌在 InnoDB 启动段里，Kafka 的网络准备、元数据追赶与日志恢复也会交错。硬约束来自具体依赖：配置要先有默认值，未指定的参数才有定义；存储引擎要先读配置，才知道数据目录在哪；对外处理请求要等存储引擎就绪，否则客户端可能拿到一个莫名其妙的报错。违反这些依赖，比如在存储初始化完成前就开始处理客户端请求，请求就会进入一个半初始化的系统，行为不可预测。</p>
 <h3 id="s64">启示五：可观测性是状态机的外显</h3>
 <p>三家的就绪日志标明了状态机所处的阶段，故障复盘靠它们定位卡在哪一段。设计生命周期时，我会要求每个阶段切换处都有一条语义明确、格式稳定的状态日志。这样，出问题时能精确指认位置；文案不随版本随意变化，旧脚本和旧排障手册也仍能用。本章 <a class="xref" href="#sec-3.3">3.3 节</a> MySQL 关闭慢的排障、<a class="xref" href="#sec-3.4">3.4 节</a> Kafka 受控关闭的超时定位，都依赖这些里程碑日志。</p>
 <p>开头说的那次事故就是这样：图省事，觉得"Redis 重启就好了"，没等 AOF 刷完就杀了进程，第二天丢了十几条订单数据。Redis 本来是会落盘的，问题出在我没给它落盘的时间。从那以后，我把优雅关闭当作必须遵守的操作纪律。</p>

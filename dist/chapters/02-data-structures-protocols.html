@@ -214,7 +214,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>对照上下两行，开销的位置不同：C 字符串省了头部，代价摊在每次取长度的遍历里；SDS 多存一个头部，取长度变成读一个字段。Redis 选的是后一种：增加固定的小开销，免去每次取长度时的遍历。</p>
 <p><strong>跳表（skiplist）</strong> 是 Redis 有序集合底层两种结构之一。skiplist 编码的 ZSET 内部是 dict + 跳表两个结构并联：member→score 的查找走 dict，ZSCORE 是 O(1)；按顺序读取一段元素走跳表，ZRANGE 是 O(log N + M)，M 为返回元素数。单一结构顾不全，就并联两个，各管一条访问路径。</p>
 <p>跳表是多层有序链表，最底层是一条完整的有序双向链表，上面几层是抽稀的索引层，每隔几个节点保留一个指针。查找时从最顶层快速定位到目标附近，再逐层下沉到精确位置。查找、插入和删除的平均时间复杂度都是 O(log N)。范围扫描只需沿底层链表前进（O(log N + M)），比红黑树的中序遍历更直接。插入时按新节点的随机层数，逐层更新前驱节点的前向指针和跨度（span），不需要旋转或再平衡。节点层数按随机结果决定，跳表高度大概率落在 O(log N)。span 逐层累加就是名次，排行榜里"查某人排第几"能 O(log N) 出结果，靠的就是它。</p>
-<p>选跳表而非红黑树，是因为实现更简单、范围操作更直接。跳表的缓存局部性确实不如红黑树，但在 Redis 的典型数据规模下，这点差异不是主导因素。多层索引长什么样、查找怎么走，见<a class="xref" href="#fig-2-2">图 2-2</a>。</p>
+<p>选跳表而非红黑树，是因为实现更简单、范围操作更直接。缓存局部性还取决于具体实现与访问模式，不能一概断言跳表比红黑树差。多层索引长什么样、查找怎么走，见<a class="xref" href="#fig-2-2">图 2-2</a>。</p>
 <figure class="fig" id="fig-2-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 88 880 312" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_2_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -537,7 +537,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL（InnoDB）的数据结构受到一个关键限制：<strong>数据在磁盘上，一次 I/O 取一页（16KB）</strong>。这个限制是决定性的。内存访问是纳秒级，而磁盘 I/O 是微秒到毫秒级，差着三到五个数量级。所以 InnoDB 的核心数据结构要解决的正是这个问题：<strong>让每一次磁盘 I/O 读上来的 16KB，每一个字节都有用</strong>。</p>
 <p><strong>B+ 树</strong> 是 InnoDB 唯一的主索引结构。一棵 B+ 树从上到下：根节点、内部节点（非叶子）、叶子节点。内部节点只存键和子节点指针（一个 16KB 页就能容纳几百个键，两层内部节点、每叶几十行，千万行的表整棵树也只有三层，树极矮），叶子节点存完整行数据——这是聚簇索引，InnoDB 的表本体就按主键组织成树。二级索引的叶子只存索引键加主键值，查完还要拿主键回聚簇索引取整行（这一步叫回表）。叶子之间用双向链表串联。</p>
 <p>这套设计同时满足三个查询需求：点查（从根走到叶，O(log N)，两到三次 I/O）、范围扫描（定位到起始叶子后顺着链表往后扫，不需要反复从根定位）、排序（叶子层天然有序，B+ 树的键序就是排序顺序）。如果换哈希索引，点查 O(1) 更快，但范围和排序完全做不到。MySQL 要的是通用查询能力，B+ 树把所有常见的查询模式都覆盖了。<a class="xref" href="08-storage-format.html">第 8 章</a>会展开 InnoDB 页内七段布局和 Page Directory 的细节。</p>
-<p>B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），每次分裂都是一次额外的磁盘写入。跳表插入只做局部的指针更新，没有页分裂；页分裂是磁盘 16KB 页约束下特有的代价，也是 MySQL 为通用查询能力付出的成本。<a class="xref" href="#fig-2-6">图 2-6</a> 画了一棵三层的示例树。</p>
+<p>B+ 树的代价在写路径：插入新键可能触发页分裂（页满时一拆为二，级联向上），分裂会增加页修改和日志记录，之后还可能增加脏页刷盘的工作量。跳表插入只做局部的指针更新，没有页分裂；页分裂是 B+ 树按页组织节点所带来的代价（这里采用 InnoDB 默认的 16KB 页），也是 MySQL 为通用查询能力付出的成本。<a class="xref" href="#fig-2-6">图 2-6</a> 画了一棵三层的示例树。</p>
 <figure class="fig" id="fig-2-6"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 63 900 569" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_2_6_arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -676,7 +676,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 2-6　InnoDB B+ 树三层结构：一棵示例树，每个方框对应一个 16KB 磁盘页。</figcaption></figure>
 <p>这张图与<a class="xref" href="#fig-2-2">图 2-2</a> 的跳表对照：两者都为顺序访问准备了底层结构，差别在于，跳表按单个内存节点组织数据，B+ 树则把一整个 16KB 磁盘页作为节点——节点的大小，对齐的是所在介质的访问单位。</p>
 <p><strong>行格式（Row Format）</strong> 决定了一行数据在页内怎么存放。以默认的 Dynamic 行格式为例，行头存变长字段长度列表和 NULL 位图，后面是各列数据。长度信息按与字段相反的顺序存放，解析时从记录头附近读取这些长度，再确定各字段的边界。行太长放不下时才动用溢出页，且按整行判定：超限就把最长的变长列（VARCHAR/BLOB/TEXT）整列挪去独立溢出页、行内只留一个指针，很短的 TEXT/BLOB 始终留在行内（字节级阈值与挪列顺序见<a class="xref" href="08-storage-format.html">第 8 章</a>）。这是"页内紧凑"与"大对象不污染整页"的折中。</p>
-<p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。当某个 B+ 树页被以相同键值频繁点查时，InnoDB 在内存里自动为它建一个哈希索引，后续相同键值的点查直接走哈希 O(1)，不再走 B+ 树 O(log N)。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。哈希表要多占一块内存，高并发点查的竞争又集中在它的保护锁上，5.7.8 起拆成 8 个分区，生产上仍常常直接关掉。</p>
+<p><strong>自适应哈希索引</strong> 是 InnoDB 在 B+ 树之上的额外一层。InnoDB 根据索引页上的查询模式，按合适的索引键前缀在内存中建立哈希索引；能够命中它的查询，可以通过平均 O(1) 的哈希查找直接定位记录，省去 B+ 树 O(log N) 的逐层查找。冷数据留在磁盘，热点页进缓冲池，被反复点查的页再由自适应哈希接管。数据结构会随访问模式自动调整。哈希表要多占一块内存，高并发点查的竞争又集中在它的保护锁上，5.7.8 起支持分区，默认分为 8 个分区，生产上仍常常直接关掉。</p>
 <h3 id="sec-2.2.3">2.2.3 Kafka 的 RecordBatch：批量、顺序、演进</h3>
 <p>Kafka 的数据结构要同时满足三件事：<strong>磁盘顺序追加 + 批量压缩 + 格式可演进</strong>。满足这三件事的结构就是 RecordBatch，一个专为"把多条消息打成一个包"设计的结构，既不是树也不是哈希。</p>
 <p><strong>RecordBatch 就是 Kafka 的基本存储单元。</strong> 生产者会把消息积累成一批（攒够 <code>batch.size</code> 字节，或等到 <code>linger.ms</code> 毫秒）再打成一个 Batch 发到 Broker，而不是一条一条往外发。Broker 收到后把整个 Batch 原样追加到日志段末尾。不对单条消息做任何拆分或索引。消费者拉取时，拿到的也是一整个 Batch。原样追加的前提是生产者的压缩类型与 topic 的 <code>compression.type</code> 一致；不一致时 Broker 要逐批解压再重新压缩，老版本客户端拉取时还要触发格式降级转换。这两处都是 Broker 端 CPU 尖刺的常见来源。</p>
@@ -779,11 +779,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Redis 6.0 引入的 RESP 3 补上了版本协商这个缺口：客户端用 <code>HELLO</code> 命令在握手时声明协议版本，服务端始终兼容 RESP 2；切到 RESP 3 后部分命令的返回类型会变（如 <code>HGETALL</code> 从扁平数组变为 Map），需要客户端显式适配。MySQL 和 Kafka 的版本协商是内建的，RESP 用了十年才补上，补的形式还是一条文本命令。</p>
 <h3 id="sec-2.3.2">2.3.2 MySQL 二进制协议：封帧与预编译</h3>
 <p>MySQL 的协议和 Redis 正相反。它选了<strong>二进制封帧</strong>：握手、长度前缀、整数编码是二进制的，但经典查询返回的结果行缺省是文本——非 NULL 值以长度编码的字符串传输，其中数值用文本表示，字符列受结果字符集控制，二进制列仍可包含任意字节；真正紧凑的二进制行格式要走预编译语句。收益集中在高并发 OLTP（联机事务处理）：预编译通常可复用解析结果，元数据变化等情形仍会触发重新预处理；二进制结果集则可减少部分数据类型的传输开销。</p>
-<p>MySQL 协议分为几个阶段：握手（服务端发送能力标志和认证随机数、客户端回传加密后的凭证）、命令（客户端发送 SQL 或预编译语句 ID）、响应（服务端返回结果集或 OK/ERR）。</p>
+<p>MySQL 协议分为几个阶段：握手（服务端发送能力标志和认证随机数、客户端按认证插件要求回传认证响应）、命令（客户端发送 SQL 或预编译语句 ID）、响应（服务端返回结果集或 OK/ERR）。</p>
 <p>报文里的整数编码分两套。定长小端整数低字节在前，类型为 int&lt;1&gt;/int&lt;2&gt;/int&lt;4&gt;/int&lt;8&gt;。另一套是首字节分档的变长整数（<code>LengthEncodedInteger</code>）：首字节小于 0xFB 时，它就是值本身，占 1 字节；0xFC/0xFD/0xFE 前缀分别后跟 2/3/8 字节，总长 1/3/4/9 字节。</p>
 <p>字符串用长度前缀（<code>LengthEncodedString</code>）。结果集先发列数和每列的类型/长度元数据，再发送各行数据。0xFB 不是长度编码，在结果集行里它标记 NULL。接收方先按首字节确定长度字段的编码，再读出字符串长度，随后按该长度接收内容。</p>
-<p><strong>预编译语句</strong> 是 MySQL 协议在"效率"上的关键设计。客户端先用 <code>COM_STMT_PREPARE</code> 把一条带占位符 <code>?</code> 的 SQL 模板发给服务端，服务端完成解析与语义检查、返回一个 <code>statement_id</code>。此后每次执行只需发 <code>COM_STMT_EXECUTE</code> + <code>statement_id</code> + 占位符的值。解析只做一次，执行计划则在每次执行时按当时的统计信息重新生成，反复执行时省掉的是逐次解析的 CPU 开销。这和 Redis Pipeline 不同：Pipeline 省的是网络往返（RTT，Round-Trip Time），预编译语句省的是服务端 CPU。同一类效率问题，两种解法对应两个不同的瓶颈。</p>
-<p><strong>二进制结果集</strong> 让行数据以紧凑的二进制格式传输，比同等数据的文本表示体积更小（数值与日期时间列越密集、值越长，省得越多；字符串列两种编码几乎一样大）。可读性在这里丢了：每一字节都是编码过的，不对照协议文档，无法直接从字节流里辨读内容。这是为省下 OLTP 场景的带宽和解析开销而支付的代价。</p>
+<p><strong>预编译语句</strong> 是 MySQL 协议在"效率"上的关键设计。客户端先用 <code>COM_STMT_PREPARE</code> 把一条带占位符 <code>?</code> 的 SQL 模板发给服务端，服务端完成解析与语义检查、返回一个 <code>statement_id</code>。此后每次执行只需发 <code>COM_STMT_EXECUTE</code> + <code>statement_id</code> + 占位符的值。解析结果通常可以复用，执行计划则在每次执行时按当时的统计信息重新生成，反复执行时省掉的是逐次解析的 CPU 开销。这和 Redis Pipeline 不同：Pipeline 省的是网络往返（RTT，Round-Trip Time），预编译语句省的是服务端 CPU。同一类效率问题，两种解法对应两个不同的瓶颈。</p>
+<p><strong>二进制结果集</strong> 按列类型编码行数据，可以减少部分数值与日期时间数据的传输开销。具体是否比文本表示更小，取决于类型和值；短小整数的文本表示也可能更省字节，字符串列两种编码几乎一样大。按二进制编码的整数、浮点数与日期时间字段不再能直接按文本辨读，需要结合列元数据与协议规则解析。这是在 OLTP 场景中为传输和解析效率作出的取舍。</p>
 <h3 id="sec-2.3.3">2.3.3 Kafka 请求/响应协议：统一头部、版本化、批量优先</h3>
 <p>Kafka 的协议按请求类型组织。Produce、Fetch、Metadata、JoinGroup、SyncGroup……几十种请求类型，每种请求有自己独立的 Schema，每种 Schema 有自己的版本号。</p>
 <p>Kafka 的请求头有自己的版本。常见的 v1 包含四个字段：<code>api_key</code>（2 字节，标识这是什么类型的请求，如 Produce = 0、Fetch = 1、Metadata = 3……）、<code>api_version</code>（2 字节，标识用哪个版本的 Schema）、<code>correlation_id</code>（4 字节，客户端自定义，服务端原样抄到响应里用来匹配请求和响应）、<code>client_id</code>（变长字符串，标识客户端身份）。v0 请求头没有 <code>client_id</code>，v2 则在这四个字段后增加 tagged fields 区域。请求头版本由 API 及其版本决定。<code>api_key</code> + <code>api_version</code> 让同一类请求可以同时存在多个版本，Broker 根据客户端声明的版本号调整解析方式和返回字段。这意味着不强制所有客户端同步升级。3.0 的 Broker 可以和 0.11 的客户端对话，双方用彼此都支持的最高版本号做协商。</p>
@@ -799,10 +799,10 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="20" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
   <text x="155" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求示例：SET key value</text>
   <rect x="40" y="156" width="230" height="74" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
-  <text x="155" y="176" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF"><tspan x="155">*3</tspan><tspan x="155" dy="17">$3 SET</tspan><tspan x="155" dy="17">$3 key</tspan><tspan x="155" dy="17">$5 value</tspan></text>
+  <text x="155" y="176" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF"><tspan x="155">*3\r\n</tspan><tspan x="155" dy="17">$3\r\nSET\r\n</tspan><tspan x="155" dy="17">$3\r\nkey\r\n</tspan><tspan x="155" dy="17">$5\r\nvalue\r\n</tspan></text>
   <text x="155" y="246" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">响应示例：OK</text>
   <rect x="40" y="252" width="230" height="18" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
-  <text x="155" y="265" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">+OK</text>
+  <text x="155" y="265" text-anchor="middle" font-size="12" font-family="monospace" fill="#1E40AF">+OK\r\n</text>
 
   <rect x="30" y="285" width="250" height="20" rx="3" fill="#ECFDF5"/>
   <text x="155" y="300" text-anchor="middle" font-size="11" fill="#065F46">文本参数可辨读 · 可手工调试</text>
@@ -842,7 +842,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="725" y="300" text-anchor="middle" font-size="11" fill="#065F46">独立演进 · Batch 为传输单位</text>
 </svg>
 </div><figcaption>图 2-8　三个软件通信协议对比：RESP 的可读前缀便于调试并简化解析，二进制省的是带宽与解析开销，版本化请求头保的是演进兼容。</figcaption></figure>
-<p>图里三家各带了一段实例：RESP 那段是 <code>SET key value</code> 实际发出去的字节，MySQL 那两步是预编译的两次往返，Kafka 那行请求头把 <code>api_key</code>、<code>api_version</code> 放在最前面，版本协商就发生在这几个字节上。</p>
+<p>图里三家各带了一段实例：RESP 那段是 <code>SET key value</code> 的编码示例（图中用 <code>\r\n</code> 表示 CRLF），MySQL 那两步是预编译的两次往返，Kafka 那行请求头把 <code>api_key</code>、<code>api_version</code> 放在最前面，用来标识请求类型和本次使用的版本。客户端可先通过 <code>ApiVersions</code> 查询 Broker 支持的版本范围，再选择双方共同支持的版本。</p>
 <h2 id="sec-2.4">2.4 横向对比</h2>
 <p>把这三个软件的内部数据结构和通信协议放进同一张表，能看清楚"目标 → 数据结构 → 协议"这条因果链。</p>
 <p class="tab-label"><strong>表 2-2　三个软件数据结构与协议的横向对比</strong></p>
@@ -851,7 +851,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-2.5">2.5 架构启示</h2>
 <p>数据结构和协议是软件最底层的两个决策，定下来就难反悔。这四条启示，都从前文三家的结构选择与所付代价里来。</p>
 <h3 id="s37">启示一：数据结构服务于核心目标</h3>
-<p>Redis 要快，所以 SDS 取长度的时间复杂度是 O(1)，字典做渐进式 rehash。跳表在缓存局部性上付出了代价，换来实现的简洁。MySQL 走另一条路，为了对齐磁盘页，B+ 树内部节点只存键不存数据（树必须矮），叶子和叶子之间用双向链表串起来，范围扫描不用回头。Kafka 又不一样，它的吞吐需求最大，于是 RecordBatch 把一批消息当成一个不可分割的存储与传输单元。</p>
+<p>Redis 要快，所以 SDS 取长度的时间复杂度是 O(1)，字典做渐进式 rehash。跳表让有序操作的实现更简洁，其缓存局部性则要结合实现与访问模式判断。MySQL 走另一条路，为了对齐磁盘页，B+ 树内部节点只存键不存数据（树必须矮），叶子和叶子之间用双向链表串起来，范围扫描不用回头。Kafka 又不一样，它的吞吐需求最大，于是 RecordBatch 把一批消息当成一个不可分割的存储与传输单元。</p>
 <h3 id="s38">启示二：协议是数据结构的外部映射</h3>
 <p>Redis 操作简单、返回轻量，适合单条交互，RESP 用短小的文本行匹配它。MySQL 查询可能返回几十列几万行，二进制结果集可减少数值、日期时间等数据的传输开销；同一条预编译语句反复执行时，通常可以复用解析结果，元数据变化等情形仍可能触发重新预处理。Kafka 有几十种请求类型，头部就给每种请求留了独立的版本号，收发则以 Batch 为单位。设计服务端协议时，先看数据结构的访问模式——一条一条地收发小包，还是按批往返——再确定协议中定长和变长编码的使用方式，以及版本管理方式。</p>
 <h3 id="s39">启示三：简单协议的接入成本最低</h3>
