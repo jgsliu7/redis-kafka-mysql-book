@@ -273,6 +273,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 最核心的抽象，是<strong>追加写日志</strong>。一个主题（Topic）被切成多个分区（partition），每个分区本质上就是一条只追加、按偏移量（offset）寻址的有序日志。生产者只往尾部追加，消费者各自维护自己的偏移量向前读。这种"只追加、不修改、按偏移量定位"的模型看着朴素，但消息队列、事件流、数据管道、流处理都能用它实现。因为这些形态要的都是同一件事：有序事件的持续流转。</p>
 <p>要将日志抽象实现为可用于生产环境的系统，Kafka 依赖一组围绕吞吐设计的机制。分区可以分散到多个节点并行处理，实际吞吐还受负载分布、网络和磁盘能力约束；磁盘 I/O 走顺序写，配合操作系统的页缓存（PageCache）与未启用 TLS 时的零拷贝（sendfile），换来很高的单机吞吐。可靠性依靠副本（replica）与 ISR（In-Sync Replicas，同步副本集合）：ISR 跟踪保持同步的副本，写入确认还要结合 acks 与最低 ISR 数配置。已提交消息不丢失的保证，以始终有至少一个同步副本存活、且不选落后副本为 Leader 等条件为前提。</p>
 <p>只追加的代价：随机查询不是它的强项；批量等待可以用额外延迟换吞吐，具体单条消息延迟取决于配置与负载。消息默认按时间或大小保留；启用压实（compaction）时，可以用同一键的新值或删除标记表达更新与删除，再由后台清理旧记录。这些约束在 Kafka 中被视为合理代价，它优先保证吞吐与可扩展性。</p>
+<p>压缩（compression）通过更紧凑的编码减少数据体积，解压后可以还原原始数据。压实则清理同一键的过时记录，不保证保留完整的变更历史。这两种机制可以同时使用。</p>
 <p>所以 Kafka 用得最多的是高吞吐的流转场景：日志与事件采集、异步解耦、流处理管道、数据同步（CDC 的下游消费端）。这些场景的特点是数据量大、生产消费要解耦、能容忍一点延迟——还是 <a class="xref" href="#sec-1.1">1.1 节</a>那笔订单，履约、推荐、风控同时收到通知，谁也不等谁。</p>
 <p><strong>Kafka 是建立在日志抽象之上的高吞吐分布式流平台。</strong></p>
 <h3 id="sec-1.2.4">1.2.4 小结</h3>
@@ -571,7 +572,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>版本状态提示（2026 年 9 月）</strong>：MySQL 8.0 已于 2026 年 4 月转入 Oracle Sustaining Support，官方建议升级至 8.4 LTS 或 9.7 LTS；Kafka 从 4.0 起只支持 KRaft，已移除 ZooKeeper 模式；Redis Open Source 的 7.2、7.4 分支仍列在官方支持范围内。本书保留上述分析基线，借 B+ 树、WAL、状态机复制、CAP 等主题讨论架构取舍；具体参数默认值和命令行为，请以所用版本的官方文档为准。</p>
 <p>几处与版本相关的演进包括：Redis 在 6.0 引入了多线程 I/O 和 ACL（访问控制列表），7.x 又带来了 Function（函数）、Sharded Pub/Sub 等改进；MySQL 8.0.x 带来了原子 DDL、新版 redo log、降序索引、直方图，组复制（MGR）也在这一代走向成熟；Kafka 在 3.3 让 KRaft 达到生产可用（新集群自此可不依赖 ZooKeeper 部署），分层存储（Tiered Storage）在 3.9 正式 GA，而生产者幂等与事务早在 0.11 就已引入。</p>
 <p>图表约定如下。图编号统一为 <code>图 N-M</code>（第 N 章第 M 张图），表编号统一为 <code>表 N-M</code>（第 N 章第 M 张表），图与表各自独立连续编号。</p>
-<p>术语约定如下。全书术语统一译法，首次出现时中英对照标注，之后按两档制使用：工程界通行的术语直接用英文，如 redo log、undo log、binlog、WAL、MVCC；中文已充分沉淀的继续用中文，如缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压缩（compaction）。遇到未列出的术语，我们会在首次出现时同样标注英文原词。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
+<p>术语约定如下。全书术语统一译法，首次出现时中英对照标注，之后按两档制使用：工程界通行的术语直接用英文，如 redo log、undo log、binlog、WAL、MVCC；中文已充分沉淀的继续用中文，如缓冲池（Buffer Pool）、分区（partition）、副本（replica）、压实（compaction）。遇到未列出的术语，我们会在首次出现时同样标注英文原词。本书出现的 KIP-xxx 是 Kafka 社区改进提案（Kafka Improvement Proposal）的编号，用来标记某特性由哪份提案引入，不关心社区历史的读者可以跳过。</p>
 <h3 id="sec-1.4.4">1.4.4 推荐阅读路径</h3>
 <p>本书提供三条阅读路径，按你的目标选择。</p>
 <p><strong>路径 A：系统通读。</strong> 从<a class="xref" href="#">第 1 章</a>顺序读到<a class="xref" href="10-summary.html">第 10 章</a>。适合想建立完整架构认知的读者。每一章都建立在前一章的基础上，读完整本书你会对后端基础设施的设计逻辑有一个连贯的理解。这是最推荐的路径，也是本书写作时假定的阅读顺序。</p>

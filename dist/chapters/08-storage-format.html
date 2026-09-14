@@ -214,7 +214,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
 <p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存充当内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
 <blockquote><strong>关键数字</strong>  <strong>InnoDB 默认 16KB 页：页头、页尾、虚拟记录和页目录占用一部分空间，其余供用户记录与空闲区使用</strong>。结构开销和每页行数随行宽、记录数与页内空闲情况变化。对单文件、未压缩的 16KB 页表空间，第 N 页的文件内字节偏移为 <code>N × 16KB</code>；按页号计算位置是页式结构随机定位的基础。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 内存/磁盘占用比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。磁盘文件远小于内存实际占用，主因是内存态每键约 66–110 字节的结构开销不落盘，小键值负载下这笔开销占内存大头；次因是变长整数编码与 LZF（LZF 仅对超过 20 字节、且能省出至少 4 字节的值生效）；恢复时快速加载。</blockquote>
-<blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台合并（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》<a class="xref" href="03-lifecycle.html">第 3 章</a>是很好的起点。</blockquote>
+<blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台压实（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》<a class="xref" href="03-lifecycle.html">第 3 章</a>是很好的起点。</blockquote>
 <h2 id="sec-8.2">8.2 Redis 的做法</h2>
 <h3 id="sec-8.2.1">8.2.1 定位先行：磁盘服务于内存</h3>
 <p>Redis 的持久化格式，源自它的定位。Redis 的数据正本在内存，RDB 与 AOF 用来重建内存中的数据，而不承担线上键查询。普通查询走内存；复制、备份等过程仍可能读取持久化文件。</p>
@@ -992,7 +992,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>第三问是："五年后还能不能读"。它适用于图中的所有方案，不用于区分页式、追加日志或快照，因此没有单列在图中。预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位），格式才能长期可读。没有预留的，需要现在补上。回答这三问后，格式结构的方向就清晰了。</p>
 <h2 id="sec-8.7">8.7 小结</h2>
 <p>三种格式的差异源于访问模式的不同。Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 的新消息顺序追加，靠 RecordBatch 成批压缩消息、稀疏索引定位，提高批量处理的吞吐。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改背上双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则直接连"原地改"这个选项都不要了。</p>
-<p>存储格式的选择会长期影响一个系统：页式结构需要管理页内空间和更新，追加日志则需要处理历史数据的清理与索引。而设计一个格式时，我还会问"五年后还能不能加字段、换编码"，把眼前的编码效率和长期兼容放在一起考虑。AOF 的重写增量、redo log 的循环写、Kafka 的 retention 与 compaction，也引出了<a class="xref" href="09-data-sync.html">第 9 章</a>的数据同步问题：哪些状态可以通过增量追赶，哪些情况下需要全量重建。</p><nav class="page-nav"><a href="07-cluster.html">← 第 7 章 集群架构 — 从单点到分布式</a><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现 →</a></nav></article>
+<p>存储格式的选择会长期影响一个系统：页式结构需要管理页内空间和更新，追加日志则需要处理历史数据的清理与索引。而设计一个格式时，我还会问"五年后还能不能加字段、换编码"，把眼前的编码效率和长期兼容放在一起考虑。AOF 的重写增量、redo log 的循环写、Kafka 的 retention 与压实，也引出了<a class="xref" href="09-data-sync.html">第 9 章</a>的数据同步问题：哪些状态可以通过增量追赶，哪些情况下需要全量重建。</p><nav class="page-nav"><a href="07-cluster.html">← 第 7 章 集群架构 — 从单点到分布式</a><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现 →</a></nav></article>
 </main>
 </div>
 <script>

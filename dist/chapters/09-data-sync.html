@@ -875,7 +875,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <div class="table-wrap"><table id="table-9-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>传播单元</td><td>命令流（必要时改写为确定操作）</td><td>binlog event（默认 ROW 行级）</td><td>消息（按分区偏移量有序）</td></tr><tr><td>传播方式</td><td>副本发起后持续流推（复制缓冲）</td><td>副本发起后持续流推（relay log 缓冲，接收与回放分离）</td><td>FETCH 请求-响应（副本发起拉取）</td></tr><tr><td>确认与协调</td><td>默认异步；WAIT 可等待此前写入的副本确认</td><td>异步、半同步确认或 MGR 组内协调；读等待另有配置</td><td>ISR + acks + min ISR；选主与事务读取另有条件</td></tr><tr><td>位点语义</td><td>replid + replication offset（历史与字节进度）</td><td>GTID 集合（事务来源与已处理事务）</td><td>分区 offset + leader epoch</td></tr><tr><td>故障恢复条件</td><td>历史匹配且所需日志仍在 backlog，才能部分重同步</td><td>GTID 自动定位需有可补发日志；组复制可按条件克隆</td><td>以任期检查分叉，再从有效保留范围追赶</td></tr><tr><td>建立副本基线的代价</td><td>fork 与 RDB 传输，保存期间的写入可能带来 COW 开销</td><td>备份恢复或按条件克隆，再补所需 binlog</td><td>获取分区保留日志及必要辅助状态</td></tr></tbody></table></div>
 <h3 id="s239">解读一：传播单元的选择决定下游设计</h3>
 <p>传播单元是多数下游设计的起点。</p>
-<p>Redis 走命令流这条路，看重的是轻：序列化开销小、副本直接复用命令处理路径，但非确定性命令得在源头改写。MySQL 的 ROW 格式记录行变更，减少了副本重新执行 SQL 时产生不同结果的风险，代价是日志可能更大。Kafka 则由分区 Leader 确定追加顺序，副本复制这条日志；应用可以追加新记录表示状态变化，在启用 compaction 的主题中，还可以用 tombstone 表示删除。</p>
+<p>Redis 走命令流这条路，看重的是轻：序列化开销小、副本直接复用命令处理路径，但非确定性命令得在源头改写。MySQL 的 ROW 格式记录行变更，减少了副本重新执行 SQL 时产生不同结果的风险，代价是日志可能更大。Kafka 则由分区 Leader 确定追加顺序，副本复制这条日志；应用可以追加新记录表示状态变化，在启用压实的主题中，还可以用 tombstone 表示删除。</p>
 <p>传播单元定下来后，传播方式、位点形态、故障恢复粒度会高度耦合。</p>
 <h3 id="s240">解读二：位点（offset / GTID / leader epoch）是同步的通用度量</h3>
 <p>三个软件的位点各走一路：</p>
