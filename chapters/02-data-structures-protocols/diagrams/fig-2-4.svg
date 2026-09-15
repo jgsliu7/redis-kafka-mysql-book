@@ -36,11 +36,11 @@
   <text x="150" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">变长了</text>
   <!-- entry2 prevlen 撑大 1→5 -->
   <rect x="250" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="325" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry2 撑大</text>
+  <text x="325" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry2 变长</text>
   <text x="325" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
   <!-- entry3 跟着撑大 -->
   <rect x="410" y="222" width="150" height="44" rx="4" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.8"/>
-  <text x="485" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry3 跟着撑大</text>
+  <text x="485" y="242" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">entry3 随之变长</text>
   <text x="485" y="258" text-anchor="middle" font-size="10.5" fill="#B91C1C">prevlen 1B→5B</text>
   <!-- 继续 -->
   <text x="580" y="248" font-size="12" fill="#B91C1C">…继续向后</text>

@@ -72,5 +72,5 @@
   <text x="440" y="563" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">从节点 offset 追平，恢复增量同步</text>
 
   <!-- 底注 -->
-  <text x="440" y="602" text-anchor="middle" font-size="12" fill="#6B7280">取舍：backlog 是"断线容忍窗口"与"内存占用"的折中 — 窗口越大越能救回部分重同步</text>
+  <text x="440" y="602" text-anchor="middle" font-size="12" fill="#6B7280">取舍：backlog 是"断线容忍窗口"与"内存占用"的折中 — 窗口越大越能支持部分重同步</text>
 </svg>

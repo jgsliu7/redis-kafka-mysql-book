@@ -180,7 +180,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 3-1　启动与关闭作为状态机重建与快照的对称过程。</figcaption></figure>
 <h2 id="sec-3.2">3.2 Redis 的做法</h2>
-<p>理解 Redis 的生命周期，得先理解一个基本事实：<strong>Redis 的全部数据都在内存里。</strong> 一旦进程重启，所有键值对全部消失。不像 MySQL 有磁盘上的数据文件兜底，也不像 Kafka 有磁盘上的日志段做持久化。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条加载回内存，重建整个键空间。数据量越大，这个过程越久。一个几十 GB 的实例从加载到就绪可能要几分钟，这期间整个实例不可用。所以 Redis 的启动链路把能省的步骤都省掉，能并行的就并行。</p>
+<p><strong>Redis 的全部数据都在内存里</strong>，这是其生命周期设计的前提。 一旦进程重启，所有键值对全部消失。不像 MySQL 有磁盘上的数据文件兜底，也不像 Kafka 有磁盘上的日志段做持久化。Redis 启动的本质，就是从磁盘上的 RDB 快照或 AOF 日志里，把数据一条条加载回内存，重建整个键空间。数据量越大，这个过程越久。一个几十 GB 的实例从加载到就绪可能要几分钟，这期间整个实例不可用。所以 Redis 的启动链路把能省的步骤都省掉，能并行的就并行。</p>
 <p>同样，Redis 的关闭也要快。但快的同时还必须考虑一个核心问题：退出前要不要把内存里的最新数据再落一次盘？还是接受丢掉最近几秒的写入？这个选择取决于Redis是作为缓存还是主存。</p>
 <h3 id="s46">启动四阶段</h3>
 <p><strong>第一段：先设默认值，再逐层覆盖。</strong> Redis 先给所有参数设一个合法的默认值（比如端口 6379、TCP backlog 511），再依次读配置文件、解析命令行参数，逐层覆盖。好处是未显式配置的参数也有默认值，后续初始化阶段不必依赖未初始化的配置项。很多线上事故就出在某个配置项忘了初始化。</p>
@@ -450,7 +450,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>以 Kafka 3.9 的 KRaft 模式为例，启动过程里最要紧的是元数据、日志恢复和网络服务之间的依赖，部分准备工作会交错进行。</p>
 <ol><li><strong>配置、日志目录与角色初始化。</strong> 加载 <code>server.properties</code> 并检查日志目录。如果一个进程同时承担 Controller 和 Broker 两种角色，会先启动 Controller 组件，再启动 Broker；只承担 Broker 角色的进程则连接独立的 Controller 组。KRaft 把元数据保存在用 Raft 复制的日志中（Raft：一种多数派共识算法，<a class="xref" href="07-cluster.html">第 7 章</a>有一分钟直觉讲解）。旧 ZooKeeper（ZK）模式下，这些集群元数据由外部 ZooKeeper 集群保存。</li><li><strong>日志恢复依赖可用的元数据。</strong> Broker 先创建日志管理器，把正式启动延后到首次元数据发布时。注册、心跳和元数据追赶也在启动期间进行。取得元数据后，日志管理器加载本地 TopicPartition（主题分区）的日志，并按需要校验、恢复日志段和重建索引，再启动副本管理器及协调器。分区数很大、恢复工作较多时，这一段可能成为启动瓶颈，<code>num.recovery.threads.per.data.dir</code> 用于增加每个数据目录的恢复并行度。</li><li><strong>准备网络组件不等于开始服务。</strong> Broker 会在前段准备 SocketServer 和后台调度器。对外服务前，还要等 Controller 确认元数据已追上、首次元数据发布完成、Broker 解除隔离，以及相应监听端点的授权组件就绪，然后开启请求处理。Acceptor/Processor/Handler 三层线程模型负责把收发包与业务处理分开，下面单独展开。</li></ol>
 <p>以 Kafka 3.9 的 KRaft 模式、<code>node.id=0</code> 为例，启动完成后会打印 <code>[KafkaRaftServer nodeId=0] Kafka Server started</code>。它和 Redis 的 <code>Ready to accept connections</code>、MySQL 的 <code>ready for connections</code> 一样，都可用来识别启动完成。</p>
-<p>KRaft 不是从来就有：元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见<a class="xref" href="07-cluster.html">第 7 章</a> 7.4.4）。</p>
+<p>元数据管理正处在从 ZooKeeper 到 KRaft 的换代中——KRaft 自 3.3 起对新集群达到生产可用状态，Kafka 自 4.0 起彻底移除 ZooKeeper（完整编年史见<a class="xref" href="07-cluster.html">第 7 章</a> 7.4.4）。</p>
 <figure class="fig" id="fig-3-5"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 920 456" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_3_5_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -586,7 +586,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <path d="M120 170 L335 170" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#fig_3_6_arrow)"/>
-  <text x="255" y="162" text-anchor="middle" font-size="11" fill="#374151">① 通知“我要走了”</text>
+  <text x="255" y="162" text-anchor="middle" font-size="11" fill="#374151">① 通知即将退出</text>
 
   
   <path d="M340 200 L555 200" fill="none" stroke="#059669" stroke-width="1.6" marker-end="url(#fig_3_6_arrowG)"/>
@@ -639,12 +639,12 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 3-6　受控关闭：Broker 先告知 Controller，Controller 提前迁移 Leader 后才放行；对照普通关闭的抖动窗口。</figcaption></figure>
 <p>两条路径的差别在客户端感受：普通关闭快，代价是选举期间的分区抖动；受控关闭慢，要等 Leader 迁移完成，但抖动窗口小得多。Kafka 默认走的是后者，拿关闭速度换集群稳定。Broker 退出前多做一段协调工作，换来的是上游业务少经历一次突兀的 Leader 重选。Kafka 是面向高可用的中间件，这个交换是划算的。</p>
-<p>受控关闭也有前提：Controller 必须可达；要完成 Leader 迁移，相关分区还需有位于其他 Broker 上、可接替的存活副本，并在超时阈值内完成迁移。否则 Broker 会退化为普通关闭，不再死等。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；在 ZooKeeper 模式下，<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制请求重试。KRaft 使用 Broker 生命周期心跳请求受控关闭，并在关闭期限内等待 Controller 批准，不使用这两个参数安排重试。</p>
+<p>受控关闭也有前提：Controller 必须可达；要完成 Leader 迁移，相关分区还需有位于其他 Broker 上、可接替的存活副本，并在超时阈值内完成迁移。否则 Broker 会退化为普通关闭，不再继续等待。受控关闭由开关 <code>controlled.shutdown.enable</code>（默认开启，只读参数，改动需重启）控制是否启用；在 ZooKeeper 模式下，<code>controlled.shutdown.max.retries</code> 与 <code>controlled.shutdown.retry.backoff.ms</code> 控制请求重试。KRaft 使用 Broker 生命周期心跳请求受控关闭，并在关闭期限内等待 Controller 批准，不使用这两个参数安排重试。</p>
 <h3 id="s56">追加写日志对恢复的影响</h3>
 <p>Kafka 的日志是 append-only（仅追加）的，这一性质决定了它的恢复语义。恢复时，Kafka 会检查日志、截断残缺尾部，并恢复索引及生产者等辅助状态，不需要像 MySQL 那样把日志修改重放到数据页或回滚数据页上的事务。一条日志要么完整写入，要么在恢复时整体作废：写了一半的残缺尾部靠 CRC 找出来直接截掉，不存在 MySQL 事务那种"已部分生效、需要回滚"的中间状态。这种日志结构省去了重建另一套业务数据结构的工作；实际恢复耗时仍取决于待检查的日志与辅助状态。</p>
 <h3 id="s57">容器化环境下的生命周期</h3>
 <p>容器的约束不分软件。多数生产部署如今跑在 Kubernetes（K8s）上。K8s 用 <code>terminationGracePeriodSeconds</code>（默认 30 秒）限制整个终止过程：倒计时开始后先执行 preStop hook（如果配置了），再发送 SIGTERM；进程未在宽限期内退出，最终会收到 SIGKILL。SIGKILL 即 <code>kill -9</code>，跳过一切清理。</p>
-<p><strong>Redis</strong> 的优雅关闭通常会终止后台 RDB/AOF 重写子进程；但首次 AOF 尚未生成时，普通关闭会被拒绝，需要先处理这一状态。真正吃掉 grace period 的，是它自己的最后一次落盘——只要配了 save 点（出厂默认就配）且不走 NOSAVE，主进程就会在退出前同步做一次全量 RDB 落盘，就是 <a class="xref" href="#sec-3.2">3.2 节</a>那种不 fork 的阻塞式 SAVE，耗时随数据量线性上涨。大实例可能越过 30 秒 grace period 被 SIGKILL，半成品临时文件作废；如果只依赖 RDB 恢复，丢的是最近一次成功快照所记录时点之后的写入。</p>
+<p><strong>Redis</strong> 的优雅关闭通常会终止后台 RDB/AOF 重写子进程；但首次 AOF 尚未生成时，普通关闭会被拒绝，需要先处理这一状态。真正消耗 grace period 的，是退出前的最后一次落盘——只要配了 save 点（出厂默认就配）且不走 NOSAVE，主进程就会在退出前同步做一次全量 RDB 落盘，就是 <a class="xref" href="#sec-3.2">3.2 节</a>那种不 fork 的阻塞式 SAVE，耗时随数据量线性上涨。大实例可能越过 30 秒 grace period 被 SIGKILL，半成品临时文件作废；如果只依赖 RDB 恢复，丢的是最近一次成功快照所记录时点之后的写入。</p>
 <p>preStop hook 可以先触发 <code>BGSAVE</code>，确认本次快照成功完成后再执行 <code>SHUTDOWN NOSAVE</code>。<code>BGSAVE</code> 返回成功只表示后台保存已启动。若要靠这份 RDB 保存退出前的数据，就必须在 fork 前停写、处理完已接受的写入，并保持停写直到退出；Pod 摘流不会自动关闭已有连接，不能据此认定没有新写入。AOF 已开启时，NOSAVE 仍要完成 AOF 刷盘。</p>
 <p>fork 拷贝页表与保存本身都耗时，写时复制（COW）开销取决于保存期间的内存页修改。grace period 在 preStop hook 执行前已开始计时，应覆盖停写、fork、保存和退出的总耗时并留出余量。把 <code>BGSAVE</code> 放进 hook，并不能保证全量落盘赶在 SIGKILL 之前完成。</p>
 <p><strong>MySQL</strong> 默认 <code>innodb_fast_shutdown=1</code>，受控关闭时刷脏页但跳过完整 purge 与 change buffer 合并；一旦被 SIGKILL 强杀，连快速关闭流程都没机会走，只能交给下次启动的崩溃恢复。容器里我会保留默认 <code>innodb_fast_shutdown=1</code>（它已包含脏页刷盘），grace period 给到 120 秒以上；只有升级、大版本切换等需要干净下线的场景才设 0，按 <a class="xref" href="#sec-3.3">3.3 节</a>的提示，为档位 0 预留几分钟到几十分钟甚至更久的时间。</p>
@@ -659,16 +659,15 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p><strong>第二，关闭的"可配置性"反映了各自的定位。</strong> Redis 给出 SAVE/NOSAVE 两个开关，因为它要同时服务缓存和主存两种用户。MySQL 给出三档参数，让 DBA 按场景在关机和开机之间分摊工作。Kafka 不给单机选项，因为它的关闭本来就是集群事件，单机的"存不存盘"不构成问题（日志在 Leader 迁移后还能从其他副本恢复），真正的问题是"Leader 走了谁来接"。这道单机与分布式的分界，<a class="xref" href="07-cluster.html">第 7 章</a>会沿 Leader 选举与 ISR 维护接着展开。</p>
 <p><strong>第三，"快"的代价在不同软件上以不同形式呈现。</strong> Redis 的快来自内存优先，加上可以选择不落盘；MySQL 的快来自把清理挪出关键路径。Kafka 直接以日志保存消息，省去了把日志重放成另一套业务数据结构的工作，但仍需检查日志并恢复辅助状态。</p>
 <h2 id="sec-3.6">3.6 架构启示</h2>
-<p>三个软件的启动与关闭各走各的流程，纪律是同一套。这五条启示，都从前文的流程取舍里来。</p>
 <h3 id="s60">启示一：确定性优先于速度</h3>
-<p>启动要达到一个"已知的、确定的状态"。预分配核心结构、跑崩溃恢复、恢复每个分区日志，本质都是为了让系统启动后处于可预测状态。出问题时运维能精准定位"死在哪一步"。懒加载启动看似快，但运行期首次访问时才报错，故障更难定位；而且懒加载意味着"什么时候暴露问题"取决于负载，问题变得不可预测。</p>
+<p>启动要达到一个"已知的、确定的状态"。预分配核心结构、跑崩溃恢复、恢复每个分区日志，本质都是为了让系统启动后处于可预测状态。出问题时运维能精准定位"在哪一步失败"。懒加载启动看似快，但运行期首次访问时才报错，故障更难定位；而且懒加载意味着"什么时候暴露问题"取决于负载，问题变得不可预测。</p>
 <p>如果启动时间本身成为可用性瓶颈（比如 Kafka 万分区启动要几分钟，正是 <a class="xref" href="#sec-3.4">3.4 节</a>说的分区恢复瓶颈），就要靠并行恢复、checkpoint 等手段缩短恢复耗时，同时保证恢复后状态的确定性。</p>
 <h3 id="s61">启示二：优雅关闭 = 兑现保证 + 交还职责</h3>
-<p>优雅关闭做三件事：完成已接受的请求、把脏状态落盘、释放占用的资源。在分布式系统里还要加第四件：把职责移交给别人（Kafka 受控关闭）。这四件事的顺序很重要。单机系统的关闭是先完成请求、再落盘、再释放；分布式系统里移交要放在停止服务之前——Kafka 受控关闭正是先让 Controller 把 Leader 迁走、确认完成后才走刷盘退出（<a class="xref" href="#sec-3.4">3.4 节</a>），而不是等资源释放完才移交。被别人依赖的职责，要在自己不可逆地退出之前交接清楚；其余三步一旦颠倒，就可能多出一个"事没做完就被打断"的窗口。</p>
+<p>优雅关闭做三件事：完成已接受的请求、把脏状态落盘、释放占用的资源。在分布式系统里还要加第四件：把职责移交给其他参与方（Kafka 受控关闭）。这四件事的顺序很重要。单机系统的关闭是先完成请求、再落盘、再释放；分布式系统里移交要放在停止服务之前——Kafka 受控关闭正是先让 Controller 把 Leader 迁走、确认完成后才走刷盘退出（<a class="xref" href="#sec-3.4">3.4 节</a>），而不是等资源释放完才移交。其他参与方依赖的职责，要在系统不可逆地退出之前交接清楚；其余三步一旦颠倒，就可能多出一个工作未完成就被中断的窗口。</p>
 <h3 id="s62">启示三：快速关闭省下了哪些工作</h3>
 <p>前面那些缩短关闭时间的选项，处理未完成工作的方式并不相同。MySQL 可以把部分清理留到以后完成，档位 2 还把崩溃恢复留给下次启动；Kafka 普通关闭后，由集群检测退出并重新选举 Leader；Redis 的 NOSAVE 则省略本次 RDB 快照，启用 AOF 时仍要刷盘。我自己设计系统时，会先想清楚每个"快"省去了哪一步，后续工作何时完成、由谁承担，省略操作又会改变什么保证。如果把清理工作全部推到启动期，却没有控制遗留的工作量，启动耗时就更难预测，运维也更难处理。需要延后的工作，应当有可预测的完成条件，不能无限推迟。</p>
 <h3 id="s63">启示四：分层 + 依赖先行</h3>
-<p>这三个软件的启动都要满足配置、基础设施、核心服务、数据恢复与对外服务之间的依赖，但这些工作不一定排成互不重叠的五段。MySQL 的崩溃恢复嵌在 InnoDB 启动段里，Kafka 的网络准备、元数据追赶与日志恢复也会交错。硬约束来自具体依赖：配置要先有默认值，未指定的参数才有定义；存储引擎要先读配置，才知道数据目录在哪；对外处理请求要等存储引擎就绪，否则客户端可能拿到一个莫名其妙的报错。违反这些依赖，比如在存储初始化完成前就开始处理客户端请求，请求就会进入一个半初始化的系统，行为不可预测。</p>
+<p>这三个软件的启动都要满足配置、基础设施、核心服务、数据恢复与对外服务之间的依赖，但这些工作不一定排成互不重叠的五段。MySQL 的崩溃恢复嵌在 InnoDB 启动段里，Kafka 的网络准备、元数据追赶与日志恢复也会交错。硬约束来自具体依赖：配置要先有默认值，未指定的参数才有定义；存储引擎要先读配置，才知道数据目录在哪；对外处理请求要等存储引擎就绪，否则客户端可能收到原因不明的报错。违反这些依赖，比如在存储初始化完成前就开始处理客户端请求，请求就会进入一个半初始化的系统，行为不可预测。</p>
 <h3 id="s64">启示五：可观测性是状态机的外显</h3>
 <p>三家的就绪日志标明了状态机所处的阶段，故障复盘靠它们定位卡在哪一段。设计生命周期时，我会要求每个阶段切换处都有一条语义明确、格式稳定的状态日志。这样，出问题时能精确指认位置；文案不随版本随意变化，旧脚本和旧排障手册也仍能用。本章 <a class="xref" href="#sec-3.3">3.3 节</a> MySQL 关闭慢的排障、<a class="xref" href="#sec-3.4">3.4 节</a> Kafka 受控关闭的超时定位，都依赖这些里程碑日志。</p>
 <p>开头说的那次事故就是这样：图省事，觉得"Redis 重启就好了"，没等 AOF 刷完就杀了进程，第二天丢了十几条订单数据。Redis 本来是会落盘的，问题出在我没给它落盘的时间。从那以后，我把优雅关闭当作必须遵守的操作纪律。</p>

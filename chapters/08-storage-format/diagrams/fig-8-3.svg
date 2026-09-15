@@ -76,7 +76,7 @@
   <text x="460" y="510" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">最终文件（Redis 6.2，混合持久化）</text>
 
   <rect x="220" y="525" width="220" height="36" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="330" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5">RDB 全量快照（大头，加载快）</text>
+  <text x="330" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5">RDB 全量快照（主要部分，加载快）</text>
 
   <rect x="440" y="525" width="240" height="36" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="2"/>
   <text x="560" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">AOF 增量命令（快照之后）</text>

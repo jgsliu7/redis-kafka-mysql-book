@@ -92,7 +92,7 @@
 
   <!-- A 复活 -->
   <rect x="610" y="488" width="270" height="80" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
-  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">A 复活，试图以 Follower 加入</text>
+  <text x="745" y="510" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">A 恢复，尝试以 Follower 加入</text>
   <text x="630" y="532" font-size="11" fill="#374151">A 仍持旧任期的 m3 m4</text>
   <text x="630" y="552" font-size="11" fill="#374151">若不截断 → 数据分叉（脑裂）</text>
 

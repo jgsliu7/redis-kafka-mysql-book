@@ -42,7 +42,7 @@
   <!-- encoding 一列 -->
   <rect x="480" y="150" width="280" height="340" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
   <text x="620" y="176" text-anchor="middle" font-size="14" font-weight="600" fill="#374151">encoding（编码 / 内存表示）</text>
-  <text x="620" y="194" text-anchor="middle" font-size="11" fill="#374151">同一 type 可挂多种 encoding</text>
+  <text x="620" y="194" text-anchor="middle" font-size="11" fill="#374151">同一 type 可用多种 encoding</text>
   <line x1="500" y1="206" x2="740" y2="206" stroke="#D1D5DB" stroke-width="1"/>
 
   <rect x="504" y="220" width="232" height="28" rx="4" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>

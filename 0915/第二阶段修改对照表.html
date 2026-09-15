@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第二阶段修改对照表 · 30 席审查</title>
+<style>
+  :root{
+    --bg:#faf9f7; --paper:#ffffff; --ink:#1f2937; --muted:#6b7280;
+    --line:#e5e1da; --head:#f3f0ea;
+    --hi:#fff3bf; --hi-border:#ffd43b;
+    --del:#dc2626; --del-bg:#fef2f2;
+    --sev-h:#dc2626; --sev-m:#d97706; --sev-l:#64748b;
+    --accent:#0f766e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+       font:14px/1.75 "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:28px 20px 80px;}
+  header h1{font-size:22px;margin:0 0 6px;letter-spacing:.5px;}
+  header .sub{color:var(--muted);font-size:13px;margin-bottom:14px;}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;align-items:center;background:var(--paper);
+          border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin-bottom:16px;
+          font-size:13px;color:var(--muted);}
+  .legend b{color:var(--ink);font-weight:600}
+  del{background:var(--del-bg);color:var(--del);text-decoration:line-through;
+      text-decoration-thickness:2px;padding:0 2px;border-radius:2px;}
+  ins{background:var(--hi);text-decoration:none;padding:0 2px;border-radius:2px;
+      box-shadow:inset 0 -2px 0 var(--hi-border);color:#663c00;font-style:normal;}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+  .controls button{border:1px solid var(--line);background:var(--paper);color:var(--ink);
+      border-radius:6px;padding:5px 14px;font-size:13px;cursor:pointer;}
+  .controls button.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  table{width:100%;border-collapse:collapse;background:var(--paper);
+        border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:13.5px;}
+  thead th{background:var(--head);text-align:left;padding:9px 12px;font-size:13px;
+           color:var(--muted);font-weight:600;border-bottom:2px solid var(--line);white-space:nowrap;}
+  tbody td{padding:12px;vertical-align:top;border-bottom:1px solid var(--line);}
+  tbody tr:hover{background:#fcfbf8;}
+  td.pos{width:120px;white-space:nowrap;}
+  td.old,td.new{width:29%;min-width:260px;}
+  td.desc{width:26%;}
+  .no{font-weight:700;color:var(--accent);}
+  .file{display:inline-block;font:12px/1.5 "SF Mono",Menlo,Consolas,monospace;
+        background:#eef2f3;border-radius:4px;padding:1px 6px;color:#334155;}
+  .ln{color:var(--muted);font-size:12px;}
+  .sev{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px;}
+  .sev.h{background:var(--sev-h)} .sev.m{background:var(--sev-m)} .sev.l{background:var(--sev-l)}
+  .sevtag{font-size:11px;border-radius:3px;padding:0 5px;margin-left:4px;color:#fff;}
+  .sevtag.h{background:var(--sev-h)} .sevtag.m{background:var(--sev-m)} .sevtag.l{background:var(--sev-l)}
+  .src{display:inline-block;font-size:11px;color:var(--muted);border:1px dashed var(--line);
+       border-radius:3px;padding:0 5px;margin-top:4px;}
+  .note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;
+        margin:18px 0;font-size:13px;color:#78350f;}
+  .note b{color:#92400e}
+  .sect-title{margin:34px 0 10px;font-size:16px;font-weight:700;color:var(--ink);
+              border-left:4px solid var(--accent);padding-left:10px;}
+  .quote{color:#9ca3af;font-size:12px;}
+  td.old .q,td.new .q{display:block;margin-top:6px;font-size:12px;color:#b45309;}
+  @media print{.controls{display:none}body{background:#fff}table{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>第二阶段修改对照表（批注模式）</h1>
+  <div class="sub">《架构观察笔记》· 30 席独立审查（N1–N10，2026-09-14 → 09-15）· 全部条目经主调度逐字核实 · 书稿零改动，本表仅为建议稿</div>
+</header>
+
+<div class="legend">
+  <b>图例</b>
+  <span><del>删除内容</del>＝原文中划线部分建议删除</span>
+  <span><ins>新增内容</ins>＝改后文本中高亮部分为新增</span>
+  <span><span class="sev h"></span>高 <span class="sev m"></span>中 <span class="sev l"></span>低</span>
+  <span>来源标签＝报告席位（D读者/G观察员/T挑刺员）</span>
+</div>
+
+<div class="controls" id="ctrl">
+  <button data-f="all" class="on">全部</button>
+  <button data-f="h">仅高危</button>
+  <button data-f="m">仅中危</button>
+  <button data-f="l">仅低危</button>
+  <button data-f="md">正文 .md</button>
+  <button data-f="svg">SVG 图</button>
+</div>
+
+<table id="tbl">
+<thead><tr>
+  <th style="width:120px">① 编号 / 位置</th>
+  <th style="width:29%">② 原文</th>
+  <th style="width:29%">③ 建议改后</th>
+  <th style="width:26%">④ 描述</th>
+</tr></thead>
+<tbody>
+
+<!-- ==================== 正文 Markdown ==================== -->
+<tr class="r md m"><td class="pos"><span class="no">1</span><br><span class="file">00-preface.md</span><br><span class="ln">L5</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">后来我突然发现大家最常用的<del>Redis、MySQL、Kafka</del> 等优秀的软件也是非常好的案例</td>
+<td class="new">后来我突然发现大家最常用的<ins> Redis、MySQL、Kafka</ins> 等优秀的软件也是非常好的案例</td>
+<td class="desc">序言共 8 处中英无空格（L3「AI的辅助」等），此为代表。全篇同规则处理。</td></tr>
+
+<tr class="r md h"><td class="pos"><span class="no">2</span><br><span class="file">00-preface.md</span><br><span class="ln">L5–L10</span><br><span class="sev h"></span>高<span class="sevtag h">D10</span></td>
+<td class="old">这些解决方案可以直接沉淀和借鉴，是具体的<del>“术”</del>。我认为更重要的是<del>“道”</del></td>
+<td class="new">这些解决方案可以直接沉淀和借鉴，是具体的<ins>"术"</ins>。我认为更重要的是<ins>"道"</ins></td>
+<td class="desc">序言整篇 14 对弯引号，全书正文以直引号为主流（D10 判定），统一为直引号。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">3</span><br><span class="file">01-introduction</span><br><span class="ln">L6</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">很少有人提及<del>“取舍”</del>和<del>“平衡”</del></td>
+<td class="new">很少有人提及<ins>"取舍"</ins>和<ins>"平衡"</ins></td>
+<td class="desc">ch1 混用样本：本章其余处均为直引号。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">4</span><br><span class="file">01-introduction</span><br><span class="ln">L80</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">提供完整的 ACID<del>（原子性、一致性、隔离性、持久性）</del>事务</td>
+<td class="new">提供完整的 ACID<ins>（Atomicity / Consistency / Isolation / Durability，原子性、一致性、隔离性、持久性）</ins>事务</td>
+<td class="desc">中文-only 展开孤例，其余缩写均带英文全称。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">5</span><br><span class="file">01-introduction</span><br><span class="ln">L204</span><br><span class="sev m"></span>中<span class="sevtag m">T10</span></td>
+<td class="old">Redis Open Source 的 <del>7.2、</del>7.4 分支仍列在官方支持范围内</td>
+<td class="new">Redis Open Source 的 7.4 分支仍列在官方支持范围内<ins>（官方政策仅维持最新版与此前的两支旧线）</ins></td>
+<td class="desc">redis.io/about/releases 一手复核：政策只维持「上一 minor＋上一大版本线末端」，当前最新 8.8 → 维护窗口为 8.x 前一支＋7.4，7.2 已出。WebFetch 逐字核实。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">6</span><br><span class="file">02-data-struct…</span><br><span class="ln">L21</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">协议选了<del> RESP，</del>类型和长度使用可读的前缀</td>
+<td class="new">协议选了<ins> RESP（REdis Serialization Protocol），</ins>类型和长度使用可读的前缀</td>
+<td class="desc">RESP 首现裸用、L142 才展开（先用后展）。首现处展开，见第 9 条联动。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">7</span><br><span class="file">02-data-struct…</span><br><span class="ln">L134</span><br><span class="sev l"></span>低<span class="sevtag l">T10</span></td>
+<td class="old">压缩比取决于消息内容相似度与压缩级别，<del>基准测试中</del>常见 2–6 倍</td>
+<td class="new">压缩比取决于消息内容相似度与压缩级别，<ins>作者经验归纳</ins>常见 2–6 倍</td>
+<td class="desc">「2–6 倍」三处（ch2:134、ch8:46/277）均无出处。推荐：明示经验归纳，ch8:46 关键数字框为主述，ch8:277 同步收敛。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">8</span><br><span class="file">02-data-struct…</span><br><span class="ln">L154</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">经典查询返回的结果行<del>缺省</del>是文本</td>
+<td class="new">经典查询返回的结果行<ins>默认</ins>是文本</td>
+<td class="desc">「缺省」全书孤例（grep=1），其余均用「默认」。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">9</span><br><span class="file">02-data-struct…</span><br><span class="ln">L142</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">Redis 的协议叫 RESP<del>（REdis Serialization Protocol）</del>。它的设计目标非常明确</td>
+<td class="new">Redis 的协议叫 RESP。它的设计目标非常明确</td>
+<td class="desc">与第 6 条联动：首现（L21）展开后，此处删重复展开；ch5:41 第三处展开（含中文译名，格式又不同）同删。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">10</span><br><span class="file">03-lifecycle</span><br><span class="ln">L15</span><br><span class="sev m"></span>中<span class="sevtag m">G10</span></td>
+<td class="old"><del>**关闭的本质是状态机快照加上资源释放。**</del>关闭要面对两个问题</td>
+<td class="new"><ins>**关闭的核心是兑现启动时做出的保证；对多数系统，这首先体现为状态机快照加上资源释放。**</ins>关闭要面对两个问题</td>
+<td class="desc">章级框架被同章反例架空（L65 SHUTDOWN NOSAVE 跳过快照、L137 Kafka「关闭是一个集群事件」），章末 L244 已实际换用「兑现保证」框架但未回头对齐。此为方案 B；方案 A（降格 L15 并声明边界）亦可。连带第 43 条（fig-3-1 与文献 [8]）。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">11</span><br><span class="file">03-lifecycle</span><br><span class="ln">L39</span><br><span class="sev l"></span>低<span class="sevtag l">T10</span></td>
+<td class="old"><del>serverCron</del> 每轮用非阻塞 waitpid(WNOHANG) 轮询回收</td>
+<td class="new"><ins>Redis 的周期任务循环 serverCron（默认约每 100ms 一轮）</ins>每轮用非阻塞 waitpid(WNOHANG) 轮询回收</td>
+<td class="desc">serverCron 全书仅此一处出现、未定义，「每轮」不知轮的是什么。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">12</span><br><span class="file">03-lifecycle</span><br><span class="ln">L130</span><br><span class="sev l"></span>低<span class="sevtag l">G9+T7</span></td>
+<td class="old">**<del>从库</del>要等复制线程退出。** <del>从库</del>关闭要等 SQL 线程回放完当前事件组再停；<del>主库</del>关闭则直接断开 dump 线程，并不等<del>从库</del>把 binlog 拉完</td>
+<td class="new">**<ins>从节点</ins>要等复制线程退出。** <ins>从节点</ins>关闭要等 SQL 线程回放完当前事件组再停；<ins>主节点</ins>关闭则直接断开 dump 线程，并不等<ins>从节点</ins>把 binlog 拉完</td>
+<td class="desc">「从库/主库」全书正文两处之一（另一处在 fig-9-6 图内，见第 58 条），其余全书用「从节点/主节点」。两席一致。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">13</span><br><span class="file">03-lifecycle</span><br><span class="ln">L162</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">迁移到 ISR<del>（同步副本集合）</del>里还活着的其他副本上</td>
+<td class="new">迁移到 ISR 里还活着的其他副本上</td>
+<td class="desc">ISR 全书五处展开、两种格式（全称式 ch1:98/ch7:166；中文式 ch3:162/ch5:193/ch9:222）。收敛为 ch1:98 首现一处，其余四删。本条与第 21、35 条联动。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">14</span><br><span class="file">04-memory-disk</span><br><span class="ln">L42</span><br><span class="sev l"></span>低<span class="sevtag l">T10</span></td>
+<td class="old">…64GB 机器内存空闲时脏页累计到约 6.4GB（按 10% 计）才触发后台刷盘<del>——这个数字是触发线，不是一块预留的缓冲区深度，内存吃紧时随可用内存一起缩小，写满前内核批量刷盘；6.4GB 还是机器级全局阈值，多盘按写入带宽份额分摊，稳态脏页量通常由写入速率×脏页过期时间（默认约 30 秒）决定，JBOD 单盘对应的窗口更小。</del>这是 Kafka 不强制 fsync…</td>
+<td class="new">…64GB 机器内存空闲时脏页累计到约 6.4GB（按 10% 计）才触发后台刷盘<ins>。<br>这个数字是触发线，不是一块预留的缓冲区深度：内存吃紧时它随可用内存一起缩小，写满前内核批量刷盘。<br>它还是机器级全局阈值，多盘按写入带宽份额分摊；稳态脏页量通常由写入速率×脏页过期时间（默认约 30 秒）决定，JBOD 单盘对应的窗口更小。</ins>这是 Kafka 不强制 fsync…</td>
+<td class="desc">全书数字密度最高段落（8+ 数字、三层限定连排）。仅断句分层，一字未增删。两档阈值句保持在前不动。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">15</span><br><span class="file">04-memory-disk</span><br><span class="ln">L104</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">也可以只有 1 条），代价是增加同步等待…改为<del>“新开 incr 文件直写 + manifest 原子切换”</del></td>
+<td class="new">也可以只有 1 条），代价是增加同步等待…改为<ins>"新开 incr 文件直写 + manifest 原子切换"</ins></td>
+<td class="desc">ch4 散点弯引号（另 L153–154 等），统一直引号。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">16</span><br><span class="file">04-memory-disk</span><br><span class="ln">L258</span><br><span class="sev l"></span>低<span class="sevtag l">T10</span></td>
+<td class="old">Redis 开启 AOF 后默认 `everysec`，<del>约 1–2 秒量级的数据窗口</del>（出厂默认不开 AOF）</td>
+<td class="new">Redis 开启 AOF 后默认 `everysec`，<ins>丢失窗口约一秒量级、后台刷盘受阻时可更长</ins>（出厂默认不开 AOF）</td>
+<td class="desc">everysec 窗口全书 5 处、两种口径（4:1）：ch4:105「约 1 秒」vs 本处「1–2 秒」同章并存无衔接，ch3:15 / ch5:77 / ch10:104 均为约一秒。按多数口径统一并补最坏情形半句。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">17</span><br><span class="file">04-memory-disk</span><br><span class="ln">L79</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">教科书里的 LRU<del>（最近最少使用，Least Recently Used）</del>维护一个双向链表</td>
+<td class="new">教科书里的 LRU<ins>（Least Recently Used，最近最少使用）</ins>维护一个双向链表</td>
+<td class="desc">展开顺序全书两制：本处「中文（缩写，英文）」，L83 LFU 与 ISR/LEO 等均为「缩写（英文，中文）」。统一为后者。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">18</span><br><span class="file">04-memory-disk</span><br><span class="ln">L119 等 4 处</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">图 4-3　Redis 持久化数据流（…）⏎<del>两条路径互相独立：…</del></td>
+<td class="new">图 4-3　Redis 持久化数据流（…）⏎<ins>（空行）</ins>⏎两条路径互相独立：…</td>
+<td class="desc">ch4 四处图注（图 4-3/4-4/4-5/4-6，L119–120、L153–154、L167–168、L215–216）后无空行，全书其余各章均有。当前自研构建按行解析未并段，换通用 Markdown 渲染即并段——工程风险项。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">19</span><br><span class="file">05-layered-…</span><br><span class="ln">L41</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">Redis 与客户端之间用 RESP<del>（REdis Serialization Protocol，Redis 序列化协议）</del>通信</td>
+<td class="new">Redis 与客户端之间用 RESP 通信</td>
+<td class="desc">RESP 第三处展开且格式与前两处又不同（带中文译名）。与第 6/9 条联动收敛。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">20</span><br><span class="file">05-layered-…</span><br><span class="ln">L116</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">通过**结构化中间表示（IR<del>，</del>解析树、执行计划）在子层之间的传递**来衔接</td>
+<td class="new">通过**结构化中间表示（IR<ins>，Intermediate Representation，</ins>解析树、执行计划）在子层之间的传递**来衔接</td>
+<td class="desc">IR 未给英文全称（AEAD/GA/SRE/DDIA 同类，见第 25/28/37/38 条）。本句另有弯引号「“生成 IR →…”」同批处理。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">21</span><br><span class="file">05-layered-…</span><br><span class="ln">L193</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">分区的 Leader 在哪台 Broker 上、ISR<del>（同步副本集合）</del>里有谁</td>
+<td class="new">分区的 Leader 在哪台 Broker 上、ISR 里有谁</td>
+<td class="desc">ISR 五处展开收敛之一（见第 13 条）。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">22</span><br><span class="file">06-security</span><br><span class="ln">L38</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">系统必须确认<del>“你是谁”</del></td>
+<td class="new">系统必须确认<ins>"你是谁"</ins></td>
+<td class="desc">同短语两种引号：本行弯、L15 直——全书最典型的同文异号。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">23</span><br><span class="file">06-security</span><br><span class="ln">L127</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">### Kafka：ACL 绑定 <del>"Principal + Operation + Resource"</del> 三元组</td>
+<td class="new">### Kafka：ACL 绑定<ins>"Principal + Operation + Resource"</ins> 三元组</td>
+<td class="desc">标题引号内侧带空格（引号内紧贴开闭引号处），删内侧空格、外侧空格保留。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">24</span><br><span class="file">06-security</span><br><span class="ln">L153</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">…。<del> </del>redo log…</td>
+<td class="new">…。redo log…</td>
+<td class="desc">全角句号后多一个半角空格，中文标点后接英文不加空格。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">25</span><br><span class="file">06-security</span><br><span class="ln">L159</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">对称加解密（AES-GCM 等 <del>AEAD</del> 套件）</td>
+<td class="new">对称加解密（AES-GCM 等 <ins>AEAD（Authenticated Encryption with Associated Data，认证加密）</ins>套件）</td>
+<td class="desc">AEAD 首现未展开。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">26</span><br><span class="file">07-cluster</span><br><span class="ln">L7 等 13 行</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">同样面对<del>“单点不够用”</del></td>
+<td class="new">同样面对<ins>"单点不够用"</ins></td>
+<td class="desc">ch7 弯引号 13 行（L7/36/69/100/113/119/166/168/188/205/209/218/242），正文最重混排章，同规则批量处理。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">27</span><br><span class="file">07-cluster</span><br><span class="ln">L57</span><br><span class="sev m"></span>中<span class="sevtag m">D8+G9</span></td>
+<td class="old"><del>复制积压区</del>（replication backlog）</td>
+<td class="new"><ins>复制积压缓冲区</ins>（replication backlog）</td>
+<td class="desc">「复制积压区」全书孤例；ch9:41/89 与 fig-9-4:13 均为「复制积压缓冲区」，三对一。跨轮两席一致。</td></tr>
+
+<tr class="r md h"><td class="pos"><span class="no">28</span><br><span class="file">07-cluster</span><br><span class="ln">L123</span><br><span class="sev h"></span>高<span class="sevtag h">G8</span></td>
+<td class="old">组复制（MGR，MySQL Group Replication）在复制链路中加入组内事务协调。<del>它在 MySQL 5.7.17 首次作为 GA 特性提供，8.0 又做了大量增强（更完善的成员管理、更好的并发写性能）。它的核心是基于 Paxos 的组通信组件 XCom。</del>以单主模式的读写事务为例…</td>
+<td class="new">组复制（MGR，MySQL Group Replication）在复制链路中加入组内事务协调<ins>：读写事务准备提交时由基于 Paxos 的 XCom 提供组通信与全序，冲突认证通过才提交。它在 MySQL 5.7.17 首次作为 GA（General Availability，正式可用）特性提供，8.0 又做了大量增强。</ins>以单主模式的读写事务为例…</td>
+<td class="desc">ch7↔ch9 六组近逐字复读之一（07:123↔09:188 首句几乎逐字）。本条为方向 A（收敛重复、保留一句概括）示意；六组同模式：07:125/119/98/113/115 ↔ 09:190/157/146/173/179。方向 B（重分工）/C（维持）仍待裁决——若选 B/C 本条改后文本作废。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">29</span><br><span class="file">07-cluster</span><br><span class="ln">L113</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old"><del>全局事务标识（GTID，Global Transaction Identifier）</del></td>
+<td class="new"><ins>GTID（Global Transaction Identifier，全局事务标识）</ins></td>
+<td class="desc">与 ch9:171 展开顺序互反，统一为「缩写（英文，中文）」式（与 ISR/LEO/LFU 一致）。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">30</span><br><span class="file">07-cluster</span><br><span class="ln">L156</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">一个主题（<del>topic</del>）被切成 N 个分区</td>
+<td class="new">一个主题（<ins>Topic</ins>）被切成 N 个分区</td>
+<td class="desc">与 ch1:96「主题（Topic）」大写不一致。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">31</span><br><span class="file">07-cluster</span><br><span class="ln">L176</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old"><del>`min-replicas`</del> 则限制副本状况不达标时继续写入</td>
+<td class="new"><ins>`min-replicas-to-write` 与 `min-replicas-max-lag`</ins> 则限制副本状况不达标时继续写入</td>
+<td class="desc">`min-replicas` 单写不是参数名，官方为两参数族。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">32</span><br><span class="file">08-storage…</span><br><span class="ln">L104/273/283</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">…机制改为<del>“新开 incr 文件直写 + manifest 原子切换”</del>。</td>
+<td class="new">…机制改为<ins>"新开 incr 文件直写 + manifest 原子切换"</ins>。</td>
+<td class="desc">ch8 弯引号散点（L104/273/283）。</td></tr>
+
+<tr class="r md h"><td class="pos"><span class="no">33</span><br><span class="file">08-storage…</span><br><span class="ln">L191</span><br><span class="sev h"></span>高<span class="sevtag h">T8+D10</span></td>
+<td class="old">存 <del>BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、</del>CRC、<del>Attributes、</del>记录数等整批共享的元数据</td>
+<td class="new">存 <ins>baseOffset、partitionLeaderEpoch、producerId、producerEpoch、baseSequence、</ins>CRC、<ins>attributes、</ins>记录数等整批共享的元数据</td>
+<td class="desc">大驼峰与表 2-1 / fig-2-7 的 camelCase 自相矛盾，KIP-98 官方 schema 为 camelCase。两席同位（T8 低 / D10 高）取高。联动第 53 条（fig-8-6 图内）。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">34</span><br><span class="file">08-storage…</span><br><span class="ln">L71</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">图 8-2　RDB 文件布局：magic / version / metadata / db-selector / entries /<del> </del>CRC64 footer</td>
+<td class="new">图 8-2　RDB 文件布局：magic / version / metadata / db-selector / entries /<ins> EOF(0xFF) /</ins> CRC64 footer</td>
+<td class="desc">图注列六段，图实画七段（多出 EOF/0xFF 框）。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">35</span><br><span class="file">09-data-sync</span><br><span class="ln">L222</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">用 ISR<del>（同步副本集合）</del>框定<del>“谁算跟上”</del></td>
+<td class="new">用 ISR 框定<ins>"谁算跟上"</ins></td>
+<td class="desc">ISR 五处展开收敛之一（见第 13 条）；弯引号顺带。LEO/HW 保留（此处为首现，正文已声明「语义定义就在这里给出」）。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">36</span><br><span class="file">09-data-sync</span><br><span class="ln">L289</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">还可以用 <del>tombstone</del> 表示删除</td>
+<td class="new">还可以用 <ins>tombstone（删除标记）</ins>表示删除</td>
+<td class="desc">tombstone 无中文对照，且 ch1:100 已用「删除标记」中文表述，双轨。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">37</span><br><span class="file">10-summary</span><br><span class="ln">L80</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">（业务方、<del>SRE</del>）</td>
+<td class="new">（业务方、<ins>SRE（Site Reliability Engineer，站点可靠性工程师）</ins>）</td>
+<td class="desc">SRE 首现未展开。</td></tr>
+
+<tr class="r md l"><td class="pos"><span class="no">38</span><br><span class="file">11-references.md</span><br><span class="ln">L109</span><br><span class="sev l"></span>低<span class="sevtag l">D10</span></td>
+<td class="old">而像 <del>DDIA</del> 这样的综合书</td>
+<td class="new">而像 <ins>DDIA（《Designing Data-Intensive Applications》）</ins>这样的综合书</td>
+<td class="desc">DDIA 缩写首现未展开（正文 ch8:50 已给全名+作者，文献表独立成篇亦应自足）。</td></tr>
+
+<tr class="r md m"><td class="pos"><span class="no">39</span><br><span class="file">全书 9 个 md</span><br><span class="ln">散点</span><br><span class="sev m"></span>中<span class="sevtag m">D10</span></td>
+<td class="old">六章 25 处散点弯引号（ch1:6、ch6:38、ch3:15、ch4:104、ch5:116、ch6:135/151/199/237、ch8:104/273/283、ch9:15/153/169/196 等）：<del>“……”</del></td>
+<td class="new">同批统一为直引号：<ins>"……"</ins></td>
+<td class="desc">正文直弯引号分裂全景：序言 14 对＋ch7 13 行＋六章 25 处散点。grep 坐实 9 个 md 文件含弯引号。第 2/3/15/22/26/32/35 条为各组代表行。</td></tr>
+
+<!-- ==================== SVG ==================== -->
+<tr class="r svg m"><td class="pos"><span class="no">40</span><br><span class="file">fig-3-1.svg</span><br><span class="ln">图内/图注</span><br><span class="sev m"></span>中<span class="sevtag m">G10</span></td>
+<td class="old">关闭：<del>快照</del> + 资源释放</td>
+<td class="new">关闭：<ins>兑现保证</ins> + 资源释放</td>
+<td class="desc">随第 10 条（ch3 框架）联动。11-references [8]「对应本章“状态机重建与快照”模型」同步改「状态机重建与关闭保证」。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">41</span><br><span class="file">fig-3-6.svg</span><br><span class="ln">L62</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">⑤ <del>强制</del>刷盘 → exit</td>
+<td class="new">⑤ 刷盘 → exit</td>
+<td class="desc">正文退出流程无「强制」定性（按配置触发），图添加了正文没有的词——「图比正文更绝对」家族。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">42</span><br><span class="file">fig-4-2.svg</span><br><span class="ln">L72</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">精度换性能：采样数越大<del>越接近真 LRU</del>，但每次淘汰成本越高</td>
+<td class="new">精度换性能：采样数越大<ins>通常越接近精确 LRU</ins>，但每次淘汰成本越高</td>
+<td class="desc">正文 ch4:81 为「采样数越大通常越接近精确 LRU」——图丢 hedge「通常」且「精确」改「真」。「图比正文更绝对」家族。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">43</span><br><span class="file">fig-5-2.svg</span><br><span class="ln">L12</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">type | encoding | <del>refcount | lru</del> | ptr</td>
+<td class="new">type | encoding | <ins>lru | refcount</ins> | ptr</td>
+<td class="desc">与源码 struct redisObject 字段序不符（源码 lru 在 refcount 之前），两字段互换。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">44</span><br><span class="file">fig-5-7.svg</span><br><span class="ln">Kafka 列</span><br><span class="sev m"></span>中<span class="sevtag m">G9+T7</span></td>
+<td class="old">Kafka 列仅三段：交互 / API / 存储（Log 日志）<del>（无第四段）</del></td>
+<td class="new">Kafka 列<ins>增加第四段：协调（Controller / ReplicaManager / KRaft）</ins></td>
+<td class="desc">正文 ch5:195/214/224 与表 5-1 均为「交互+API+存储+协调」四段，图 Kafka 列无协调层痕迹（grep 图内零命中坐实）。两席一致。图结构改动需 svg-illustrator 执行。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">45</span><br><span class="file">fig-6-1.svg</span><br><span class="ln">图内</span><br><span class="sev l"></span>低<span class="sevtag l">G10</span></td>
+<td class="old">审计（<del>旁路记录</del>，贯穿全程）</td>
+<td class="new">审计（<ins>贯穿全程留痕</ins>）</td>
+<td class="desc">「旁路」定位只在图内出现，正文 ch6:30 用「审计留痕」；「旁路」在工程语境另有 bypass 专义。图自造定位。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">46</span><br><span class="file">fig-7-1.svg</span><br><span class="ln">L42</span><br><span class="sev m"></span>中<span class="sevtag m">D9+T7</span></td>
+<td class="old">少数派超时后停写<del>（见 7.2.3 节）</del></td>
+<td class="new">少数派超时后停写</td>
+<td class="desc">图挂 §7.1 却前向引 7.2.3，命中禁前向节引用的「图内路标」变体——§1.3ap 28 处已清零后的图内漏网。两席一致。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">47</span><br><span class="file">fig-7-3.svg</span><br><span class="ln">L46</span><br><span class="sev m"></span>中<span class="sevtag m">D9+G9+T7</span></td>
+<td class="old"><del>应用线程</del>：回放事件</td>
+<td class="new"><ins>SQL 线程</ins>：回放事件</td>
+<td class="desc">图注、ch7 正文、fig-9-2「SQL 线程回放」、fig-9-5「SQL 线程（图示单线程）」与 MySQL 官方术语均为 SQL thread，本图独称「应用线程」。三席独立命中（2:1 取中）。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">48</span><br><span class="file">fig-7-3.svg</span><br><span class="ln">L26</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">从节点（<del>Slave</del>）</td>
+<td class="new">从节点（<ins>Replica</ins>）</td>
+<td class="desc">MySQL 8.0.26 起官方更名 source/replica，fig-9-5 已用新名，同书新旧并存。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">49</span><br><span class="file">fig-8-1.svg</span><br><span class="ln">L12/L45</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">磁盘（备份/<del>主存</del>/正本）…表空间 .ibd（<del>正本</del>）</td>
+<td class="new">磁盘（备份/<ins>主存储</ins>/正本）…表空间 .ibd（<ins>主存储</ins>）</td>
+<td class="desc">「正本」本书专用于 Kafka 唯一正本（§8.4.1），MySQL 侧借用即冲突；正文用「主存储」，fig-10-1 的「主存」专指 DRAM。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">50</span><br><span class="file">fig-8-2.svg</span><br><span class="ln">L55</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old"><del>1 字节，</del>标识类型</td>
+<td class="new"><ins>1B，</ins>标识类型</td>
+<td class="desc">同图单位两制（L18「0010 (4B)」vs 本处「1 字节」），图内统一 B。D9/G9 另对本图 L18 长度编码语义有双席疑问，详见 N9 明细。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">51</span><br><span class="file">fig-8-3.svg</span><br><span class="ln">3 处</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old"><del>temp-rewrite.aof</del> → appendonly.aof</td>
+<td class="new"><ins>temp-rewriteaof-bg-*.aof</ins> → appendonly.aof</td>
+<td class="desc">真实临时文件名为 temp-rewriteaof-bg-&lt;pid&gt;.aof，图用示意名但未声明。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">52</span><br><span class="file">fig-8-4.svg</span><br><span class="ln">L30</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">界定页内最小 / 最大 <del>主键</del>边界</td>
+<td class="new">界定页内最小 / 最大 <ins>记录</ins>边界</td>
+<td class="desc">正文为「Infimum 与 Supremum 两条虚拟记录（界定最小与最大记录）」——虚拟记录非主键边界，二级索引页无主键语义。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">53</span><br><span class="file">fig-8-4.svg</span><br><span class="ln">图内</span><br><span class="sev l"></span>低<span class="sevtag l">G10</span></td>
+<td class="old">大对象不<del>拖累</del>整页</td>
+<td class="new">大对象不<ins>污染</ins>整页</td>
+<td class="desc">「污染」是全书锚定词（ch2:102「不污染整页」、ch4:136/148「缓冲池被污染」页池两层共用同一意象），图内换词丢跨章呼应。</td></tr>
+
+<tr class="r svg h"><td class="pos"><span class="no">54</span><br><span class="file">fig-8-6.svg</span><br><span class="ln">L57/61/65</span><br><span class="sev h"></span>高<span class="sevtag h">D10</span></td>
+<td class="old">Batch：<del>BaseOffset</del>=150（180/210 同）</td>
+<td class="new">Batch：<ins>baseOffset</ins>=150（180/210 同）</td>
+<td class="desc">与第 33 条同病：图内大驼峰与表 2-1 camelCase 打架，三处。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">55</span><br><span class="file">fig-8-6.svg</span><br><span class="ln">L81</span><br><span class="sev m"></span>中<span class="sevtag m">T7</span></td>
+<td class="old">条目：(offsetΔ=60, <del>pos=1200</del>)</td>
+<td class="new">条目：(offsetΔ=60, <ins>pos≥4608</ins>)<span class="q">＋ 图内加注：图示间隔已缩小，非默认 4KB 比例；`.index` 首条 (0,0) 略去未画</span></td>
+<td class="desc">图内自相矛盾：L84 自述「默认 4KB」，但 1200−512=688B＜4096B 按该规则不应有条目；且 `.index` 首条恒为 (0,0) 缺失。读者按图自述规则复算即穿帮。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">56</span><br><span class="file">fig-9-6.svg</span><br><span class="ln">L16</span><br><span class="sev l"></span>低<span class="sevtag l">G9+T7</span></td>
+<td class="old">① <del>从库</del>多线程并行复制（LOGICAL_CLOCK）</td>
+<td class="new">① <ins>从节点</ins>多线程并行复制（LOGICAL_CLOCK）</td>
+<td class="desc">「从库」全书图内仅此一处，ch9 正文全用「从节点/副本」。与第 12 条联动。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">57</span><br><span class="file">fig-9-7.svg</span><br><span class="ln">L31</span><br><span class="sev m"></span>中<span class="sevtag m">T7</span></td>
+<td class="old"><del>m2（新写）</del>…m3(off=3)、m4(off=4)（虚线=未复制）…Leader LEO = 5</td>
+<td class="new"><ins>m4（新写）</ins>（高亮与角标移至 m4，m2 恢复普通样式）</td>
+<td class="desc">图内算术矛盾：LEO=5 → 已写 0–4，「新写」=LEO−1=4 → 只能是 m4；红色高亮＋「新写」角标落在 m2 上，与已画 m3/m4 冲突。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">58</span><br><span class="file">fig-9-7.svg</span><br><span class="ln">L97</span><br><span class="sev l"></span>低<span class="sevtag l">D9+T7</span></td>
+<td class="old">若不截断 → 数据分叉<del>（脑裂）</del></td>
+<td class="new">若不截断 → 数据分叉</td>
+<td class="desc">「脑裂」ch9 正文未用（全章用「分叉」）；此处实为副本日志分叉——A 重入后是 Follower 并不参与选主，非经典脑裂。两席一致。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">59</span><br><span class="file">fig-10-1.svg</span><br><span class="ln">L10</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old"><del>图 10-1　存储层次的对照：处理器与存储系统</del>（图内标题行）</td>
+<td class="new">（删除图内标题行，与其余 56 图一致）</td>
+<td class="desc">全书 57 图唯一保留图内编号标题（构建剥离后顶部留约 60px 空白，其余图顶距约 12px）；另有 3 图残留空标题注释，标题去留呈三种状态，定一制。</td></tr>
+
+<tr class="r svg m"><td class="pos"><span class="no">60</span><br><span class="file">57 图两制</span><br><span class="ln">约 17 图</span><br><span class="sev m"></span>中<span class="sevtag m">T7+D10</span></td>
+<td class="old">fig-3-2/3-3/3-6、fig-4-2、fig-5-4、fig-8-4/8-6 用<del>“弯引号”</del>；fig-1-1/2-4/6-1/6-4/9-3/9-7/10-3 等用"直引号"</td>
+<td class="new">全书图内统一<ins>"直引号"</ins>（与正文主流一致、改动量最小；fig-2-8 L47 `client_id="p1"` 为协议原文不动）</td>
+<td class="desc">跨轮两席（T7 建议弯引号、D10 判定正文直引号为主流）——按「正文主流＋改动量最小」取直引号制，与第 39 条同批执行。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">61</span><br><span class="file">fig-2-1 等</span><br><span class="ln">散点</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">fig-2-1:72「O(1) 取长 <del>＋</del> 二进制安全」（57 图唯一全角＋）；fig-2-7:28「<del>1B·=2</del>」、fig-9-1「·」间隔符一空一不空</td>
+<td class="new">统一半角 <ins>+</ins>；间隔符统一<ins>「8B · xxx」</ins>带空格式</td>
+<td class="desc">图内符号体例散点（全角＋孤例、间隔符·两制、+号空格两制 fig-2-6/fig-5-1），机械批量修复。</td></tr>
+
+<tr class="r svg l"><td class="pos"><span class="no">62</span><br><span class="file">5 张图</span><br><span class="ln">散点</span><br><span class="sev l"></span>低<span class="sevtag l">T7</span></td>
+<td class="old">fig-5-4/8-7/10-3 等 5 处：彩色线 shaft 配<del>灰色</del>箭头 marker</td>
+<td class="new">各线<ins>配同色 marker</ins></td>
+<td class="desc">marker 异色家族，机械修复。另有几何类小项（fig-1-2 刻度基线、fig-5-5 响应终点、fig-6-3 相位带、fig-5-7 标注漂移、fig-9-5 标签距离）见登记文档，均 svg-illustrator 一并处理。</td></tr>
+
+</tbody>
+</table>
+
+<div class="note">
+  <b>未入表的待裁决项（无唯一改后文本，不出对照行）：</b><br>
+  ① ch7↔ch9 六组重复的整改方向（A 收敛 / B 重分工 / C 维持）——第 28 行为 A 案示意，选 B/C 则作废；② KIP-405 精确年份查证授权（「你说查我就查」）；③ N6 遗留 ch9 L260 严重度（G6 高 / D6 低）；④ 第一阶段总账 7 决策点；⑤ 文献表体例二选一。<br><br>
+  <b>执行约束：</b>本表为建议稿，书稿尚未改动任何一字。批准修改时按项目协议走：改前多 agent 分析（≥2 同意）→ 单人 Edit 精准替换 → 改后多 agent 验证；作者第一人称与判断锋芒绝对保留。<br>
+  <b>覆盖范围：</b>N8 跨章 + N9 图文 + N10 终扫三轮全部核实坐实且有明确改法的发现；N1–N7 章内轮明细在当日对话汇总中，未含本表。原文均为核实时逐字摘抄（≤40 字规则内截取）。
+</div>
+
+</div>
+<script>
+const btns=document.querySelectorAll('#ctrl button');
+btns.forEach(b=>b.addEventListener('click',()=>{
+  btns.forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  const f=b.dataset.f;
+  document.querySelectorAll('#tbl tbody tr').forEach(tr=>{
+    const show=f==='all'||tr.classList.contains(f);
+    tr.style.display=show?'':'none';
+  });
+}));
+</script>
+</body>
+</html>

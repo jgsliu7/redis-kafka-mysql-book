@@ -40,9 +40,9 @@
   <text x="725" y="97" text-anchor="middle" font-size="11" fill="#374151">统一头部 · 版本化 · 批量优先</text>
 
   <rect x="590" y="120" width="270" height="150" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-  <text x="725" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求头（4 字段）</text>
+  <text x="725" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">请求头 v1（4 字段）</text>
   <rect x="610" y="158" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>
-  <text x="725" y="178" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">api_key=0 api_version=9</text>
+  <text x="725" y="178" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">api_key=0 api_version=8</text>
   <rect x="610" y="192" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>
   <text x="725" y="212" text-anchor="middle" font-size="11" font-family="monospace" fill="#065F46">correlation_id=42 client_id="p1"</text>
   <rect x="610" y="226" width="230" height="28" rx="4" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="0.8"/>

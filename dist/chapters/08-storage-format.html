@@ -198,7 +198,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 
   
   <rect x="190" y="345" width="220" height="40" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="300" y="362" text-anchor="middle" font-size="12" fill="#374151">OS 页缓存（不自己管）</text>
+  <text x="300" y="362" text-anchor="middle" font-size="12" fill="#374151">OS 页缓存（由内核管理）</text>
   <text x="300" y="378" text-anchor="middle" font-size="11" fill="#6B7280">无独立缓存层</text>
 
   
@@ -213,7 +213,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
 <p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存充当内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
-<blockquote><strong>关键数字</strong>  <strong>InnoDB 默认 16KB 页：页头、页尾、虚拟记录和页目录占用一部分空间，其余供用户记录与空闲区使用</strong>。结构开销和每页行数随行宽、记录数与页内空闲情况变化。对单文件、未压缩的 16KB 页表空间，第 N 页的文件内字节偏移为 <code>N × 16KB</code>；按页号计算位置是页式结构随机定位的基础。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 内存/磁盘占用比：1GB 内存实例（字符串/列表型负载，典型场景）≈ 300–500MB 快照</strong>。磁盘文件远小于内存实际占用，主因是内存态每键约 66–110 字节的结构开销不落盘，小键值负载下这笔开销占内存大头；次因是变长整数编码与 LZF（LZF 仅对超过 20 字节、且能省出至少 4 字节的值生效）；恢复时快速加载。</blockquote>
+<blockquote><strong>关键数字</strong>  <strong>InnoDB 默认 16KB 页：页头、页尾、虚拟记录和页目录占用一部分空间，其余供用户记录与空闲区使用</strong>。结构开销和每页行数随行宽、记录数与页内空闲情况变化。对单文件、未压缩的 16KB 页表空间，第 N 页的文件内字节偏移为 <code>N × 16KB</code>；按页号计算位置是页式结构随机定位的基础。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 体积取决于键值大小、对象编码与压缩效果，不能由实例内存直接按固定比例换算</strong>。RDB 不会原样保存字典指针、对象头与分配器碎片等内存开销，小键值负载下这部分差异尤其明显；整数编码与 LZF 还可能进一步缩小文件。启用 RDB 压缩时，只对超过 20 字节的字符串尝试 LZF，压缩数据至少缩短 4 字节才采用。恢复时按文件内容重建内存对象，适合快速加载。</blockquote>
 <blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台压实（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》<a class="xref" href="03-lifecycle.html">第 3 章</a>是很好的起点。</blockquote>
 <h2 id="sec-8.2">8.2 Redis 的做法</h2>
 <h3 id="sec-8.2.1">8.2.1 定位先行：磁盘服务于内存</h3>
@@ -320,7 +320,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-2　RDB 文件布局：magic / version / metadata / db-selector / entries / CRC64 footer。</figcaption></figure>
 <p>整个文件分成几个部分：开头魔数与版本号做自识别，metadata 区存辅助字段（如 Redis 版本、创建时间、repl-stream-db 等元信息），db-selector 标记接下来的数据属于哪个 db，entries 段是一条条键值记录，结尾是 8 字节 CRC64 校验和。CRC64 覆盖文件开头到校验和之前的内容，包括魔数、版本号和记录；写文件时边写边累积，结束时把结果写在尾部。加载时也边读取边计算，读到尾部再比对。启用校验且文件带有效校验和时，校验失败会中止恢复。</p>
-<p>RDB 用"不支持随机访问"换"加载快、文件小"。RDB 完全不支持按 key 定位，要恢复必须整体加载。这对 Redis 没有损失：反正加载就是一次性把内存建起来，没人会对 RDB 做点查。</p>
+<p>RDB 用"不支持随机访问"换"加载快、文件小"。RDB 完全不支持按 key 定位，要恢复必须整体加载。这对 Redis 没有损失：加载时需要一次性重建内存状态，不需要通过 RDB 进行点查。</p>
 <p>还有一处体现"格式为演进服务"的细节：7.0 起用 listpack 取代了旧版的 ziplist。ziplist 的历史包袱是 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的连锁更新：每个元素记前一个元素的长度，长度字段一旦扩张就逐级传导，早期实现会反复搬移后缀，最坏 O(n²)；6.2 虽已优化扩容和搬移，相邻元素的依赖仍在。listpack 让每个元素只自记长度，连锁更新随之消失。这次换代没有动 RDB 的整体布局，旧文件也不用迁移：listpack 值落盘只是多了几个新类型码（RDB 版本号随之从 v9 升到 v10），Redis 7.0 加载器同时保留了新旧编码的读取与转换路径。类型码和加载代码共同维护了这种兼容。格式定型后难免积累问题，演进机制（在这里是编码切换）就是用来补这些不足。</p>
 <h3 id="sec-8.2.3">8.2.3 AOF：持久化文件复用协议格式</h3>
 <p>AOF（仅追加文件）走的是另一条路。它记录的是"写命令本身"：命令记录使用 RESP 格式，命令参数可以包含二进制数据。AOF 落的不是客户端发来的原文，而是命令执行完后、经与复制链路同一套规则改写的传播命令（<code>EXPIRE</code> 记成绝对时间的 <code>PEXPIREAT</code>），<strong>磁盘上的持久化文件直接复用线上协议的格式</strong>。这个选择决定了后续的一系列设计。</p>
@@ -329,7 +329,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>AOF 还有一个绕不开的难题：随着命令不断追加，文件只会越来越大，里面会堆积大量被覆盖、被删除的过时命令——比如对同一个 key 执行一百万次 INCR，重建当前值不必逐次重放这一百万条命令，可以改写成设置最终计数值的命令。Redis 的解法是重写（rewrite）。重写的关键取舍是：<strong>fork 子进程从当前内存直接生成新 AOF</strong>。这一步绕开了"解析越积越大的日志"这个坑：重写复杂度只跟当前内存数据量有关，跟 AOF 已经积累了多少无关。</p>
 <p>但 fork 那一刻之后，父进程还在处理新写命令，重写需要把这部分增量接上。7.0 之前，新写命令既追加到旧 AOF，也进入 aof_rewrite_buffer。以 Redis 6.2 为例，父进程在重写期间还通过管道向子进程传递增量，子进程将收到的部分追加到新文件；子进程退出后，父进程再补写尚未传完的剩余增量，最后用 rename 原子替换旧文件。原子性指的是文件切换，不是整段增量追加。fork 与收尾写入仍可能造成服务停顿。7.0 起的替代方案见下节。</p>
 <h3 id="sec-8.2.4">8.2.4 从混合持久化到 Multi-Part AOF</h3>
-<p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）。开启后（7.0 之前）AOF 是单个文件：文件头为 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（大头走二进制快速加载）加上 AOF 的"少丢"（尾部重放快照时点之后已保存的增量命令）。一次重启，先用 RDB 快速把内存主体建起来，再重放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
+<p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）。开启后（7.0 之前）AOF 是单个文件：文件头为 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（主体数据以二进制格式快速加载）加上 AOF 的"少丢"（尾部重放快照时点之后已保存的增量命令）。一次重启，先用 RDB 快速把内存主体建起来，再重放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
 <p>相关机制已在<a class="xref" href="04-memory-disk.html">第 4 章</a>介绍，这里只讨论文件布局的变化。Multi-Part AOF 的变化在于文件结构的重构。7.0 之前，AOF 是单个大文件，重写完成后通过 rename 切换到新文件。重写期间的新命令既要追加到旧 AOF，又要经重写缓冲传给新文件，带来额外的内存和 I/O 开销；失败后还需继续使用旧 AOF。</p>
 <p>7.0 把 AOF 拆成一个目录，由清单文件（manifest）管理三类文件：至多一个基础文件（base，默认 RDB 格式）、零或多个增量文件（incr，AOF 命令），以及重写后标为历史（history）待删除的文件。父进程先新开 incr 文件记录后续写入，子进程生成新 base，完成后通过原子替换 manifest 让新组合生效。仍被清单引用的 incr 文件必须保留；新 base 已涵盖的旧文件才可转为 history 清理。重写失败时，原有 base、incr 和新开的 incr 仍用于恢复，Redis 也有历史文件与临时文件的清理逻辑；异常中断后的残留文件仍需按清单引用关系处理。</p>
 <p><code>aof-use-rdb-preamble</code> 在 7.0 Multi-Part AOF 改造后仍存在（默认 yes），语义是控制 base 文件是否使用 RDB 格式：默认 yes 时 base 为 RDB 格式，效果等同混合持久化常开；设为 no 则 base 为 AOF 命令格式。</p>
@@ -410,7 +410,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="460" y="510" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">最终文件（Redis 6.2，混合持久化）</text>
 
   <rect x="220" y="525" width="220" height="36" rx="4" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
-  <text x="330" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5">RDB 全量快照（大头，加载快）</text>
+  <text x="330" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5">RDB 全量快照（主要部分，加载快）</text>
 
   <rect x="440" y="525" width="240" height="36" rx="4" fill="#FEF2F7" stroke="#EF4444" stroke-width="2"/>
   <text x="560" y="548" text-anchor="middle" font-size="12" font-weight="700" fill="#EF4444">AOF 增量命令（快照之后）</text>
@@ -428,7 +428,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>页与页之间靠双向链表串联：B+ 树同一层的页用 FIL Header 里的前后指针串成双向链表，范围扫描顺着叶子层的链走；空闲页的分配回收由区（extent）描述里的位图与链表管理，undo 页归回滚段调度，都不走页头指针。链表是页式存储的通用工具：顺序遍历建立在它之上。</p>
 <p>关键取舍落在页大小上。较大的页一次能容纳更多记录，有利于某些顺序访问；较小的页在随机读取少量数据时，可能减少同时读入的无关数据。答案取决于这台机器的磁盘和这个负载的访问模式。MySQL 允许在初始化实例时通过 <code>innodb_page_size</code> 配置页大小（4K/8K/16K/32K/64K），默认是 16KB。实例初始化后不能直接更改这个值，调整时需要迁移到采用目标页大小的新实例。</p>
 <h3 id="sec-8.3.3">8.3.3 数据页内布局：一行行记录如何放进 16KB</h3>
-<p>知道了页是 16KB 之后，下一个问题是这 16KB 内部怎么布局。InnoDB 的数据页内部分成七段，从上到下依次是：</p>
+<p>InnoDB 的数据页内部分成七段，从上到下依次是：</p>
 <ol><li>FIL Header（含页号、前后指针、LSN、页类型）</li><li>Page Header（记录页内统计信息）</li><li>Infimum 与 Supremum 两条虚拟记录（界定这一页的最小与最大记录）</li><li>User Records（用户记录按索引键顺序链接，物理位置不必按键排序）</li><li>Free Space（剩余空间）</li><li>Page Directory（稀疏槽）</li><li>FIL Trailer（包含页 LSN 的低 4 字节及校验相关字段）</li></ol>
 <p>页尾保存的 LSN 低 4 字节应与页头对应部分一致，配合页校验和，可用于检测不完整写入等损坏。</p>
 <figure class="fig" id="fig-8-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 66 920 554" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
@@ -521,7 +521,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="720" y="571" text-anchor="middle" font-size="11" fill="#374151">访问模式决定缓存与 I/O 收益</text>
 </svg>
 </div><figcaption>图 8-4　InnoDB 16KB 数据页内部七段布局：Page Directory 的稀疏槽是页内查找的落点，与 Kafka 段级稀疏索引同一手法。</figcaption></figure>
-<p>七段布局里最关键的是 Page Directory。它是页内的稀疏索引：普通记录组通常由 4–8 条记录组成，首尾组有例外。每个槽占 2 字节，记录组末记录在页内的偏移量；记录之间用 next_record 串成按索引键排序的单向链表。查找时，先在槽数组中二分缩小到相邻槽之间的范围，再沿记录链比较组内的几条记录。这一招把页内逐条遍历改成二分加少量顺序比较，用较少索引空间缩小查找范围，跟 Kafka 段级稀疏索引采用的是相近思路。</p>
+<p>七段布局里最关键的是 Page Directory。它是页内的稀疏索引：普通记录组通常由 4–8 条记录组成，首尾组有例外。每个槽占 2 字节，记录组末记录在页内的偏移量；记录之间用 next_record 串成按索引键排序的单向链表。查找时，先在槽数组中二分缩小到相邻槽之间的范围，再沿记录链比较组内的几条记录。这种索引方式把页内逐条遍历改成二分加少量顺序比较，用较少索引空间缩小查找范围，跟 Kafka 段级稀疏索引采用的是相近思路。</p>
 <p>行格式（row format）层面，InnoDB 默认用 Dynamic 行格式（5.7 起为默认，8.0 沿用，由 <code>innodb_default_row_format</code> 控制）。有两个设计要点。一是变长字段的长度信息按与字段相反的顺序存放。解析时从记录头附近读取这些长度，再确定字段边界。</p>
 <p>二是溢出按整行判定，不以单个字段超页大小一半为准。默认 16KB 页下，行内记录长度上限略小于 8KB；行太长时，从最长的变长列（VARCHAR、BLOB、TEXT）起移到溢出页，行内只留一个 20 字节指针，直到行内部分能放下。不超过 40 字节的短 TEXT/BLOB 留在行内；旧版 COMPACT 则会在行内保留被移出列的 768 字节前缀，再加外挂指针。这个取舍使聚簇索引叶子页能容纳更多行内记录，减少长列占用的页内空间；读取被移出的列时，仍需访问溢出页。</p>
 <h3 id="sec-8.3.4">8.3.4 redo log + 双写：保证"原地改"在断电后可恢复</h3>
@@ -644,7 +644,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>只有确认整条存储路径能为数据页写入提供所需的原子性时，才可以考虑关闭双写缓冲（<code>innodb_doublewrite=OFF</code>，这个开关早于 8.0 就存在），减少写放大。设备支持某种原子写指令，不等于当前文件系统和 InnoDB 写入路径已经使用它。MySQL 8.0 文档列出的自动关闭支持限于 Linux 上配合 NVMFS 的 Fusion-io 原子写路径，而且关闭开关会影响全部数据文件。软件冗余能否撤下，要按实际运行路径确认。</p>
 <h2 id="sec-8.4">8.4 Kafka 的做法</h2>
 <h3 id="sec-8.4.1">8.4.1 定位先行：磁盘就是日志本体</h3>
-<p>Kafka 的定位又反过来了。对 Kafka 来说，消息只有一份正本，就存储在磁盘的日志段里。它不像 MySQL 那样自己管缓冲池，页缓存交给操作系统，Kafka 只把字节往日志文件里追加，读时直接从页缓存或磁盘顺序读。数据本体就在磁盘日志里，格式设计围绕三项需求展开：顺序追加写（新消息写入活跃日志段尾部）、按偏移量（offset）随机读（通过稀疏索引和局部扫描定位）、成批压缩（带宽稀缺，一批相近消息压在一起能省下数倍的存储与传输成本）。于是 Kafka 的基本结构就由"日志段 + 稀疏索引 + RecordBatch"三部分组成。</p>
+<p>对 Kafka 来说，消息只有一份正本，就存储在磁盘的日志段里。它不像 MySQL 那样自己管缓冲池，页缓存交给操作系统，Kafka 只把字节往日志文件里追加，读时直接从页缓存或磁盘顺序读。数据本体就在磁盘日志里，格式设计围绕三项需求展开：顺序追加写（新消息写入活跃日志段尾部）、按偏移量（offset）随机读（通过稀疏索引和局部扫描定位）、成批压缩（带宽稀缺，一批相近消息压在一起能省下数倍的存储与传输成本）。于是 Kafka 的基本结构就由"日志段 + 稀疏索引 + RecordBatch"三部分组成。</p>
 <h3 id="sec-8.4.2">8.4.2 日志段（Log Segment）：日志文件与两类索引</h3>
 <p>Kafka 的分区在磁盘上是一串日志段（segment）。其中三类主要文件是：<code>.log</code> 存消息数据本体、<code>.index</code> 存偏移量索引、<code>.timeindex</code> 存时间戳索引。它们按日志段配套管理；此外还有事务索引 <code>.txnindex</code> 等辅助文件。删除和压实日志段时，也要处理相应的索引。</p>
 <p>文件名使用该日志段的起始偏移量。比如 <code>00000000000000000000.log</code>、<code>00000000000000123456.log</code>，这个数是段内偏移量的下界；压实移除早期记录后，未必还有一条记录恰好等于它。Kafka 在内存中按起始偏移量维护有序的日志段集合。按偏移量定位时，先找到起始偏移量不大于目标的最后一个日志段，再到段内查找，不需要每次重新排序文件系统目录。</p>
@@ -781,7 +781,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>V2 把共享元数据集中到 Batch（批）头部。一个 Batch 头部固定 61 字节，存 BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、CRC、Attributes、记录数等整批共享的元数据。Batch 内每条 Record 的时间戳和偏移量保存为相对差值，key、value 及 headers 则分别带有长度或数量信息。差值较小时，变长整数只需一两个字节；每条记录仍有自己的长度、属性等字段，但不再重复保存整批共享的信息。</p>
 <p>这个变化把压缩边界与共享元数据的边界放在同一个 Batch 上：一批时间相近、内容相似的消息一起压缩，内部记录用差值表示时间戳和偏移量，减少重复元数据。V0/V1 的整包 wrapper 压缩也能合并多条消息，只是内层仍保留各自的头部。V2 的结构减少了这些开销，实际压缩比仍取决于负载特征与所选算法。</p>
 <p>代价也有：读取压缩 Batch 中的一条记录，仍要解压包含它的批数据。Kafka 通常成批拉取消息，批量处理可以分摊这项开销；但一个 Batch 也可能只有一条记录，应用只需要其中一部分时，解压和解析仍有成本。批头的 61 字节也要靠条数分摊：单条成批时，V2 的固定开销反而高于 V1 同口径的 34 字节，约三条起才反超。<strong>让存储单元适应常见的访问方式</strong>，是在批量消费场景下作出的取舍。</p>
-<p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让"重启后能续上"成为磁盘层面的保证。</p>
+<p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让重启后恢复协议状态成为磁盘层面的保证。</p>
 <h3 id="sec-8.4.4">8.4.4 双索引：偏移量索引 + 时间戳索引</h3>
 <p>Kafka 的随机读靠两套索引：偏移量索引和时间戳索引。两套都是稀疏索引：不是给每条消息都建一条索引项。</p>
 <p>偏移量索引的条目是 8 字节定长：4 字节相对偏移量（相对日志段起始偏移量）加 4 字节物理位置（在 <code>.log</code> 文件中的字节偏移）。<code>log.index.interval.bytes</code> 控制索引间隔，默认约每 4KB 建一个条目，实际位置还受追加批次边界影响。查找时，先按起始偏移量定位日志段，再在 <code>.index</code> 内二分找到不大于目标的最大偏移量条目，得到物理位置，最后从那里顺序扫描 <code>.log</code>，找到目标或其后的首条现存记录。这是典型的"粗索引 + 顺序扫"组合。</p>
@@ -879,7 +879,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="sec-8.5.1">8.5.1 三栏对比表</h3>
 <p class="tab-label"><strong>表 8-2　三个软件在八个维度上的范式对比</strong></p>
 <div class="table-wrap"><table id="table-8-2"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>数据的主存储位置</td><td>内存</td><td>磁盘</td><td>日志段（本地或远程存储）</td></tr><tr><td>文件组织与处理单元</td><td>RDB 文件 / AOF 命令记录</td><td>默认 16KB 页</td><td>RecordBatch（变长）</td></tr><tr><td>写方式</td><td>全量重写（RDB）/ 追加与重写（AOF）</td><td>原地改页 + WAL</td><td>新消息追加，压实时重写日志段</td></tr><tr><td>读方式</td><td>加载后在内存中查询</td><td>B+ 树定位与页内查找</td><td>稀疏索引 + 顺序扫描</td></tr><tr><td>索引形态</td><td>持久化文件无 key 索引，查询使用内存结构</td><td>B+ 树 + 页内 Page Directory</td><td>稀疏偏移量 / 时间戳索引</td></tr><tr><td>崩溃恢复</td><td>按配置加载 RDB 或 AOF（可含 RDB base）</td><td>redo 重放 + 完整双写模式修页</td><td>以日志为正本，校验并截断残缺尾部</td></tr><tr><td>演进机制</td><td>RDB 版本号 + 编码类型</td><td>行格式与页内格式标记</td><td>Magic 版本号</td></tr><tr><td>损坏检测</td><td>RDB 尾部 CRC64</td><td>页校验和与 LSN 对应部分</td><td>Batch 级 CRC</td></tr></tbody></table></div>
-<p>每一行都是一次明确的取舍。读方式这一行差异最直观：Redis 加载后才随机访问，MySQL 用 B+ 树随机定位，Kafka 靠稀疏索引加顺序扫描，三种读方式直接对应三种格式结构。损坏检测这一行则反映出它们对"损坏粒度"的不同假设：Redis 校验整个文件，MySQL 校验单页，Kafka 按批校验。</p>
+<p>三种读方式直接对应三种格式结构：Redis 加载后才随机访问，MySQL 用 B+ 树随机定位，Kafka 靠稀疏索引加顺序扫描。三家对"损坏粒度"的假设也不同：Redis 校验整个文件，MySQL 校验单页，Kafka 按批校验。</p>
 <h3 id="sec-8.5.2">8.5.2 解读：三种范式各为谁优化</h3>
 <p>三种格式背后是三种不同的优化目标。<a class="xref" href="04-memory-disk.html">第 4 章</a>按数据的主存储放在内存还是磁盘，把三家分成全内存、缓存磁盘、顺序日志三种范式；本节按磁盘文件本身的组织结构来分，快照、页式、追加日志是另一个维度。</p>
 <p>快照范式（Redis）为“快速整体恢复”优化。RDB 把内存数据序列化成紧凑的二进制文件，恢复时顺序加载；AOF 把传播命令按 RESP 格式追加，可逐条重放，也可从当前内存重写。这套格式不承担线上按 key 查询磁盘的工作，普通查询走内存；持久化文件仍可用于恢复、复制或备份。</p>
@@ -889,7 +889,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>贯穿三个软件的规律是：<strong>存储格式反映访问模式</strong>。"数据怎么被读、怎么被写、读多还是写多、要不要随机定位"，会影响存储单元、索引和更新方式的选择。Kafka 采用日志段与 RecordBatch，把追加、批量传输和压缩组织在一起；如果换一种格式，也需要保留这些访问上的收益，并重新权衡定位和更新的成本。</p>
 <p>这也解释了表中“文件组织与处理单元”的差异：Redis 恢复时顺序加载文件，AOF 又以命令记录增量；MySQL 按页管理缓存与数据文件；Kafka 把记录组织成变长 RecordBatch。这些单元处在不同层次，分别服务于各自的加载、缓存和批量处理需求。</p>
 <h2 id="sec-8.6">8.6 架构启示</h2>
-<p>存储格式是软件里极难推翻的决策之一，三个软件的选择里藏着五条启示。</p>
+<p>存储格式是软件里极难推翻的决策之一。</p>
 <h3 id="sec-8.6.1">8.6.1 启示一：存储单元要对齐访问单元</h3>
 <p>Kafka 的 RecordBatch 适合批量传输和压缩；MySQL 以页为单位管理缓冲池与数据文件，一次读取也可能涉及多个页；Redis 的 AOF 命令记录可以复用协议解析和执行路径。三者都是让文件组织适应常见访问方式。批量共享元数据、按页管理缓存和复用命令解析，都有助于减少相应的处理开销，但存储单元不必与业务一次请求的范围完全相同。</p>
 <p><strong>存储单元需要适应常见的访问方式。</strong> 我设计存储格式时，第一个要定的就是这个：数据被批量读还是单条读？被整体加载还是随机点查？答案会影响存储单元该多大。</p>
@@ -989,9 +989,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-8　本章三个样本的存储结构选择示意：按原地修改和主要读取方式，理解页式、追加日志与快照的取舍。</figcaption></figure>
 <p>图中的分支对应本章样本的主要需求：MySQL 用页式结构支持原地更新和随机查找；Kafka 把追加写与批量读取组织在日志段中；Redis 的持久化文件主要服务于内存状态重建。同一系统也可以组合这些做法。</p>
-<p>第三问是："五年后还能不能读"。它适用于图中的所有方案，不用于区分页式、追加日志或快照，因此没有单列在图中。预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位），格式才能长期可读。没有预留的，需要现在补上。回答这三问后，格式结构的方向就清晰了。</p>
+<p>第三问是："五年后还能不能读"。它适用于图中的所有方案，不用于区分页式、追加日志或快照，因此没有单列在图中。预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位），格式才能长期可读。没有预留的，需要现在补上。</p>
 <h2 id="sec-8.7">8.7 小结</h2>
-<p>三种格式的差异源于访问模式的不同。Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 的新消息顺序追加，靠 RecordBatch 成批压缩消息、稀疏索引定位，提高批量处理的吞吐。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改背上双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则直接连"原地改"这个选项都不要了。</p>
+<p>三种格式的差异源于访问模式的不同。Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 的新消息顺序追加，靠 RecordBatch 成批压缩消息、稀疏索引定位，提高批量处理的吞吐。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改背上双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则放弃了原地修改既有消息的能力。</p>
 <p>存储格式的选择会长期影响一个系统：页式结构需要管理页内空间和更新，追加日志则需要处理历史数据的清理与索引。而设计一个格式时，我还会问"五年后还能不能加字段、换编码"，把眼前的编码效率和长期兼容放在一起考虑。AOF 的重写增量、redo log 的循环写、Kafka 的 retention 与压实，也引出了<a class="xref" href="09-data-sync.html">第 9 章</a>的数据同步问题：哪些状态可以通过增量追赶，哪些情况下需要全量重建。</p><nav class="page-nav"><a href="07-cluster.html">← 第 7 章 集群架构 — 从单点到分布式</a><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现 →</a></nav></article>
 </main>
 </div>
