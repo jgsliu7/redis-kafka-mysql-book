@@ -26,7 +26,7 @@
 
   <!-- Right disk state (snapshot produced) -->
   <rect x="680" y="190" width="160" height="90" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5"/>
-  <text x="760" y="222" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">落盘的快照</text>
+  <text x="760" y="222" text-anchor="middle" font-size="14" font-weight="600" fill="#111827">磁盘上的完整状态</text>
   <text x="760" y="244" text-anchor="middle" font-size="12" fill="#374151">脏状态刷盘 + </text>
   <text x="760" y="262" text-anchor="middle" font-size="12" fill="#374151">释放连接 / 锁 / 身份</text>
 
@@ -35,9 +35,9 @@
   <text x="282" y="178" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">启动：状态机重建</text>
   <text x="282" y="205" text-anchor="middle" font-size="12" fill="#374151">把不完整状态重建为一致状态</text>
 
-  <!-- Shutdown arrow: running -> disk (关闭=快照+释放) -->
+  <!-- Shutdown arrow: running -> disk (关闭=状态落盘+释放) -->
   <path d="M525 255 L675 255" fill="none" stroke="#4B5563" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="600" y="295" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">关闭：快照 + 资源释放</text>
+  <text x="600" y="295" text-anchor="middle" font-size="14" font-weight="700" fill="#111827">关闭：状态落盘 + 资源释放</text>
   <text x="600" y="318" text-anchor="middle" font-size="12" fill="#374151">先把数据落盘 → 交还对外占用 → 最后退出进程</text>
 
   <!-- Crash dashed arrow (return to incomplete state, the loop) -->

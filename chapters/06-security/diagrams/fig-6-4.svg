@@ -94,7 +94,7 @@
   <!-- bottom note: 内存授权结构 -->
   <rect x="60" y="478" width="760" height="96" rx="6" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
   <text x="80" y="500" font-size="12" font-weight="600" fill="#111827">命中即停：检查到任一层授予权限就停止下钻，避免无谓穿透。</text>
-  <text x="80" y="520" font-size="12" fill="#374151">性能取舍：层级越细检查越慢，MySQL 启动时把授权表载入内存，</text>
-  <text x="80" y="540" font-size="12" fill="#374151">按"账号加库表"组织成位图（bitmap）化权限结构，绝大多数热路径一次内存查询。</text>
+  <text x="80" y="520" font-size="12" fill="#374151">MySQL 启动时把授权表载入内存，</text>
+  <text x="80" y="540" font-size="12" fill="#374151">按"账号加库表"组织成位图（bitmap）化权限结构，权限检查在内存中完成。</text>
   <text x="80" y="560" font-size="12" fill="#374151">8.0 增量：RBAC 角色 = 一组权限的命名集合，会话内 <tspan font-weight="600" fill="#111827">SET ROLE</tspan> 激活后并入同一套层级检查。</text>
 </svg>

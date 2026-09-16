@@ -60,7 +60,7 @@
   <rect x="580" y="296" width="140" height="110" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="650" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Memory</text>
   <text x="650" y="346" text-anchor="middle" font-size="11" fill="#374151">内存表</text>
-  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">哈希索引</text>
+  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">默认哈希索引</text>
   <text x="650" y="386" text-anchor="middle" font-size="11" fill="#374151">重启即失</text>
 
   <rect x="580" y="416" width="140" height="48" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3"/>

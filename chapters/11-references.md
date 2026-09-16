@@ -8,7 +8,7 @@
 
 [2] Kreps J. I Heart Logs[M]. Sebastopol: O'Reilly Media, 2014. —— Kafka 核心贡献者将日志当作统一抽象的极简论述，全书核心抽象观的缩影。
 
-[3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人对数据全部放内存这一设计取舍的第一手阐述。
+[3] Sanfilippo S (antirez). antirez 博客（Redis 设计随笔）[EB/OL]. [2026-08-14]. http://antirez.com. —— Redis 作者本人的设计随笔，设计取舍的第一手记录。
 
 ## 第 2 章 数据结构与协议 — 为各自的目标而设计
 
@@ -36,7 +36,7 @@
 
 ## 第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层
 
-[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典判据，本章"接口稳定性比接口优雅更重要"这一说法的直接学术渊源。
+[13] Parnas D L. On the Criteria to Be Used in Decomposing Systems into Modules[J]. Communications of the ACM, 1972, 15(12): 1053-1058. —— 模块分解与信息隐藏的经典论文，"这一层挡住了什么变化"这一问的学术源头。
 
 [14] MySQL. MySQL 8.0.36 源码（handler 与 THD）[EB/OL]. [2026-09-09]. https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/handler.h；https://github.com/mysql/mysql-server/blob/mysql-8.0.36/sql/sql_class.h. —— 存储引擎接口与连接上下文的定义，可对照第 5 章查看 handler 的虚函数接口及 THD 保存的跨层状态。
 
@@ -84,25 +84,21 @@
 
 ## 第 10 章 总结：架构设计的共性规律与取舍
 
-[32] 同 [1]。—— 贯穿全书的对照之作，更广视角的数据系统取舍论述，本章五条共性规律的上位参照。
+本章延伸阅读：文献 [1] 提供更广的数据系统取舍视角；文献 [22] 讨论网络分区条件下的一致性与可用性约束。
 
-[33] 同 [22]。—— CAP 定理的形式化证明，本章"一致 vs 可用"这一取舍维度的理论基础。
-
-[34] Gray J, Reuter A. Transaction Processing: Concepts and Techniques[M]. San Francisco: Morgan Kaufmann, 1993. —— 事务、WAL、两阶段提交、恢复语义的系统化集大成著作，以性能换可靠性这一原则的经典源头。
+[32] Gray J, Reuter A. Transaction Processing: Concepts and Techniques[M]. San Francisco: Morgan Kaufmann, 1993. —— 事务、WAL、两阶段提交、恢复语义的系统化集大成著作，以性能换可靠性这一原则的经典源头。
 
 ---
 
 ## 综合推荐
 
-[35] 同 [1]。—— 跨系统架构取舍的入门读物，本书反复与之呼应的核心参照。
+综合阅读可先参考文献 [1] 的跨系统比较，再阅读文献 [2] 对日志抽象的讨论。
 
-[36] 同 [2]。—— 将日志当作统一抽象的精炼论述，适合快速建立数据系统统一视角。
+[33] Bailis P, Hellerstein J M, Stonebraker M. Readings in Database Systems: 5th Edition[M/OL]. (2015)[2026-08-14]. http://www.redbook.io/. —— 数据库经典论文（社群通称 Red Book）按主题组织的导读索引，适合有论文阅读需求的读者。
 
-[37] Bailis P, Hellerstein J M, Stonebraker M. Readings in Database Systems: 5th Edition[M/OL]. (2015)[2026-08-14]. http://www.redbook.io/. —— 数据库经典论文（社群通称 Red Book）按主题组织的导读索引，适合有论文阅读需求的读者。
+[34] Botros S, Tinley J. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2022. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
 
-[38] Botros S, Tinley J. High Performance MySQL[M]. 4th ed. Sebastopol: O'Reilly Media, 2022. —— MySQL 性能与架构优化的实战参考，适合深化 MySQL 理解。
-
-[39] Kreps J, Narkhede N, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. Athens, 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，可用于理解日志追加、分区和批量传输等早期设计选择，并与后续复制及元数据架构的演进对照。
+[35] Kreps J, Narkhede N, Rao J. Kafka: a Distributed Messaging System for Log Processing[C]//NetDB Workshop. Athens, 2011. —— Kafka 原始设计论文，首发于 NetDB 2011，可用于理解日志追加、分区和批量传输等早期设计选择，并与后续复制及元数据架构的演进对照。
 
 ---
 

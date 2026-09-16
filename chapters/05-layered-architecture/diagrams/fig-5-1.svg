@@ -20,7 +20,7 @@
   <!-- 步骤 1：RESP 解析 -->
   <rect x="80" y="86" width="340" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="250" y="110" text-anchor="middle" font-size="14" fill="#111827">① RESP 协议解析</text>
-  <text x="250" y="130" text-anchor="middle" font-size="11" fill="#374151">边读边解析，不等完整命令；填入 client 结构</text>
+  <text x="250" y="130" text-anchor="middle" font-size="11" fill="#374151">边接收边解析，不等完整命令；填入 client 结构</text>
 
   <!-- client 结构体（贯穿）-->
   <rect x="470" y="86" width="220" height="500" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5 3"/>
