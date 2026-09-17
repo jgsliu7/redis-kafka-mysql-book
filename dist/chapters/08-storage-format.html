@@ -212,7 +212,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="440" y="448" text-anchor="middle" font-size="12" fill="#6B7280">方框区分存储职责，不表示容量比例</text>
 </svg>
 </div><figcaption>图 8-1　三个软件"数据真正存放在哪里"的内存/磁盘权重示意。</figcaption></figure>
-<p>这张图把上面三句定位画成内存与磁盘的权重对比：Redis 内存占绝对主导，MySQL 磁盘主导，Kafka 磁盘就是本体、内核页缓存充当内存层角色。权重的倒置，也是它们格式选择不同的原因：为内存优化、为磁盘随机访问优化、为顺序追加优化的格式，各有各的样子。</p>
 <blockquote><strong>关键数字</strong>  <strong>InnoDB 默认 16KB 页：页头、页尾、虚拟记录和页目录占用一部分空间，其余供用户记录与空闲区使用</strong>。结构开销和每页行数随行宽、记录数与页内空闲情况变化。对单文件、未压缩的 16KB 页表空间，第 N 页的文件内字节偏移为 <code>N × 16KB</code>；按页号计算位置是页式结构随机定位的基础。  <strong>Kafka RecordBatch V2：每批元数据约 61 字节</strong>（V0 单条消息固定开销约 14 字节、V1 约 22 字节，均不含最外层 12 字节消息框，同口径计入外框为 26/34 字节）。Batch 级压缩在同类消息上可达 2–6 倍（zstd，取决于消息内容相似度与压缩级别；文本类数据近上限，二进制数据次之，已压缩数据趋近 1 倍——基本无收益），带宽与存储成本结构性下降。  <strong>Redis RDB 体积取决于键值大小、对象编码与压缩效果，不能由实例内存直接按固定比例换算</strong>。RDB 不会原样保存字典指针、对象头与分配器碎片等内存开销，小键值负载下这部分差异尤其明显；整数编码与 LZF 还可能进一步缩小文件。启用 RDB 压缩时，只对超过 20 字节的字符串尝试 LZF，压缩数据至少缩短 4 字节才采用。恢复时按文件内容重建内存对象，适合快速加载。</blockquote>
 <blockquote><strong>本书为什么没讲 LSM 树</strong>：日志结构合并树（LSM-tree）是现代存储系统的另一个重要范式，RocksDB、LevelDB、HBase、TiDB 都在用它。它通过"内存写入 + 分层 SST 文件（Sorted String Table，排序字符串表）+ 后台压实（compaction）"实现高写入吞吐。本书这三个软件（Redis/MySQL/Kafka）无一采用 LSM 树作为默认引擎（MySQL 虽有 MyRocks 引擎但非默认），因此 LSM 范式不在本书深度覆盖范围内。读者若需要理解这一范式，Kleppmann《Designing Data-Intensive Applications》<a class="xref" href="03-lifecycle.html">第 3 章</a>是很好的起点。</blockquote>
 <h2 id="sec-8.2">8.2 Redis 的做法</h2>
@@ -321,13 +320,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 8-2　RDB 文件布局：magic / version / metadata / db-selector / entries / CRC64 footer。</figcaption></figure>
 <p>整个文件分成几个部分：开头魔数与版本号做自识别，metadata 区存辅助字段（如 Redis 版本、创建时间、repl-stream-db 等元信息），db-selector 标记接下来的数据属于哪个 db，entries 段是一条条键值记录，结尾是 8 字节 CRC64 校验和。CRC64 覆盖文件开头到校验和之前的内容，包括魔数、版本号和记录；写文件时边写边累积，结束时把结果写在尾部。加载时也边读取边计算，读到尾部再比对。启用校验且文件带有效校验和时，校验失败会中止恢复。</p>
 <p>RDB 用"不支持随机访问"换"加载快、文件小"。RDB 完全不支持按 key 定位，要恢复必须整体加载。这对 Redis 没有损失：加载时需要一次性重建内存状态，不需要通过 RDB 进行点查。</p>
-<p>还有一处体现"格式为演进服务"的细节：7.0 起用 listpack 取代了旧版的 ziplist。ziplist 的历史包袱是 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>讲过的连锁更新：每个元素记前一个元素的长度，长度字段一旦扩张就逐级传导，早期实现会反复搬移后缀，最坏 O(n²)；6.2 虽已优化扩容和搬移，相邻元素的依赖仍在。listpack 让每个元素只自记长度，连锁更新随之消失。这次换代没有动 RDB 的整体布局，旧文件也不用迁移：listpack 值落盘只是多了几个新类型码（RDB 版本号随之从 v9 升到 v10），Redis 7.0 加载器同时保留了新旧编码的读取与转换路径。类型码和加载代码共同维护了这种兼容。格式定型后难免积累问题，演进机制（在这里是编码切换）就是用来补这些不足。</p>
+<p>还有一处体现"格式为演进服务"的细节：7.0 起用 listpack 取代旧版 ziplist，连锁更新的背景见第 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.1">2.2.1 节</a>。这次换代没有改变 RDB 的整体布局，而是新增类型码，并把 RDB 版本号从 v9 升到 v10。加载器保留新旧编码的读取与转换路径，让新版 Redis 继续读取旧文件。内部编码可以换，已有文件仍要有读取路径。</p>
 <h3 id="sec-8.2.3">8.2.3 AOF：持久化文件复用协议格式</h3>
 <p>AOF（仅追加文件）走的是另一条路。它记录的是"写命令本身"：命令记录使用 RESP 格式，命令参数可以包含二进制数据。AOF 落的不是客户端发来的原文，而是命令执行完后、经与复制链路同一套规则改写的传播命令（<code>EXPIRE</code> 记成绝对时间的 <code>PEXPIREAT</code>），<strong>磁盘上的持久化文件直接复用线上协议的格式</strong>。这个选择决定了后续的一系列设计。</p>
 <p>这种复用带来了现成的工具。纯命令格式的 AOF 可以用 <code>redis-cli --pipe</code> 发送给 Redis 重放，相当于多了一套现成的恢复工具；带 RDB 前段的混合文件和 Multi-Part AOF 则应按各自的文件结构加载，不能把整份内容都当 RESP 命令发送。AOF 损坏时，可以先用 <code>redis-check-aof</code> 定位问题，再决定如何修复；<code>--fix</code> 可能截断损坏位置之后的内容，不能理解为只删掉一条坏命令。人工修改还要保持 RESP 的字节长度与命令语义正确。复用已有协议，省去了另行定义一套命令记录格式的成本。</p>
 <p>代价同样明显：与保存同一份数据的 RDB 相比，AOF 通常更大，恢复时还要逐条解析、执行命令；恢复耗时取决于日志内容和积累量。Redis 用 fsync 策略在数据丢失窗口与写入开销之间切档：<code>always</code> 在追加一批已执行命令后刷盘，再发送相应回复，多个命令可以共用一次刷盘；<code>everysec</code> 默认约每秒刷盘一次；<code>no</code> 不由 Redis 主动调用 fsync，交给操作系统决定。后两种方式减少同步等待，也会留下更大的故障丢失窗口。</p>
 <p>AOF 还有一个绕不开的难题：随着命令不断追加，文件只会越来越大，里面会堆积大量被覆盖、被删除的过时命令——比如对同一个 key 执行一百万次 INCR，重建当前值不必逐次重放这一百万条命令，可以改写成设置最终计数值的命令。Redis 的解法是重写（rewrite）。重写的关键取舍是：<strong>fork 子进程从当前内存直接生成新 AOF</strong>。这一步绕开了"解析越积越大的日志"这个坑：重写复杂度只跟当前内存数据量有关，跟 AOF 已经积累了多少无关。</p>
-<p>但 fork 那一刻之后，父进程还在处理新写命令，重写需要把这部分增量接上。7.0 之前，新写命令既追加到旧 AOF，也进入 aof_rewrite_buffer。以 Redis 6.2 为例，父进程在重写期间还通过管道向子进程传递增量，子进程将收到的部分追加到新文件；子进程退出后，父进程再补写尚未传完的剩余增量，最后用 rename 原子替换旧文件。原子性指的是文件切换，不是整段增量追加。fork 与收尾写入仍可能造成服务停顿。7.0 起的替代方案见下节。</p>
+<p>但 fork 那一刻之后，父进程还在处理新写命令，重写需要把这部分增量接上。下一节对照旧版单文件 AOF 与 7.0 起的多部分 AOF，说明这部分增量怎样保存。</p>
 <h3 id="sec-8.2.4">8.2.4 从混合持久化到 Multi-Part AOF</h3>
 <p>Redis 4.0 引入 <code>aof-use-rdb-preamble</code> 开关（5.x–6.x 默认 yes，即混合持久化）。开启后（7.0 之前）AOF 是单个文件：文件头为 RDB 全量快照，尾部接 AOF 增量命令。意图是取 RDB 的"加载快"（主体数据以二进制格式快速加载）加上 AOF 的"少丢"（尾部重放快照时点之后已保存的增量命令）。一次重启，先用 RDB 快速把内存主体建起来，再重放 AOF 尾部的少量增量，兼顾恢复速度与数据完整。</p>
 <p>相关机制已在<a class="xref" href="04-memory-disk.html">第 4 章</a>介绍，这里只讨论文件布局的变化。Multi-Part AOF 的变化在于文件结构的重构。7.0 之前，AOF 是单个大文件，重写完成后通过 rename 切换到新文件。重写期间的新命令既要追加到旧 AOF，又要经重写缓冲传给新文件，带来额外的内存和 I/O 开销；失败后还需继续使用旧 AOF。</p>
@@ -780,7 +779,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 消息格式的关键变化是 V2 引入的 RecordBatch（字段布局见 <a class="xref" href="02-data-structures-protocols.html#sec-2.2.3">2.2.3 节</a><a class="xref" href="02-data-structures-protocols.html#table-2-1">表 2-1</a>，这里看它为什么这样演进）。V0、V1 的 MessageSet 中，每条消息自带偏移量、key 长度、value 长度、CRC、属性等元数据，V1 起还增加了时间戳。这两代也能把多条消息包装后整体压缩，但内部消息仍各带一份元数据；消息越多，这部分重复开销越明显。</p>
 <p>V2 把共享元数据集中到 Batch（批）头部。一个 Batch 头部固定 61 字节，存 BaseOffset、PartitionLeaderEpoch、ProducerId、ProducerEpoch、BaseSequence、CRC、Attributes、记录数等整批共享的元数据。Batch 内每条 Record 的时间戳和偏移量保存为相对差值，key、value 及 headers 则分别带有长度或数量信息。差值较小时，变长整数只需一两个字节；每条记录仍有自己的长度、属性等字段，但不再重复保存整批共享的信息。</p>
 <p>这个变化把压缩边界与共享元数据的边界放在同一个 Batch 上：一批时间相近、内容相似的消息一起压缩，内部记录用差值表示时间戳和偏移量，减少重复元数据。V0/V1 的整包 wrapper 压缩也能合并多条消息，只是内层仍保留各自的头部。V2 的结构减少了这些开销，实际压缩比仍取决于负载特征与所选算法。</p>
-<p>代价也有：读取压缩 Batch 中的一条记录，仍要解压包含它的批数据。Kafka 通常成批拉取消息，批量处理可以分摊这项开销；但一个 Batch 也可能只有一条记录，应用只需要其中一部分时，解压和解析仍有成本。批头的 61 字节也要靠条数分摊：单条成批时，V2 的固定开销反而高于 V1 同口径的 34 字节，约三条起才反超。<strong>让存储单元适应常见的访问方式</strong>，是在批量消费场景下作出的取舍。</p>
+<p>代价也有：读取压缩 Batch 中的一条记录，仍要解压包含它的批数据。Kafka 通常成批拉取消息，批量处理可以分摊这项开销；但一个 Batch 也可能只有一条记录，应用只需要其中一部分时，解压和解析仍有成本。批头的 61 字节也要靠条数分摊：单条成批时，V2 的固定开销反而高于 V1 同口径的 34 字节，按简化字段估算，约三条起才反超。<strong>让存储单元适应常见的访问方式</strong>，是在批量消费场景下作出的取舍。</p>
 <p>还有一处设计：ProducerId、ProducerEpoch、BaseSequence 直接进了存储格式本身。这三个字段是幂等生产与事务的根基（生产者带单调递增序列号发消息，Broker 据此把重试的重复去掉），这意味着幂等与事务不只是协议层的事，也是存储格式问题：Broker 重启后要从日志里恢复这些状态，格式不支持就存不下来。把协议状态写进存储格式，让重启后恢复协议状态成为磁盘层面的保证。</p>
 <h3 id="sec-8.4.4">8.4.4 双索引：偏移量索引 + 时间戳索引</h3>
 <p>Kafka 的随机读靠两套索引：偏移量索引和时间戳索引。两套都是稀疏索引：不是给每条消息都建一条索引项。</p>
@@ -789,13 +788,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>稠密索引为每条记录建立条目，数据量大时，索引也会占用更多空间。稀疏索引通过增加少量顺序扫描，换取较小的索引体积，使常用部分更有机会留在页缓存中。以每 4KB 数据对应一个 8 字节偏移量条目粗略估算，1TB 数据约需 2GB 偏移量索引；实际还受批次边界影响，时间戳索引等空间另计。Page Directory 在页内也采用了相近的思路（第 <a class="xref" href="#sec-8.3.3">8.3.3 节</a>）：二分缩小范围，再沿记录链完成局部查找。</p>
 <h3 id="sec-8.4.5">8.4.5 格式演进 V0 → V1 → V2</h3>
 <p>从 V0 到 V2，格式逐步适应新的需求。V0 的消息没有时间戳；V1 加入时间戳，消息本身仍各带元数据，压缩时由外层 wrapper 包装一组消息。V2 引入 RecordBatch，将共享字段放到批头，记录内部采用差值编码，并加入 ProducerId/Epoch/BaseSequence，支持幂等与事务所需的状态。</p>
-<p>演进机制靠 Magic 字段做版本号。Magic 是消息格式里的一个字节，标识这条消息是哪个版本。老 Broker 收到不支持的 Magic 版本直接拒绝；消费者按 Magic 选不同的解析路径。这种"格式自带版本号"的做法，是支持混合版本部署与平滑升级的标配：跟 RDB 的 version、InnoDB 的页类型字段是同一类机制。</p>
+<p>演进机制靠 Magic 字段做版本号。Magic 是消息格式里的一个字节，标识这条消息是哪个版本。老 Broker 收到不支持的 Magic 版本直接拒绝；消费者按 Magic 选不同的解析路径。这种"格式自带版本号"的做法，是支持混合版本部署与平滑升级的标配：RDB 的 version 字段就是同一类机制。</p>
 <p>下面用一张表对比三代格式的字段与演进动机。</p>
 <p class="tab-label"><strong>表 8-1　Kafka 消息格式 V0 / V1 / V2 的字段对比与演进动机</strong></p>
 <div class="table-wrap"><table id="table-8-1"><thead><tr><th>维度</th><th>V0（原始单消息）</th><th>V1（加时间戳）</th><th>V2（RecordBatch）</th></tr></thead><tbody><tr><td>存储单元</td><td>MessageSet 内的 Message</td><td>MessageSet 内的 Message</td><td>RecordBatch（可含一条或多条 Record）</td></tr><tr><td>时间戳</td><td>无</td><td>每条 8 字节</td><td>每条存与 BaseTimestamp 的差值</td></tr><tr><td>偏移量</td><td>每条绝对偏移量</td><td>普通消息为绝对量；压缩内层为相对量</td><td>Batch 存 BaseOffset，每条存差值</td></tr><tr><td>CRC</td><td>每条消息一个校验值</td><td>每条消息一个校验值</td><td>每个 Batch 一个校验值</td></tr><tr><td>压缩</td><td>整包 wrapper 压缩，内层各带元数据</td><td>整包 wrapper 压缩，内层各带元数据</td><td>Batch 级压缩，记录共用批头元数据</td></tr><tr><td>幂等/事务</td><td>不支持</td><td>不支持</td><td>支持（ProducerId/Epoch/BaseSequence）</td></tr><tr><td>演进动机</td><td>——</td><td>加入消息时间语义</td><td>减少重复元数据，支持幂等与事务状态</td></tr></tbody></table></div>
 <p>每一代演进本身都有代价：V1 解决了时间问题却留下元数据冗余，V2 解决了冗余却引入 Batch 边界。</p>
 <h3 id="sec-8.4.6">8.4.6 Tiered Storage：从本地日志到分层存储</h3>
-<p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405；Apache Kafka 3.9.0 发布公告将 Tiered Storage 列为 production-ready），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
+<p>Kafka 3.9 起正式 GA 的 Tiered Storage（KIP-405），是 3.x 系列最重要的存储架构变化之一：<strong>日志本体横跨本地磁盘和远程对象存储，热数据在本地，冷数据可卸载到远端</strong>。</p>
 <p>机制核心是 RemoteStorageManager：一个统一接口，定义日志段及相关文件的上传、读取和删除，需要配置相应的远程存储实现。日志段关闭，且段内记录都位于最后稳定偏移量之前，Kafka 才把它列为上传候选，异步复制到 S3、GCS 或 Azure Blob 等远程存储；成功上传后，本地副本可按本地保留策略删除。消费者读取远端数据时，Broker 通过远程接口取得所需内容，不必把整段重新建成本地日志段。</p>
 <p>副本同步不直接复制已经只存于远端的日志段。Follower 请求的偏移量落到仅存于远端的日志范围时，会收到 OFFSET_MOVED_TO_TIERED_STORAGE，随后进入远程状态重建流程。它从远程存储取得 leader epoch 历史（记录各任 Leader 的日志起点，<a class="xref" href="09-data-sync.html">第 9 章</a>展开）和 producer snapshot（保存生产者序列等状态，见<a class="xref" href="04-memory-disk.html#table-4-2">表 4-2</a>），重建辅助状态，再从对应远程段末尾的下一偏移量继续向 Leader 拉取本地日志。这个流程依赖远程数据和元数据可用；副本若长期无法追上，仍可能因 <code>replica.lag.time.max.ms</code>（默认 30 秒）的条件被移出 ISR。较长的本地保留窗口，可以减少落后副本转入这条路径的机会。</p>
 <p>这里的设计要点是：<strong>日志段与索引可以沿用原有格式</strong>，而远程存储接口和元数据管理负责其放置与读取。客户端仍按 offset 消费，复制层则需要识别远程边界并重建辅助状态。<a class="xref" href="05-layered-architecture.html">第 5 章</a>讲的"让可替换出现在最值得替换的地方"，在这里体现为远程存储后端接口。</p>
@@ -989,7 +988,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 8-8　本章三个样本的存储结构选择示意：按原地修改和主要读取方式，理解页式、追加日志与快照的取舍。</figcaption></figure>
 <p>图中的分支对应本章样本的主要需求：MySQL 用页式结构支持原地更新和随机查找；Kafka 把追加写与批量读取组织在日志段中；Redis 的持久化文件主要服务于内存状态重建。同一系统也可以组合这些做法。</p>
-<p>第三问是："五年后还能不能读"。它适用于图中的所有方案，不用于区分页式、追加日志或快照，因此没有单列在图中。预留版本号、Magic 与编码切换位（ziplist→listpack、V1→V2、页类型位），格式才能长期可读。没有预留的，需要现在补上。</p>
+<p>第三问是："五年后还能不能读"。无论选哪种格式，都要考虑版本识别与旧文件的读取路径。</p>
 <h2 id="sec-8.7">8.7 小结</h2>
 <p>三种格式的差异源于访问模式的不同。Redis 用磁盘保存内存数据的备份，为的是崩溃后快速整体重建；MySQL 把数据行放进 16KB 定长页，为的是事务安全的原地改与随机读写，双写和 redo log 是它对断电风险的保护；Kafka 的新消息顺序追加，靠 RecordBatch 成批压缩消息、稀疏索引定位，提高批量处理的吞吐。代价各自不同：Redis 因为不用原地改，省下了页式那套复杂度，代价是恢复时要整体加载重建；MySQL 则要为原地改背上双写与 redo log 的写放大，崩溃恢复还要按 checkpoint 之后的日志量重放 redo；Kafka 则放弃了原地修改既有消息的能力。</p>
 <p>存储格式的选择会长期影响一个系统：页式结构需要管理页内空间和更新，追加日志则需要处理历史数据的清理与索引。而设计一个格式时，我还会问"五年后还能不能加字段、换编码"，把眼前的编码效率和长期兼容放在一起考虑。AOF 的重写增量、redo log 的循环写、Kafka 的 retention 与压实，也引出了<a class="xref" href="09-data-sync.html">第 9 章</a>的数据同步问题：哪些状态可以通过增量追赶，哪些情况下需要全量重建。</p><nav class="page-nav"><a href="07-cluster.html">← 第 7 章 集群架构 — 从单点到分布式</a><a href="09-data-sync.html">第 9 章 数据同步机制 — 集群一致性的实现 →</a></nav></article>

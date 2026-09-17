@@ -129,7 +129,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我排查过不止一次缓存和数据库不一致的问题。印象最深的一次，用户改了资料，刷新页面看到的还是旧值：写库成功了，缓存没失效。查到最后，是删缓存和写数据库的先后顺序在不同代码路径里不一致。现在涉及多份数据的写路径，我先把"以谁为准、怎么对齐"画清楚再动手。这一章讲的就是这三个软件各自怎么解决这两个问题。</p>
 <h2 id="sec-9.1">9.1 问题的本质</h2>
 <p>需要提高可用性或分担读请求时，可以增加副本。副本复制需要决定何时向客户端返回成功：异步方式不等待副本，故障转移时可能缺少已提交的写；等待副本确认会延后响应，慢副本或失联也可能使写入失败。数据能否保留、读取能否立即看到新值，还取决于确认的含义、选主和应用规则。</p>
-<p>导读里“缓存和数据库谁为准”的问题，讨论的是正本与派生数据的关系，本章小结与<a class="xref" href="10-summary.html">第 10 章</a>会给出答案。本章先讲清楚副本之间怎么对齐，不重复上述机制的完整推导，而是从一个工程问题说起：数据同步到底在同步什么？</p>
+<p>“缓存和数据库谁为准”，涉及正本与派生数据的关系；副本之间如何对齐，则要先回答：数据同步到底在同步什么？</p>
 <h3 id="s209">数据同步的四个子问题</h3>
 <p>数据同步包含四个独立但彼此关联的子问题。</p>
 <p><strong>第一，传播什么。</strong> 一次状态变化，到底把什么东西传给副本？是命令本身（"执行 <code>SET k v</code>"）、是事件（"行 k 的值变成了 v"）还是消息（"编号 7 的记录内容是 v"）？传播单元的粒度，决定了下游几乎所有机制。</p>
@@ -492,7 +492,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 提供异步复制、半同步复制和组复制（MGR），让使用者按业务选择副本确认与事务协调方式。MySQL 的同步以 binlog event 为传播单元，串起了从主从复制到组复制的一整套机制。</p>
 <h3 id="s219">传播单元：binlog event</h3>
 <p>MySQL 把<strong>行变更的逻辑日志</strong>作为传播单元。当一条 SQL 改动了行，主节点把它转换成 binlog event：现代主流是 ROW 格式，记录的是"行 k 从值 v1 变成了 v2"这样的行级事件。</p>
-<p>选 ROW 而非语句，是因为语句复制有歧义：<code>UPDATE t SET x = x + 1</code> 在不同副本上可能影响不同行数（如果副本上数据状态不同），还可能因为非确定性函数产生不同结果。ROW 格式把"最终状态变化"作为事实下发，避免副本重新执行语句时再次解释这些运算。这和 Redis 处理非确定性命令是同一类思路：在源头确定要传播的变更。</p>
+<p>选 ROW 而非语句，是因为语句复制可能受到非确定性函数（如 <code>NOW()</code>）和执行环境的影响。ROW 格式把已经确定的行变更传给副本，避免副本重新执行 SQL 时再次计算。这和 Redis 处理非确定性命令是同一类思路：在源头确定要传播的变更。</p>
 <p>代价是日志可能更重：一条 <code>UPDATE ... WHERE id&lt;100</code> 如果实际改动了一百行，ROW 格式就需要记录这一百行的变更。多行变更可以合并在一个行事件中，事件数量还取决于行大小等因素。但副本拿到的是具体的行变更，对复制正确性来说，这个代价值得付。</p>
 <h3 id="s220">传统复制：两段式的收流 + 回放</h3>
 <p>MySQL 的传统异步复制分为<strong>接收和回放两段</strong>。先以单线程回放为例：</p>
@@ -595,7 +595,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s222">半同步复制：可降级的副本确认</h3>
 <p>半同步（semi-sync）在本地提交路径上增加了副本确认：主节点等至少一个副本的 ACK（确认应答；副本 I/O 线程把事件写入 relay log 文件后即回 ACK，不等本地回放）才返回成功。这份 ACK 只保证事件已写入 relay log 文件，是否 fsync 由副本的 <code>sync_relay_log</code> 决定（默认 10000，即每累计一万条事件才强制同步一次；设为 1 才是确认即持久）。它有两档等待时点。<code>AFTER_SYNC</code>（8.0 默认）是主节点先将 binlog 刷盘，等副本 ACK 后再提交到存储引擎。<code>AFTER_COMMIT</code> 则先在引擎层提交，再等 ACK。这一档有个危险窗口：事务先在引擎层提交，其他会话已经能读到它；若主节点在副本 ACK 返回前崩溃，晋升的新主可能没有这笔事务；之前读到它的会话，等于看见数据消失。这是提交可见性与副本确认之间的窗口，不是隔离级别意义上的幻读。</p>
 <p>半同步还可降级：等 ACK 超时（<code>rpl_semi_sync_source_timeout</code>，默认 10 秒）自动降级回异步，不再阻塞；等待副本数由 <code>rpl_semi_sync_source_wait_for_replica_count</code> 控制（默认 1）。</p>
-<p>半同步仍有适用边界：超时降级后，提交不再等待副本确认；故障转移时，也必须选择持有已确认事务的副本，并保留、应用其 relay log。事务还未在副本上回放，并不等于它已经丢失。<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.3.2">7.3.2 节</a>从集群拓扑角度也提到了这些条件。</p>
+<p>半同步仍有适用边界：超时降级后，提交不再等待副本确认；故障转移时，也必须选择持有已确认事务的副本，并保留、应用其 relay log。事务还未在副本上回放，并不等于它已经丢失。第 <a class="xref" href="07-cluster.html#sec-7.3.2">7.3.2 节</a>从集群拓扑角度也提到了这些条件。</p>
 <p>从同步的视角看，半同步的一个设计要点是：副本确认可以因超时而暂时取消，但这种降级必须可观测。如果降级默默发生，你以为在半同步其实在异步，故障时才发现缺少数据，为时已晚。MySQL 因此把降级次数、当前是否处于半同步状态都暴露成可观测变量。<strong>正常状态与降级状态同等重要，都得可观测</strong>。Redis 的 <code>min-replicas</code> 触发拒绝写入、Kafka 的 ISR 收缩虽然采取了不同动作，也都需要让运维知道保护条件发生了什么变化。</p>
 <blockquote><strong>说明</strong>：8.0.26 起，半同步相关的 master/slave 命名变量统一重命名为 source/replica（如 <code>rpl_semi_sync_master_enabled</code> → <code>rpl_semi_sync_source_enabled</code>），旧名变量在过渡期仍可用但已标记弃用。本章统一以新名为准。</blockquote>
 <h3 id="s223">GTID：用事务标识辅助切换复制源</h3>
@@ -729,9 +729,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>组通信需要多数派才能继续作出决定，因此少数成员故障时，只要剩余成员仍能形成多数派，组就能继续运行。事务通过认证后，发起节点提交本地事务，其他成员接收并应用远端事务。共识确定的事务顺序，并不意味着每个成员在同一时刻都已应用到同一位置。</p>
 <p>组通信与认证增加了提交等待，但跨成员读取是否需要追平，还由 <code>group_replication_consistency</code> 控制。MySQL 8.0 默认 <code>EVENTUAL</code>（不额外等待）；<code>BEFORE_ON_PRIMARY_FAILOVER</code> 在主切换后等待新主应用积压事务；<code>BEFORE</code> 在事务执行前等待本节点应用先前事务；<code>AFTER</code> 让读写事务等待其变更在其他 ONLINE 成员上应用；<code>BEFORE_AND_AFTER</code> 同时提供前后两种等待。<code>BEFORE</code> 对只读和读写事务都生效，可以按场景选择。</p>
 <h3 id="s226">分布式恢复：新成员怎么追上</h3>
-<p>新成员加入 MGR 时，要从现有成员（donor）补齐缺失的数据。binlog 仍可用时，默认走增量恢复；<code>group_replication_clone_threshold</code> 的默认值是 GTID 事务序号上限，实际上不会仅因缺口大而触发 clone。若所需 binlog 已被清理，或缺口超过调低后的阈值，MGR 会尝试使用 8.0.17+ 的 clone 插件，前提是 donor 和新成员已配置好克隆所需的插件、权限及兼容环境。克隆以 donor 的物理数据建立基线，重启后再用 binlog 追平克隆期间的新事务。这是“先全量再增量”的做法：先拿到基线，再补上期间的增量，思路和 Redis 的“RDB 快照 + 期间增量补发”相近。</p>
+<p>新成员加入 MGR 时，要从现有成员（donor）补齐数据。所需 binlog 仍可用时，可以增量恢复；无法用 binlog 补齐时，配置好 clone 插件等条件后，也可以先克隆物理数据建立基线，再用 binlog 追平期间的新事务。这是“先全量再增量”的做法，思路和 Redis 的“RDB 快照 + 期间增量补发”相近。</p>
 <h3 id="s227">取舍总结</h3>
-<p>MySQL 在数据同步上提供了不同选择：异步复制不等待副本，半同步增加可超时降级的接收确认，组复制增加组内事务协调和可配置的一致性等待。业务方需要分别判断确认范围、故障转移条件和读取要求。Redis 默认使用异步复制，另有参数按副本状态限制写入，也可以使用 <code>WAIT</code> 命令，等待副本确认本连接此前的写入（均见 <a class="xref" href="#sec-9.2">9.2 节</a>）。</p>
+<p>MySQL 在数据同步上提供了不同选择：异步复制不等待副本，半同步增加可超时降级的接收确认，组复制增加组内事务协调和可配置的一致性等待。业务方需要分别判断确认范围、故障转移条件和读取要求。</p>
 <h2 id="sec-9.4">9.4 Kafka 的做法</h2>
 <p>Kafka 本身就是围绕"日志"构建的系统。当别的系统要想办法把状态变化封装进某种传播单元时，Kafka 的传播单元就是它的原生数据结构：分区日志里按偏移量追加的消息。这让 Kafka 的复制机制变得简洁：副本就是分区日志的一份拷贝，同步就是把这份日志从 Leader 拷到 Follower。</p>
 <h3 id="s229">传播单元：按分区有序的消息</h3>
@@ -740,9 +740,9 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h3 id="s230">拉模式：复用本地日志读取逻辑</h3>
 <p>Kafka 复制用的是<strong>拉模式</strong>：Follower 主动向 Leader 发 <code>FETCH</code> 请求拉取日志。这和 Redis、MySQL"副本发起后主端流推"都不同。</p>
 <p><strong>Follower 与消费者的 FETCH 复用本地日志的读取逻辑</strong>，但 Leader 会区分请求角色。Follower 可以拉取到 LEO，其请求还用于更新副本进度；消费者的读取受 HW 约束，使用 <code>read_committed</code> 时还受 LSO（Last Stable Offset，最后稳定偏移量）这一事务稳定边界约束。请求中的 <code>replica_id</code> 可区分副本与普通消费者：Follower 填自己的 broker id，普通消费者填 -1。两类请求可以共享页缓存、批量读取等底层优化；本地文件传输在条件满足时还能使用零拷贝。<a class="xref" href="05-layered-architecture.html">第 5 章</a>的分层思想在这里体现为：上层职责不同，底层日志读取仍可复用。</p>
-<p>拉模式让 Follower 自己掌握追赶节奏，但副本数量多时，大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一批日志）和页缓存（命中时可从内存读取，未命中时仍需磁盘 I/O）。3.9 的 Tiered Storage 已可用于生产，冷段可卸载到远程存储。消费者可以读取远程段；Follower 的 FETCH 仍由 Leader 的本地日志提供消息。若所需数据已移到远程层，副本会从远程段恢复 leader epoch、生产者快照等辅助状态，再从对应远程段之后继续拉取本地日志（详见<a class="xref" href="08-storage-format.html">第 8 章</a> <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。本地保留窗口覆盖副本的落后量，有助于避免这条较复杂的追赶路径。</p>
+<p>拉模式让 Follower 自己掌握追赶节奏，但副本数量多时，大量 FETCH 请求会集中在 Leader 上。Kafka 的应对是批量化（一次 FETCH 拉一批日志）和页缓存（命中时可从内存读取，未命中时仍需磁盘 I/O）。3.9 的 Tiered Storage 已可用于生产，冷段可卸载到远程存储。消费者可以读取远程段；Follower 的 FETCH 仍由 Leader 的本地日志提供消息。若所需数据已移到远程层，副本会从远程段恢复 leader epoch、生产者快照等辅助状态，再从对应远程段之后继续拉取本地日志（详见第 <a class="xref" href="08-storage-format.html#sec-8.4.6">8.4.6 节</a>）。本地保留窗口覆盖副本的落后量，有助于避免这条较复杂的追赶路径。</p>
 <h3 id="s231">LEO、HW 与 ISR：同步进度的度量</h3>
-<p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.2">7.4.2 节</a>展开。</p>
+<p>Kafka 用 LEO（Log End Offset，日志末端偏移量）和 HW（High Watermark，高水位）描述副本的同步进度，用 ISR（同步副本集合）框定"谁算跟上"。ISR 的定义与动态进出机制已在第 <a class="xref" href="07-cluster.html#sec-7.4.2">7.4.2 节</a>展开。</p>
 <p>从同步视角看，LEO 是副本下一条消息的追加位置，HW 是复制提交的边界。Leader 根据 FETCH 中获知的副本进度和 ISR 状态推进 HW，不能直接看到所有副本此刻的实际 LEO。ISR 稳定且满足最小副本数要求时，较慢副本的已知进度会限制 HW 的推进。副本长时间未追上 Leader，超过 <code>replica.lag.time.max.ms</code> 后会被移出 ISR，随后按调整后的集合推进。HW 以下的记录已完成复制提交；消费者是否能返回其中的事务记录，还取决于隔离级别。Leader、Follower、ISR 与 HW 的时间关系见<a class="xref" href="#fig-9-7">图 9-7</a>。</p>
 <figure class="fig" id="fig-9-7"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 61 940 639" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -854,8 +854,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>Kafka 用 <strong>leader epoch</strong>（单调递增的任期号）标识日志的任期边界。分区的 <code>leader-epoch-checkpoint</code> 文件记录任期号和该任期的起始偏移量。副本重新追随时，可以在 FETCH 请求中带上最后已获取记录的任期和下一次拉取的偏移量；Leader 检查是否分叉，必要时返回 <code>diverging_epoch</code> 中的任期及结束偏移量。副本据此定位共同日志的边界，截断不一致尾部，再继续拉取。任期边界也可通过 <code>OffsetsForLeaderEpoch</code> 请求查询。</p>
 <p>leader epoch 补充了 offset 所没有的历史信息：相同偏移量在不同任期可能对应不同的日志内容。Redis 的 replid 也用于区分复制历史；MySQL 的 GTID 则标识事务来源和事务身份。它们都让位点带上了可核对的来源信息，但各自标识的对象不同。</p>
 <h3 id="s233">acks 参数：生产者的写入确认要求</h3>
-<p>Kafka 通过生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档）设置写入确认要求。<code>acks=all</code> 等待当前 ISR 中的副本确认，并配合 <code>min.insync.replicas</code> 检查 ISR 是否达到最低数量；达到最低数量后，<code>all</code> 仍要求当前 ISR 全部确认。<code>min.insync.replicas=1</code> 时，ISR 收缩到只剩 Leader 后写入仍被放行，<code>acks=all</code> 实际只等 Leader 本地确认，语义退化接近 <code>acks=1</code>。确认复制也不等于各副本已逐条执行 fsync。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在<a class="xref" href="07-cluster.html">第 7 章</a> <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
-<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步确认超时后可降级为异步；Kafka 在 ISR 不足最低要求时会拒绝这类写入。两款软件在确认条件无法满足时，采取了不同的处理方式。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。一个常见的配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>：它可在一个副本故障后继续写入；保留已确认数据还要求始终有同步副本存活，并避免从缺少这些数据的副本选主。</p>
+<p>Kafka 通过生产者侧的 <code>acks</code> 参数（0 / 1 / all 三档）设置写入确认要求。<code>acks=all</code> 等待当前 ISR 中的副本确认，并配合 <code>min.insync.replicas</code> 检查 ISR 是否达到最低数量；达到最低数量后，<code>all</code> 仍要求当前 ISR 全部确认。<code>min.insync.replicas=1</code> 时，ISR 收缩到只剩 Leader 后写入仍被放行，<code>acks=all</code> 实际只等 Leader 本地确认，语义退化接近 <code>acks=1</code>。确认复制也不等于各副本已逐条执行 fsync。三档的完整定义与 3.0 起默认 <code>acks=all</code> 的定位调整，已在第 <a class="xref" href="07-cluster.html#sec-7.4.3">7.4.3 节</a>展开。</p>
+<p><code>acks=all</code> + <code>min.insync.replicas</code> 与 MySQL 半同步在<strong>降级语义</strong>上存在关键差别：MySQL 半同步确认超时后可降级为异步；Kafka 不会因为 ISR 不足而自动按更低的确认要求返回成功。不过，发送失败不一定表示消息没有写入，重试仍需考虑幂等。这里没有标准答案，但有我的倾向：写路径碰钱和库存时，我站 Kafka 这边，宁可写失败让业务立刻感知，也不要超时后静默降级；日志、监控这类丢了能补的，降级才划算。一个常见的配置是副本数 3、<code>min.insync.replicas=2</code>、<code>acks=all</code>：它可在一个副本故障后继续写入；保留已确认数据还要求始终有同步副本存活，并避免从缺少这些数据的副本选主。</p>
 <h3 id="s234">unclean leader 选举：数据保留与恢复可用性的取舍</h3>
 <p><code>unclean.leader.election.enable</code> 控制是否允许<strong>非 ISR 副本</strong>当选 Leader。没有可用的 ISR 成员时，这个开关决定是否接受从落后日志恢复服务的风险：</p>
 <ul><li><strong>允许（true）</strong>：所有 ISR 副本均不可用时，从落后副本中选一个当 Leader，系统恢复可用，但新 Leader 缺少的消息可能丢失，其中也可能包括原先已提交、位于 HW 以下的消息——可用性优先。</li><li><strong>禁止（false，3.x 默认）</strong>：所有 ISR 副本均不可用时宁可不选主，等待 ISR 成员恢复，分区在此期间不可用。（这个默认值自 0.11 起就由 true 改为 false，KIP-106，3.x 沿用。）</li></ul>
@@ -866,7 +866,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>生产者幂等（<code>enable.idempotence=true</code>）处理重试导致的重复追加，事务则把多项 Kafka 写入纳入同一提交单元。</p>
 <p>幂等使用 ProducerId、ProducerEpoch 和按分区维护的序列号，消息批次携带 BaseSequence。Broker 据此识别生产者的重复重试，避免在日志中再次追加同一批数据。它不负责识别应用重新发送的相同业务内容，也不保证消费处理只执行一次。开启事务（设置 <code>transactional.id</code>）会隐含启用幂等；反过来，仅开幂等不会自动启动事务。</p>
 <p>事务由 transaction coordinator 协调，可以包含跨分区写入及消费 offset 的更新。提交或中止结果通过控制记录传播。对于事务消息，使用 <code>read_committed</code> 的消费者只返回已提交事务的记录，并跳过中止事务。非事务消息也可以返回，但同样不能越过 LSO；默认的 <code>read_uncommitted</code> 仍可能返回未提交或已中止事务的记录。事务提交结果与消费者的隔离级别共同决定哪些记录能被返回。</p>
-<p>事务甚至能把消费 offset 纳入同一个提交单元，纳入不了的是外部系统的处理结果。消费端需要区分三件事：当前读取位置、已提交的 offset、业务系统里这条记录的处理结果；前两种由客户端管理，第三种在 Kafka 之外。因此，提交位置必须遵守一条规则：能提交的只有已交付记录中处理完成的前缀。并行处理时后一条先完成，不能越过前面还没处理完的记录去提交，否则重启后那条消息会被直接跳过。我写消费者默认按分区顺序处理完再提交，接受消费并行度降低，换来这条规则自动成立。</p>
+<p>事务甚至能把消费 offset 纳入同一个提交单元，纳入不了的是外部系统的处理结果。消费端需要区分三件事：当前读取位置、已提交的 offset、业务系统里这条记录的处理结果；前两种由客户端管理，第三种在 Kafka 之外。因此，提交位置必须遵守一条规则：只能提交同一分区已交付记录中处理完成的前缀。例如 100、101、102 中，100 和 102 已完成，101 还没完成，只能提交 101，表示下次从 101 继续；三条都完成后才能提交 103。我写消费者默认按分区顺序处理完再提交，接受消费并行度降低，换来这条规则自动成立。</p>
 <h3 id="s237">取舍总结</h3>
 <p>Kafka 的取舍思路是：<strong>把写入确认、准入条件和故障选主要求分别交给配置控制</strong>。<code>acks</code>、<code>min.insync.replicas</code>、<code>unclean.leader.election.enable</code>、ISR 阈值各有作用，组合起来决定相应场景下的等待、失败和数据保留行为。</p>
 <h2 id="sec-9.5">9.5 横向对比</h2>

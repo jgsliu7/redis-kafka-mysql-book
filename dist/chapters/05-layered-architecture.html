@@ -142,11 +142,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <h2 id="sec-5.2">5.2 Redis 的做法</h2>
 <p>Redis 的分层很薄，但该有的边界都在，跨层几乎零开销。它用极少的层加进程内直接函数调用，让"关注点分离"和"延迟敏感"这两个看似冲突的目标都能满足：单线程 Reactor 把交互与逻辑放在同一线程、命令表把逻辑层做成一张可查的表、<code>redisObject</code> 的类型/编码分离让逻辑层与存储层解耦。</p>
 <h3 id="sec-5.2.1">5.2.1 交互层：RESP 与单线程多路复用</h3>
-<p>Redis 与客户端之间用 RESP（REdis Serialization Protocol，Redis 序列化协议）通信。RESP 的设计极简：每段数据用前缀字符区分类型（<code>+</code> 简单字符串、<code>-</code> 错误、<code>:</code> 整数、<code>$</code> 批量字符串、<code>*</code> 数组），用 <code>\r\n</code> 分隔。这种结构让解析器可以<strong>边读边解析</strong>。读到一行就处理一行，不需要等整个命令到齐。对 <code>SET key value</code> 这种短命令，协议处理几乎是一次零成本的拼接。</p>
+<p>Redis 与客户端之间用 RESP（Redis 序列化协议）通信。类型和长度信息使解析器能够<strong>边接收边解析</strong>，收齐一条命令并通过检查后再执行。具体编码见<a class="xref" href="02-data-structures-protocols.html">第 2 章</a>，这里关注网络处理怎样衔接命令执行。</p>
 <p>承载这套协议的是单线程 Reactor 模型（Reactor 是事件驱动 I/O 模式的统称）。在 6.0 之前，Redis 的网络 I/O 和命令执行在同一个线程里：主线程用 epoll/kqueue 多路复用监听所有客户端连接，有事件就处理，处理完再回到事件循环。这套设计的关键是"没有跨层线程切换"。交互层和逻辑层在同一线程中运行，命令从解析到执行到写回，全程不用锁、不用队列，也没有上下文切换。Redis 看起来分层薄，根子就在这里。</p>
 <p>6.0 引入、7.x 沿用的多线程 I/O，可以把网络 I/O 工作分配给一组线程，<strong>命令执行依然在主线程串行</strong>。启用多个 I/O 线程后，默认只辅助处理响应发送；读取与协议解析还需开启 <code>io-threads-do-reads</code>。串行执行使键空间更新不必在多个命令执行线程之间加锁；若引入命令并发，则需要重新处理共享对象和数据结构的同步。7.x 默认仍只使用主线程完成这些 I/O 工作，多线程 I/O 是需要显式启用的可选优化，启用它也不会改变命令串行执行的前提。</p>
 <p>交互层还有一个容易被忽视的细节：<strong>客户端输出缓冲区（client output buffer）</strong>。每个客户端连接有两个写缓冲区，一个是初始约 16KB 的回复缓冲区，另一个用链表承接放不下的响应。前者吸收小响应，避免每次回复都 malloc。<code>client-output-buffer-limit</code> 可按客户端类型设置硬限制、软限制和持续时间；普通客户端默认不设上限，只有配置了有效限制，超限才会触发关闭连接。输出缓冲把命令执行与后续网络发送分开；合理配置输出缓冲限制，可以降低慢客户端持续占用内存的风险。</p>
-<p><strong>Redis 的分层极薄，目标就是低延迟</strong>。跨层不花任何抽象成本，副作用是交互层和逻辑层也没法独立演进。你不可能像换 MySQL 引擎那样换掉 Redis 的网络层。</p>
+<p><strong>Redis 的分层很薄，目标是低延迟</strong>；代价是它没有像 MySQL 那样，把存储引擎做成可插拔接口。</p>
 <h3 id="sec-5.2.2">5.2.2 逻辑层：命令表 + robj 统一抽象</h3>
 <p>逻辑层是 Redis 里执行命令的一层，但它没有一个面向对象式的类层级，而是用一张表把所有命令组织起来。这张表叫 <code>redisCommandTable</code>，6.x 及更早版本定义在 <code>server.c</code> 里，每条命令占一行。Redis 7.0 重构后，命令表改由 <code>commands/</code> 目录下的 JSON 描述文件自动生成到 <code>commands.c</code>，处理函数仍分布在 <code>server.c</code>、<code>t_string.c</code>、<code>t_list.c</code> 等文件中。每一行包含命令名、处理函数指针、参数数量校验规则（arity）、命令标志位（read/write、是否阻塞、键在第几个参数位置、是否能在订阅态执行等等）。</p>
 <p>命令执行流程如下：RESP 解析完得到参数数组 <code>argv</code> 和参数个数 <code>argc</code> → 用命令名做一次 dict 哈希查到命令表条目 → ACL 权限校验和 arity 校验 → 调用 <code>cmd-&gt;proc(client)</code> 执行 → 记录慢查询日志并执行 MONITOR 钩子。下面这张图画的是这条流水线，以及 <code>client</code> 结构体怎么把交互层和逻辑层衔接起来。</p>
@@ -171,7 +171,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   
   <rect x="80" y="86" width="340" height="56" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
   <text x="250" y="110" text-anchor="middle" font-size="14" fill="#111827">① RESP 协议解析</text>
-  <text x="250" y="130" text-anchor="middle" font-size="11" fill="#374151">边读边解析，不等完整命令；填入 client 结构</text>
+  <text x="250" y="130" text-anchor="middle" font-size="11" fill="#374151">边接收边解析，不等完整命令；填入 client 结构</text>
 
   
   <rect x="470" y="86" width="220" height="500" rx="6" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5 3"/>
@@ -331,7 +331,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>MySQL 的连接层在协议上比 Redis 复杂得多。它支持四种连接方式：TCP/IP（最常用）、Unix Socket（本机通信）、共享内存（Windows）、命名管道（Windows 历史遗留）。每一种都对应一套握手与认证流程。</p>
 <p>认证本身是可插拔的。MySQL 8.0 默认使用 <code>caching_sha2_password</code>（比旧的 <code>mysql_native_password</code> 更安全），SSL/TLS（传输层安全协议）可选启用。认证插件可对接 LDAP、Kerberos 等外部身份系统。</p>
 <p>线程模型有两种。默认 thread-per-connection：每个连接一个独立线程，隔离好但高并发下线程数爆炸。另一种是线程池（企业版/Percona/MariaDB）：多个连接复用工作线程，减少线程切换开销，但也增加了排队与调度。以 MySQL 8.0 企业版为例，连接分配到不同线程组，慢查询可能延迟同组后续请求；线程池检测到阻塞或长时间运行后，会继续调度其他语句，并非等待慢查询结束才处理整个队列。两种模型需要在每连接独立线程与线程复用、调度开销之间取舍。</p>
-<p>无论用哪种线程模型，MySQL 都有一个贯穿三层的对象：<strong><code>THD</code></strong>。每个连接创建一个 THD，里面存着这条连接在生命周期内需要的所有状态，包括当前库、当前事务、会话变量、权限位图、错误栈、字符集、临时表列表等。THD 会跟着请求穿过连接层、服务层、存储引擎层，每一层都从它里面读写各自需要的字段。THD 在源码里通常理解为 thread descriptor（线程描述符），MySQL 官方文档并未给出权威展开。下面这张时序图把 THD 如何贯穿三层画了出来。</p>
+<p>无论用哪种线程模型，MySQL 都有一个贯穿三层的对象：<strong><code>THD</code></strong>。每个连接创建一个 THD，里面存着这条连接在生命周期内需要的所有状态，包括当前库、当前事务、会话变量、权限位图、错误栈、字符集、临时表列表等。THD 会跟着请求穿过连接层、服务层、存储引擎层，每一层都从它里面读写各自需要的字段。下面这张时序图把 THD 如何贯穿三层画了出来。</p>
 <figure class="fig" id="fig-5-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_3_arr45" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
@@ -409,17 +409,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="60" y="507" font-size="12" font-weight="600" fill="#111827">关键取舍：连接层与服务层之间没有真正的解耦点</text>
 </svg>
 </div><figcaption>图 5-3　THD 贯穿 MySQL 三层的会话上下文：THD 是跨层共享的可变状态。</figcaption></figure>
-<p>THD 是一个横贯三层的状态容器。连接层新建它、服务层读它的变量和事务、引擎层取它的事务上下文去做加锁和 MVCC。更要紧的是，连接层和服务层之间没有真正的解耦点。它们共享 THD 这个可变对象。<strong>MySQL 顶上的分层边界是虚的</strong>。它用"一个贯穿全程的对象"替代了"层层复制参数"。这与 Redis 的 <code>client</code> 结构体（<a class="xref" href="#sec-5.2.2">5.2.2 节</a>）是同一手法，但 MySQL 的 THD 还要承载 SQL 执行和存储引擎所需的会话状态，复杂度要高得多。</p>
+<p>THD 是一个横贯三层的状态容器。连接层新建它、服务层读它的变量和事务、引擎层取它的事务上下文去做加锁和 MVCC。更要紧的是，连接层和服务层分了职责，却共享 THD 这个可变对象——<strong>边界并不彻底</strong>。它用"一个贯穿全程的对象"替代了"层层复制参数"。这与 Redis 的 <code>client</code> 结构体（<a class="xref" href="#sec-5.2.2">5.2.2 节</a>）是同一手法，但 MySQL 的 THD 还要承载 SQL 执行和存储引擎所需的会话状态，复杂度要高得多。</p>
 <h3 id="sec-5.3.2">5.3.2 逻辑层：SQL 全生命周期的三段切分</h3>
 <p>MySQL 的逻辑层在文档里统称"服务层"（Server 层 / SQL 层），但它内部其实是一条清晰的三段流水线：解析器、优化器、执行器。</p>
 <p><strong>解析器（Parser）</strong> 由 bison 生成（语法文件 <code>sql_yacc.yy</code>）。它先把 SQL 文本切成词法 token，再按 SQL 语法规则建出解析树，然后进入预处理阶段做语义检查（表存不存在、列存不存在、权限够不够），最终生成一个预处理查询树。这一段不做任何执行决策，只检查语法对不对、语义清不清楚。</p>
 <p><strong>优化器（Optimizer）</strong> 是 MySQL 挑选执行策略的组件。它接收查询树，输出一个执行计划。优化手段包括常量折叠、范围优化、直方图辅助索引选择、JOIN 顺序搜索等。8.0 引入的直方图让优化器能根据没有索引的列的数据分布作出判断。这个执行计划是一组结构化的"该按什么顺序、用什么索引、走什么 JOIN 策略"的指令，不是 SQL，也不是机器码。</p>
 <p><strong>执行器（Executor）</strong> 取得执行计划后开始执行查询。以逐行执行路径为例：调用 handler 接口读一行 → 评估 WHERE 条件 → 聚合或返回 → 再读下一行。handler 的逐行访问接口通过虚函数调用引擎实现，会产生间接调用开销。但 SQL 的声明式语义并不要求只能逐行访问。MySQL 8.0 也支持批量访问机制，例如 BKA（批量键访问）可以通过 MRR（多范围读）接口，把一批查找键交给存储引擎。</p>
-<p><strong>查询缓存（Query Cache）</strong> 是缓存失效协调成本的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。这项功能在 8.0 被彻底移除。服务层维护查询结果缓存，底层表发生修改后，引用该表的缓存项需要失效；加上全局互斥锁的协调，在高并发、高写入负载下，维护开销可能抵消结果复用的收益。这个案例说明，缓存的失效粒度与协调方式必须匹配负载。InnoDB 的缓冲池缓存的是数据页，与服务层的查询结果缓存承担不同工作，不能仅凭这一案例判定缓存都应放在引擎层。</p>
+<p><strong>查询缓存（Query Cache）</strong> 是缓存失效协调成本的一个案例。MySQL 5.x 时代有个功能：把 SELECT 的结果按 SQL 文本做 key 缓存，下次同样的 SQL 直接返回。这项功能在 8.0 被彻底移除。服务层维护查询结果缓存，底层表发生修改后，引用该表的缓存项需要失效；加上全局互斥锁的协调，在高并发、高写入负载下，维护开销可能抵消结果复用的收益。这个案例说明，缓存的失效粒度与协调方式必须匹配负载。InnoDB 的缓冲池缓存的是数据页，与服务层的查询结果缓存承担不同工作。</p>
 <p>服务层内的这三段，通过<strong>结构化中间表示（IR，解析树、执行计划）在子层之间的传递</strong>来衔接。SQL 是声明式语言，解析器生成查询表示，优化器将其转换为执行计划，执行器按计划执行，因此可以概括为“生成 IR → 变换 IR → 消费 IR”。Redis 的常见命令则按命令表分派到相应处理函数。这里的差别在于查询表示需要逐步转换；MySQL 这些阶段之间同样可以通过函数或方法调用衔接。</p>
 <h3 id="sec-5.3.3">5.3.3 存储层：Handler API 与可插拔引擎</h3>
 <p>MySQL 存储层的核心是 <strong>Handler API</strong>。这是 MySQL 与存储引擎之间的契约，用一套方法签名规定了"引擎必须能做什么"。接口包含表级方法（<code>open</code> / <code>close</code>）、行级方法（<code>rnd_init</code> / <code>rnd_next</code> 顺序扫描、<code>index_init</code> / <code>index_read</code> 索引扫描）和事务相关方法（<code>external_lock</code> / <code>start_stmt</code> / <code>commit</code> / <code>rollback</code>）。其中，<code>commit</code> 和 <code>rollback</code> 由 handler 层转发给引擎级 handlerton 插件结构里的同名钩子执行。</p>
-<p>只要实现了这套接口，就能作为一个引擎接入。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池（Buffer Pool）、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。Memory 引擎把数据放内存、用哈希索引、重启即失。此外还有 Archive（压缩归档）、NDB（Cluster）、第三方引擎如 RocksDB（Percona 的 MyRocks）等数十种，可以在同一个 MySQL 实例里并存。同一个数据库里，不同表可以使用不同引擎。下面这张图把这套可插拔结构画了出来。</p>
+<p>只要实现了这套接口，就能作为一个引擎接入。InnoDB 是默认引擎，提供 ACID 事务、行锁、MVCC、缓冲池（Buffer Pool）、redo log 与 undo log，是 OLTP 场景的标配。MyISAM 是老引擎，无事务、表锁，但全文索引曾经比 InnoDB 好。MEMORY 引擎把数据放内存，默认用哈希索引，也支持 B 树索引，重启后数据丢失。此外还有 ARCHIVE（压缩归档）、NDB，以及基于 RocksDB 的 MyRocks 等引擎，具体支持因发行版而异。同一个数据库里，不同表可以使用不同的已安装引擎。下面这张图把这套可插拔结构画了出来。</p>
 <figure class="fig" id="fig-5-4"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 840 492" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
     <marker id="fig_5_4_arrow44" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
@@ -481,7 +481,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <rect x="580" y="296" width="140" height="110" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
   <text x="650" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">Memory</text>
   <text x="650" y="346" text-anchor="middle" font-size="11" fill="#374151">内存表</text>
-  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">哈希索引</text>
+  <text x="650" y="366" text-anchor="middle" font-size="11" fill="#374151">默认哈希索引</text>
   <text x="650" y="386" text-anchor="middle" font-size="11" fill="#374151">重启即失</text>
 
   <rect x="580" y="416" width="140" height="48" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.2" stroke-dasharray="4 3"/>
@@ -495,14 +495,14 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是“可插拔”带来的固有开销。</text>
 </svg>
 </div><figcaption>图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。</figcaption></figure>
-<p>这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下层各引擎分别实现这套接口，互不干扰，可并存。InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池 → redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。文件组织上，InnoDB 用 <code>.ibd</code> 表空间存数据和索引、独立 redo log 文件存 redo log（8.0.30 前为 <code>ib_logfile*</code>，之后为 <code>#innodb_redo</code> 目录）、<code>undo_*</code> 存 undo log，再配合双写缓冲（doublewrite buffer），在完整双写模式下通过页副本恢复写入不完整的数据页。其中表空间的四层结构、redo log 的物理结构与双写，归<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
-<p><strong>生态和多态开销是一体两面</strong>。handler 通过虚函数（vtable）多态调用，每次行操作都过一次虚函数表。这意味着一个全表扫描的每一行、一个索引查找的每一次定位，都是一次间接调用，无法被内联优化。这是可插拔接口相对"引擎与执行器一体化"数据库的固有开销——PostgreSQL 12 起的 table access method 同属抽象层，行访问一样要过函数指针，差别只在接口契约的宽窄。MySQL 拿这个代价换来了可插拔。划不划算，取决于你怎么用 MySQL：如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎（比如热数据 InnoDB、冷数据 RocksDB），这笔开销换来的是生态收益。</p>
+<p>这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下层各引擎分别实现这套接口，互不干扰，可并存。InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池 → redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。表空间、日志与双写缓冲的文件布局，见<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
+<p><strong>生态和多态开销是一体两面</strong>。handler 通过虚函数（vtable）多态调用，每次行操作都过一次虚函数表。这意味着一个全表扫描的每一行、一个索引查找的每一次定位，都是一个间接调用点，往往难以被内联优化。这是可插拔接口相对"引擎与执行器一体化"数据库的固有开销——PostgreSQL 12 起的 table access method 同属抽象层，行访问一样要过函数指针，差别只在接口契约的宽窄。MySQL 拿这个代价换来了可插拔。划不划算，取决于你怎么用 MySQL：如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎（比如热数据 InnoDB、冷数据 RocksDB），这笔开销换来的是生态收益。</p>
 <h3 id="sec-5.3.4">5.3.4 层间通信</h3>
 <p>MySQL 的层间通信有三种形态，分别对应三条边界。以默认的每连接一线程模型和本地 InnoDB 为例，连接层到服务层通过 THD 对象加函数调用衔接，请求由连接线程继续处理。服务层到引擎层使用 handler 虚函数，进行多态调用。引擎访问操作系统时，可使用文件 API（<code>pread</code> / <code>pwrite</code>）和 Native AIO（Linux 上的 <code>io_submit</code>）。这些路径在同一服务器内完成，不需要跨机器通信；其中引擎到操作系统是用户态与内核态之间的交互。Kafka 在 Broker 内也有类似的本地调用，同时还需要跨 Broker 的网络通信。</p>
 <h2 id="sec-5.4">5.4 Kafka 的做法</h2>
 <p>Kafka 的分层服务于<strong>水平扩展与高吞吐</strong>。不同机器上的 Broker 通过协议协作，Broker 内部则需要划分不同的功能职责。网络层用 Reactor 加 RequestChannel 把"收发"和"处理"在多线程间解耦、API 层把协议请求类型列成枚举，用统一的 <code>handle</code> 分派、Log 层把存储抽象成"追加写加偏移量寻址"，使存储层与复制层共享同一份数据。此外，本章还把 Kafka 的协调职责单独列为一层。</p>
 <h3 id="sec-5.4.1">5.4.1 交互层：SocketServer 与 Reactor 多线程模型</h3>
-<p>Kafka 的网络层是三者里最"重"的。它受 Netty 的 Reactor 模式启发，但用 Scala 实现，分成四级：Acceptor、Processor、RequestChannel、KafkaRequestHandler。<a class="xref" href="03-lifecycle.html">第 3 章</a><a class="xref" href="03-lifecycle.html#fig-3-5">图 3-5</a> 按线程角色把它数作 Acceptor / Processor / Handler 三层；这里把夹在中间的 RequestChannel 也单独数作一级。RequestChannel 不是线程，而是负责请求排队和响应转交的通道，背压主要落在其中的共享请求队列上。KafkaRequestHandler 就是<a class="xref" href="03-lifecycle.html">第 3 章</a>说的 Handler 线程池。</p>
+<p>Kafka 的网络层有四个主要组成部分：Acceptor、Processor、RequestChannel、KafkaRequestHandler。其中 RequestChannel 是线程间传递请求与响应的通道，不是独立线程；KafkaRequestHandler 对应<a class="xref" href="03-lifecycle.html">第 3 章</a>的 Handler 线程池。</p>
 <p><strong>Acceptor</strong> 是单线程，只做一件事：<code>accept</code> 新连接。它用 Java NIO 的 Selector 监听服务端 socket，每来一个新连接就按轮询策略交给某个 Processor。</p>
 <p><strong>Processor</strong> 是一组线程（数量可配，典型几个到十几个），每个 Processor 管理一批连接的网络读写和请求解析。它把客户端发来的字节流按 Kafka 协议解析成 <code>Request</code> 对象，写入 RequestChannel 的请求队列。响应经 RequestChannel 转交给对应 Processor 的独立响应队列，再由该 Processor 写回客户端。</p>
 <p><strong>RequestChannel</strong> 是 Processor 与业务线程之间的交接点，内部的请求队列是一个<strong>有界阻塞队列</strong>。它有界是关键：当业务线程处理不过来、请求队列填满时，Processor 的入队操作会阻塞，进而阻塞该线程的网络 I/O。这是一个天然的背压（backpressure）点，免得内存被堆积的请求压垮。这种用有界队列阻塞入队来限制请求进入速度的模式，是高吞吐系统的通用做法。</p>
@@ -721,7 +721,6 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>在本章的功能视角下，Kafka 分为"交互 + API + 存储 + 协调"四段，比三段式多列一组协调职责。Redis Cluster 的槽路由、MySQL 组复制（MGR）的多数派投票也属于类似的关注点；本章在 Kafka 一节单独展开这些职责。</p>
 <h3 id="sec-5.4.5">5.4.5 层间通信</h3>
 <p>Kafka 的层间通信有三种形态，每一种都与部署形态严格匹配。交互层到 API 层是 RequestChannel 队列，<strong>跨线程</strong>但同一 JVM 内。API 层到存储/协调层是对象方法调用，<strong>同 JVM 内</strong>直接调用，无网络、无序列化。Broker 之间的通信永远使用<strong>网络协议</strong>，无论 ReplicaManager 找另一个 Broker 的 Leader 拉数据，还是 ZooKeeper 模式下 Controller 下 STOP_REPLICA 指令，都封装成 Kafka 协议请求走 TCP。</p>
-<p>这种"层间通信机制跟着部署形态走"是 Kafka 分层最明显的特征：同一 JVM 内既有跨线程的队列交接，也有直接的对象方法调用；跨 Broker 则使用网络协议。</p>
 <p>SocketServer、KafkaApis、Log、ReplicaManager/Controller 分别承担不同职责；跨 Broker 协议则负责连接分布在不同进程中的组件。<strong>功能职责与部署边界需要分别考虑，分层要为水平扩展服务</strong>。</p>
 <h2 id="sec-5.5">5.5 横向对比</h2>
 <p>三个软件都分层，但职责划分和跨边界调用的方式不同。</p>
@@ -815,7 +814,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 5-7　三个软件映射到"交互 / 逻辑 / 存储"统一视角。</figcaption></figure>
 <p>同样的交互、逻辑、存储三段，落到三个软件有不同的实现：Redis 通过函数调用衔接模块；MySQL 的服务层里还套着解析、优化、执行三段子层，靠 THD 串起来；Kafka 除了这三段，还需要协调多个 Broker，内部用队列和对象方法调用衔接，跨 Broker 则用网络协议。</p>
-<p>表中列出各自重点观察的模块、接口和通信机制：Redis 的 RESP 解析、命令分派、robj 抽象与内存存储；MySQL 的连接、服务、Handler 接口与引擎；Kafka 的 SocketServer、KafkaApis、Log、协调职责，以及跨 Broker 协议。这些项目的划分口径不同，不能直接相加比较层数。</p>
+<p><a class="xref" href="#table-5-1">表 5-1</a> 对照三家的主要模块、接口和通信方式。</p>
 <p class="tab-label"><strong>表 5-1　三个软件分层形态横向对比</strong></p>
 <div class="table-wrap"><table id="table-5-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心抽象</td><td><code>robj</code> 键值对象（type/encoding 分离）</td><td>关系表 + 索引</td><td>追加日志（Log / LogSegment）</td></tr><tr><td>主要存储介质</td><td>内存（持久化为辅）</td><td>磁盘（缓冲池做内存缓存）</td><td>磁盘（重度依赖页缓存）</td></tr><tr><td>主要环节与接口</td><td>RESP 解析、命令分派、robj 抽象、内存存储</td><td>连接、服务（解析/优化/执行）、Handler 接口、引擎</td><td>SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调职责</td></tr><tr><td>层间通信机制</td><td>函数调用 + 对象指针（无序列化）</td><td>THD 对象 + handler 虚函数</td><td>RequestChannel 队列 + 对象方法调用 + 跨 Broker 协议</td></tr><tr><td>可插拔性</td><td>未提供可插拔引擎接口</td><td>Handler API 支持多引擎并存</td><td>未提供通用日志引擎替换接口；远程后端可扩展，另有 Connect/Streams 插件生态</td></tr><tr><td>分层的首要目标</td><td>低延迟（减少跨层开销）</td><td>兼容性与生态（标准接口）</td><td>水平扩展与高吞吐（内部并发与跨 Broker 协作）</td></tr></tbody></table></div>
 <p>差异的根因有三条。</p>
