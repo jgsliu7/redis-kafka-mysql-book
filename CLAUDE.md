@@ -9,10 +9,8 @@
 - **全书契约**：`docs/book-bible.md`
 - **出版前终审入口**：`AGENTS.md` §1 审查全维度矩阵 → §4 执行流水线
 - **Agent 人设**：`.claude/agents/`（19 个）
-- **构建**：`python3 scripts/build_html.py`
-- **"更新 html" = 两个构建都要跑**（2026-09-17 作者裁定，只跑一个会漏）：
-  - 单文件版：`python3 scripts/build_html.py` → `架构之道.html`
-  - 分章站点：`python3 scripts/build_pages.py` → `dist/index.html` + `dist/chapters/*.html`
+- **构建**：`python3 scripts/build_pages.py`
+- **"更新 html" 默认只跑分章站点**（2026-09-17 作者裁定）：`python3 scripts/build_pages.py` → `dist/index.html` + `dist/chapters/*.html`；仅当明确指定"单文件"时才另跑 `python3 scripts/build_html.py` → `架构之道.html`
 
 ## 核心约束（详见 AGENTS.md §6）
 

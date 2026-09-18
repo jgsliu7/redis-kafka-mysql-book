@@ -45,7 +45,7 @@
   <!-- Step 3: 重放到 Buffer Pool -->
   <rect x="450" y="244" width="180" height="40" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
   <text x="540" y="262" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">③ 重放页修改（roll forward）</text>
-  <text x="540" y="278" text-anchor="middle" font-size="11" fill="#374151">无差别补回所有页修改（含未提交）</text>
+  <text x="540" y="278" text-anchor="middle" font-size="11" fill="#374151">补回所需页修改（不按提交筛选）</text>
   <path d="M540 284 L745 284" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
 
   <!-- Step 4: undo 回滚未提交事务 -->
