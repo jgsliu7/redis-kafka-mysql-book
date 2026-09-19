@@ -124,8 +124,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <main class="content">
 <article class="chapter"><h1 id="s93">第 5 章 分层架构设计 — 存储层 / 逻辑层 / 交互层</h1>
 <h2 id="s94">本章导读</h2>
-<p>很多人接手过越改越乱的老项目：改一个小功能会牵连出三个模块的 bug，加一个新特性要在五六个地方重复改动，甚至想换底层存储时，调用方和实现已经耦合紧密、无法分离。这种痛，归根到底都指向同一件事：系统没有分好层。"对外收发消息、内部决定逻辑、底层存数据"这三件事混在一起写，系统就必然随着规模增长越来越难维护，修改风险越来越大。分层，就是把它们切开，让每一层只做自己的事。</p>
-<p>我接手过一个运营后台，需求只是加一个导出按钮。我改了 Controller 三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我动的那几行不小心改了 SQL 拼接的顺序。我只动了三行，但影响的边界根本不在这三行里。</p>
+<p>很多人接手过越改越乱的老项目：改一个小功能会牵连出三个模块的 bug，加一个新特性要在五六个地方重复改动，甚至想换底层存储时，调用方和实现已经耦合紧密、无法分离。这些问题常常暴露出同一种缺陷：协议、业务和存储的职责没有分清。"对外收发消息、内部决定逻辑、底层存数据"这三件事混在一起写，系统就必然随着规模增长越来越难维护，修改风险越来越大。分层，就是把它们切开，让每一层只做自己的事。</p>
+<p>我接手过一个运营后台，需求只是加一个导出按钮。我改了三行代码，结果部署后首页打不开了。原来订单查询的 SQL 和导出逻辑混在同一个 DAO 里，我的改动影响了 SQL 拼接的顺序。我只动了三行，但影响的边界根本不在这三行里。</p>
 <p>但分层是有代价的。每多一层，就多一笔层间开销、多一个接口要维护。分多深、层之间靠什么通信、谁可以替换，每一项都是实打实的取舍。Redis、MySQL、Kafka 分别侧重单机最低延迟、标准化生态、分布式水平扩展，展示了分层设计中不同的取舍。</p>
 <p>分层深度要权衡抽象收益、调用开销与接口维护成本。我们用交互层、逻辑层、存储层三段式主线，把这三个软件放在一起对比。</p>
 <h2 id="sec-5.1">5.1 问题的本质：为什么必须分层</h2>
@@ -134,17 +134,17 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>分层要做到三件事：<strong>关注点分离（Separation of Concerns）</strong>，让每一层只处理一种关注点。<strong>修改的局部性</strong>，改一层不动另一层。<strong>可替换性</strong>，接口不变、实现可换。这三件事是工程上可验收的指标。你能不能独立测试某一层？换掉某层实现会不会牵动别层？这层有没有引入新的抽象边界？</p>
 <p>软件系统的请求路径大体是同一条：从"外部不可信的输入"出发，穿过一道道边界，最终走到"确定性的存储操作"，再原路返回。每穿过一层，都要做一次抽象与代价的交换。丢掉一些细节（比如客户端的 TCP 句柄、SQL 的语法糖），换来一个更纯净、也更好处理的中间表示。</p>
 <p>这套路径对 Redis、MySQL、Kafka 都成立，但同样的路径，因为每家要满足的约束不同，最后形成了各自的形态。</p>
-<p>Redis 的约束是<strong>单机最低延迟</strong>。它要把每条命令的端到端时间降到亚毫秒，于是层数越少越好，跨层调用最好是直接函数调用，连虚函数的开销都要避免。对 Redis 来说，薄本身就是目标。</p>
+<p>Redis 侧重<strong>常见命令的低延迟</strong>。它尽量让模块在进程内通过共享对象和函数调用衔接，减少额外的数据转换与线程交接。</p>
 <p>MySQL 的约束是<strong>SQL 语义 + 多种存储后端</strong>。它把通用的 SQL 处理与具体存储引擎分开；事务型、内存型、归档型等引擎的能力和访问方式各有差异。为支持这些后端，MySQL 提供一套可插拔接口，让服务层通过统一接口访问不同的引擎实现。</p>
 <p>Kafka 的约束是<strong>分布式部署</strong>。Broker 与 Broker 之间、Producer 与 Broker 之间通过 TCP 通信；一个 Broker 内部的模块则可以用队列或对象方法调用衔接。Kafka 的分层需要兼顾内部职责划分与跨 Broker 协作，服务于水平扩展。</p>
 <p>这三个软件尽管源码目录不同，但从功能职责看都可以映射到交互层、逻辑层、存储层三段。这三段并不与各自源码目录的字面命名一一对应。Redis 的源码里是 <code>networking.c</code> + <code>server.c</code> + <code>db.c</code>，MySQL 是 <code>sql/</code> + <code>storage/</code>，Kafka 是 <code>network</code> + <code>api</code> + <code>log</code>。这里按功能职责归类各自名称不同的模块，再比较它们的实现，这就是<strong>语义映射</strong>。</p>
-<p>分层的数量取决于性能目标和实际收益。带着"这层抽象值不值它的延迟"这个问题，我们先看 Redis 如何把分层做到最薄。</p>
+<p>分层的数量取决于性能目标和实际收益。带着"这层抽象值不值它的延迟"这个问题，我们先看 Redis 如何把分层做到最薄。这里的"薄"指的是请求路径简短。</p>
 <h2 id="sec-5.2">5.2 Redis 的做法</h2>
 <p>Redis 的分层很薄，但该有的边界都在，跨层几乎零开销。它用极少的层加进程内直接函数调用，让"关注点分离"和"延迟敏感"这两个看似冲突的目标都能满足：单线程 Reactor 把交互与逻辑放在同一线程、命令表把逻辑层做成一张可查的表、<code>redisObject</code> 的类型/编码分离让逻辑层与存储层解耦。</p>
 <h3 id="sec-5.2.1">5.2.1 交互层：RESP 与单线程多路复用</h3>
 <p>Redis 与客户端之间用 RESP（Redis 序列化协议）通信。类型和长度信息使解析器能够<strong>边接收边解析</strong>，收齐一条命令并通过检查后再执行。具体编码见<a class="xref" href="02-data-structures-protocols.html">第 2 章</a>，这里关注网络处理怎样衔接命令执行。</p>
-<p>承载这套协议的是单线程 Reactor 模型（Reactor 是事件驱动 I/O 模式的统称）。在 6.0 之前，Redis 的网络 I/O 和命令执行在同一个线程里：主线程用 epoll/kqueue 多路复用监听所有客户端连接，有事件就处理，处理完再回到事件循环。这套设计的关键是"没有跨层线程切换"。交互层和逻辑层在同一线程中运行，命令从解析到执行到写回，全程不用锁、不用队列，也没有上下文切换。Redis 看起来分层薄，根子就在这里。</p>
-<p>6.0 引入、7.x 沿用的多线程 I/O，可以把网络 I/O 工作分配给一组线程，<strong>命令执行依然在主线程串行</strong>。启用多个 I/O 线程后，默认只辅助处理响应发送；读取与协议解析还需开启 <code>io-threads-do-reads</code>。串行执行使键空间更新不必在多个命令执行线程之间加锁；若引入命令并发，则需要重新处理共享对象和数据结构的同步。7.x 默认仍只使用主线程完成这些 I/O 工作，多线程 I/O 是需要显式启用的可选优化，启用它也不会改变命令串行执行的前提。</p>
+<p>承载这套协议的是单线程 Reactor 模型（Reactor 是事件驱动 I/O 模式的统称）。在 6.0 之前，Redis 的网络 I/O 和命令执行在同一个线程里：主线程用 epoll/kqueue 多路复用监听所有客户端连接，有事件就处理，处理完再回到事件循环。这套设计的关键是：交互层和命令逻辑在同一线程中衔接，不必为每次模块调用增加工作线程交接。数据结构可以保持串行访问，层与层之间主要传递对象和调用函数。</p>
+<p>Redis 6.0 起可以选择启用多线程 I/O，分担网络收发等工作，但<strong>普通命令仍由主线程串行执行</strong>。它把一部分 I/O 工作并行化，却保留了键空间更新的串行路径。</p>
 <p>交互层还有一个容易被忽视的细节：<strong>客户端输出缓冲区（client output buffer）</strong>。每个客户端连接有两个写缓冲区，一个是初始约 16KB 的回复缓冲区，另一个用链表承接放不下的响应。前者吸收小响应，避免每次回复都 malloc。<code>client-output-buffer-limit</code> 可按客户端类型设置硬限制、软限制和持续时间；普通客户端默认不设上限，只有配置了有效限制，超限才会触发关闭连接。输出缓冲把命令执行与后续网络发送分开；合理配置输出缓冲限制，可以降低慢客户端持续占用内存的风险。</p>
 <p><strong>Redis 的分层很薄，目标是低延迟</strong>；代价是它没有像 MySQL 那样，把存储引擎做成可插拔接口。</p>
 <h3 id="sec-5.2.2">5.2.2 逻辑层：命令表 + robj 统一抽象</h3>
@@ -228,8 +228,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <line x1="420" y1="392" x2="468" y2="392" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#fig_5_1_arrow4)"/>
 </svg>
 </div><figcaption>图 5-1　Redis 命令处理流水线：交互层与逻辑层用 client 结构体衔接，全程无序列化。</figcaption></figure>
-<p>图里右边那个贯穿全程的虚线框是 <code>client</code> 结构体。它持有查询缓冲区、参数数组、当前命令指针等会话状态。整个会话上下文都在这一个对象里。交互层往里写、逻辑层从里面读、存储层从里面取 db 索引，三段之间不传参数，只传这个对象。这与 MySQL 的 THD 是同一种思路。在 Redis 的单线程执行路径中，交互层和逻辑层在同一线程内共享这个对象。</p>
-<p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 是一张可查的表，新增命令只需要在表里加一行，运行时也可以通过模块（Modules）API 往表里注册新命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。新增一类横切标志要逐一审定受影响命令的元数据；6.x 时代加结构体字段才需动全表，7.0 的 JSON 化正是为消除这一代价。</p>
+<p>图中的 <code>client</code> 保存查询缓冲区、命令参数和当前数据库等会话状态。多个处理环节共享这份上下文，不必逐层复制全部状态；代价是这些环节也依赖同一对象的字段约定。后面的 MySQL THD 同样采用了共享上下文。</p>
+<p>这里有一个关键的设计取舍：<strong>把命令做成数据</strong>。<code>redisCommandTable</code> 把命令的名字、处理函数和元数据集中登记。实现一个新命令后，可以把它接入这套分派机制；模块 API 也支持在运行时注册命令。这换来运行时的可扩展性，代价是表项的字段（命令标志位）一旦定下就很难改。新增一类横切标志要逐一审定受影响命令的元数据；6.x 时代加结构体字段才需动全表，7.0 的 JSON 化正是为消除这一代价。</p>
 <p>命令的统一抽象靠 <code>redisObject</code>（业内简称 robj）完成。robj 是 Redis 统一表示所有数据类型的关键。它的设计核心是把<strong>类型（type）与编码（encoding）分离</strong>。type 决定语义：这个对象是字符串、列表、哈希、集合还是有序集合，决定了它能执行哪些命令；encoding 决定内存表示。同一个 type 可以挂不同的 encoding，比如一个哈希在小数据量时用 listpack（紧凑连续内存），膨胀到阈值后自动升级为 hashtable。下面这张图把 type 和 encoding 的解耦关系画了出来。</p>
 <figure class="fig" id="fig-5-2"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 62 820 488" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -324,13 +324,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>持久化是存储层的"可选职责"，这是另一个 Redis 与传统数据库的根本差异。RDB（快照文件）做全量快照，AOF（仅追加文件）做增量日志，4.0 起支持混合重写（重写时把当前快照作为 AOF 的开头）。关键是：<strong>两者都可以关闭</strong>。你可以把 Redis 跑成纯内存、重启即丢的缓存，也可以开启 AOF，通过重放日志恢复数据；使用 <code>appendfsync everysec</code> 时，可能在故障中丢失最近约一秒的写入。Redis 把持久化当作附加项，而不是内建的强约束。这与"存储是数据库第一公民"的传统观念正相反。</p>
 <p>代价是 Redis 无法像 MySQL 那样换后端。你不能给 Redis 配一个"磁盘引擎"让它变成磁盘数据库（Redis on Flash、Pika 这类项目想补的正是这个空缺，但它们是 Redis 生态的外部方案，不是 Redis 内建能力）。</p>
 <h3 id="sec-5.2.4">5.2.4 层间通信</h3>
-<p>Redis 三层的通信机制可以概括成一句：<strong>全程无序列化、无虚函数</strong>。交互层到逻辑层走 <code>client</code> 结构体加直接函数调用；逻辑层到存储层走 <code>robj</code> 指针加直接内存访问。命令分派用的是函数指针（<code>cmd-&gt;proc(client)</code>），就是一张静态表里的一次跳转。这种低开销的层间通信保留了模块抽象，避免了为层间通信重新编码数据，有助于降低常见命令的执行开销。</p>
+<p>Redis 这些进程内环节通过函数调用和共享对象衔接，不必为层间交互重新序列化数据。交互层到逻辑层走 <code>client</code> 结构体加直接函数调用；逻辑层到存储层走 <code>robj</code> 指针加直接内存访问。命令分派用的是函数指针（<code>cmd-&gt;proc(client)</code>），就是一张静态表里的一次跳转。这种低开销的层间通信保留了模块抽象，有助于降低常见命令的执行开销。</p>
 <h2 id="sec-5.3">5.3 MySQL 的做法</h2>
 <p>MySQL 的分层目标与 Redis 相反：它的核心目标是<strong>用一套标准化接口把存储层做成可插拔</strong>。连接层用 <code>THD</code> 贯穿三层、服务层把 SQL 处理切成解析/优化/执行三段、存储引擎层用 Handler API 定义"行操作"契约。</p>
 <h3 id="sec-5.3.1">5.3.1 交互层：连接、认证与线程模型</h3>
 <p>MySQL 的连接层在协议上比 Redis 复杂得多。它支持四种连接方式：TCP/IP（最常用）、Unix Socket（本机通信）、共享内存（Windows）、命名管道（Windows 历史遗留）。每一种都对应一套握手与认证流程。</p>
 <p>认证本身是可插拔的。MySQL 8.0 默认使用 <code>caching_sha2_password</code>（比旧的 <code>mysql_native_password</code> 更安全），SSL/TLS（传输层安全协议）可选启用。认证插件可对接 LDAP、Kerberos 等外部身份系统。</p>
-<p>线程模型有两种。默认 thread-per-connection：每个连接一个独立线程，隔离好但高并发下线程数爆炸。另一种是线程池（企业版/Percona/MariaDB）：多个连接复用工作线程，减少线程切换开销，但也增加了排队与调度。以 MySQL 8.0 企业版为例，连接分配到不同线程组，慢查询可能延迟同组后续请求；线程池检测到阻塞或长时间运行后，会继续调度其他语句，并非等待慢查询结束才处理整个队列。两种模型需要在每连接独立线程与线程复用、调度开销之间取舍。</p>
+<p>线程模型有两种。默认 thread-per-connection：每个连接一个独立线程，隔离好但高并发下线程数爆炸。另一种是线程池（企业版/Percona/MariaDB）。线程池减少了大量连接各自占用工作线程的成本，但也引入排队与调度。取舍在于：每个连接独立执行，还是让多个连接复用一组工作线程。</p>
 <p>无论用哪种线程模型，MySQL 都有一个贯穿三层的对象：<strong><code>THD</code></strong>。每个连接创建一个 THD，里面存着这条连接在生命周期内需要的所有状态，包括当前库、当前事务、会话变量、权限位图、错误栈、字符集、临时表列表等。THD 会跟着请求穿过连接层、服务层、存储引擎层，每一层都从它里面读写各自需要的字段。下面这张时序图把 THD 如何贯穿三层画了出来。</p>
 <figure class="fig" id="fig-5-3"><div class="svg-wrap"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 68 820 462" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <defs>
@@ -495,8 +495,8 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
   <text x="100" y="546" font-size="11" fill="#374151">每次行操作都过一次虚函数调用，这是“可插拔”带来的固有开销。</text>
 </svg>
 </div><figcaption>图 5-4　MySQL Handler API 与可插拔存储引擎：服务层通过 handler 虚函数向下调用，引擎可并存、可替换。</figcaption></figure>
-<p>这张图的关键在中间那条粗黄线：Handler API 接口契约，它把服务层与引擎层彻底切开。下层各引擎分别实现这套接口，互不干扰，可并存。InnoDB 自己又是多层：事务管理 → 锁与 MVCC → 缓冲池 → redo log 与 undo log → 页与 B+ 树。这些子层全部封装在 InnoDB 内部，对服务层不可见。服务层看到的只是一个"实现了 Handler 接口的黑盒"。表空间、日志与双写缓冲的文件布局，见<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
-<p><strong>生态和多态开销是一体两面</strong>。handler 通过虚函数（vtable）多态调用，每次行操作都过一次虚函数表。这意味着一个全表扫描的每一行、一个索引查找的每一次定位，都是一个间接调用点，往往难以被内联优化。这是可插拔接口相对"引擎与执行器一体化"数据库的固有开销——PostgreSQL 12 起的 table access method 同属抽象层，行访问一样要过函数指针，差别只在接口契约的宽窄。MySQL 拿这个代价换来了可插拔。划不划算，取决于你怎么用 MySQL：如果你只用 InnoDB，这笔开销就是纯成本；如果你需要混合引擎（比如热数据 InnoDB、冷数据 RocksDB），这笔开销换来的是生态收益。</p>
+<p>图中最重要的是 Handler API：服务层通过共同接口访问不同引擎，不必自己实现每个引擎的页组织和恢复机制。引擎仍需向服务层报告自身能力和统计信息，实现细节则由接口隔离。文件布局见<a class="xref" href="08-storage-format.html">第 8 章</a>。</p>
+<p><strong>Handler 的多态调用可能增加间接调用开销，换来不同引擎共用服务层的能力。</strong>即使一个实例只用 InnoDB，这个边界仍有维护和演进价值；是否值得，要看安装了几种引擎，还要看接口收益与实际热点路径的成本。</p>
 <h3 id="sec-5.3.4">5.3.4 层间通信</h3>
 <p>MySQL 的层间通信有三种形态，分别对应三条边界。以默认的每连接一线程模型和本地 InnoDB 为例，连接层到服务层通过 THD 对象加函数调用衔接，请求由连接线程继续处理。服务层到引擎层使用 handler 虚函数，进行多态调用。引擎访问操作系统时，可使用文件 API（<code>pread</code> / <code>pwrite</code>）和 Native AIO（Linux 上的 <code>io_submit</code>）。这些路径在同一服务器内完成，不需要跨机器通信；其中引擎到操作系统是用户态与内核态之间的交互。Kafka 在 Broker 内也有类似的本地调用，同时还需要跨 Broker 的网络通信。</p>
 <h2 id="sec-5.4">5.4 Kafka 的做法</h2>
@@ -617,13 +617,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </div><figcaption>图 5-5　Kafka Reactor + RequestChannel 线程模型：网络线程与业务线程通过有界队列解耦，队列满时天然背压上游。</figcaption></figure>
 <p>Kafka 用多线程处理多分区、多副本的并发 I/O；Redis 的普通命令仍在主线程执行，网络 I/O 和部分后台任务可以使用其他线程。一个 Broker 可能承载几百个分区，同时处理来自生产者、消费者和 Controller 的请求。Redis 更侧重短命令与低延迟，Kafka 更侧重批量传输与持续吞吐，这使两者采用了不同的线程组织方式。<strong>Kafka 的交互层是三者中最重的，网络线程与业务线程分工处理请求，以利用多核；两者的吞吐和延迟差异仍取决于消息大小、批量、持久化与硬件配置。</strong></p>
 <h3 id="sec-5.4.2">5.4.2 逻辑层（API 层）：请求类型分派</h3>
-<p>Kafka 的"逻辑层"在源码里叫 <code>KafkaApis</code>，这一层比 MySQL 的服务层要薄得多。它不做解析（解析在 Processor 完成），也不做优化（Kafka 没有查询优化），只做<strong>协议适配加请求分派</strong>。</p>
+<p>Kafka 的"逻辑层"在源码里叫 <code>KafkaApis</code>，这一层比 MySQL 的服务层要薄得多。这一层主要做<strong>协议适配与请求分派</strong>，并处理鉴权、配额等请求级工作；日志和副本管理交给相应组件。</p>
 <p>Kafka 把所有请求类型枚举成 ApiKeys：PRODUCE、FETCH、LIST_OFFSETS、METADATA、LEADER_AND_ISR 等。每一种有自己的版本号，Broker 要兼容新旧版本。<code>KafkaApis.handle()</code> 拿到一个 <code>RequestChannel.Request</code>，按 ApiKeys 走 switch 分派到对应的 <code>handleXxx</code> 方法。</p>
 <p>这一层还处理横切关注点：<strong>鉴权、配额（quota）、版本协商</strong>。鉴权在每个 handler 入口检查这个用户有没有权限操作这个资源。带宽配额按字节速率限制生产与消费流量；请求配额按网络线程和 I/O 线程的处理时间占比计量。配额可以按用户、<code>client-id</code> 或两者组合共享，并在每个 Broker 上执行，以减少单组客户端占满资源的风险。版本协商在协议层完成：客户端先发 ApiVersions 请求问 Broker 支持哪些版本，之后每类请求用哪个版本由客户端选定。</p>
-<p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。分开的原因是协议版本演进和领域逻辑演进节奏不同。协议格式演进慢，一次修改的影响面大；副本管理算法可能半年调整一次。两者耦合时，修改其中一方也需要修改另一方。</p>
+<p>这里有一个设计决策：<strong>Kafka 把"逻辑层"切成"协议分派"和"领域逻辑"两段</strong>。<code>KafkaApis</code> 只做协议适配和分派，领域逻辑在更下层的 <code>Log</code>、<code>ReplicaManager</code>、<code>GroupCoordinator</code>、<code>Controller</code> 里。协议版本要照顾已有客户端，副本管理则有自己的演进需求。把两者分开，可以减少一类变化对另一类代码的牵连。</p>
 <h3 id="sec-5.4.3">5.4.3 存储层：Log 抽象 + 零拷贝</h3>
 <p>存储层是 Kafka 最具特色的一层。它的核心抽象是分区日志；在 Kafka 3.9 源码中，由 <strong><code>UnifiedLog</code></strong> 统一呈现本地与远程日志段，本地部分由 <code>LocalLog</code> 管理。下文用 Log 统称这一日志抽象，每个分区副本有自己的日志实例，由多个 LogSegment 组成。每个 LogSegment 的三类主要文件是：消息数据文件（<code>.log</code>）、偏移量索引文件（<code>.index</code>）、时间戳索引文件（<code>.timeindex</code>），另有事务索引（<code>.txnindex</code>）等辅助文件。这套字节布局会在<a class="xref" href="08-storage-format.html">第 8 章</a>详讲，这里只看它作为"存储层抽象"的形态。</p>
-<p><strong>写入路径</strong>很简单：生产者发来一批消息，Broker 把它<strong>顺序追加</strong>到当前活跃 LogSegment 末尾，写入页缓存（PageCache），可选地按策略刷盘（fsync）。常规追加无需维护 B+ 树，也避免了逐条原地更新；副本复制和日志压实仍会带来额外写入。顺序追加便于批量 I/O，在机械盘上还能减少寻道。刷盘策略可配：<code>log.flush.interval.messages</code>（每多少条刷一次）或 <code>log.flush.interval.ms</code>（每多少毫秒刷一次），也可以保持默认设置，依靠 OS 和 Kafka 的后台刷盘完成落盘。副本机制的数据保护还取决于确认与故障条件：<code>acks=all</code> 等待当前 ISR 确认，并受 <code>min.insync.replicas</code> 限制；在不启用非同步副本选主、且始终至少有一个同步副本存活的前提下，Kafka 能保证已提交消息不丢。增加副本数本身不等于满足这些条件。</p>
+<p><strong>写入时，Broker 把消息批追加到活跃日志段。</strong>Log 层组织文件与索引，刷盘和副本确认则分别处理持久化与复制保证。</p>
 <p><strong>读取路径</strong>有一个关键技巧：按偏移量二分定位日志段，再在段内用稀疏索引找具体位置。索引是稀疏的。每隔一段距离（默认 4KB）记一项，这把索引大小控制得很小，常驻内存。命中索引后，从消息文件里读出一段连续数据返回。如果数据已经在页缓存里（追得上生产者的消费者读近期数据时基本命中），读取就是一次内存拷贝，不需要真去磁盘。</p>
 <p>Kafka 高吞吐的另一个来源是<strong>零拷贝（sendfile）</strong>。传统路径要把数据拷贝四次。Kafka 用 Linux 的 <code>sendfile</code> 系统调用，让内核直接把页缓存的数据传到网卡 socket：磁盘 → 页缓存 → 网卡，<strong>跳过用户态</strong>，省掉的正是两次拷贝和两次上下文切换。对追着日志尾部消费、数据还在页缓存里的场景，这点收益尤为明显。</p>
 <p>但零拷贝还有一个硬前提：<strong>数据必须是从文件到 socket 的纯转发，中间不能被修改</strong>。Kafka 直接转发本地日志且不需要修改字节时，可以满足这个前提；需要 TLS 加密等额外处理的路径则不能直接这样转发。</p>
@@ -713,7 +713,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 </svg>
 </div><figcaption>图 5-6　Kafka Log 复用：消费与副本同步共享底层日志读取，上层仍有各自的状态与读取边界。</figcaption></figure>
 <p>Kafka 分层的核心：消费者发 FETCH 请求，Follower 也发 FETCH 请求。它们都经 <code>KafkaApis.handleFetchRequest</code>、<code>ReplicaManager.fetchMessages</code> 进入日志读取，符合条件的本地文件发送还可使用 sendfile。请求会区分普通消费者与副本同步：两者共享底层读取，但读取边界与进度处理不同。</p>
-<p><strong>存储层和复制层共享底层日志读取代码</strong>。Kafka 不需要为副本同步另写一套本地日志读取实现，但副本进度、任期和截断仍有独立的状态处理。对共享读取部分的优化（零拷贝、索引、缓存）和 bug 修复，可以同时惠及消费与复制。很多系统的"主从复制"是独立模块，复制代码和读写代码各写一份，长年累月就会漂移、出 bug。</p>
+<p><strong>存储与复制复用底层日志读取</strong>，所以索引、缓存和文件读取的优化可以同时惠及两条路径。副本进度、任期和截断仍由复制逻辑处理。</p>
 <p><strong>Kafka 用追加日志作为基础存储抽象，索引与压实仍由日志存储组件处理，副本协调则由上层组件负责</strong>。它没有提供 MySQL 式的引擎插件接口，系统各层都依赖"Log 是顺序追加、按偏移量寻址"这一核心抽象。好处也很直接：追加路径简单、零拷贝路径简单、读写复用。3.9 起 Tiered Storage 正式 GA（3.6 起以早期版本引入）后，存储后端又有了新变化。已完成的日志段可以放到对象存储等远程后端，存储从本地扩展为本地和远程两级。客户端仍通过 Kafka 按偏移量读取日志，Broker 内部则增加了远程日志管理与读取处理，远程存储后端通过 RemoteStorageManager 接口接入（详见<a class="xref" href="08-storage-format.html">第 8 章</a>）。</p>
 <h3 id="sec-5.4.4">5.4.4 协调层：在 Log 之上的额外一层</h3>
 <p>本章还把 Kafka 的分布式协调职责单独列为<strong>协调层</strong>。它包括 ReplicaManager（副本管理）、Partition（分区对象）、Controller（集群控制器），以及 KRaft（取代 ZooKeeper 的元数据管理），细节留给<a class="xref" href="07-cluster.html">第 7 章</a>。</p>
@@ -816,11 +816,11 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>同样的交互、逻辑、存储三段，落到三个软件有不同的实现：Redis 通过函数调用衔接模块；MySQL 的服务层里还套着解析、优化、执行三段子层，靠 THD 串起来；Kafka 除了这三段，还需要协调多个 Broker，内部用队列和对象方法调用衔接，跨 Broker 则用网络协议。</p>
 <p><a class="xref" href="#table-5-1">表 5-1</a> 对照三家的主要模块、接口和通信方式。</p>
 <p class="tab-label"><strong>表 5-1　三个软件分层形态横向对比</strong></p>
-<div class="table-wrap"><table id="table-5-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心抽象</td><td><code>robj</code> 键值对象（type/encoding 分离）</td><td>关系表 + 索引</td><td>追加日志（Log / LogSegment）</td></tr><tr><td>主要存储介质</td><td>内存（持久化为辅）</td><td>磁盘（缓冲池做内存缓存）</td><td>磁盘（重度依赖页缓存）</td></tr><tr><td>主要环节与接口</td><td>RESP 解析、命令分派、robj 抽象、内存存储</td><td>连接、服务（解析/优化/执行）、Handler 接口、引擎</td><td>SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调职责</td></tr><tr><td>层间通信机制</td><td>函数调用 + 对象指针（无序列化）</td><td>THD 对象 + handler 虚函数</td><td>RequestChannel 队列 + 对象方法调用 + 跨 Broker 协议</td></tr><tr><td>可插拔性</td><td>未提供可插拔引擎接口</td><td>Handler API 支持多引擎并存</td><td>未提供通用日志引擎替换接口；远程后端可扩展，另有 Connect/Streams 插件生态</td></tr><tr><td>分层的首要目标</td><td>低延迟（减少跨层开销）</td><td>兼容性与生态（标准接口）</td><td>水平扩展与高吞吐（内部并发与跨 Broker 协作）</td></tr></tbody></table></div>
+<div class="table-wrap"><table id="table-5-1"><thead><tr><th>维度</th><th>Redis</th><th>MySQL</th><th>Kafka</th></tr></thead><tbody><tr><td>核心抽象</td><td><code>robj</code> 键值对象（type/encoding 分离）</td><td>关系与 SQL；Handler 接口隔离引擎实现</td><td>追加日志（Log / LogSegment）</td></tr><tr><td>主要存储介质</td><td>内存（持久化为辅）</td><td>磁盘（缓冲池做内存缓存）</td><td>磁盘（重度依赖页缓存）</td></tr><tr><td>主要环节与接口</td><td>RESP 解析、命令分派、robj 抽象、内存存储</td><td>连接、服务（解析/优化/执行）、Handler 接口、引擎</td><td>SocketServer、KafkaApis、Log、ReplicaManager/Controller 协调职责</td></tr><tr><td>层间通信机制</td><td>函数调用 + 对象指针（无序列化）</td><td>THD 对象 + handler 虚函数</td><td>RequestChannel 队列 + 对象方法调用 + 跨 Broker 协议</td></tr><tr><td>可插拔性</td><td>未提供可插拔引擎接口</td><td>Handler API 支持多引擎并存</td><td>未提供通用日志引擎替换接口；远程后端可扩展，另有 Connect/Streams 插件生态</td></tr><tr><td>分层的首要目标</td><td>低延迟（减少跨层开销）</td><td>兼容性与生态（标准接口）</td><td>水平扩展与高吞吐（内部并发与跨 Broker 协作）</td></tr></tbody></table></div>
 <p>差异的根因有三条。</p>
 <p><strong>第一，存储引擎的能力差异影响可插拔接口的取舍。</strong> Redis 以内存数据结构为核心，没有提供 MySQL 那样的可插拔引擎接口。MySQL 要支持事务型、内存型、归档型等引擎，因此用统一接口隔离不同引擎的实现。Kafka 的存储高度专用（追加写日志），本地零拷贝和复制读路径复用都依赖现有的日志组织。它没有提供 MySQL 那样的通用引擎替换接口，但可通过 RemoteStorageManager 接入远程存储后端。</p>
 <p><strong>第二，通信机制受部署边界影响。</strong> Redis 和本地 MySQL 引擎的模块间可以通过函数调用衔接；Kafka 在同一 JVM 内既有队列交接，也有对象方法调用，跨 Broker 则使用网络协议。进程内调用不需要网络传输，跨机器通信还要处理协议与传输开销。即使用函数式接口封装远程调用，底层的网络通信也不会消失。Redis 侧重减少常见命令路径的间接开销，Kafka 则需要支持跨 Broker 协作，两者谈不上谁高谁低。</p>
-<p><strong>第三，可插拔的程度应由实现多样性的真实需求决定。</strong> MySQL 的可插拔带来生态（几十种引擎），也带来 vtable 开销。Kafka 保留专用的本地日志组织，以便支持零拷贝；远程存储则通过单独的接口扩展。判断可插拔要不要做的标准只有一个：<strong>这层的实现多样性是否真实存在</strong>。如果存在（如 MySQL 的引擎、Kafka 的远程存储后端），就值得考虑可插拔接口；如果没有实际替换需求，为此增加接口就是负担。</p>
+<p><strong>第三，可插拔的程度应由实现多样性的真实需求决定。</strong> MySQL 的可插拔带来生态（几十种引擎），也带来 vtable 开销。Kafka 保留专用的本地日志组织，以便支持零拷贝；远程存储则通过单独的接口扩展。判断可插拔要不要做，先看是否有真实的实现替换需求，再看维护这份契约的收益是否值得。如果存在（如 MySQL 的引擎、Kafka 的远程存储后端），就值得考虑可插拔接口；如果没有实际替换需求，为此增加接口就是负担。</p>
 <p>维度是观察工具，不是评判标准。</p>
 <h2 id="sec-5.6">5.6 架构启示</h2>
 <p>同一个分层问题，三个软件的方案完全不同。</p>
@@ -832,13 +832,13 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>我设计接口时的检验标准，是十年后这个接口还能否适应需求演进。能适应的，哪怕丑一点，也比反复重构的接口有价值。</p>
 <h3 id="s116">启示三：让"可替换"出现在最值得替换的地方</h3>
 <p>不是每一层都要可插拔。MySQL 把可插拔放在存储层。这里是存储引擎多样性最真实的地方（事务型、内存型、归档型引擎并存）。Redis 围绕内存数据结构组织存储，没有提供这类可插拔引擎接口。Kafka 把 Connect（数据进出 Kafka 的连接器）、Streams（流处理 SDK）等扩展放在外围，同时为远程存储后端提供 RemoteStorageManager 接口。它保留顺序追加、按偏移量寻址的日志核心，在这一抽象下扩展远程后端。</p>
-<p>判断标准还是 <a class="xref" href="#sec-5.5">5.5 节</a>那一条：实现多样性真实存在才做接口。最糟糕的做法是为了"显得架构高级"而强行做可插拔，你得到的是一个没人用的扩展点，要搭上接口维护成本和调用开销，还可能把简单问题复杂化。</p>
+<p>判断标准还是 <a class="xref" href="#sec-5.5">5.5 节</a>那两条：有真实的实现替换需求，且维护契约的收益值得，才做接口。最糟糕的做法是为了"显得架构高级"而强行做可插拔，你得到的是一个没人用的扩展点，要搭上接口维护成本和调用开销，还可能把简单问题复杂化。</p>
 <h3 id="s117">启示四：警惕分层的反模式</h3>
 <p>真正的分层应当引入新的抽象并收窄关注点。典型的反模式有三种。</p>
 <p>第一，<strong>镜像分层</strong>：每一层只是给上一层改个名字。比如 Service 层调用 Manager 层、Manager 层调用 Dao 层、Dao 层调用 Mapper，但每一层都只是把参数原样转交。这种"分层"没有引入任何抽象，只是增加了认知负担和调用栈深度。</p>
 <p>第二，<strong>空洞透传</strong>：一层只做转发，却没有承担独立的职责。比如某个转发层既不负责统一入口、路由或隔离后端，也不做鉴权、限流、转换，只是把请求原样交给下一层，就需要判断这层是否还有保留价值。</p>
 <p>第三，<strong>循环依赖</strong>：A 层依赖 B 层、B 层又依赖 A 层。这破坏了分层的封闭性。本意是"修改局部化"，循环依赖却把两个层的修改耦合在了一起。</p>
-<p>检验分层是否合理的三问，在 5.1 开头已经列过。这里补一个判据：“有没有引入新的抽象边界”是硬门槛——没引入新抽象的层，即使能独立测试、替换实现不牵动别层，也不合格。前两问只要有一问不合格（不能独立测试，或换实现会牵动别层），这层多半该并掉。</p>
+<p>检验一层是否值得保留，要看它有没有独立职责、能否限制变化的影响。难以独立测试或替换时，先找出共享状态和接口泄漏；没有收益的转发层可以合并，确有职责的层则应理清边界。</p>
 <p>我评审分层方案时必问一句：这一层挡住了什么变化？答不上来的层，就是我下一步要删的层；为"将来可能需要"预留的扩展点，我至今没见几个真用上的。</p>
 <h3 id="s118">启示五：移除失去价值的层，也是分层能力的一部分</h3>
 <p>随着系统演化，应持续审视分层，并删去失去价值的层。<a class="xref" href="#sec-5.3">5.3 节</a>讲的查询缓存就是例子，MySQL 在 8.0 中将它移除了。</p>
@@ -846,7 +846,7 @@ figcaption{color:var(--mute);font-size:.92em;margin-top:.6em;line-height:1.5}
 <p>这五条合起来看，分层要保留能支撑演进的核心抽象，也要允许内部实现调整。Redis 从一个缓存工具发展为支持多种数据结构、Function、Cluster 的多模数据库，robj 的类型/编码分离和命令表仍是组织核心代码的重要方式，结构布局和命令表实现则已经演进。MySQL 的 Handler API、Kafka 的 Log 抽象也体现了这一取舍：保留核心契约，让具体实现适应新需求。</p>
 <h2 id="sec-5.7">5.7 小结</h2>
 <p>回到本章开头的问题：为什么必须分层？分多深？层间靠什么通信？谁可以替换？三个软件用各自不同的形态解决了同一个问题：怎么把交互、逻辑、存储分开，且分得划算。</p>
-<p>Redis 的经验是：<strong>性能敏感处，分层要薄，跨层要直接</strong>。它用极少的层和函数调用把延迟降到亚毫秒，代价是放弃存储的可插拔。MySQL 走的是另一端，用 Handler API 接入几十种引擎，<strong>标准化接口能支撑起生态，但多态有开销</strong>。Kafka 需要处理跨 Broker 的网络通信，<strong>分层要为水平扩展服务</strong>：交互层是三者中最重的，用来利用多核；存储层做得最薄，以此支撑高吞吐。</p>
+<p>Redis 提醒我关注请求路径的开销，MySQL 提醒我为真实的替换需求保留接口，Kafka 则提醒我把功能职责、线程交接和跨机器通信分别看清。</p>
 <p><strong>分层的价值，是让每次修改都有明确的改动位置。</strong></p>
 <p>好分层下，加新功能、换实现、修 bug 各有各的落点；坏分层下，任何修改都牵动全局。区分好坏的标准，是边界画得准不准。</p>
 <p>本章把边界画清楚了，下一章（<a class="xref" href="06-security.html">第 6 章</a> 安全机制）就看这些边界怎么守住。认证、授权、加密、审计分别处理身份、操作范围、数据保护与事件记录；这些措施分布在请求链路和存储路径中。再往后，<a class="xref" href="07-cluster.html">第 7 章</a>集群架构会展开 Kafka 的协调层、Redis Cluster 的槽路由、MySQL MGR 的多数派。</p><nav class="page-nav"><a href="04-memory-disk.html">← 第 4 章 内存与磁盘 — 速度与持久化的平衡</a><a href="06-security.html">第 6 章 安全机制 — 权限、加密、审计 →</a></nav></article>

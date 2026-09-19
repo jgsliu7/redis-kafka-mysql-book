@@ -2,7 +2,7 @@
   "title": "第四章",
   "key": "book-review-0333f889923c7518c7b036aeec7b46fd6f3b791f-ch4-20260917:finals",
   "page": "/Users/liu/dev/demos/redis-kafka-books/0917/%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%B2%BE%E8%AF%BB%E5%AE%A1%E6%9F%A5_0333f889.html",
-  "exported_at": "2026-09-19T03:09:47.603Z",
+  "exported_at": "2026-09-19T10:52:57.556Z",
   "items": {
     "C04-01": {
       "final": "面对同一个问题，Redis、MySQL、Kafka 有三种分工方式：Redis 以内存为主，磁盘用于持久化和恢复；MySQL 用缓冲池加速磁盘数据的访问；Kafka 则把日志文件的缓存交给操作系统的 PageCache。",
