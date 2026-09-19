@@ -45,6 +45,7 @@ MARKER = '*_`'
 # 写回前对 final 做的体例级修正（不动字词，可审计）：title → [(原文片段, 修正片段)]
 NORMALIZE = {
     '第三章': [('“', '"'), ('”', '"')],  # 弯引号归一为本章一贯的直引号
+    '第四章': [('“', '"'), ('”', '"')],  # 同上（章内直引号 138 对 弯 1，弯者为待替换段存量）
 }
 
 # 建议稿更名后按全书体例须恢复的加粗引导句（报告是渲染纯文本带不出格式；
@@ -111,6 +112,27 @@ def transplant(raw_span, final):
     return result, dropped
 
 
+def runs_paired(seg):
+    """行内记号按 run 计数是否配对（`x` 成对、**x** 成对；孤立单 * 视为字面量忽略）。"""
+    return (len(re.findall(r'`+', seg)) % 2 == 0
+            and len(re.findall(r'\*{2,}', seg)) % 2 == 0)
+
+
+def expand_span(md, r0, r1):
+    """区间边界外扩吃进贴边记号字符。只外扩到能配对为止——报告引用常从
+    `code` 内部起止，盲目外扩可能抓进相邻 span 的开头记号，宁可逐候选试。"""
+    b = r0
+    while b > 0 and md[b - 1] in MARKER:
+        b -= 1
+    e = r1
+    while e < len(md) and md[e] in MARKER:
+        e += 1
+    for cand in ((r0, r1), (b, r1), (r0, e), (b, e)):
+        if runs_paired(md[cand[0]:cand[1]]):
+            return cand
+    return None
+
+
 def git_head(path):
     r = subprocess.run(['git', '-C', ROOT, 'show', 'HEAD:' + path],
                        capture_output=True, text=True)
@@ -157,19 +179,18 @@ def main():
             continue
         h = hits[0]
         r0, r1 = idx[h], idx[h + len(nold) - 1] + 1
-        while r0 > 0 and md[r0 - 1] in MARKER:    # 外扩吃进贴边记号，防拆对
-            r0 -= 1
-        while r1 < len(md) and md[r1] in MARKER:
-            r1 += 1
-        raw = md[r0:r1]
-        if raw.count('`') % 2 or raw.count('*') % 2:
-            print('%-7s ✗ 区间内 ` 或 * 记号不成对，转人工' % rid)
+        ext = expand_span(md, r0, r1)             # 外扩吃进贴边记号，防拆对
+        if ext is None:
+            print('%-7s ✗ 区间内 ` 或 * 记号无法配对，转人工' % rid)
             continue
+        r0, r1 = ext
+        raw = md[r0:r1]
         if fin == '' and it.get('suggested', '') != '':
             print('%-7s ✗ 定稿为空但建议稿非空（疑似误清空）' % rid)
             continue
         new_seg, dropped = transplant(raw, fin)
         assert normalize(new_seg)[0] == normalize(fin)[0], rid + ': 移植自洽断言失败'
+        assert runs_paired(new_seg), rid + ': 替换段记号失配'
         spans.append((r0, r1, rid, raw, new_seg, fin == old, dropped, struct_n))
 
     # 重叠检查（首尾相接允许）
@@ -200,8 +221,11 @@ def main():
         out.append(md[cursor:r0]); out.append(new_seg); cursor = r1
     out.append(md[cursor:])
     new_md = ''.join(out)
-    if new_md.count('`') % 2 or new_md.count('*') % 2:
-        raise SystemExit('合成全文 ` 或 * 记号不成对，中止（未写盘）')
+    # 全文记号 run 数与原文的差值必须为偶（替换只成对增删记号；原文可含字面 *）
+    d_bt = len(re.findall(r'`+', new_md)) - len(re.findall(r'`+', md))
+    d_st = len(re.findall(r'\*{2,}', new_md)) - len(re.findall(r'\*{2,}', md))
+    if d_bt % 2 or d_st % 2:
+        raise SystemExit('合成全文记号 run 差值为奇（`%d, **%d），中止（未写盘）' % (d_bt, d_st))
 
     if not write:
         print('\nDRY-RUN（未写盘）。确认后加 --write 执行。')
