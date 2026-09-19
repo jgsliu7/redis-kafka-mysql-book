@@ -2,7 +2,7 @@
   "title": "第七章",
   "key": "book-review-0333f889923c7518c7b036aeec7b46fd6f3b791f-ch7-20260917:finals",
   "page": "/Users/liu/dev/demos/redis-kafka-books/0917/%E7%AC%AC%E4%B8%83%E7%AB%A0%E7%B2%BE%E8%AF%BB%E5%AE%A1%E6%9F%A5_0333f889.html",
-  "exported_at": "2026-09-19T11:24:00.153Z",
+  "exported_at": "2026-09-19T15:15:05.192Z",
   "items": {
     "C07-01": {
       "final": "同样面对“单点不够用”，三个软件都要解决：数据怎么分，副本怎么配，故障后谁来接。不同之处在于，它们把哪些能力做进内核，又把哪些选择留给使用者。本章讨论拓扑与容错，具体复制过程留到第 9 章。",
